@@ -1,0 +1,14 @@
+^LICENSE\.md$
+^README\.Rmd$
+
+^\.github$
+
+^.*\.Rproj$
+^\.Rproj\.user$
+
+data-raw/*
+
+^README\.Rmd$
+vignettes/
+
+R-hdiAnalysis/*

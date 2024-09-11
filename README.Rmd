@@ -1,0 +1,91 @@
+---
+output: github_document
+---
+
+<!-- README.md is generated from README.Rmd. Please edit that file.
+Build with
+
+# load_all()
+rmarkdown::render("README.Rmd")
+
+which builds the .html that can be viewed locally (but isn't pushed to GitHub;
+GitHub uses README.md to make the page you see on GitHub). See pacea if want to
+save figures.
+-->
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "man/figures/README-",
+  out.width = "60%"
+)
+library(tibble)
+```
+
+# sizeSpectra2
+
+<!-- badges: start -->
+[![R-CMD-check](https://github.com/andrew-edwards/sizeSpectra2/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/andrew-edwards/sizeSpectra2/actions/workflows/R-CMD-check.yaml)
+[![Codecov test coverage](https://codecov.io/gh/andrew-edwards/sizeSpectra2/branch/main/graph/badge.svg)](https://app.codecov.io/gh/andrew-edwards/sizeSpectra2?branch=main)
+![Visitors](https://api.visitorbadge.io/api/visitors?path=https%3A%2F%2Fgithub.com%2Fandrew-edwards%2FsizeSpectra2&label=VISITORS&countColor=%23263759&style=flat&labelStyle=lower)
+<!-- badges: end -->
+
+A streamlined R package for fitting size spectra to ecological data
+
+Provides code for fitting size spectra to ecological data using maximum
+likelihood methods. This is a more user-friendly version of [sizeSpectra](https://github.com/andrew-edwards/sizeSpectra), being
+written from scratch (rather than adapting old code into a package), and with a
+focus on applying methods to users' data rather than reproducing results from
+our earlier papers. The methods used are described and fully simulation tested
+in our two earlier papers [1, 2].
+
+The size spectrum of an ecological community characterizes how a property, such as abundance or biomass, varies with body size. Size spectra are often used as ecosystem indicators of marine systems. Past applications have included groundfish trawl surveys, visual surveys of fish in kelp forests and coral reefs, sediment samples of benthic invertebrates and satellite remote sensing of chlorophyll, as well as terrestrial systems. Various methods have been used to fit size spectra over the past decades, and in [1] we tested eight of them and recommend the use of maximum likelihood. In [2] we extended the likelihood method to properly account for the bin structure of data.
+
+
+
+
+
+
+
+### References
+
+[1] **Testing and recommending methods for fitting size spectra to data** by Andrew M. Edwards, James P. W. Robinson, Michael J. Plank, Julia K. Baum and Julia L. Blanchard. ***Methods in Ecology and Evolution*** (2017, 8:57-67). Freely available at <http://onlinelibrary.wiley.com/doi/10.1111/2041-210X.12641/full>.
+
+[2] **Accounting for the bin structure of data removes bias when fitting size spectra** by Andrew M. Edwards, James P. W. Robinson, Julia L. Blanchard, Julia K. Baum and Michael J. Plank. ***Marine Ecology Progress Series*** (2020, 636:19-33). Freely available at <https://www.int-res.com/abstracts/meps/v636/p19-33/>.
+
+Could be useful template:
+
+* [results.html](http://htmlpreview.github.io/?https://github.com/andrew-edwards/hdiAnalysis/blob/main/vignettes/results.html)
+  -- Designed as a template for users to analyse their own data, by reproducing the results in
+  the manuscript as an example.
+* [results-extra.html](http://htmlpreview.github.io/?https://github.com/andrew-edwards/hdiAnalysis/blob/main/vignettes/results-extra.html)
+  -- Includes further results, calculations, explanations, and figure options.
+
+To run and adapt the code yourself, simply download the raw R Markdown files
+from
+[results.Rmd](https://github.com/andrew-edwards/hdiAnalysis/blob/main/vignettes/results.Rmd)
+or [results-extra.Rmd](https://github.com/andrew-edwards/hdiAnalysis/blob/main/vignettes/results-extra.Rmd).
+Run the file locally, and then adapt it for your own data.
+
+## Installation
+
+To install the latest version just:
+
+```
+install.packages("remotes")    # If you do not already have the "remotes" package
+
+remotes::install_github("andrew-edwards/sizeSpectra2")
+```
+
+If you get an error like
+```
+Error in utils::download.file(....)
+```
+then the connection may be timing out (this happens to me on our work network). Try
+
+```
+options(timeout = 1200)
+```
+and then try and install again. If you get a different error then post an Issue
+or contact <a href="mailto:andrew.edwards@dfo-mpo.gc.ca">Andy</a> for help.
