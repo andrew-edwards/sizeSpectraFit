@@ -17,6 +17,8 @@ coverage](https://codecov.io/gh/andrew-edwards/sizeSpectra2/branch/main/graph/ba
 
 A streamlined R package for fitting size spectra to ecological data
 
+**Under development**
+
 Provides code for fitting size spectra to ecological data using maximum
 likelihood methods. This is a more user-friendly version of
 [sizeSpectra](https://github.com/andrew-edwards/sizeSpectra), being
