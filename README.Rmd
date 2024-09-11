@@ -2,18 +2,19 @@
 output: github_document
 ---
 
-<!-- README.md is generated from README.Rmd. Please edit that file.
-Build with
+<!-- README.md is generated from README.Rmd. Please edit that file. -->
 
+```{r, instructions, eval = FALSE, include = FALSE}
+# Build with
 # load_all()
 rmarkdown::render("README.Rmd")
-
-which builds the .html that can be viewed locally (but isn't pushed to GitHub;
+```
+<!-- which builds the .html that can be viewed locally (but isn't pushed to GitHub;
 GitHub uses README.md to make the page you see on GitHub). See pacea if want to
 save figures.
 -->
 
-```{r, include = FALSE}
+```{r, setup, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
@@ -41,11 +42,6 @@ our earlier papers. The methods used are described and fully simulation tested
 in our two earlier papers [1, 2].
 
 The size spectrum of an ecological community characterizes how a property, such as abundance or biomass, varies with body size. Size spectra are often used as ecosystem indicators of marine systems. Past applications have included groundfish trawl surveys, visual surveys of fish in kelp forests and coral reefs, sediment samples of benthic invertebrates and satellite remote sensing of chlorophyll, as well as terrestrial systems. Various methods have been used to fit size spectra over the past decades, and in [1] we tested eight of them and recommend the use of maximum likelihood. In [2] we extended the likelihood method to properly account for the bin structure of data.
-
-
-
-Hello
-
 
 
 ### References
