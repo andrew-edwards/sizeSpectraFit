@@ -5,3 +5,7 @@
 .Rproj.user
 
 *.Rproj
+
+R-hdiAnalysis/
+R-sizeSpectra/
+tests/testthat-hdiAnalysis/

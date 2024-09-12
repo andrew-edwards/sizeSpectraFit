@@ -1,0 +1,489 @@
+---
+title: "Extra results and examples of code functionality"
+author: "Andrew Edwards"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Extra results and examples of code functionality}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+date: "Last rendered on `r format(Sys.time(), '%d %B, %Y')`"
+---
+
+<!-- To build either run
+rmarkdown::render("results-extra.Rmd")
+ or click the knit button in RStudio -->
+
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.width = 7,
+  fig.height = 6
+)
+```
+
+This vignette follows on from the `results.Rmd` vignette, including:
+
+- plotting of all density functions when multiple years of data are analysed
+ (specifically all years of recruitment shown in Figure 2A).
+- detailed demonstration of how intervals a and b are calculated in Fig. 1B
+- calculation on a longer MCMC chain that used for the hake assessment.
+- exporation of additional options for calculating HDIs, based on the kernel
+density estimate of the MCMC sample.
+- session information (documenting R and package version numbers).
+
+Set up:
+```{r setup}
+library(hdiAnalysis)
+library(dplyr)
+```
+
+## MCMC samples for multiple years -- recruitments as in Figure 2A but plotting the full distributions
+
+It is instructive to look at the full distributions of recruitment for each
+year.
+
+For the multiple years of MCMC samples of hake recruitment, we calculate the
+results as in `results.Rmd` (see that for more details) and plot the full
+distributions with ETI and HDI for each year.
+```{r hake_mcmc2}
+res_all_years <- create_intervals(dplyr::select(hake_recruitment_mcmc,
+                                                -"Virgin"))
+```
+
+The default plot (which uses `plot.intervals_density_list()`) is that shown in Figure 2A:
+```{r hake_mcmc7}
+plot(res_all_years,
+     xlab = "Year",
+     ylab = "Recruitment (billions of fish)")
+```
+
+To plot all density plots and ETIs for each year (equivalent to Figure 1A), the `type` argument is used
+(and we have changed the `fig.height` for the chunk, and specified `mfrow` as an
+argument, and fixed `xlim` so that it is the same for each plot). The year is
+automatically shown in each figure.
+```{r hake_mcmc9, fig.height = 80}
+plot(res_all_years,
+     type = "eti",
+     xlim = c(0, 40),
+     xlab = "Recruitment (billions of fish)",
+     mfrow = c(30, 2))  # 59 default
+```
+
+For the equvalent figures for HDIs, just change the `type` argument:
+```{r hake_mcmc9hdi, fig.height = 80}
+plot(res_all_years,
+     type = "hdi",
+     xlim = c(0, 40),
+     xlab = "Recruitment (billions of fish)",
+     mfrow = c(30, 2))  # 59 default
+```
+
+## Detailed explanation of calculation of intervals 'a' and 'b' in Figure 1A
+
+The calculation of intervals 'a' and 'b' in Fig. 1A is described in the Extended
+Methods, with explicit options given here to add helpful lines to further
+understanding:
+
+```{r ab}
+res_vec <- create_intervals(rec_2021)
+
+plot(res_vec,
+     type = "eti",
+     xlim = c(0, 40),
+     ylim = c(0, 0.11),
+     interval_arrows = TRUE,
+     xlab = "Recruitment (billions of age-0 fish)",
+     arrowhead_gap = 0.1,
+     explanatory_lines_a_b = TRUE)
+```
+
+This shows the ETI in Fig. 1A but with extra lines.
+Two of the vertical grey lines show the
+recruitment values at the ends of the ETI (at the red/blue boundaries), denoting
+the right ends of 'a' and 'b'. Horizontal grey lines show the densities at these
+two values; the intersection of these lines with the opposite limb of the
+distribution gives the other two vertical grey lines, defining the left ends
+of 'a' and 'b'. Therefore, 'a' and 'b' both span the same range of densities on
+the y-axis,
+but 'a' is outside of the ETI while 'b' is inside of it.
+
+Another undesirable feature of ETIs (for asymmetric distributions) is that there
+we can construct ranges `c` and `d` for which all values in `c` are more likely
+than those in `d`, yet `c` is outside the ETI and `d` is inside it:
+```{r green}
+plot(res_vec,
+     type = "eti",
+     xlim = c(0, 40),
+     ylim = c(0, 0.11),
+     interval_arrows = TRUE,
+     xlab = "Recruitment (billions of age-0 fish)",
+     arrowhead_gap = 0.1,
+     explanatory_lines_a_b = FALSE,
+     show_a_b = FALSE,
+     explanatory_lines_extra = TRUE)
+```
+
+Here, the horizontal green line is set (as an example) at the mean of the
+densities at the ends of the ETI (horizontal grey lines are as in the previous
+figure). Its intersections with the density curve define the left ends of `c`
+and `d`, and all values within `c` are more likely than all those in `d`, but
+`c` is outside the ETI and `d` is inside it. The green line can be placed at any
+point between the two grey lines to create such ranges `c` and `d`. This includes at
+the density corresponding the HDI, as in Figure 12.2 of Kruschke (2015; Doing
+Bayesian Data Analysis: A Tutorial with R, JAGS, and Stan. 2nd Edition).
+
+## Longer chain of 32,000 MCMC samples for hake recruitment in 2021
+
+We also analysed an experimental longer chain of 32,000 MCMC samples (that took
+several days to run), and results are similar to the standard chain of 8,000
+samples. Code is not run here (since the data object is large and so not included
+in the package) but results are presented below.
+
+```{r longchain, echo = FALSE, eval = FALSE}
+vec_long <- dplyr::pull(hake_recruitment_mcmc_14_long,
+                        "2021")
+
+res_vec_long <- create_intervals(vec_long)
+
+summary_table(res_vec_long)
+
+plot(res_vec_long,
+     type = "hdi",
+     xlim = c(0, 40),
+     ylim = c(0, 0.11),
+     interval_arrows = TRUE,
+     xlab = "Recruitment (billions of age-0 fish)",
+     arrowhead_gap = 0.1)
+# Density kernel is a bit smoother
+```
+
+| Quantity| Value | Interval width |
+| :-------| -----:| -----:|
+| Median  | 10.20 | -- |
+| ETI     | 4.05 -- 29.53 | 25.49 |
+| HDI     | 2.89 -- 25.23 | 22.34 |
+| Range a | 2.27 -- 4.05 | 1.78 |
+| Range b | 16.02 -- 29.53 | 13.52 |
+
+The slight differences between the HDI for this chain and the one used in the
+main results are small
+compared to the difference to the ETI (for either chain). The ETIs change
+slightly between chains due to randomness between them, and the median even
+changes very slightly.
+
+Also, the density values at the endpoints of the HDI are still not equal (they
+should be theoretically):
+```{r longchain2, eval = FALSE}
+> res_vec_long$interval$y_hdi_lower
+[1] 0.01026998
+> res_vec_long$interval$y_hdi_upper
+[1] 0.007201427
+```
+These are similar to the results for the original chain, suggesting long MCMC
+chains will not result in the densities at the HDI endpoints being exactly
+equal. This is likely due to the true bumpy shape of the posterior and the
+approximations from the kernel density estimate required to estimate the densities.
+
+Also, the integral over the HDI is estimated to be 94.7%, which is a slight
+improvement to the 94.5% for the original chain of 8,000 samples, but still not
+exactly 95%, such that the minor issue of the HDI not being exactly 95% is not
+resolved by using the longer chain.
+
+## Computing the HDI on the kernel density estimate
+
+Given the minor issue in Fig 1B that the densities at the endpoints of the HDI
+are not exactly equal, but they should be in theory, we also tried another
+approach to computing the HDI. This involved first calculating the kernel
+density estimate on the MCMC sample, and then using that to calculate the
+HDI. The HDInterval package includes the function
+\texttt{HDInterval::hdi.density()} to do this, which we incorporate into our
+`create_intervals()` function with the argument `density = TRUE`.
+
+So repeating our Fig. 1B of 2021 hake recruitment, but using the density option,
+we obtain:
+
+```{r density}
+res_2021_density <- create_intervals(rec_2021,
+                                     density = TRUE)
+res_2021_density$intervals %>% a()
+```
+with the main results being:
+```{r densitymain, results = "asis"}
+summary_table(res_2021_density)
+```
+The HDI is shifted downwards slightly from our default calculation of
+2.80--25.18, and is slightly narrower.
+
+The equivalent plot to our Fig. 1B for the calculated HDI is
+```{r densityplot}
+plot(res_2021_density,
+     xlim = c(0,40),
+     xlab = "Recruitment (billions of age-0 fish)")
+```
+in which we can see that the heights of the two endpoints are equal.
+
+Furthermore, the integral over the
+HDI is the theoretical 95%:
+```{r density4}
+res_2021_density$intervals$integral_hdi
+```
+
+One technical issue we resolved was that the default of 512 equally spaced points (`n`) at which to compute the kernal density
+estimate in the `density()` function, did not resolve the issue of unequal
+densities at the endpoints of the HDI.
+Setting the number of points to 512 here shows this:
+```{r n512}
+res_2021_n_512 <- create_intervals(rec_2021,
+                                   n = 512)
+plot(res_2021_n_512,
+     xlim = c(0, 40),
+     xlab = "Recruitment (billions of age-0 fish)")
+```
+
+We found that increasing `n` to 100,000 resolved this (this does not increase the wiggliness of the kernel density estimate,
+just the number of points at which it is calculated), and hence is set as the
+default in our `create_intervals()` function.
+
+So while the density approach (with `n=100,000`) did seem preferable, given the equal densities at
+the endpoints of the HDI, the following simple simulation experiment convinced
+us to stick with the moving-window approach. We present these results for
+interested users.
+
+## Simulation experiment
+
+We simulate 8,000 values from a lognormal distribution
+with mean on the log scale of 4 and standard deviation of 0.5, somewhat
+resembling our recruitment MCMC samples. We calculate the HDI using our default
+approach and with the density approach just described. We repeated this
+experiment 1,000 times, to compare the calculated HDI's with the known true
+theoretical values (because we know the true underlying distribution, unlike for
+our MCMC samples).
+
+The true theoretical values are calculated from the
+inverse cumulative distribution function for the lognormal
+distribution, using the \texttt{HDInterval::hdi.function()} function.
+
+```{r ints}
+mean_log <- 4
+sd_log <- 0.5
+n <- 8000
+
+# True theoretical values:
+hdi_true <- HDInterval::hdi(qlnorm,
+                            credMass = 0.95,
+                            meanlog = mean_log,
+                            sdlog = sd_log)
+hdi_true
+
+# Format into tibble output to match the $intervals output from `create_intervals()` to then
+# easily append the results of the simulation:
+ints_true <- tibble::tibble(median = qlnorm(0.5, mean_log, sd_log),
+                            eti_lower = qlnorm(0.025, mean_log, sd_log),
+                            eti_upper = qlnorm(0.975, mean_log, sd_log),
+                            hdi_lower = hdi_true["lower"],
+                            hdi_upper = hdi_true["upper"]) %>%
+  dplyr::mutate(width_eti = eti_upper - eti_lower,
+                width_hdi = hdi_upper - hdi_lower,
+                width_diff = width_eti - width_hdi,
+                a_lower = NA,
+                b_lower = NA,
+                i_eti_lower = NA,
+                y_eti_lower = dlnorm(eti_lower,
+                                     mean_log,
+                                     sd_log),
+                i_eti_upper = NA,
+                y_eti_upper = dlnorm(eti_upper,
+                                     mean_log,
+                                     sd_log),
+                i_hdi_lower = NA,
+                y_hdi_lower = dlnorm(hdi_lower,
+                                     mean_log,
+                                     sd_log),
+                i_hdi_upper = NA,
+                y_hdi_upper = dlnorm(hdi_upper,
+                                     mean_log,
+                                     sd_log),
+                hdi_height = NA,
+                integral_full = NA,
+                integral_eti = plnorm(eti_upper,
+                                     mean_log,
+                                     sd_log) -
+                               plnorm(eti_lower,
+                                      mean_log,
+                                      sd_log),
+                integral_hdi = plnorm(hdi_upper,
+                                     mean_log,
+                                     sd_log) -
+                               plnorm(hdi_lower,
+                                      mean_log,
+                                      sd_log),
+                warning = NA,
+                allow_hdi_zero = NA)
+
+ints_true %>% a()
+```
+
+We can see that the densities at the two ends of the HDI are (exactly) equal, as expected:
+```{r densitiesequal}
+ints_true$y_hdi_lower
+ints_true$y_hdi_upper
+```
+
+Now to do 1,000 simulations, and compare the results to the theoretical values:
+```{r simulations}
+num_sims <- 1000
+simulations <- list()
+# Set up a tibble to then add results for each simulation as a new row, with the
+# first row being the theoretical results obtained above:
+
+# Results when not using density option (our default):
+ints_simulations_density_false <- cbind(type = "theoretical",
+                                      ints_true)
+
+# Results when using density option:
+ints_simulations_density_true <- ints_simulations_density_false # same format
+
+for(i in 1:num_sims){
+  set.seed(i)
+  this_sim <- rlnorm(n,
+                     mean_log,
+                     sd_log)
+
+  # Not using density:
+  this_int_density_false <- create_intervals(this_sim,
+                                           density = FALSE)
+
+  ints_simulations_density_false <- rbind(ints_simulations_density_false,
+                                        cbind(type = i,
+                                              this_int_density_false$intervals))
+
+  # Using density:
+  this_int_density_true <- create_intervals(this_sim,
+                                           density = TRUE)
+
+  ints_simulations_density_true <- rbind(ints_simulations_density_true,
+                                        cbind(type = i,
+                                              this_int_density_true$intervals))
+}
+
+ints_simulations_density_false <- tibble::as_tibble(ints_simulations_density_false)
+ints_simulations_density_true <- tibble::as_tibble(ints_simulations_density_true)
+
+ints_simulations_density_false
+ints_simulations_density_true
+```
+
+So we have 1,000 HDIs for each option (using `density` or not), so plot the
+intervals and compare with the known values. Show the HDIs, including the first
+one that represents the theoretical HDI which we illustrate with in red, and
+plot vertical red lines for its endpoints, to compare with the simulated HDIs:
+```{r plotints}
+# Set up plot
+plot(range(c(ints_simulations_density_false$hdi_lower,
+             ints_simulations_density_false$hdi_upper)),
+     c(1, nrow(ints_simulations_density_false)),
+     type = "n",
+     xlab = "95% interval",
+     ylab = "Simulation row number",
+     main = "Intervals with density = FALSE")
+
+lines(c(ints_simulations_density_false[1, "hdi_lower"],
+        ints_simulations_density_false[1, "hdi_upper"]),
+      c(1, 1),
+      col = "red")
+for(i in 1:num_sims){
+  lines(c(ints_simulations_density_false[i+1, "hdi_lower"],
+        ints_simulations_density_false[i+1, "hdi_upper"]),
+      c(i+1, i+1),
+      col = "black")
+}
+abline(v = c(ints_simulations_density_false[1, "hdi_lower"],
+             ints_simulations_density_false[1, "hdi_upper"]),
+       col = "red")
+```
+
+These look okay, but to more clearly compare we show histograms of lower and
+upper HDI values compared to true theoretical value (includes the
+theoretical value in the histogram):
+```{r checklower}
+hist(ints_simulations_density_false$hdi_lower,
+     xlab = "HDI lower value",
+     main = "Lower HDI with density = FALSE")
+abline(v = ints_simulations_density_false[1, "hdi_lower"], col = "red")
+
+hist(ints_simulations_density_false$hdi_upper,
+     xlab = "HDI upper value",
+     main = "Upper HDI with density = FALSE")
+abline(v = ints_simulations_density_false[1, "hdi_upper"], col = "red")
+```
+
+The actual numbers of simulated lower endpoints of HDI above the true value is
+```{r calcnums}
+sum(ints_simulations_density_false$hdi_lower[-1] > ints_simulations_density_false$hdi_lower[1])
+```
+and the number of upper endpoints above the true value is
+```{r calcnumupper}
+sum(ints_simulations_density_false$hdi_upper[-1] > ints_simulations_density_false$hdi_upper[1])
+```
+So not exactly half (`r num_sims/2`), but okay.
+
+Now to do the same plots for the results when using the density approach to
+calculating the HDIs:
+```{r plotintsdens}
+# Set up plot
+plot(range(c(ints_simulations_density_true$hdi_lower,
+             ints_simulations_density_true$hdi_upper)),
+     c(1, nrow(ints_simulations_density_true)),
+     type = "n",
+     xlab = "95% interval",
+     ylab = "Simulation row number",
+     main = "Intervals with density = TRUE")
+
+lines(c(ints_simulations_density_true[1, "hdi_lower"],
+        ints_simulations_density_true[1, "hdi_upper"]),
+      c(1, 1),
+      col = "red")
+for(i in 1:num_sims){
+  lines(c(ints_simulations_density_true[i+1, "hdi_lower"],
+        ints_simulations_density_true[i+1, "hdi_upper"]),
+      c(i+1, i+1),
+      col = "black")
+}
+abline(v = c(ints_simulations_density_true[1, "hdi_lower"],
+             ints_simulations_density_true[1, "hdi_upper"]),
+       col = "red")
+```
+
+These do not look great at the low end, as we can see from the histogram (the one
+value on the right in the first panel is indeed the true theoretical value as
+it's included in the tibble of lower HDI values):
+```{r checklowerdens}
+hist(ints_simulations_density_true$hdi_lower,
+     xlab = "HDI lower value",
+     main = "Lower HDI with density = TRUE")
+abline(v = ints_simulations_density_true[1, "hdi_lower"], col = "red")
+
+hist(ints_simulations_density_true$hdi_upper,
+     xlab = "HDI upper value",
+     main = "Upper HDI with density = TRUE")
+abline(v = ints_simulations_density_true[1, "hdi_upper"], col = "red")
+```
+
+The actual numbers of simulated lower endpoints of HDI above the true value is
+```{r calcnums2}
+sum(ints_simulations_density_true$hdi_lower[-1] > ints_simulations_density_true$hdi_lower[1])
+```
+and the number of upper endpoints above the true value is
+```{r calcnumupper2}
+sum(ints_simulations_density_true$hdi_upper[-1] > ints_simulations_density_true$hdi_upper[1])
+```
+
+So these values are quite a way off being the desired half (`r num_sims/2`). This convinced us to stick with the simpler no-density method.
+
+## Session information
+
+```{r sessioninfo}
+sessionInfo()
+```
