@@ -7,6 +7,6 @@
 # * https://testthat.r-lib.org/articles/special-files.html
 
 library(testthat)
-library(hdiAnalysis)
+library(sizeSpectra2)
 
-test_check("hdiAnalysis")
+test_check("sizeSpectra2")
