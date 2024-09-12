@@ -12,3 +12,4 @@ data-raw/*
 vignettes/
 
 R-hdiAnalysis/*
+R-sizeSpectra/*
