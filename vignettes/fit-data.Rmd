@@ -40,9 +40,10 @@ are included as the data object `sim_vec` (which stands for simulated vector) in
 sizeSpectra2, and so we can just use that.
 
 ```{r MLE1}
-sim_vec[1:10]
+sim_vec[1:15]
 res_vec <- fit_size_spectrum(sim_vec)
-res_vec    # full list, so do something simpler
+res_vec    # summarised results, including just first 10 of the input
+length(res_vec$x)
 
 ```
 

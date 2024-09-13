@@ -73,7 +73,7 @@ fit_size_spectrum.numeric <- function(dat,
               b_conf = b_conf,
               x = x)
 
-  class(res) = c("size_spectrum",
+  class(res) = c("size_spectrum_numeric",
                  class(res))
 
   return(res)

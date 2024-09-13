@@ -76,10 +76,10 @@ zero or be negative; if FALSE (the default) then do not allow this
 \value{
 \itemize{
 \item If \code{dat} is numeric then returns a list object of class
-\code{intervals_density} (such that we can plot it
-with \code{plot.intervals_density()}, with objects:
+\code{size_spectrum_numeric} (such that we can plot it
+with \code{\link[=plot.size_spectrum_numeric]{plot.size_spectrum_numeric()}}, with objects:
 \itemize{
-\item intervals: one-row tibble with columns:
+\item TODOintervals: one-row tibble with columns:
 \itemize{
 \item median: median of the data
 \item eti_lower: lower end of the ETI

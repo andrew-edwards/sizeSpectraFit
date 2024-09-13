@@ -60,9 +60,9 @@
 ##'
 ##' @return
 ##' * If `dat` is numeric then returns a list object of class
-##'   `intervals_density` (such that we can plot it
-##'   with `plot.intervals_density()`, with objects:
-##'   * intervals: one-row tibble with columns:
+##'   `size_spectrum_numeric` (such that we can plot it
+##'   with [plot.size_spectrum_numeric()], with objects:
+##'   * TODOintervals: one-row tibble with columns:
 ##'     * median: median of the data
 ##'     * eti_lower: lower end of the ETI
 ##'     * eti_upper: upper end of the ETI
