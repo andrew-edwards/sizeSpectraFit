@@ -42,11 +42,14 @@ sizeSpectra2, and so we can just use that.
 ```{r MLE1}
 sim_vec[1:15]
 res_vec <- fit_size_spectrum(sim_vec)
-res_vec    # summarised results, including just first 10 of the input
-length(res_vec$x)
+res_vec    # We have set it up to just print the MLE results plus only the first
+           # 10 values of the original data, sim_vec. To see all the data just do:
+# res_vec$x    # This will print all 1000 values
+length(res_vec$x)   # Confirms there are still 1000 values
 
 ```
 
+Next, do a figure.
 
 [1](http://onlinelibrary.wiley.com/doi/10.1111/2041-210X.12641/full)
 

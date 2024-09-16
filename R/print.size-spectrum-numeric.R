@@ -22,5 +22,7 @@ print.size_spectrum_numeric <- function(res,
   res_to_print$x <- head(res$x,
                          10)
   class(res_to_print) <- "list"    # So that it does not print all the attributes
-  print.default(res_to_print)
+
+  print.default(res_to_print,
+                ...)
 }
