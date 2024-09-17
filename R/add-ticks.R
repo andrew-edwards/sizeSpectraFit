@@ -86,11 +86,8 @@ add_ticks = function(log = "",
 
 
 
-
-
-
-
-##' Add tickmarks to an existing plot; from pacea, may want to use some.
+##' Add tickmarks to an existing plot; from pacea, may want to use some. TODO
+##' then delete
 ##'
 ##' Add sensible smaller (unlabelled) tickmarks to both axes of an existing
 ##' pacea temporal plot. Called from `plot.pacea_index()`,
