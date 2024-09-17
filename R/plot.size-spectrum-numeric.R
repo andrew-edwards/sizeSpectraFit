@@ -142,7 +142,7 @@ plot.size_spectrum_numeric <- function(res,
               max(x),
               length=1000)     # x values to plot PLB
   y_plb = (1 - pPLB(x = x_plb,
-                    b = res_vec$b_mle,
+                    b = res$b_mle,
                     xmin = min(x_plb),
                     xmax = max(x_plb))) * length(x)
   lines(x_plb,
@@ -150,10 +150,10 @@ plot.size_spectrum_numeric <- function(res,
         col="red")
 
   if(plot_conf_ints){
-    for(i in 1:length(res_vec$b_conf)){
+    for(i in 1:length(res$b_conf)){
       lines(x_plb,
             (1 - pPLB(x = x_plb,
-                      b = res_vec$b_conf[i],
+                      b = res$b_conf[i],
                       xmin = min(x_plb),
                       xmax = max(x_plb))) * length(x), # TODO make more negative
                                         # I think, see other example
