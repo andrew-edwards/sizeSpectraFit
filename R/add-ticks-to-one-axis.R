@@ -1,15 +1,26 @@
 ##' Add ticks and labels to one axis
+##'
+##' Called from [add_ticks()] which is called from [plot.size_spectrum_numeric()].
+##' @param log_scale logical, whether not this axis is on the log10 scale
+##' @param x_or_y character, either "x" or "y" to specify which axis the tick
+##'   marks and labels are being added to
+##' @param big_ticks, big_ticks_labels, small_ticks, small_ticks_by,
+##'   small_ticks_labels See corresponding `x_...` definitions in
+##'   [plot.size_spectrum_numeric()].
+##' @inherit plot.size_spectrum_numeric
+##' @return adds tickmarks to one axis of a plot. Returns invisible.
+##' @export
+##' @author Andrew Edwards
 add_ticks_to_one_axis <- function(log_scale,
                                   x_or_y,
-                                  mgp_val,
                                   tcl_small,
+                                  mgp_val,
                                   big_ticks,
                                   big_ticks_labels,
                                   small_ticks,
                                   small_ticks_by,
                                   small_ticks_labels){
   ll = 1:9
-  # log10_ll = log10(ll)  not needed?
 
   if(x_or_y == "x"){
     axis_to_do <- 1
@@ -94,7 +105,7 @@ add_ticks_to_one_axis <- function(log_scale,
                        length = par(axp)[3] + 1)
       # Not really, but just need the max and min below.
     }
-browser()
+
     # Small ticks if specified
     if(!is.null(small_ticks)){
       axis(axis_to_do,

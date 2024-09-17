@@ -1,20 +1,25 @@
 ##' Single plot of individual size distribution of values and the MLE fit with confidence intervals
 ##'
-##' Plot the results from a fit to a vector of values, as in Figure 2h and 6b of
-##' [1](http://onlinelibrary.wiley.com/doi/10.1111/2041-210X.12641/full).
+##' Plot the results from a PLB fit to a vector of values, as in Figure 2h and 6b of
+##' [1](http://onlinelibrary.wiley.com/doi/10.1111/2041-210X.12641/full). Also
+##' shows PLB fits using the values of `b` at the ends of the confidence intervals.
 ##' TODO add argument to do all of Figure 6.
 ##'
 ##' @param res size_spectrum_numeric object, as output from
 ##'   [fit_size_spectrum.numeric()], which gets called when applying
 ##'   [fit_size_spectrum()] to a numeric vector
-##'
-##'
-##' @param panel Which panel number for multi-panel plots. `"h"` gives the
-##'   method and MLE estimate (as in MEE Figure 2(h)), `"b"` gives just (b) as
-##'   in Figure 6(b) and plots confidence interval curves, and NULL gives nothing.
-##' @param log.xy Which axes to log, for `plot(..., log = log.xy)`. So "xy" for
+##' @param log Which axes to log, for `plot(..., log = log)`. So "xy" for
 ##'   log-log axes, "x" for only x-axis logged.
-##' @param mgpVals mgp values to use, as in `plot(..., mgp = mgpVals)`.
+##' @param plot_conf_ints logical whether to plot PLB fit for confidence
+##'   intervals or not
+##' @param xlab, ylab x/y labels, explicitly given default values here which can
+##'   be modified as required.
+##' @param mgp_val mgp values to use, as in `plot(..., mgp = mgp_vals)`; see [?par].
+##' @param tcl_small Length of small tickmarks; see [?axis].
+##' @param legend_text text to put in the corner, defaults to `b = <value>`. Set to
+##'   `NA` to have none, and modify default if needed.
+##' @param legend_position where to place legend, gets used as the first
+##'   argument in [legend()].
 ##' @param inset Inset distance for legend
 ##' @param x_big_ticks, y_big_ticks numeric vector of big tick marks on
 ##'   x-axis/y-axis. If NULL then gets done automatically, so if that does not
@@ -33,11 +38,10 @@
 ##' @param x_small_ticks_labels, y_small_ticks_labels numeric vector of big tick
 ##'   marks to label on x-axis/y-axis. If NULL then gets done automatically, so
 ##'   if that does not look good then define explicitly here
-##' @param xlim_global Define global x-axis limits
-##' @param ylim_global Define global y-axis limits
 ##' @param ... Further arguments for `plot()`
 ##' @return Single figure of ISD on log-log plot (or log-linear depending on the
-##'   options given).
+##'   options given), with values as points and PLB fit (and fits of confidence
+##'   limits) as solid (and dashed) lines.
 ##'
 ##' @export
 ##' @author Andrew Edwards
@@ -47,13 +51,18 @@
 ##' plot(res_vec)
 ##' plot(res_vec, x_small_ticks_labels = c(5, 50, 500), log = "x")
 plot.size_spectrum_numeric <- function(res,
-                                       panel = FALSE,
                                        log = "xy",
+                                       plot_conf_ints = TRUE,
                                        xlab = expression(paste("Values, ", italic(x))),
                                        ylab = expression( paste("Number of ", values >= x), sep=""),
                                        mgp_val = c(1.6, 0.5, 0),
-                                       inset = c(0, -0.04),
                                        tcl_small = -0.2,
+                                       legend_text = expression(paste("b=",
+                                                                      signif(res$b_mle,
+                                                                             3),
+                                                                      sep="")),
+                                       legend_position = "topright",
+                                       inset = c(0, 0),
                                        x_big_ticks = NULL,
                                        x_big_ticks_labels = NULL,
                                        x_small_ticks = NULL,
@@ -116,15 +125,7 @@ plot.size_spectrum_numeric <- function(res,
     y_small_ticks_by = y_small_ticks_by,
     y_small_ticks_labels = y_small_ticks_labels)
 
-
   box()
-
-
-  ## if(log.xy == "xy"){
-  ##   logTicks(xLim,
-  ##            yLim,
-  ##            xLabelSmall = c(5, 50, 500))   # Tick marks.
-  ## }
 
   ## if(log.xy == "x"){
   ##   mgpVal = c(2, 0.5, 0)
@@ -132,53 +133,43 @@ plot.size_spectrum_numeric <- function(res,
   ##        yLim = NULL,
   ##        xLabelSmall = c(5, 50, 500),
   ##        mgpVal = mgpVal)
-  ##   yBig = c(0, 500, 1000)
-  ##   # Big labelled:
-  ##   axis(2,
-  ##        at = yBig,
-  ##        labels = yBig,
-  ##        mgp = mgpVal)
-  ##   # Small unlabelled:
-  ##   axis(2,
-  ##        seq(yBig[1],
-  ##            yBig[length(yBig)],
-  ##            by = 100),
-  ##    labels = rep("", 11),
-  ##    tcl = -0.2,
-  ##    mgp = mgpVal)
-  ##   }
-  if(FALSE){  # just ignore this for now
+
   x_plb = seq(min(x),
               max(x),
               length=1000)     # x values to plot PLB
   y_plb = (1 - pPLB(x = x_plb,
-                    b = res$b_mle,
+                    b = res_vec$b_mle,
                     xmin = min(x_plb),
                     xmax = max(x_plb))) * length(x)
   lines(x_plb,
         y_plb,
         col="red")
-  if(panel == "b"){
+
+  if(plot_conf_ints){
     for(i in 1:length(res_vec$b_conf)){
       lines(x_plb,
-      (1 - pPLB(x = x_plb,
+            (1 - pPLB(x = x_plb,
                       b = res_vec$b_conf[i],
                       xmin = min(x_plb),
-                      xmax = max(x_plb))) * length(x),
-            col="red",
-            lty=2)
+                      xmax = max(x_plb))) * length(x), # TODO make more negative
+                                        # I think, see other example
+      col="red",
+      lty=2)
     }
+  }
+
+  if(!is.na(as.character(legend_text))){
     legend("topright",
-           "(b)",
+           eval(legend_text),
            bty = "n",
            inset = inset)
   }
-  if(panel == "h"){
-    legJust(c("(h) MLE",
-            paste("b=", signif(b, 3), sep="")),
-            inset=inset,
-            logxy=TRUE)
-  }
-  }
 
+    # Original code had this, may need but doubt it
+    # if(panel == "h"){
+    # legJust(c("(h) MLE",
+    #             paste("b=", signif(b, 3), sep="")),
+    #           inset=inset,
+    #           logxy=TRUE)
+    # }
 }

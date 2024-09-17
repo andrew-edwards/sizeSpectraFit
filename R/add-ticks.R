@@ -1,28 +1,21 @@
-##' Add axes and tick marks to a plot, including for log axes to represent
-##' unlogged values.
+##' Add labelled and unlabelled tick marks to a plot, for linear or log axes
+##' (where labels represent unlogged values),
+##' calculated automatically if needed, or can be explicitly specified.
 ##'
 ##' Useful because you can then interpret the unlogged values, e.g. Figures 2(h)
-##' and 6(b) of MEE paper and Figure 7 of MEPS paper.
+##' and 6(b) of MEE paper and Figure 7 of MEPS paper. `log` argument needs to
+##' match the original [plot()] call (this is not checked).
 ##'
-##' @param xLim the x limits for the plot (unlogged scale); if NULL then do not
-##'   add anything to x-axis
-##' @param yLim  the y limits for the plot (unlogged scale); if NULL then
-##'   do not add anything to y-axis
-##' @param tclSmall size of small tick marks
-##' @param xLabelSmall which small tick marks on x-axis to label
-##' @param yLabelSmall which small tick marks on y-axis to label
-##' @param xLabelBig which big tick marks on the x-axis to label
-##'   (when automated they can overlap, so may need to specify)
-##' @param mgpVal `mgp` values for axes. See `?par`
 ##' @inherit plot.size_spectrum_numeric
-##' @return Adds axes and big and small tick marks to the plot. Returns NULL
+##' @return Adds axes and big and small tick marks to the plot. Returns invisible.
 ##' @examples
 ##' \dontrun{
-##' # Adapt the following (could make an explicit example):
-##'   plot(..., log="xy", xlab=..., ylab=..., xlim=..., ylim=..., axes=FALSE)
-##'   xLim = 10^par("usr")[1:2]
-##'   yLim = 10^par("usr")[3:4]
-##'   logTicks(xLim, yLim, xLabelSmall = c(5, 50, 500))
+##' plot(1:10, axes = FALSE)
+##' add_ticks()
+##' box()
+##' plot(1:1000, axes = FALSE, log = "xy")
+##' add_ticks(log = "xy")
+##' box()
 ##' }
 ##' @export
 ##' @author Andrew Edwards
@@ -85,4 +78,5 @@ add_ticks = function(log = "",
                           small_ticks_by = y_small_ticks_by,
                           small_ticks_labels = y_small_ticks_labels)
   }
+  invisible()
 }
