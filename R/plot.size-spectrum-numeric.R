@@ -25,18 +25,21 @@
 ##' @export
 ##' @author Andrew Edwards
 plot.size_spectrum_numeric <- function(res,
-                     panel = FALSE,
-                     log = "xy",
-                     xlab = expression(paste("Values, ", italic(x))),
-                     ylab = expression( paste("Number of ", values >= x), sep=""),
-                     mgp_val = c(1.6, 0.5, 0),
-                     inset = c(0, -0.04),
-                     tcl_small = -0.2,
-                     x_label_small = NULL,
-                     x_label_big = NULL,
-                     x_tick_by = 10,   # linear axis, small ticks. Give a better name
-                     ...
-                     ){
+                                       panel = FALSE,
+                                       log = "xy",
+                                       xlab = expression(paste("Values, ", italic(x))),
+                                       ylab = expression( paste("Number of ", values >= x), sep=""),
+                                       mgp_val = c(1.6, 0.5, 0),
+                                       inset = c(0, -0.04),
+                                       tcl_small = -0.2,
+                                       x_label_small = NULL,
+                                       x_label_big = NULL,
+                                       x_tick_by = 10,   # linear axis, small
+                                       # ticks. Give a better name
+                                       x_ticks_linear_default = TRUE,
+                                       y_ticks_linear_default = TRUE,
+                                       ...
+                                       ){
 
   x <- res$x
 
@@ -79,11 +82,15 @@ plot.size_spectrum_numeric <- function(res,
     x_tick_big_labels = NULL,  # vector of values of big
           # tickmarks to add labels
     x_tick_small_labels = NULL,  # vector of values of small
-          # ticks to add labels to
+    # ticks to add labels to
+    x_ticks_linear_default = x_ticks_linear_default,   # if TRUE and linear axis used then default
+                                     # tick marks are used; to tailor them set
+                                     # to FALSE and specify in x_tick_start etc.
     y_tick_start = y_tick_start,
     y_tick_by = y_tick_by,
     y_tick_end = y_tick_end,
-    y_tick_big_labels = NULL) # y_tick_big_labels)
+    y_tick_big_labels = NULL,
+    y_ticks_linear_default = y_ticks_linear_default)
 
   box()
 

@@ -34,11 +34,13 @@ add_ticks = function(log = "",
                      x_tick_big_labels = NULL,  # vector of values of big
                      # tickmarks to add labels
                      x_tick_small_labels = NULL,  # vector of values of small
-                                        # ticks to add labels to
+                     # ticks to add labels to
+                     x_ticks_linear_default = NULL,
                      y_tick_start = NULL,
                      y_tick_by = NULL,
                      y_tick_end = NULL,
-                     y_tick_big_labels = NULL
+                     y_tick_big_labels = NULL,
+                     y_ticks_linear_default = NULL
                      ){
 #                    xLabelSmall = NULL,
 #                    yLabelSmall = NULL,
@@ -49,7 +51,8 @@ add_ticks = function(log = "",
   if(log %in% c("x", "xy")){
     add_ticks_to_one_axis(log_scale = TRUE,
                           x_or_y = "x",
-                          increment = x_tick_by,   # only for linear axis
+                          ticks_default = x_ticks_linear_default, # only for
+                                        # linear, so ignored here
                           tick_big_labels = x_tick_big_labels,
                           tick_small_labels = x_tick_small_labels,
                           mgp_val = mgp_val,
@@ -57,7 +60,7 @@ add_ticks = function(log = "",
   } else {
     add_ticks_to_one_axis(log_scale = FALSE,
                           x_or_y = "x",
-                          increment = x_tick_by,   # only for linear axis
+                          ticks_default = x_ticks_linear_default,
                           tick_big_labels = x_tick_big_labels,
                           tick_small_labels = x_tick_small_labels,
                           mgp_val = mgp_val,
@@ -85,77 +88,9 @@ add_ticks = function(log = "",
 
 
 
-##' Add ticks and lable to one axis
-add_ticks_to_one_axis <- function(log_scale,
-                                  x_or_y,
-                                  increment,
-                                  tick_big_labels,
-                                  tick_small_labels,
-                                  mgp_val,
-                                  tcl_small){
-  ll = 1:9
-  # log10_ll = log10(ll)  not needed?
-
-  if(x_or_y == "x"){
-    axis_to_do <- 1
-    lim <- par("usr")[1:2]   # But 10^ this below if logscale
-  } else {
-    axis_to_do <- 2
-    lim <- par("usr")[3:4]
-  }
-
-  if(log_scale){
-    lim <- 10^lim
-    # Do enough tick marks to encompass axes:
-    encompass_log <- c(floor(log10(lim[1])),
-                       ceiling(log10(lim[2])))
-    big <- 10^c(encompass_log[1]:encompass_log[2])
-  } else {
-# HERE, figure out what to do with ticks on linear. Add small and big options to plot.size_spectrum_numeric()
-    big <- seq(0.9 * lim[1],
-               1.1 * lim[2],
-               by = increment)
-  }
-
-  # Big unlabelled, always want these:
-  axis(axis_to_do,
-       at = big,
-       labels = rep("", length(big)),
-       mgp = mgp_val)
-
-  # Big labelled, if not specified then label them all
-  if(is.null(tick_big_labels)){
-    tick_big_labels = big
-  }
-  axis(axis_to_do,
-       at = tick_big_labels,
-       labels = tick_big_labels,
-       mgp = mgp_val)
-
-  # Small unlabelled:
-  axis(axis_to_do,
-       big %x% ll,
-       labels=rep("",
-                  length(big %x% ll)),
-       tcl = tcl_small)
-
-  # Small labelled:
-  if(!is.null(tick_small_labels)){
-    axis(axis_to_do,
-         at = tick_small_labels,
-         labels = tick_small_labels,
-         mgp = mgp_val,
-         tcl = tcl_small)
-  }
-}
 
 
-
-
-
-
-
-##' Add tickmarks to an existing plot
+##' Add tickmarks to an existing plot; from pacea, may want to use some.
 ##'
 ##' Add sensible smaller (unlabelled) tickmarks to both axes of an existing
 ##' pacea temporal plot. Called from `plot.pacea_index()`,
