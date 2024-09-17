@@ -13,11 +13,20 @@
 
 \item{...}{Further arguments passed onto \code{\link[=print.default]{print.default()}}}
 }
+\value{
+Invisible, as for for \code{\link[=print.default]{print.default()}}.
+}
 \description{
 Since the raw data are included in the output from
-\code{\link[=fit_size_spectrum.numeric]{fit_size_spectrum.numeric()}}, the default \code{\link[=print]{print()}} will print all values,
+\code{\link[=fit_size_spectrum.numeric]{fit_size_spectrum.numeric()}}, the default \code{\link[=print]{print()}} would print all values,
 so here we provide condensed output, and do not print the class attribute
 (namely \code{size_spectrum_numeric} and \code{list}).
+}
+\examples{
+\dontrun{
+res_vec <- fit_size_spectrum(sim_vec)
+res_vec
+}
 }
 \author{
 Andrew Edwards

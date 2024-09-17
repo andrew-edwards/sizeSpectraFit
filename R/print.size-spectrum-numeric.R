@@ -13,6 +13,7 @@
 ##' @export
 ##' @author Andrew Edwards
 ##' @examples
+##' \dontrun{
 ##' res_vec <- fit_size_spectrum(sim_vec)
 ##' res_vec
 ##' }

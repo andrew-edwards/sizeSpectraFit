@@ -8,17 +8,18 @@
 ##'
 ##' @inherit plot.size_spectrum_numeric
 ##' @return Adds axes and big and small tick marks to the plot. Returns invisible.
+##' @export
+##' @author Andrew Edwards
 ##' @examples
 ##' \dontrun{
 ##' plot(1:10, axes = FALSE)
 ##' add_ticks()
 ##' box()
+##'
 ##' plot(1:1000, axes = FALSE, log = "xy")
 ##' add_ticks(log = "xy")
 ##' box()
 ##' }
-##' @export
-##' @author Andrew Edwards
 add_ticks = function(log = "",
                      tcl_small = -0.2,
                      mgp_val = c(1.6, 0.5, 0),

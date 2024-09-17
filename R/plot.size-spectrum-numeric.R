@@ -50,6 +50,7 @@
 ##' res_vec <- fit_size_spectrum(sim_vec)
 ##' plot(res_vec)
 ##' plot(res_vec, x_small_ticks_labels = c(5, 50, 500), log = "x")
+##' }
 plot.size_spectrum_numeric <- function(res,
                                        log = "xy",
                                        plot_conf_ints = TRUE,
