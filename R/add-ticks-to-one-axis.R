@@ -6,6 +6,7 @@ add_ticks_to_one_axis <- function(log_scale,
                                   big_ticks,
                                   big_ticks_labels,
                                   small_ticks,
+                                  small_ticks_by,
                                   small_ticks_labels){
   ll = 1:9
   # log10_ll = log10(ll)  not needed?
@@ -82,9 +83,19 @@ add_ticks_to_one_axis <- function(log_scale,
     } else {
       axis(axis_to_do,
            mgp = mgp_val)
-    }
+      if(axis_to_do == 1){
+        axp <- "xaxp"
+      } else {
+        axp <- "yaxp"
+      }
 
-    # Small ticks, if not specified then do none.
+      big_ticks <- seq(par(axp)[1],
+                       par(axp)[2],
+                       length = par(axp)[3] + 1)
+      # Not really, but just need the max and min below.
+    }
+browser()
+    # Small ticks if specified
     if(!is.null(small_ticks)){
       axis(axis_to_do,
            small_ticks,
@@ -93,13 +104,54 @@ add_ticks_to_one_axis <- function(log_scale,
            tcl = tcl_small)
     }
 
-    # Small labelled:
+    # Small ticks if not specified then create them, unless small_ticks_by is
+    #  NA then just add none. Cannot do is.na(NULL) so have to get creative.
+    if(is.null(small_ticks)){          # Going to create them
+      add_these_ticks <- TRUE
+      if(!is.null(small_ticks_by)){    # Could still be NA
+        if(!is.na(small_ticks_by)){
+          small_ticks <- seq(min(big_ticks),
+                             max(big_ticks),
+                             small_ticks_by) # Could maybe check divisible
+          # Then extend 20% of number of values each way to ensure full coverage.
+          small_ticks <- seq(min(small_ticks) - floor(0.2 * length(small_ticks)) *
+                               small_ticks_by,
+                             max(small_ticks) + floor(0.2 * length(small_ticks)) *
+                               small_ticks_by,
+                             small_ticks_by)
+        } else {
+          add_these_ticks <- FALSE
+        }
+      } else {       # small_ticks_by is NULL and so is small_ticks, so create ticks
+        small_ticks_by <- (big_ticks[2] - big_ticks[1])/10 # TODO small_ticks_per_big
+        small_ticks <-  seq(min(big_ticks),
+                            max(big_ticks),
+                            small_ticks_by) # Could maybe check divisible
+        # Then extend 20% of number of values each way to ensure full coverage.
+          small_ticks <- seq(min(small_ticks) - floor(0.2 * length(small_ticks)) *
+                             small_ticks_by,
+                             max(small_ticks) + floor(0.2 * length(small_ticks)) *
+                             small_ticks_by,
+                             small_ticks_by)
+      }
+
+      if(add_these_ticks){
+        axis(axis_to_do,
+             small_ticks,
+             labels=rep("",
+                        length(small_ticks)),
+             tcl = tcl_small)
+      }
+    }
+
+    # Small labelled (even if small_ticks not specified)
     if(!is.null(small_ticks_labels)){
       axis(axis_to_do,
            at = small_ticks_labels,
            labels = small_ticks_labels,
            mgp = mgp_val,
            tcl = tcl_small)
+
     }
   }
 }

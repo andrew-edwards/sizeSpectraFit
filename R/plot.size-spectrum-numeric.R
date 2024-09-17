@@ -23,7 +23,13 @@
 ##'   marks to label on x-axis/y-axis. If NULL then gets done automatically, so
 ##'   if that does not look good then define explicitly here
 ##' @param x_small_ticks, y_small_ticks  numeric vector of small tick marks on x-axis/y-axis. If
-##'   NULL then gets done automatically, so if that does not  look good then define explicitly here
+##'   NULL then gets done automatically, so if that does not  look good then
+##'   define explicitly here.
+##' @param x_small_ticks_by, y_small_ticks_by  numeric vector of increment to
+##'   use to generate small tick marks on x-axis/y-axis. Will conincide with the
+##'   big tick marks and extend beyond them. Can only define `x_small_ticks` or
+##'   `x_small_ticks_by` (same for `y_...`). Only relevant for linear axes. Set
+##'   to `NA` to force no small unlabelled tickmarks.
 ##' @param x_small_ticks_labels, y_small_ticks_labels numeric vector of big tick
 ##'   marks to label on x-axis/y-axis. If NULL then gets done automatically, so
 ##'   if that does not look good then define explicitly here
@@ -35,6 +41,11 @@
 ##'
 ##' @export
 ##' @author Andrew Edwards
+##' @examples
+##' \dontrun{
+##' res_vec <- fit_size_spectrum(sim_vec)
+##' plot(res_vec)
+##' plot(res_vec, x_small_ticks_labels = c(5, 50, 500), log = "x")
 plot.size_spectrum_numeric <- function(res,
                                        panel = FALSE,
                                        log = "xy",
@@ -46,12 +57,19 @@ plot.size_spectrum_numeric <- function(res,
                                        x_big_ticks = NULL,
                                        x_big_ticks_labels = NULL,
                                        x_small_ticks = NULL,
+                                       x_small_ticks_by = NULL,
                                        x_small_ticks_labels = NULL,
                                        y_big_ticks = NULL,
                                        y_big_ticks_labels = NULL,
                                        y_small_ticks = NULL,
+                                       y_small_ticks_by = NULL,
                                        y_small_ticks_labels = NULL,
                                        ...){
+
+  stopifnot("Cannot define both x_small_ticks and x_small_ticks_by" =
+              !(!is.null(x_small_ticks) & !is.null(x_small_ticks_by)))
+  stopifnot("Cannot define both y_small_ticks and y_small_ticks_by" =
+              !(!is.null(y_small_ticks) & !is.null(y_small_ticks_by)))
 
   x <- res$x
 
@@ -90,10 +108,12 @@ plot.size_spectrum_numeric <- function(res,
     x_big_ticks = x_big_ticks,
     x_big_ticks_labels = x_big_ticks_labels,
     x_small_ticks = x_small_ticks,
+    x_small_ticks_by = x_small_ticks_by,
     x_small_ticks_labels = x_small_ticks_labels,
     y_big_ticks = y_big_ticks,
     y_big_ticks_labels = y_big_ticks_labels,
     y_small_ticks = y_small_ticks,
+    y_small_ticks_by = y_small_ticks_by,
     y_small_ticks_labels = y_small_ticks_labels)
 
 
