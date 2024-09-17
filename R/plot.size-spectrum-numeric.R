@@ -16,6 +16,17 @@
 ##'   log-log axes, "x" for only x-axis logged.
 ##' @param mgpVals mgp values to use, as in `plot(..., mgp = mgpVals)`.
 ##' @param inset Inset distance for legend
+##' @param x_big_ticks, y_big_ticks numeric vector of big tick marks on
+##'   x-axis/y-axis. If NULL then gets done automatically, so if that does not
+##'   look good then define explicitly here, plus `x_big_ticks_labels` and/or `y_big_ticks_labels`.
+##' @param x_big_ticks_labels, y_big_ticks_labels numeric vector of big tick
+##'   marks to label on x-axis/y-axis. If NULL then gets done automatically, so
+##'   if that does not look good then define explicitly here
+##' @param x_small_ticks, y_small_ticks  numeric vector of small tick marks on x-axis/y-axis. If
+##'   NULL then gets done automatically, so if that does not  look good then define explicitly here
+##' @param x_small_ticks_labels, y_small_ticks_labels numeric vector of big tick
+##'   marks to label on x-axis/y-axis. If NULL then gets done automatically, so
+##'   if that does not look good then define explicitly here
 ##' @param xlim_global Define global x-axis limits
 ##' @param ylim_global Define global y-axis limits
 ##' @param ... Further arguments for `plot()`
@@ -32,14 +43,15 @@ plot.size_spectrum_numeric <- function(res,
                                        mgp_val = c(1.6, 0.5, 0),
                                        inset = c(0, -0.04),
                                        tcl_small = -0.2,
-                                       x_label_small = NULL,
-                                       x_label_big = NULL,
-                                       x_tick_by = 10,   # linear axis, small
-                                       # ticks. Give a better name
-                                       x_ticks_linear_default = TRUE,
-                                       y_ticks_linear_default = TRUE,
-                                       ...
-                                       ){
+                                       x_big_ticks = NULL,
+                                       x_big_ticks_labels = NULL,
+                                       x_small_ticks = NULL,
+                                       x_small_ticks_labels = NULL,
+                                       y_big_ticks = NULL,
+                                       y_big_ticks_labels = NULL,
+                                       y_small_ticks = NULL,
+                                       y_small_ticks_labels = NULL,
+                                       ...){
 
   x <- res$x
 
@@ -75,22 +87,15 @@ plot.size_spectrum_numeric <- function(res,
     log = log,
     tcl_small = tcl_small,
     mgp_val = mgp_val,
-    # Add all these to arguments at top
-    x_tick_start = x_tick_start,
-    x_tick_by = x_tick_by,
-    x_tick_end = x_tick_end,
-    x_tick_big_labels = NULL,  # vector of values of big
-          # tickmarks to add labels
-    x_tick_small_labels = NULL,  # vector of values of small
-    # ticks to add labels to
-    x_ticks_linear_default = x_ticks_linear_default,   # if TRUE and linear axis used then default
-                                     # tick marks are used; to tailor them set
-                                     # to FALSE and specify in x_tick_start etc.
-    y_tick_start = y_tick_start,
-    y_tick_by = y_tick_by,
-    y_tick_end = y_tick_end,
-    y_tick_big_labels = NULL,
-    y_ticks_linear_default = y_ticks_linear_default)
+    x_big_ticks = x_big_ticks,
+    x_big_ticks_labels = x_big_ticks_labels,
+    x_small_ticks = x_small_ticks,
+    x_small_ticks_labels = x_small_ticks_labels,
+    y_big_ticks = y_big_ticks,
+    y_big_ticks_labels = y_big_ticks_labels,
+    y_small_ticks = y_small_ticks,
+    y_small_ticks_labels = y_small_ticks_labels)
+
 
   box()
 

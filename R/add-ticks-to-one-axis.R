@@ -1,68 +1,103 @@
 ##' Add ticks and labels to one axis
 add_ticks_to_one_axis <- function(log_scale,
                                   x_or_y,
-                                  ticks_default,
-                                  tick_big_labels,
-                                  tick_small_labels,
                                   mgp_val,
-                                  tcl_small){
+                                  tcl_small,
+                                  big_ticks,
+                                  big_ticks_labels,
+                                  small_ticks,
+                                  small_ticks_labels){
   ll = 1:9
   # log10_ll = log10(ll)  not needed?
 
   if(x_or_y == "x"){
     axis_to_do <- 1
-    lim <- par("usr")[1:2]   # But 10^ this below if logscale
+    lim <- par("usr")[1:2]   # But then 10^ this below if logscale
   } else {
     axis_to_do <- 2
     lim <- par("usr")[3:4]
   }
 
+  # Log scale
   if(log_scale){
-    lim <- 10^lim
-    # Do enough tick marks to encompass axes:
-    encompass_log <- c(floor(log10(lim[1])),
-                       ceiling(log10(lim[2])))
-    big <- 10^c(encompass_log[1]:encompass_log[2])
-  } else {
-# HERE, figure out what to do with ticks on linear. Add small and big options to plot.size_spectrum_numeric()
-
-#    big <- seq(0.9 * lim[1],
-#               1.1 * lim[2],
-#               by = increment)
-  }
-
-  if(ticks_default & !log_scale){
-    # Default ticks and labelling
-    axis(axis_to_do,
-         mgp = mgp_val)
-  } else {
-  # Big unlabelled, always want these:
-  axis(axis_to_do,
-       at = big,
-       labels = rep("", length(big)),
-       mgp = mgp_val)
-
-    # Big labelled, if not specified then label them all
-    if(is.null(tick_big_labels)){
-      tick_big_labels = big
+    # Big ticks
+    if(is.null(big_ticks)){      # If NULL then create them
+      lim <- 10^lim
+      # Do enough tick marks to encompass axes:
+      encompass_log <- c(floor(log10(lim[1])),
+                         ceiling(log10(lim[2])))
+      big_ticks <- 10^c(encompass_log[1]:encompass_log[2])
     }
+
+    # If big labels not specified then label them all, can assume always want that
+    if(is.null(big_ticks_labels)){
+      big_ticks_labels <- big_ticks
+    }
+
+    stopifnot("big_ticks_labels must be a subset of big_ticks; check the inputs for x and y" =
+                all(big_ticks_labels %in% big_ticks))
+
+    # Big unlabelled
     axis(axis_to_do,
-         at = tick_big_labels,
-         labels = tick_big_labels,
+         at = big_ticks,
+         labels = rep("", length(big_ticks)),
          mgp = mgp_val)
+
+    # Big labelled
+    axis(axis_to_do,
+         at = big_ticks_labels,
+         labels = big_ticks_labels,
+         mgp = mgp_val)
+
+    # Small ticks
+    if(is.null(small_ticks)){     # If NULL then create them
+      small_ticks <- big_ticks %x% ll
+    }
 
     # Small unlabelled:
     axis(axis_to_do,
-         big %x% ll,
+         small_ticks,
          labels=rep("",
-                    length(big %x% ll)),
+                    length(small_ticks)),
          tcl = tcl_small)
 
     # Small labelled:
-    if(!is.null(tick_small_labels)){
+    if(!is.null(small_ticks_labels)){
+      stopifnot("small_ticks_labels must be a subset of small_ticks; check the inputs for x and y" =
+                  all(small_ticks_labels %in% small_ticks))
+
       axis(axis_to_do,
-           at = tick_small_labels,
-           labels = tick_small_labels,
+           at = small_ticks_labels,
+           labels = small_ticks_labels,
+           mgp = mgp_val,
+           tcl = tcl_small)
+    }
+  } else {
+    # Linear scale, do the specified values else the usual default for big ticks.
+    if(!is.null(big_ticks)){
+      axis(axis_to_do,
+           at = big_ticks,
+           labels = rep("", length(big_ticks)),
+           mgp = mgp_val)
+    } else {
+      axis(axis_to_do,
+           mgp = mgp_val)
+    }
+
+    # Small ticks, if not specified then do none.
+    if(!is.null(small_ticks)){
+      axis(axis_to_do,
+           small_ticks,
+           labels=rep("",
+                      length(small_ticks)),
+           tcl = tcl_small)
+    }
+
+    # Small labelled:
+    if(!is.null(small_ticks_labels)){
+      axis(axis_to_do,
+           at = small_ticks_labels,
+           labels = small_ticks_labels,
            mgp = mgp_val,
            tcl = tcl_small)
     }

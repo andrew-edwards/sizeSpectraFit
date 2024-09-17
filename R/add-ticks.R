@@ -28,44 +28,35 @@
 add_ticks = function(log = "",
                      tcl_small = -0.2,
                      mgp_val = c(1.6, 0.5, 0),
-                     x_tick_start = NULL,
-                     x_tick_by = NULL,
-                     x_tick_end = NULL,
-                     x_tick_big_labels = NULL,  # vector of values of big
-                     # tickmarks to add labels
-                     x_tick_small_labels = NULL,  # vector of values of small
-                     # ticks to add labels to
-                     x_ticks_linear_default = NULL,
-                     y_tick_start = NULL,
-                     y_tick_by = NULL,
-                     y_tick_end = NULL,
-                     y_tick_big_labels = NULL,
-                     y_ticks_linear_default = NULL
-                     ){
-#                    xLabelSmall = NULL,
-#                    yLabelSmall = NULL,
-#                    xLabelBig = NULL,
-#                    mgpVal=c(1.6,0.5,0))
+                     x_big_ticks = NULL,
+                     x_big_ticks_labels = NULL,
+                     x_small_ticks = NULL,
+                     x_small_ticks_labels = NULL,
+                     y_big_ticks = NULL,
+                     y_big_ticks_labels = NULL,
+                     y_small_ticks = NULL,
+                     y_small_ticks_labels = NULL){
 
   # Add tickmarks to x-axis
   if(log %in% c("x", "xy")){
     add_ticks_to_one_axis(log_scale = TRUE,
                           x_or_y = "x",
-                          ticks_default = x_ticks_linear_default, # only for
-                                        # linear, so ignored here
-                          tick_big_labels = x_tick_big_labels,
-                          tick_small_labels = x_tick_small_labels,
                           mgp_val = mgp_val,
-                          tcl_small = tcl_small)
+                          tcl_small = tcl_small,
+                          big_ticks = x_big_ticks,
+                          big_ticks_labels = x_big_ticks_labels,
+                          small_ticks = x_small_ticks,
+                          small_ticks_labels = x_small_ticks_labels)
   } else {
     add_ticks_to_one_axis(log_scale = FALSE,
                           x_or_y = "x",
-                          ticks_default = x_ticks_linear_default,
-                          tick_big_labels = x_tick_big_labels,
-                          tick_small_labels = x_tick_small_labels,
                           mgp_val = mgp_val,
-                          tcl_small = tcl_small)
-}
+                          tcl_small = tcl_small,
+                          big_ticks = x_big_ticks,
+                          big_ticks_labels = x_big_ticks_labels,
+                          small_ticks = x_small_ticks,
+                          small_ticks_labels = x_small_ticks_labels)
+}  # TODO then repeat for y-axis
     ## # Repeat for y axis:
     ## if(!is.null(yLim))               # if NULL then ignore
     ##   {
