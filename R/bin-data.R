@@ -1,5 +1,5 @@
 ##' Construct bins that either double in size or are of equal width, and encompass
-##'  the data
+##'  the data  SEE ISSUE for what to do next.
 ##'
 ##' Construct bins that start from `floor(min(x))` or `min(x)` and either double
 ##'    in size or are of equal width, and encompass the data. Adapted from
@@ -51,79 +51,79 @@
 ##' @export
 ##' @author Andrew Edwards
 bin_data <- function(x = NULL,
-                    counts = NULL,
-                    bin_width = NULL,
-                    bin_breaks = NULL,
-                    start_integer = TRUE){
-        if(!is.null(x) & !is.null(counts)) {
-            stop("need only one of x or counts in bin_data") }
-        if(is.null(x) & is.null(counts)) {
-            stop("need x or counts in bin_data") }
-        if(!is.null(x)) {
-          if(!is.vector(x))stop("x not a vector in bin_data")
-          if(anyNA(x)) stop("x contains NA's in bin_data")
-          if(min(x) <= 0)stop("x needs to be >0 in bin_data")
-          }
-        if(!is.null(counts))  {
-          if(dim(counts)[2] != 2)stop("counts needs two cols in bin_data")
-          if(min(counts[,1]) < 0) {
-              stop("x values in counts need to be >= 0 in bin_data") }
-          if(min(counts[,2]) < 0) {
-              stop("numbers in counts need to be >= 0 in bin_data") }
-          if(sum(!is.wholenumber(counts[,2])) > 0) {
-              stop("numbers in counts need to be integers in bin_data;
+                     counts = NULL,
+                     bin_width = NULL,
+                     bin_breaks = NULL,
+                     start_integer = TRUE){
+  if(!is.null(x) & !is.null(counts)) {
+    stop("need only one of x or counts in bin_data") }
+  if(is.null(x) & is.null(counts)) {
+    stop("need x or counts in bin_data") }
+  if(!is.null(x)) {
+    if(!is.vector(x))stop("x not a vector in bin_data")
+    if(anyNA(x)) stop("x cannot contain NA's in bin_data")
+    if(min(x) <= 0)stop("x needs to be >0 in bin_data")
+  }
+  if(!is.null(counts))  {
+    if(dim(counts)[2] != 2)stop("counts needs two cols in bin_data")
+    if(min(counts[,1]) < 0) {
+      stop("x values in counts need to be >= 0 in bin_data") }
+    if(min(counts[,2]) < 0) {
+      stop("numbers in counts need to be >= 0 in bin_data") }
+    if(sum(!is.wholenumber(counts[,2])) > 0) {
+      stop("numbers in counts need to be integers in bin_data;
                       for non-integer count see a new function. Currently,
                       such a new function has no name [so says Jaqen H'ghar]. Or it may be easier to
                       adapt bin_data.") }
-          }
-        if(is.null(bin_width) & is.null(bin_breaks)) {
-            stop("need one of bin_width or bin_breaks in bin_data") }
-        if(!is.null(bin_width) & !is.null(bin_breaks)) {
-            stop("need only one of bin_width or bin_breaks in bin_data") }
-        if(start_integer != "TRUE" & start_integer != "FALSE"){
-            stop("start_integer must be TRUE or FALSE in bin_data") }
-        # As for LBNbiom.method(), could write code that would make
-        #  use of the counts dataframe explicitly, but actually quite easy
-        #  to just create the longer vector x (though may be slightly slower
-        #  computationally), to save writing extensive new code. But do this
-        #  at some point for noninteger counts.
-        if(is.null(x))
-           { x = rep(counts[,1], counts[,2])
-             minx = min(counts[,1])
-             maxx = max(counts[,1])
-           } else
-           { minx = min(x)
-             maxx = max(x)
-           }
-        #
-        if(!is.null(bin_breaks))
-           {
-           if(minx < min(bin_breaks) | maxx > max(bin_breaks) )
-             { stop("bin_breaks do not span data in bin_data")
-             }
-           } else           # create bin_breaks based on bin_width
-           {
-           if(bin_width == "2k")
-             {
-             if(start_integer)
-               { bin_breaks = 2^( floor(log2(minx)) : ceiling(log2(maxx)) )
-               } else
-               { stop("start_integer currently needs to be TRUE when
+  }
+  if(is.null(bin_width) & is.null(bin_breaks)) {
+    stop("need one of bin_width or bin_breaks in bin_data") }
+  if(!is.null(bin_width) & !is.null(bin_breaks)) {
+    stop("need only one of bin_width or bin_breaks in bin_data") }
+  if(start_integer != "TRUE" & start_integer != "FALSE"){
+    stop("start_integer must be TRUE or FALSE in bin_data") }
+  # As for LBNbiom.method(), could write code that would make
+  #  use of the counts dataframe explicitly, but actually quite easy
+  #  to just create the longer vector x (though may be slightly slower
+  #  computationally), to save writing extensive new code. But do this
+  #  at some point for noninteger counts.
+  if(is.null(x))
+  { x = rep(counts[,1], counts[,2])
+    minx = min(counts[,1])
+    maxx = max(counts[,1])
+  } else
+  { minx = min(x)
+    maxx = max(x)
+  }
+  #
+  if(!is.null(bin_breaks))
+  {
+    if(minx < min(bin_breaks) | maxx > max(bin_breaks) )
+    { stop("bin_breaks do not span data in bin_data")
+    }
+  } else           # create bin_breaks based on bin_width
+  {
+    if(bin_width == "2k")
+    {
+      if(start_integer)
+      { bin_breaks = 2^( floor(log2(minx)) : ceiling(log2(maxx)) )
+      } else
+      { stop("start_integer currently needs to be TRUE when
                    bin_width = 2k")
-               }
-             } else     # If not "2k"
-             {
-             if(!is.numeric(bin_width))
-               { stop("bin_width must be 2k or a number (in quotes is okay
+      }
+    } else     # If not "2k"
+    {
+      if(!is.numeric(bin_width))
+      { stop("bin_width must be 2k or a number (in quotes is okay
                          in quotes) in bin_data().")
-               }
-             # start_integer says whether to start from an integer value or
-             #  start from min(x),
-             z = floor(minx) * start_integer + minx * !start_integer
-             bin_breaks = seq( z, by=bin_width,
-                        length = ceiling( (maxx - z)/bin_width) + 1)
-             }
-           }
+      }
+      # start_integer says whether to start from an integer value or
+      #  start from min(x),
+      z = floor(minx) * start_integer + minx * !start_integer
+      bin_breaks = seq( z, by=bin_width,
+                       length = ceiling( (maxx - z)/bin_width) + 1)
+    }
+  }
 
         indiv = data.frame(x)       # dataframe with one row for each individual
         indiv$bin_mid = cut(x, breaks = bin_breaks, right = FALSE, include.lowest = TRUE,
