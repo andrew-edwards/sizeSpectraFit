@@ -18,133 +18,132 @@
 ##' @param counts_df dataframe (or array, can be a tibble) with first column `x` being the measured values
 ##'  (e.g. body masses or lengths), and second column `counts` being the counts of the
 ##'  number of individuals for that value. The `counts` column can have
-##'   non-integer values, unlike for `binData()`.
-##' @param binWidth type of bins to use:
-##'   * `"2k"` will result in `binBreaks` that:
-##'     + with `startInteger=TRUE` are powers of 2, i.e. ..., 0.25, 0.5, 1, 2, 4, 8, 16,....
-##'     + with `startInteger=FALSE` are bins that double in size and  start with
+##'   non-integer values.
+##' @param bin_width type of bins to use:
+##'   * `"2k"` will result in `bin_breaks` that:
+##'     + with `start_integer=TRUE` are powers of 2, i.e. ..., 0.25, 0.5, 1, 2, 4, 8, 16,....
+##'     + with `start_integer=FALSE` are bins that double in size and  start with
 ##'       `min(x)`; not yet implemented, since have to think about what the width of
 ##'       the first bin should be.
-##'   * numeric value (call it `a`) will result in binBreaks are separated by `a` and span the
+##'   * numeric value (call it `a`) will result in bin_breaks are separated by `a` and span the
 ##'       data, that:
-##'     + with `startInteger=TRUE` start from `z = floor(min(x))` and are then
+##'     + with `start_integer=TRUE` start from `z = floor(min(x))` and are then
 ##'          `z, z+a, z+2a, z+3a, ....`   (if `z = 0` then power-law cannot be fit
-##'        so then need to use `startInteger=FALSE`)
-##'     + with `startInteger=FALSE` start from `z = min(x)` and are then
+##'        so then need to use `start_integer=FALSE`)
+##'     + with `start_integer=FALSE` start from `z = min(x)` and are then
 ##'           `z, z+a, z+2a, z+3a, ....`
-##'   * only `binWidth` or `binBreaks` can be specified.
-##' @param binBreaks pre-defined bin breaks as a vector. Only `binWidth`
-##'   or `binBreaks` can be specified.
-##' @param startInteger TRUE or FALSE, whether to start the bin breaks at an integer
-##'   power of 2 (for method `"2k"`) or an integer. See `binWidth` above.
-##'   `startInteger` is ignored if `binBreaks` is specified.
+##'   * only `bin_width` or `bin_breaks` can be specified.
+##' @param bin_breaks pre-defined bin breaks as a vector. Only `bin_width`
+##'   or `bin_breaks` can be specified.
+##' @param start_integer TRUE or FALSE, whether to start the bin breaks at an integer
+##'   power of 2 (for method `"2k"`) or an integer. See `bin_width` above.
+##'   `start_integer` is ignored if `bin_breaks` is specified.
 ##' @return list containing:
 ##'   * indiv: dataframe with a row for each `counts_df$x` value, with columns:
 ##'      + `x`: original `counts_df$x` values
-##'      + `binMid`, `binMin`, `binMax`, `binWidth`: midpoint, minimum,
+##'      + `bin_mid`, `bin_min`, `bin_max`, `bin_width`: midpoint, minimum,
 ##'      maximum, and width, respectively, of the bin within
 ##'      which the `x` value falls.  If indiv has `>=10^6` rows then it isn't
 ##'      saved. Keeping the name `indiv` as for `binData()`, but these are
-##'      individual counts not individual organisms.
-##'   * binVals: dataframe with a row for each new bin and columns:
-##'      + `binMid`, `binMin`, `binMax`, `binWidth`: midpoint, minimum,
+##'      individual counts not individual organisms. TODO prob change
+##'   * bin_vals: dataframe with a row for each new bin and columns:
+##'      + `bin_mid`, `bin_min`, `bin_max`, `bin_width`: midpoint, minimum,
 ##'         maximum, and width, respectively, of the bin
-##'      + `binCount`: total count of numbers of individuals in that bin
-##'      + `binCountNorm`: normalised bin count, `binCount / binWidth`
-##'      + `binSum`: sum of numbers of individuals * x values in that bin (appropriate if `x`
+##'      + `bin_count`: total count of numbers of individuals in that bin
+##'      + `bin_count_norm`: normalised bin count, `bin_count / bin_width`
+##'      + `bin_sum`: sum of numbers of individuals * x values in that bin (appropriate if `x`
 ##'         represents biomass, but not length)
-##'      + `binSumNorm`: `binSum / binWidth`
+##'      + `bin_sum_norm`: `bin_sum / bin_width`
 ##'      + `log10....` - `log10()` of some of the above quantities
 ##' @export
 ##' @examples
 ##' \dontrun{
 ##' counts_ex <- tibble::tibble(x = as.numeric(1:50), counts = rep(c(0.19, 27.05, 9, 3.1, 0.001), 10))
-##' bin_data(counts_ex, binWidth = 6)
+##' bin_data(counts_ex, bin_width = 6)
 ##' }
 ##' @author Andrew Edwards
-bin_data = function(counts_df,
-                    binWidth = NULL,
-                    binBreaks = NULL,
-                    startInteger = TRUE)
-    {
+bin_data.data.frame <- function(counts_df,
+                                bin_width = NULL,
+                                bin_breaks = NULL,
+                                start_integer = TRUE){
       if(dim(counts_df)[2] != 2)stop("counts_df needs two cols in binData")
       if(min(counts_df$x) < 0) {
         stop("x values in counts_df need to be >= 0 in binData") }
       if(min(counts_df$counts) < 0) {
         stop("numbers in counts_df need to be >= 0 in binData") }
-        if(is.null(binWidth) & is.null(binBreaks)) {
-          stop("need one of binWidth or binBreaks in binData") }
-        if(!is.null(binWidth) & !is.null(binBreaks)) {
-          stop("need only one of binWidth or binBreaks in binData") }
-        if(startInteger != "TRUE" & startInteger != "FALSE"){
-          stop("startInteger must be TRUE or FALSE in binData") }
+        if(is.null(bin_width) & is.null(bin_breaks)) {
+          stop("need one of bin_width or bin_breaks in binData") }
+        if(!is.null(bin_width) & !is.null(bin_breaks)) {
+          stop("need only one of bin_width or bin_breaks in binData") }
+        if(start_integer != "TRUE" & start_integer != "FALSE"){
+          stop("start_integer must be TRUE or FALSE in binData") }
 
       x = counts_df$x                   # need a lot, these are
                                         # measurements
       minx = min(x)  # min(dplyr::pull(counts_df ,1))
       maxx = max(x)  # max(dplyr::pull(counts_df ,1))
 
-        if(!is.null(binBreaks))
+        if(!is.null(bin_breaks))
            {
-           if(minx < min(binBreaks) | maxx > max(binBreaks) )
-             { stop("binBreaks do not span data in binData")
+           if(minx < min(bin_breaks) | maxx > max(bin_breaks) )
+             { stop("bin_breaks do not span data in binData")
              }
-           } else           # create binBreaks based on binWidth
+           } else           # create bin_breaks based on bin_width
            {
-           if(binWidth == "2k")
+           if(bin_width == "2k")
              {
-             if(startInteger)
-               { binBreaks = 2^( floor(log2(minx)) : ceiling(log2(maxx)) )
+             if(start_integer)
+               { bin_breaks = 2^( floor(log2(minx)) : ceiling(log2(maxx)) )
                } else
-               { stop("startInteger currently needs to be TRUE when
-                   binWidth = 2k")
+               { stop("start_integer currently needs to be TRUE when
+                   bin_width = 2k")
                }
              } else     # If not "2k"
              {
-             if(!is.numeric(binWidth))
-               { stop("binWidth must be 2k or a number (in quotes is okay
+             if(!is.numeric(bin_width))
+               { stop("bin_width must be 2k or a number (in quotes is okay
                          in quotes) in binData().")
                }
-             # startInteger says whether to start from an integer value or
+             # start_integer says whether to start from an integer value or
              #  start from min(x),
-             z = floor(minx) * startInteger + minx * !startInteger
-             binBreaks = seq( z, by=binWidth,
-                        length = ceiling( (maxx - z)/binWidth) + 1)
+             z = floor(minx) * start_integer + minx * !start_integer
+             bin_breaks = seq( z, by=bin_width,
+                        length = ceiling( (maxx - z)/bin_width) + 1)
              }
            }
 
       indiv = counts_df           # data.frame(x = x)       # dataframe with one
                                   # row for each x value in x
       # x
-      indiv$binMid =cut(x, breaks=binBreaks, right=FALSE, include.lowest=TRUE,
-                        labels = binBreaks[-length(binBreaks)] + 0.5*diff(binBreaks))
-      indiv$binMin =cut(x, breaks=binBreaks, right=FALSE, include.lowest=TRUE,
-                        labels = binBreaks[-length(binBreaks)])
-      indiv$binMax =cut(x, breaks=binBreaks, right=FALSE, include.lowest=TRUE,
-                        labels = binBreaks[-1])
+      indiv$bin_mid =cut(x, breaks=bin_breaks, right=FALSE, include.lowest=TRUE,
+                        labels = bin_breaks[-length(bin_breaks)] + 0.5*diff(bin_breaks))
+      indiv$bin_min =cut(x, breaks=bin_breaks, right=FALSE, include.lowest=TRUE,
+                        labels = bin_breaks[-length(bin_breaks)])
+      indiv$bin_max =cut(x, breaks=bin_breaks, right=FALSE, include.lowest=TRUE,
+                        labels = bin_breaks[-1])
       #
-      indiv$binMid = as.numeric(as.character(indiv$binMid))
-      indiv$binMin = as.numeric(as.character(indiv$binMin))
-      indiv$binMax = as.numeric(as.character(indiv$binMax))
+      indiv$bin_mid = as.numeric(as.character(indiv$bin_mid))
+      indiv$bin_min = as.numeric(as.character(indiv$bin_min))
+      indiv$bin_max = as.numeric(as.character(indiv$bin_max))
       # Now calculate biomass in each bin class:
 
-        binVals = dplyr::summarise(dplyr::group_by(indiv, binMid),
-                                   binMin = unique(binMin),
-                                   binMax = unique(binMax),
-                                   binWidth = binMax - binMin,
-                                   binCount = sum(counts),         # was length(x) for binData
-                                   binCountNorm = binCount / binWidth,
-                                   binSum = sum(x * counts),       # only appropriate for body masses
-                                   binSumNorm = binSum / binWidth )
-      # binWidth uses new columns binMax and binMin
+        bin_vals = dplyr::summarise(dplyr::group_by(indiv, bin_mid),
+                                   bin_min = unique(bin_min),
+                                   bin_max = unique(bin_max),
+                                   bin_width = bin_max - bin_min,
+                                   bin_count = sum(counts),         # was length(x) for binData
+                                   bin_count_norm = bin_count / bin_width,
+                                   bin_sum = sum(x * counts),       # only appropriate for body masses
+                                   bin_sum_norm = bin_sum / bin_width )
+      # bin_width uses new columns bin_max and bin_min
       # Indices for minima of bins that have zero counts and so do not
-      #  appear in binVals yet:
-        emptyBinMinInd = !(signif(binBreaks[-length(binBreaks)], digits = 8) %in%
-                           signif(binVals$binMin, digits = 8))
+      #  appear in bin_vals yet:
+        emptyBinMinInd = !(signif(bin_breaks[-length(bin_breaks)], digits = 8) %in%
+                           signif(bin_vals$bin_min, digits = 8))
                          # to avoid not-real differences due to rounding/storing
-        emptyBinMin = binBreaks[emptyBinMinInd]
+        emptyBinMin = bin_breaks[emptyBinMinInd]
         empties = length(emptyBinMin)
-        emptyBinMax = binBreaks[-1][emptyBinMinInd]
+        emptyBinMax = bin_breaks[-1][emptyBinMinInd]
         emptyBinWidth = emptyBinMax - emptyBinMin
         emptyBinMid = emptyBinMin + emptyBinWidth/2
 
@@ -153,36 +152,36 @@ bin_data = function(counts_df,
                                         emptyBinMax,
                                         emptyBinWidth,
                                         matrix(0, nrow=empties, ncol=4)))
-        names(emptyVals) = names(binVals)
-        binVals = rbind(binVals, emptyVals)         # still a local df
+        names(emptyVals) = names(bin_vals)
+        bin_vals = rbind(bin_vals, emptyVals)         # still a local df
 
-        binVals = binVals[order(binVals$binMid), ]   # order by binMid
+        bin_vals = bin_vals[order(bin_vals$bin_mid), ]   # order by bin_mid
 
-        binVals = dplyr::mutate(binVals,
-                                log10binMid = log10(binMid),
-                                log10binCount = log10(binCount),
-                                log10binSum = log10(binSum),
-                                log10binCountNorm = log10(binCountNorm),
+        bin_vals = dplyr::mutate(bin_vals,
+                                log10bin_mid = log10(bin_mid),
+                                log10bin_count = log10(bin_count),
+                                log10bin_sum = log10(bin_sum),
+                                log10bin_count_norm = log10(bin_count_norm),
                                 # Had thought that last line is needed to avoid
                                 # warnings (e.g. simulate-data2.R) and whole
                                 # column being NA's. Maybe don't actually use it
                                 # in results, but have put it in, may need to
                                 # test it more.
-                                log10binSumNorm = log10(binSumNorm))
-        binVals[is.infinite(binVals$log10binCount),
-                "log10binCount"] = NA
+                                log10bin_sum_norm = log10(bin_sum_norm))
+        bin_vals[is.infinite(bin_vals$log10bin_count),
+                "log10bin_count"] = NA
                   # lm can't cope with -Inf, which appear if 0 counts in a bin
-        binVals[is.infinite(binVals$log10binCountNorm),
-                "log10binCountNorm"] = NA
-        binVals[is.infinite(binVals$log10binSum),
-                "log10binSum"] = NA
-        binVals[is.infinite(binVals$log10binSumNorm),
-                "log10binSumNorm"] = NA
+        bin_vals[is.infinite(bin_vals$log10bin_count_norm),
+                "log10bin_count_norm"] = NA
+        bin_vals[is.infinite(bin_vals$log10bin_sum),
+                "log10bin_sum"] = NA
+        bin_vals[is.infinite(bin_vals$log10bin_sum_norm),
+                "log10bin_sum_norm"] = NA
         if(dim(indiv)[1] < 10^6) {       # only save indiv if not too big
-          y = list(indiv = indiv, binVals = binVals)
+          y = list(indiv = indiv, bin_vals = bin_vals)
           } else
           {
-          y = list(binVals = binVals)
+          y = list(bin_vals = bin_vals)
           }
         return(y)
     }
