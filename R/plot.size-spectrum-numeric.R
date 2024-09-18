@@ -1,4 +1,6 @@
-##' Single plot of individual size distribution of values and the MLE fit with confidence intervals
+##' Single plot of individual size distribution of values and the MLE fit with
+##' confidence intervals TODO Going to simplify this and call plot_isd(), which
+##' is a copy of this right now.
 ##'
 ##' Plot the results from a PLB fit to a vector of values, as in Figure 2h and 6b of
 ##' [1](http://onlinelibrary.wiley.com/doi/10.1111/2041-210X.12641/full). Also

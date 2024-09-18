@@ -28,7 +28,7 @@ Fitting a size spectrum to a data set using likelihood is done using the
 function `fit_size_spectrum()`. The function automatically selects the
 method to use based on the class of the data, as described by Table 2 in [2].
 
-### MLE method
+### Vector of individual measurements
 
 This simplest method is given a vector of measurements, such as body masses or
 body lengths, fit the size spectrum to calculate the maximum likelihood estimate
@@ -40,23 +40,64 @@ The simulated data used from a bounded power-law distribution as used for Figure
 are included as the data object `sim_vec` (which stands for simulated vector) in
 sizeSpectra2, and so we can just use that.
 
+So let's print the first 15 values, check
+the length is 1000, and do a quick histogram to show the long tail:
 ```{r, MLE1}
 sim_vec[1:15]
 length(sim_vec)
-hist(sim_vec, breaks = 100)        # Quick histogram to show the long tail
+hist(sim_vec, breaks = 100)
 ```
 
-To fit the data using the MLE method, simply:
+To fit the data using the MLE method, simply use [fit_size_spectrum()]:  TODO
+check if that works in vignette
 ```{r, MLE2}
 res_vec <- fit_size_spectrum(sim_vec)
-res_vec    # We have set it up to just print the MLE results plus only the first
-           # 10 values of the original data, sim_vec.
-# res_vec$x         # Print all 1000 values of the original data
-length(res_vec$x)   # Confirms there are still 1000 values
+res_vec
 ```
 So `res_vec` is a list that contains the MLE and confidence intervals for $b$,
-plus also the original data.
-Next, do a figure.
+plus also the original data. When printing we have set it up to just show the
+first 10 values of the original data. You can check that all 1000 values are in
+`res_vec$x` with simply:
+```{r, MLE3}
+length(res_vec$x)
+```
+
+Now, to plot the PLB fit and the original data, simply:
+```{r, MLE4}
+plot(res_vec)
+```
+
+The style of plot is as recommended in Figure 6b of
+[1](http://onlinelibrary.wiley.com/doi/10.1111/2041-210X.12641/full), and
+includes the PLB fits using the values of `b` at the bounds of the confidence
+interval for `b`.
+
+The plot comes out this way because we have written a function
+`plot.size_spectrum_numeric()` which gets automatically used on `res_vec`
+because `res_vec` has class `size_spectrum_numeric`, which we assigned
+automatically in the function `fit_size_spectrum()` that was used above to
+create `res_vec`. This all happens behind the scenes but it is useful for users
+to know about this. In particular, to see the help you need to do
+`?plot.size_spectrum_numeric()`. There you can see lots of customisable options
+by setting arguments; for example to add the extra labels on the x-axis (to
+*exactly* match the Figure 6b):
+```{r, MLE5}
+plot(res_vec,
+     x_small_ticks_labels = c(5, 50, 500))
+```
+
+Now do MLEbin, then come back and add extra options for this one (since will first
+create binned figures for MLEbin). TODO
+
+### Binned data of counts in bins
+
+TODO Basically am redoing the MLEbin_recommend vignette but with more usable functions.
+
+
+
+
+
+
 
 [1](http://onlinelibrary.wiley.com/doi/10.1111/2041-210X.12641/full)
 
