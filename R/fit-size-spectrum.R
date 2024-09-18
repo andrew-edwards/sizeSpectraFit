@@ -2,9 +2,6 @@
 ##'
 ##' The function automatically uses the method...
 ##'
-##'
-##'
-##'
 ##' TODO Works for a numeric vector (e.g. MCMC samples of an estimated population size) or
 ##' a data frame (such as MCMC samples of an estimated population size in 10
 ##' different years -- years would be the named columns, each row would be an
@@ -16,7 +13,6 @@
 ##' @param dat One of:
 ##' * `numeric` vector of values (such as individual body masses), which uses
 ##'   the MLE method (via the function [fit_size_spectrum.numeric()];
-##'
 ##' @param x_min minimum value of data to fit the PLB distribution to. If `NULL`
 ##'   (the default) then it is set to the minimum value of the data (if `dat` is
 ##'   `numeric`), else to the minimum bin break of the lowest bin or ??any
@@ -24,40 +20,7 @@
 ##' @param x_max maximum value of data to fit the PLB distribution to. If `NULL`
 ##'   (the default) then it is set to the maximum value of the data (if `dat` is
 ##'   `numeric`), else to the maximum bin break of the highest bin or ??any
-##'   other options? Mention species-specific
-##'
-##'
-##' @param density if TRUE then use the density approach for the HDI
-##'   calculation, rather than the `HDInterval::hdi()` default of just the sample values. If
-##'   FALSE (the default) then the density kernel is only used to estimate the y
-##'   values of the probability density function at specified points.
-##' @param credibility numeric value between 0 and 1 specifying the interval to
-##'   be specified (0.95 for 95%, 0.90 for 90%, etc.)
-##' @param n the number of equally spaced points at which the density is
-##'   to be estimated, to be passed onto `density()`. We found the `density()`
-##'   default of 512 to give inaccurate results (see vignette), so set a higher default here as
-##'   1e05 (`?density` advises to use powers of 2 as the value gets rounded up
-##'   anyway, but we found this not to be the case). Changing `n` changes the
-##'   resolution of the density kernel but not the wiggliness.
-##' @param allow_hdi_zero logical, only relevant if `density = TRUE`. If TRUE
-##'   then allow HDI lower bound to include
-##'   zero or be negative; if FALSE (the default) then do not allow this
-##'   (requires `min(dat) >= 0`).
-##' @param tol tolerance for integral checking, see description in
-##'   `?integrate_simpsons()`
-##' @param ... arguments to pass onto `density()`, including `from` (the
-##'   left-most point of the grid at which the density is to be
-##'   estimated) and `to` (the right-most equivalent to `from`). If `from` is
-##'   undefined then the default in `density()` will be used, which is
-##'   'cut * bw' outside of 'min(x)' (see `?density`), and can fall below 0. If
-##'   `min(dat) >= 0` then `from` is set to 0 (if it is not explicitly defined)
-##'   as it is assumed that values are positive. Though if `density` is TRUE and
-##'   `allow_hdi_zero` is FALSE but the lower end of the HDI is 0 then `from`
-##'   will get set to be the minimum of the data (since `allow_hdi_zero` says
-##'   that we do not want the end of the HDI interval to be zero, and this is a
-##'   parsimonious way of forcing it to be >0).
-##' @md
-##'
+##'   other options? Mention species-specific...
 ##' @return
 ##' * If `dat` is numeric then returns a list object of class
 ##'   `size_spectrum_numeric` (such that we can plot it
@@ -101,7 +64,6 @@
 ##'   discontinuities in the HDI.
 ##'     * allow_hdi_zero: logical of `allow_hdi_zero` used
 ##'
-##'
 ##' * If `dat` is a data frame then return a list object of class
 ##'   `intervals_density_list` with:
 ##'   * element `[[i]]` corresponding to column `i` of the `dat_mcmc`. Each
@@ -117,7 +79,6 @@
 ##' @examples
 ##' \dontrun{
 ##' fit_size_spectrum(sim_vec)
-##'
 ##'
 ##' # See the vignettes for further details and refinements.
 ##' # Create intervals from the vector MCMC samples for hake recruitment in 2021:

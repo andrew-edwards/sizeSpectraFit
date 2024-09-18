@@ -93,7 +93,10 @@ TODO add argument to do all of Figure 6.
 \dontrun{
 res_vec <- fit_size_spectrum(sim_vec)
 plot(res_vec)
-plot(res_vec, x_small_ticks_labels = c(5, 50, 500), log = "x")
+plot(res_vec, log = "x")
+plot(res_vec, log = "")
+plot(res_vec, x_small_ticks_labels = c(5, 50, 500), log = "x") # Tailor the
+  labels for a particular figure
 }
 }
 \author{

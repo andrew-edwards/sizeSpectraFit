@@ -1,9 +1,10 @@
 ##' Calculate confidence interval
 ##'
-##' Gets called from [fit_size_spectrum.numeric()].
+##' Gets called from [fit_size_spectrum.numeric()]. TODO may need to be explicit
+##' about the help. Might be simpler as fitting function gets more complex.
 ##'
-##' @param min_ll list output from `nlm()`]
-##' @rdname fit_size_spectrum
+##' @param min_ll list output from [nlm()].
+##' @inheritParams fit_size_spectrum
 ##' @export
 ##' @author Andrew Edwards
 ##' @examples

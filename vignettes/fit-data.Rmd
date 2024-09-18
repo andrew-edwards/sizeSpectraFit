@@ -9,10 +9,11 @@ vignette: >
 date: "Last rendered on `r format(Sys.time(), '%d %B, %Y')`"
 ---
 
-<!-- To build either run
+```{r, echo = FALSE, eval = FALSE}
+# To build either run
 rmarkdown::render("fit-data.Rmd")
- or click the knit button in RStudio -->
-
+# or click the knit button in RStudio -->
+```
 
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
@@ -34,21 +35,27 @@ body lengths, fit the size spectrum to calculate the maximum likelihood estimate
 (the MLE method) of the size-spectrum exponent, and also provide confidence
 intervals.
 
-The simulated data used for Figures 1 and 2 of
+The simulated data used from a bounded power-law distribution as used for Figures 1 and 2 of
 [1](http://onlinelibrary.wiley.com/doi/10.1111/2041-210X.12641/full)
 are included as the data object `sim_vec` (which stands for simulated vector) in
 sizeSpectra2, and so we can just use that.
 
-```{r MLE1}
+```{r, MLE1}
 sim_vec[1:15]
-res_vec <- fit_size_spectrum(sim_vec)
-res_vec    # We have set it up to just print the MLE results plus only the first
-           # 10 values of the original data, sim_vec. To see all the data just do:
-# res_vec$x    # This will print all 1000 values
-length(res_vec$x)   # Confirms there are still 1000 values
-
+length(sim_vec)
+hist(sim_vec, breaks = 100)        # Quick histogram to show the long tail
 ```
 
+To fit the data using the MLE method, simply:
+```{r, MLE2}
+res_vec <- fit_size_spectrum(sim_vec)
+res_vec    # We have set it up to just print the MLE results plus only the first
+           # 10 values of the original data, sim_vec.
+# res_vec$x         # Print all 1000 values of the original data
+length(res_vec$x)   # Confirms there are still 1000 values
+```
+So `res_vec` is a list that contains the MLE and confidence intervals for $b$,
+plus also the original data.
 Next, do a figure.
 
 [1](http://onlinelibrary.wiley.com/doi/10.1111/2041-210X.12641/full)
