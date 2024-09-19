@@ -134,7 +134,8 @@ bin_data.data.frame <- function(dat,
               bin_vals = bin_vals)
   } else
   {
-    y <- list(bin_vals = bin_vals)
+    y <- list(bin_vals = bin_vals)     # nocov   # would require a
+                                       # time-consuming big data set
   }
   return(y)
 }

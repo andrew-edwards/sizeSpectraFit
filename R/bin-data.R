@@ -1,22 +1,24 @@
 ##' Construct bins that either double in size or are of equal width, and encompass
 ##'  the data
 ##'
-##' SEE ISSUE for what to do next.
-##'
 ##' Takes either a `numeric` vector of values (e.g. body masses) or a `data.frame`
 ##' of counts of values, and bins the values or counts into bins. In particular
 ##' needed for
-##' MLEbin method (TODO function is ??) or the goodness-of-fit tests.
+##' MLEbin method (TODO function is ??) and the goodness-of-fit tests.
 ##' The counts can take non-integer values, which can occur when standardising field
 ##' measurements.
 ##'
-##' Construct bins that start from `floor(min(x))` or `min(x)` and either double
-##' in size or are of equal width, and encompass the data. Adapted from
-##' [sizeSpectra::binData()]. User must specify either `bin_width` or
-##' `bin_breaks`. Bins are defined intervals `[w_j, w_{j+1})`, which means values
-##' `x` in the interval satisfy `w_j <= x < w_{j+1}`, the exception being for
+##' Constructs bins that start from `floor(min(x))` or `min(x)` and either double
+##' in size or are of equal width, and encompass the data. User must specify
+##' either `bin_width` or
+##' `bin_breaks`.
+##'
+##' Bins are defined intervals `[w_j, w_{j+1})`, which means values
+##' `x` in the interval satisfy `w_j <= x < w_{j+1}`, i.e. closed on the left
+##' and open on the right.  The exception being for
 ##' the highest bin `[w_{J-1}, w_J]` which includes both bin breaks; see p11 of
-##' Appendix of MEE paper [1] for more details.
+##' Appendix of MEE paper [1] for more details. Functions are adapted from
+##' [sizeSpectra::binData()].
 ##'
 ##' @param dat numeric vector of individual values (e.g. body masses) OR a
 ##'   data.frame with first column `x` being the measured values

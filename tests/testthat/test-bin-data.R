@@ -33,6 +33,23 @@ test_that("bin_data() works correctly on an example", {
                  8.0568333,
                  0.5168333))    # Calculated 19/9/24 from the code.
 
+  # Work through the errors to get full code coverage
+  expect_error(bin_data.numeric(df, bin_width = "2k"))
+  expect_error(bin_data(c(1, 2, 3, NA), bin_width = "2k"))
+  expect_error(bin_data(c(-5, 1, 2, 3), bin_width = "2k"))
 
+  expect_error(bin_data(cbind(df, df), bin_width = "2k"))
+  df_2 <- df
+  df_2[1, "x"] <- -1
+  expect_error(bin_data(df_2, bin_width = "2k"))
+  df_3 <- df
+  df_3[1, "counts"] <- -7
+  expect_error(bin_data(df_3, bin_width = "2k"))
 
+  expect_error(bin_data(df))
+  expect_error(bin_data(df, bin_width = "2k", bin_breaks = 1:5))
+  expect_error(bin_data(df, bin_width = "2k", start_integer = 7))
+  expect_error(bin_data(df, bin_breaks = 5:60))
+  expect_error(bin_data(df, bin_width = "2k", start_integer = FALSE))
+  expect_error(bin_data(df, bin_width = "hello"))
 })
