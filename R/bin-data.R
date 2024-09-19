@@ -1,19 +1,22 @@
 ##' Construct bins that either double in size or are of equal width, and encompass
 ##'  the data
 ##'
-##' SEE ISSUE for what to do next.  TODO THIS WILL become the generic
-##'  class thing. PROB MAKE THESE THE DEFAULT HELP, easier for people to find,
-##'  as for fit-size-spectrum.
+##' SEE ISSUE for what to do next.
 ##'
-##' Takes either a numeric vector of values (e.g. body masses) or a data.frame
-##' of counts of values, and bins them into bins. In particular needed for
+##' Takes either a `numeric` vector of values (e.g. body masses) or a `data.frame`
+##' of counts of values, and bins the values or counts into bins. In particular
+##' needed for
 ##' MLEbin method (TODO function is ??) or the goodness-of-fit tests.
 ##' The counts can take non-integer values, which can occur when standardising field
 ##' measurements.
 ##'
 ##' Construct bins that start from `floor(min(x))` or `min(x)` and either double
-##'    in size or are of equal width, and encompass the data. Adapted from
-##'    [sizeSpectra::binData()].
+##' in size or are of equal width, and encompass the data. Adapted from
+##' [sizeSpectra::binData()]. User must specify either `bin_width` or
+##' `bin_breaks`. Bins are defined intervals `[w_j, w_{j+1})`, which means values
+##' `x` in the interval satisfy `w_j <= x < w_{j+1}`, the exception being for
+##' the highest bin `[w_{J-1}, w_J]` which includes both bin breaks; see p11 of
+##' Appendix of MEE paper [1] for more details.
 ##'
 ##' @param dat numeric vector of individual values (e.g. body masses) OR a
 ##'   data.frame with first column `x` being the measured values
@@ -34,9 +37,9 @@
 ##'        so then need to use `start_integer=FALSE`)
 ##'     + with `start_integer=FALSE` start from `z = min(x)` and are then
 ##'           `z, z+a, z+2a, z+3a, ....`
-##'   * only `bin_width` or `bin_breaks` can be specified.
-##' @param bin_breaks pre-defined bin breaks as a vector. Only `bin_width`
-##'   or `bin_breaks` can be specified.
+##'   * exactly one of `bin_width` or `bin_breaks` must be specified.
+##' @param bin_breaks pre-defined bin breaks as a vector. Exactly one of  `bin_width`
+##'   or `bin_breaks` must be specified.
 ##' @param start_integer TRUE or FALSE, whether to start the bin breaks at an integer
 ##'   power of 2 (for method `"2k"`) or an integer. See `bin_width` above.
 ##'   `start_integer` is ignored if `bin_breaks` is specified.
@@ -60,9 +63,10 @@
 ##' @author Andrew Edwards
 ##' @examples
 ##' \dontrun{
-##' TODO test
 ##' x <- c(1:5, 3:7, 7, 7, 7)
 ##' bin_data(x, bin_width = 2)
+##'
+##' bin_data(sim_vec, bin_width = "2k")
 ##'
 ##' counts_df <- tibble::tibble(x = as.numeric(1:50), counts = rep(c(0.19, 27.05, 9, 3.1, 0.001), 10))
 ##' bin_data(counts_df, bin_width = 6)

@@ -12,9 +12,9 @@ bin_data.numeric <- function(dat = NULL,
   # Then just make a data.frame of counts for each measurement, and then use
   #  `bin_data.data.frame()`
 
-  counts_df <- as.data.frame(table(dat))
+  counts_df <- as.data.frame(table(dat))   # This does order them numerically
   names(counts_df) <- c("x", "counts")
-  counts_df$x <- as.numeric(counts_df$x)
+  counts_df$x <- as.numeric(levels(counts_df$x))
 
   yy <- bin_data.data.frame(counts_df,
                            ...)

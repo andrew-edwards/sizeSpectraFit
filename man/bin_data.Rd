@@ -94,7 +94,6 @@ in size or are of equal width, and encompass the data. Adapted from
 }
 \examples{
 \dontrun{
-TODO test
 x <- c(1:5, 3:7, 7, 7, 7)
 bin_data(x, bin_width = 2)
 
