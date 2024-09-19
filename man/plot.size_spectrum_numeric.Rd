@@ -2,7 +2,9 @@
 % Please edit documentation in R/plot.size-spectrum-numeric.R
 \name{plot.size_spectrum_numeric}
 \alias{plot.size_spectrum_numeric}
-\title{Single plot of individual size distribution of values and the MLE fit with confidence intervals}
+\title{Single plot of individual size distribution of values and the MLE fit with
+confidence intervals TODO Going to simplify this and call plot_isd(), which
+is a copy of this right now.}
 \usage{
 \method{plot}{size_spectrum_numeric}(
   res,

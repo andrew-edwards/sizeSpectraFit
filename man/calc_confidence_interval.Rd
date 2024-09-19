@@ -20,7 +20,8 @@ other options? Mention species-specific}
 other options? Mention species-specific...}
 }
 \description{
-Gets called from \code{\link[=fit_size_spectrum.numeric]{fit_size_spectrum.numeric()}}.
+Gets called from \code{\link[=fit_size_spectrum.numeric]{fit_size_spectrum.numeric()}}. TODO may need to be explicit
+about the help. Might be simpler as fitting function gets more complex.
 }
 \examples{
 \dontrun{

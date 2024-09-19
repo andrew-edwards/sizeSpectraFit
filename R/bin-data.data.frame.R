@@ -1,78 +1,17 @@
-##' Construct bins either double in size or are of equal width, and encompass
-##'  the data, and allows for non-integer counts.
-##'
-##' Taking from `goodnessOfFit/bin_data()` and adapting here, tidying up case
-##' etc.
-##'
-##' Adapted from sizeSpectra::binData() that did not allow for non-integer
-##' counts. Had to write new function as non-integer counts implies we only have
-##' the `counts_df` dataframe input, cannot have the `x` vector of individual
-##' values.
-##'
-##' This sums the counts of each value into bins.
-##'
-##' TODO Construct bins that start from `floor(min(x))` or `min(x)` and either double
-##'    in size or are of equal width, and encompass the data. More generalised
-##'    version of `log2bins()`.
-##'
-##' @param counts_df data.frame (can be a tibble) with first column `x` being the measured values
-##'  (e.g. body masses or lengths), and second column `counts` being the counts of the
-##'  number of individuals for that value. The `counts` column can have
-##'   non-integer values.
-##' @param bin_width type of bins to use:
-##'   * `"2k"` will result in `bin_breaks` that:
-##'     + with `start_integer=TRUE` are powers of 2, i.e. ..., 0.25, 0.5, 1, 2, 4, 8, 16,....
-##'     + with `start_integer=FALSE` are bins that double in size and  start with
-##'       `min(x)`; not yet implemented, since have to think about what the width of
-##'       the first bin should be.
-##'   * numeric value (call it `a`) will result in bin_breaks are separated by `a` and span the
-##'       data, that:
-##'     + with `start_integer=TRUE` start from `z = floor(min(x))` and are then
-##'          `z, z+a, z+2a, z+3a, ....`   (if `z = 0` then power-law cannot be fit
-##'        so then need to use `start_integer=FALSE`)
-##'     + with `start_integer=FALSE` start from `z = min(x)` and are then
-##'           `z, z+a, z+2a, z+3a, ....`
-##'   * only `bin_width` or `bin_breaks` can be specified.
-##' @param bin_breaks pre-defined bin breaks as a vector. Only `bin_width`
-##'   or `bin_breaks` can be specified.
-##' @param start_integer TRUE or FALSE, whether to start the bin breaks at an integer
-##'   power of 2 (for method `"2k"`) or an integer. See `bin_width` above.
-##'   `start_integer` is ignored if `bin_breaks` is specified.
-##' @return list containing:
-##'   * bin_for_each_x: data.frame with a row for each `counts_df$x` value, with columns:
-##'      + `x`: original `counts_df$x` values
-##'      + `bin_mid`, `bin_min`, `bin_max`, `bin_width`: midpoint, minimum,
-##'      maximum, and width, respectively, of the bin within
-##'      which the `x` value falls.  If bin_for_each_x has `>=10^6` rows then it isn't
-##'      saved.
-##'   * bin_vals: data.frame with a row for each new bin and columns:
-##'      + `bin_mid`, `bin_min`, `bin_max`, `bin_width`: midpoint, minimum,
-##'         maximum, and width, respectively, of the bin
-##'      + `bin_count`: total count of numbers of individuals in that bin
-##'      + `bin_count_norm`: normalised bin count, `bin_count / bin_width`
-##'      + `bin_sum`: sum of numbers of individuals * x values in that bin (appropriate if `x`
-##'         represents biomass, but not length)
-##'      + `bin_sum_norm`: `bin_sum / bin_width`
-##'      + `log10....` - `log10()` of some of the above quantities
+##' @rdname bin_data
 ##' @export
-##' @examples
-##' \dontrun{
-##' counts_ex <- tibble::tibble(x = as.numeric(1:50), counts = rep(c(0.19, 27.05, 9, 3.1, 0.001), 10))
-##' bin_data(counts_ex, bin_width = 6)
-##' }
-##' @author Andrew Edwards
-bin_data.data.frame <- function(counts_df,
+bin_data.data.frame <- function(dat,
                                 bin_width = NULL,
                                 bin_breaks = NULL,
                                 start_integer = TRUE){
-  if(dim(counts_df)[2] != 2){
-    stop("counts_df needs two cols in bin_data.data.frame()")
+  if(dim(dat)[2] != 2){
+    stop("dat needs two cols in bin_data.data.frame()")
   }
-  if(min(counts_df$x) < 0){
-    stop("x values in counts_df need to be >= 0 in bin_data.data.frame")
+  if(min(dat$x) < 0){
+    stop("x values in dat need to be >= 0 in bin_data.data.frame")
   }
-  if(min(counts_df$counts) < 0){
-    stop("numbers in counts_df need to be >= 0 in bin_data.data.frame")
+  if(min(dat$counts) < 0){
+    stop("numbers in dat need to be >= 0 in bin_data.data.frame")
   }
   if(is.null(bin_width) & is.null(bin_breaks)){
     stop("need one of bin_width or bin_breaks in bin_data.data.frame")
@@ -84,9 +23,9 @@ bin_data.data.frame <- function(counts_df,
     stop("start_integer must be TRUE or FALSE in bin_data.data.frame")
   }
 
-  x <- counts_df$x # measured values corresponding to counts
-  min_x <- min(x)  # min(dplyr::pull(counts_df ,1))
-  max_x <- max(x)  # max(dplyr::pull(counts_df ,1))
+  x <- dat$x # measured values corresponding to counts
+  min_x <- min(x)  # min(dplyr::pull(dat ,1))
+  max_x <- max(x)  # max(dplyr::pull(dat ,1))
 
   if(!is.null(bin_breaks)){
     if(min_x < min(bin_breaks) | max_x > max(bin_breaks)){
@@ -114,7 +53,7 @@ bin_data.data.frame <- function(counts_df,
     }
   }
 
-  bin_for_each_x <- counts_df   # data.frame with one row for each x value
+  bin_for_each_x <- dat   # data.frame with one row for each x value
 
   bin_for_each_x$bin_mid <- cut(x,
                                 breaks = bin_breaks,
