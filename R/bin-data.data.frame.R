@@ -53,7 +53,7 @@ bin_data.data.frame <- function(dat,
     }
   }
 
-  bin_for_each_x <- dat   # data.frame with one row for each x value
+  bin_for_each_x <- tibble::as_tibble(dat)   # data.frame with one row for each x value
 
   bin_for_each_x$bin_mid <- cut(x,
                                 breaks = bin_breaks,

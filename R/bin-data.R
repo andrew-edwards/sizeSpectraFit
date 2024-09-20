@@ -46,13 +46,13 @@
 ##'   power of 2 (for method `"2k"`) or an integer. See `bin_width` above.
 ##'   `start_integer` is ignored if `bin_breaks` is specified.
 ##' @return list containing:
-##'   * bin_for_each_x: data.frame with a row for each `counts_df$x` value, with columns:
+##'   * bin_for_each_x: tibble with a row for each `counts_df$x` value, with columns:
 ##'      + `x`: original `x` or `counts_df$x` values (depending on the input)
 ##'      + `bin_mid`, `bin_min`, `bin_max`, `bin_width`: midpoint, minimum,
 ##'      maximum, and width, respectively, of the bin within
 ##'      which the `x` value falls.  If bin_for_each_x has `>=10^6` rows then it isn't
 ##'      saved.
-##'   * bin_vals: data.frame with a row for each new bin and columns:
+##'   * bin_vals: tibble with a row for each new bin and columns:
 ##'      + `bin_mid`, `bin_min`, `bin_max`, `bin_width`: midpoint, minimum,
 ##'         maximum, and width, respectively, of the bin
 ##'      + `bin_count`: total count of numbers of individuals in that bin

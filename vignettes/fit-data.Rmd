@@ -86,12 +86,54 @@ plot(res_vec,
      x_small_ticks_labels = c(5, 50, 500))
 ```
 
-Now do MLEbin, then come back and add extra options for this one (since will first
+TODO After doing MLEbin below , then come back and add extra options for this one (since will first
 create binned figures for MLEbin). TODO
 
 ### Binned data of counts in bins
 
-TODO Basically am redoing the MLEbin_recommend vignette but with more usable functions.
+Now we demonstrate the MLEbin method, which is for binned data. Let's just take
+the same simulated data as used above, bin it, and then use the MLEbin
+method. Then we will do an example with real data.
+
+The function `bin_data()` takes a vector of values and assigns it to bins:
+```{r, MLEbin1}
+sim_vec_binned <- bin_data(sim_vec,
+                           bin_width = "2k")
+sim_vec_binned
+```
+The `2k` value says to assign bin widths that double in width.
+The function returns a list of two tibbles, the first (`$bin_for_each_x` above) shows each
+original value of `sim_vec`, the counts of that value (usually each count would
+be 1 for accurate data, like we have in `sim_vec`), and the bin that that value
+is assigned to. The bins are defined by their midpoint, minimum, and maximum
+values, given as `bin_mid`, `bin_min`, and `bin_max`, respectively. Given there
+are many values close to 1 the above values are not overly instructive. To see
+the final values simply do:
+```{r, MLEbin2}
+tail(sim_vec_binned$bin_for_each_x)
+```
+to see the bins that the rare large values get assigned to.
+
+The second component of the output of `bin_data()` is the tibble `bin_vals`, as
+seen above. This just gives the counts in the bins (`bin_count`), along with
+various useful the bin count divided by the bin width (`bin_count_norm`). See
+`?bin_data` for full details of outputs.
+
+We will only used the binned data now (`$bin_vals`) without knowledge of the raw
+measurements, to replicate what we might have for real data where measurements
+are assigned to bins (in this case ones that double in size; real data would
+more likely have linear bins based on the measurement accuracy of the
+instruments).
+
+TODO HERE Basically am redoing the MLEbin_recommend vignette but with more
+usable functions.
+
+NEXT: want `fit_size_spectrum()` to detect that we are applying it to a tibble,
+and then apply MLEbin automatically. Need to decide on a standard for input. And
+create a function to make into that if we have a vector of counts and binbreaks.
+
+
+
 
 
 
