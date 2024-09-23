@@ -13,7 +13,4 @@ vignettes/
 
 R-hdiAnalysis/*
 R-sizeSpectra/*
-
-R/negll-mlebin.R
-R/calc-mle-conf.R
-^R/fit-size-spectrum.data.frame.R$
+R-temp/*
