@@ -144,10 +144,12 @@ and then apply MLEbin automatically. Need to decide on a standard for input. And
 create a function to make into that if we have a vector of counts and binbreaks.
 
 Got to HERE in `fit-size-spectrum.data.frame.R`, but need to :
+
  - make a general `calc_mle_conf` function based on previous `calcLike` (see
-   `fit-size-spectrum.numeric.R` also). Need to make `prof_like()`.
+   `fit-size-spectrum.numeric.R` also, and move some ideas from that into
+   `calc_mle_conf()`, plus replace that code with `calc_mle_conf()`.). Need to make `prof_like()`.
  - use that in `fit-size-spectrum.numeric.R` instead of current
- - back to `fit-size-spectrum.data.frame.R` to carry on.
+ - back to `fit-size-spectrum.data.frame.R` to carry on. See HERE.
 
 And then also consider that we want to also allow for a tibble that has year or
 another heading (maybe allow it to be called strata, or let user add that as an
