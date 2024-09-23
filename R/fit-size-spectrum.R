@@ -1,26 +1,37 @@
 ##' Fit a size spectrum to data using maximum likelihood
 ##'
 ##' The function automatically uses the method...
-##'
-##' TODO Works for a numeric vector (e.g. MCMC samples of an estimated population size) or
-##' a data frame (such as MCMC samples of an estimated population size in 10
-##' different years -- years would be the named columns, each row would be an
-##' MCMC sample). Calculate the ETI, HDI (using appropriate functions from
-##' HDInterval), their respective widths, kernel density, and other useful
-##' information. See our manuscript, Appendix, and vignettes for
-##' further background and uses.
+##' For tibble, need `strata` if the data are different
 ##'
 ##' @param dat One of:
-##' * `numeric` vector of values (such as individual body masses), which uses
+##' * `numeric` vector of values (such as individual body masses of lengths), which uses
 ##'   the MLE method (via the function [fit_size_spectrum.numeric()];
+##' * `data.frame` that can be either
+##'   * individual measurements for a strata
+##'   (such as a year), for which column names are given by `strata` (default
+##'   is `year`, user can specify) and `x` for the measurements. More column
+##'   names can be in the data.frame but will not be used. In this case the MLE
+##'   method `fit_size_spectrum.numeric()` will be applied separately to each
+##'   year. TODO - need the functions OR
+##'   * count data for MLEbin method. At a minimum this has to include the columns:
+##'     * `bin_min`
+##'     * `bin_max`
+##'     * `bin_count`
+##'
+##'
+##' TODO
 ##' @param x_min minimum value of data to fit the PLB distribution to. If `NULL`
 ##'   (the default) then it is set to the minimum value of the data (if `dat` is
-##'   `numeric`), else to the minimum bin break of the lowest bin or ??any
-##'   other options? Mention species-specific
+##'   `numeric`), else to the minimum bin break of the lowest bin or ??TODO any
+##'   other options? If not NULL then the fitting is restricted to value above
+##'   `x_min` (and for the MLEbin method this has to be at one of the bin
+##'   breaks). TODO check the MLEbinfunction when finished. TODO Mention species-specific
 ##' @param x_max maximum value of data to fit the PLB distribution to. If `NULL`
 ##'   (the default) then it is set to the maximum value of the data (if `dat` is
-##'   `numeric`), else to the maximum bin break of the highest bin or ??any
-##'   other options? Mention species-specific...
+##'   `numeric`), else to the maximum bin break of the highest bin or ??TODOany
+##'   other options? If not NULL then the fitting is restricted to values below
+##'   `x_max` (and for the MLEbin method this has to be at one of the bin
+##'   breaks). Mention species-specific...
 ##' @return
 ##' * If `dat` is numeric then returns a list object of class
 ##'   `size_spectrum_numeric` (such that we can plot it
