@@ -56,12 +56,33 @@ hist(sim_vec, breaks = 100)
 
 To fit the data using the MLE method, simply use `fit_size_spectrum()`
 ```{r, MLE2}
-NEW CODE GIVES DIFFERENT CONF - previously had conf as -2.097417 -1.964317. See .html
-Set up a test to check, and obtain values from sizeSpectra code. Need to figure
-out why.
 res_vec <- fit_size_spectrum(sim_vec)
 res_vec
 ```
+
+--
+
+TODO NEW CODE GIVES DIFFERENT CONF - previously had conf as -2.097417 -1.964317,
+now have (-2.096697, -1.964697). MLEs are the same.
+
+Need to figure
+out why. Difference was on 2024-09-24, between 10:14am (when last rendered this
+file) at end of day. Aha - originally had `vec_inc = 0.001`, now have `b_vec_inc
+= 0.00001`.
+
+Check what I had in sizeSpectra. Re-run first vignette code, get the same as
+before (-2.097417, -1.964317). Oh, but I had
+`bvec = seq(PLB.bMLE - 0.5, PLB.bMLE + 0.5, 0.00001)`  so same increment as what
+I now have here. Seems like an issue in the new code then. Aha -
+`calc_mle_conf()` has `vec_inc` and `b_vec_inc`; should just have the former for
+generality.
+
+Have fixed in the commit that creates this section of text. Saving then deleting
+in next commit.
+
+--
+
+
 So `res_vec` is a list that contains the MLE and confidence intervals for $b$,
 as components `b_mle` and `b_conf` ,respectively,
 plus also the original data as component `x`. When printing I have set it up to just show the

@@ -6,6 +6,8 @@
 ##'  negative log-likelihood function and its arguments (other parameters and data).
 ##' TODO Will likely give warnings that can safely be ignored (see
 ##'  `suppress.warnings` description below). Decide what to do, maybe like for hdiAnalysis.
+##' This should be a general function, i.e. not just applicable to size
+##'  spectra. TODO check that I did that.
 ##'
 ##' @param neg_ll_fn negative log-likelihood function that take arguments
 ##'  (parameters and data) in ... and returns a negative
@@ -38,11 +40,10 @@
 calc_mle_conf <- function(this_neg_ll_fn,   # needed to avoid partial matching
                                         # with n
                           p,
+                          vec = NULL,
                           vec_diff = 0.5,
-                          vec_inc = 0.001,
+                          vec_inc = 0.00001,
                           suppress_warnings = FALSE,
-                          b_vec,
-                          b_vec_inc,
                           ...){
 
   # calcLike was:  TODO decide about the warnings
@@ -58,36 +59,36 @@ calc_mle_conf <- function(this_neg_ll_fn,   # needed to avoid partial matching
 
   mle = min_neg_ll$estimate
 
-  if(is.null(b_vec)){
-    b_vec <- seq(mle - vec_diff,
-                 mle + vec_diff,
-                 by = vec_inc)
+  if(is.null(vec)){
+    vec <- seq(mle - vec_diff,
+               mle + vec_diff,
+               by = vec_inc)
   }
 
-  b_conf <- calc_confidence_interval(this_neg_ll_fn = this_neg_ll_fn,
+  conf <- calc_confidence_interval(this_neg_ll_fn = this_neg_ll_fn,
                                      min_neg_ll_value = min_neg_ll$minimum,
                                      # x = x,
                                      # n = n,
                                      # x_min = x_min,
                                      # x_max = x_max,
                                      # sum_log_x = sum_log_x,
-                                     b_vec = b_vec,
+                                     vec = vec,
                                      ...)
 
   # If confidence interval hits a bound then redo it over a larger range
-  while(b_conf[1] == min(b_vec) | b_conf[2] == max(b_vec)){
-    b_vec <- seq(min(b_vec) - 0.5,
-                 max(b_vec) + 0.5,
-                 b_vec_inc)
+  while(conf[1] == min(vec) | conf[2] == max(vec)){
+    vec <- seq(min(vec) - 0.5,
+                 max(vec) + 0.5,
+                 vec_inc)
 
-    b_conf <- calc_confidence_interval(this_neg_ll_fn = this_neg_ll_fn,  # TODO same as above
+    conf <- calc_confidence_interval(this_neg_ll_fn = this_neg_ll_fn,  # TODO same as above
                                        min_neg_ll_value = min_neg_ll$minimum,
 #                                       x = x,
 #                                       n = n,
 #                                       x_min = x_min,
 #                                       x_max = x_max,
 #                                       sum_log_x = sum_log_x,
-                                       b_vec = b_vec,
+                                       vec = vec,
                                        ...)
   }
 
@@ -99,6 +100,6 @@ calc_mle_conf <- function(this_neg_ll_fn,   # needed to avoid partial matching
 #                   ...)
 
   res = list(mle = mle,
-             conf = b_conf)   # TODO standardise, just have conf not b_conf
+             conf = conf)
   return(res)
 }

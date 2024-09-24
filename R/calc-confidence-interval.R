@@ -13,7 +13,7 @@
 ##' }
 calc_confidence_interval <- function(this_neg_ll_fn,
                                      min_neg_ll_value,
-                                     b_vec,
+                                     vec,
                                      ...){
   # Values to pass on here in ...
 #                                     n,    # not sure if always used
@@ -27,12 +27,12 @@ calc_confidence_interval <- function(this_neg_ll_fn,
   #  sets in Table 2 of Edwards (2011) the intervals were symmetric, so make a
   #  symmetric interval here.
 
-  neg_ll_vals <- sapply(X = b_vec,
+  neg_ll_vals <- sapply(X = vec,
                         FUN = this_neg_ll_fn,
                         ...)
-#  ll_vals <- vector(length = length(b_vec))  # negative log-likelihood for bvec
-#  for(i in 1:length(b_vec)){
-#    ll_vals[i] <- negll_mle(b_vec[i],
+#  ll_vals <- vector(length = length(vec))  # negative log-likelihood for bvec
+#  for(i in 1:length(vec)){
+#    ll_vals[i] <- negll_mle(vec[i],
 #                            x = x,
 #                            n = n,
 #                            x_min = x_min,
@@ -43,8 +43,8 @@ calc_confidence_interval <- function(this_neg_ll_fn,
   crit_val <- min_neg_ll_value  + qchisq(0.95,1)/2
                       # 1 degree of freedom, Hilborn and Mangel (1997) p162.
 
-  b_in_95 <- b_vec[neg_ll_vals < crit_val] # b values in 95% confidence interval
-  b_conf = c(min(b_in_95),
-             max(b_in_95))
-  return(b_conf)
+  values_in_95 <- vec[neg_ll_vals < crit_val] # b values in 95% confidence interval
+  conf = c(min(values_in_95),
+             max(values_in_95))
+  return(conf)
 }
