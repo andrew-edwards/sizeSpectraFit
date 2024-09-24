@@ -56,6 +56,9 @@ hist(sim_vec, breaks = 100)
 
 To fit the data using the MLE method, simply use `fit_size_spectrum()`
 ```{r, MLE2}
+NEW CODE GIVES DIFFERENT CONF - previously had conf as -2.097417 -1.964317. See .html
+Set up a test to check, and obtain values from sizeSpectra code. Need to figure
+out why.
 res_vec <- fit_size_spectrum(sim_vec)
 res_vec
 ```

@@ -26,7 +26,7 @@ calc_confidence_interval <- function(this_neg_ll_fn,
   #  interval. For the real movement data
   #  sets in Table 2 of Edwards (2011) the intervals were symmetric, so make a
   #  symmetric interval here.
-browser()
+
   neg_ll_vals <- sapply(X = b_vec,
                         FUN = this_neg_ll_fn,
                         ...)

@@ -80,14 +80,15 @@ calc_mle_conf <- function(this_neg_ll_fn,   # needed to avoid partial matching
                  max(b_vec) + 0.5,
                  b_vec_inc)
 
-    b_conf <- calc_confidence_interval(this_neg_ll_fn,  # TODO same as above
+    b_conf <- calc_confidence_interval(this_neg_ll_fn = this_neg_ll_fn,  # TODO same as above
                                        min_neg_ll_value = min_neg_ll$minimum,
-                                       x = x,
-                                       n = n,
-                                       x_min = x_min,
-                                       x_max = x_max,
-                                       sum_log_x = sum_log_x,
-                                       b_vec = b_vec)
+#                                       x = x,
+#                                       n = n,
+#                                       x_min = x_min,
+#                                       x_max = x_max,
+#                                       sum_log_x = sum_log_x,
+                                       b_vec = b_vec,
+                                       ...)
   }
 
 
@@ -98,6 +99,6 @@ calc_mle_conf <- function(this_neg_ll_fn,   # needed to avoid partial matching
 #                   ...)
 
   res = list(mle = mle,
-             conf = conf)
+             conf = b_conf)   # TODO standardise, just have conf not b_conf
   return(res)
 }
