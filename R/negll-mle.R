@@ -15,12 +15,12 @@
 ##' @return numeric negative log-likelihood of the parameters given the data
 ##' @export
 ##' @author Andrew Edwards
-negll_mle = function(b,
-                     x,
-                     n,
-                     x_min,
-                     x_max,
-                     sum_log_x){
+neg_ll_mle = function(b,
+                      x,
+                      n,
+                      x_min,
+                      x_max,
+                      sum_log_x){
   if(x_min <= 0 | x_min >= x_max) stop("Parameters out of bounds in negLL.PLB")
   if(b != -1){
     negll = -n * log( ( b + 1) / (x_max^(b + 1) - x_min^(b + 1)) ) -

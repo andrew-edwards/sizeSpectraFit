@@ -42,11 +42,11 @@ so then need to use \code{start_integer=FALSE})
 \item with \code{start_integer=FALSE} start from \code{z = min(x)} and are then
 \verb{z, z+a, z+2a, z+3a, ....}
 }
-\item only \code{bin_width} or \code{bin_breaks} can be specified.
+\item exactly one of \code{bin_width} or \code{bin_breaks} must be specified.
 }}
 
-\item{bin_breaks}{pre-defined bin breaks as a vector. Only \code{bin_width}
-or \code{bin_breaks} can be specified.}
+\item{bin_breaks}{pre-defined bin breaks as a vector. Exactly one of  \code{bin_width}
+or \code{bin_breaks} must be specified.}
 
 \item{start_integer}{TRUE or FALSE, whether to start the bin breaks at an integer
 power of 2 (for method \code{"2k"}) or an integer. See \code{bin_width} above.
@@ -55,7 +55,7 @@ power of 2 (for method \code{"2k"}) or an integer. See \code{bin_width} above.
 \value{
 list containing:
 \itemize{
-\item bin_for_each_x: data.frame with a row for each \code{counts_df$x} value, with columns:
+\item bin_for_each_x: tibble with a row for each \code{counts_df$x} value, with columns:
 \itemize{
 \item \code{x}: original \code{x} or \code{counts_df$x} values (depending on the input)
 \item \code{bin_mid}, \code{bin_min}, \code{bin_max}, \code{bin_width}: midpoint, minimum,
@@ -63,7 +63,7 @@ maximum, and width, respectively, of the bin within
 which the \code{x} value falls.  If bin_for_each_x has \verb{>=10^6} rows then it isn't
 saved.
 }
-\item bin_vals: data.frame with a row for each new bin and columns:
+\item bin_vals: tibble with a row for each new bin and columns:
 \itemize{
 \item \code{bin_mid}, \code{bin_min}, \code{bin_max}, \code{bin_width}: midpoint, minimum,
 maximum, and width, respectively, of the bin
@@ -77,25 +77,32 @@ maximum, and width, respectively, of the bin
 }
 }
 \description{
-SEE ISSUE for what to do next.  TODO THIS WILL become the generic
-class thing. PROB MAKE THESE THE DEFAULT HELP, easier for people to find,
-as for fit-size-spectrum.
-}
-\details{
-Takes either a numeric vector of values (e.g. body masses) or a data.frame
-of counts of values, and bins them into bins. In particular needed for
-MLEbin method (TODO function is ??) or the goodness-of-fit tests.
+Takes either a \code{numeric} vector of values (e.g. body masses) or a \code{data.frame}
+of counts of values, and bins the values or counts into bins. In particular
+needed for
+MLEbin method (TODO function is ??) and the goodness-of-fit tests.
 The counts can take non-integer values, which can occur when standardising field
 measurements.
+}
+\details{
+Constructs bins that start from \code{floor(min(x))} or \code{min(x)} and either double
+in size or are of equal width, and encompass the data. User must specify
+either \code{bin_width} or
+\code{bin_breaks}.
 
-Construct bins that start from \code{floor(min(x))} or \code{min(x)} and either double
-in size or are of equal width, and encompass the data. Adapted from
+Bins are defined intervals \verb{[w_j, w_\{j+1\})}, which means values
+\code{x} in the interval satisfy \verb{w_j <= x < w_\{j+1\}}, i.e. closed on the left
+and open on the right.  The exception being for
+the highest bin \verb{[w_\{J-1\}, w_J]} which includes both bin breaks; see p11 of
+Appendix of MEE paper \link{1} for more details. Functions are adapted from
 \code{\link[sizeSpectra:binData]{sizeSpectra::binData()}}.
 }
 \examples{
 \dontrun{
 x <- c(1:5, 3:7, 7, 7, 7)
 bin_data(x, bin_width = 2)
+
+bin_data(sim_vec, bin_width = "2k")
 
 counts_df <- tibble::tibble(x = as.numeric(1:50), counts = rep(c(0.19, 27.05, 9, 3.1, 0.001), 10))
 bin_data(counts_df, bin_width = 6)

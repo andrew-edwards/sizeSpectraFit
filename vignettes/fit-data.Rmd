@@ -145,6 +145,7 @@ create a function to make into that if we have a vector of counts and binbreaks.
 
 Got to HERE in `fit-size-spectrum.data.frame.R`, but need to :
 
+[have moved works-in-progress files to R-temp/]
  - make a general `calc_mle_conf` function based on previous `calcLike` (see
    `fit-size-spectrum.numeric.R` also, and move some ideas from that into
    `calc_mle_conf()`, plus replace that code with `calc_mle_conf()`.). Need to make `prof_like()`.

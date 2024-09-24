@@ -28,49 +28,32 @@ fit_size_spectrum.numeric <- function(dat,
   # Use analytical value of MLE b for PL model (Box 1, Edwards et al. 2007)
   #  as a starting point for nlm for MLE of b for PLB model. Everything after
   #  this is for PLB.
-  pl_b_mle = 1/( log(x_min) - sum_log_x/length(x)) - 1
+  pl_b_mle <- 1/( log(x_min) - sum_log_x/length(x)) - 1
 
-  min_ll <- nlm(negll_mle,
-                p = pl_b_mle,
-                x = x,
-                n = n,
-                x_min = x_min,
-                x_max = x_max,
-                sum_log_x = sum_log_x)
 
-  b_mle <- min_ll$estimate
+  mle_and_conf <- calc_mle_conf(this_neg_ll_fn = neg_ll_mle,  # TODO change to _method
+                                p = pl_b_mle,
+                                b_vec = b_vec,
+                                x = x,
+                                n = n,
+                                x_min = x_min,
+                                x_max = x_max,
+                                sum_log_x = sum_log_x,
+                                b_vec_inc = b_vec_inc)
 
-  if(is.null(b_vec)){
-    b_vec <- seq(b_mle - 0.5,
-                 b_mle + 0.5,
-                 b_vec_inc)
-  }
+  # Did have this, replacing with calc_mle_conf() call:
+#  min_ll <- nlm(negll_mle,
+#                p = pl_b_mle,
+#                x = x,
+#                n = n,
+#                x_min = x_min,
+#                x_max = x_max,
+#                sum_log_x = sum_log_x)
 
-  b_conf <- calc_confidence_interval(min_ll = min_ll,
-                                     x = x,
-                                     n = n,
-                                     x_min = x_min,
-                                     x_max = x_max,
-                                     sum_log_x = sum_log_x,
-                                     b_vec = b_vec)
+#  b_mle <- min_ll$estimate
 
-  # If confidence interval hits a bound then redo it over a larger range
-  while(b_conf[1] == min(b_vec) | b_conf[2] == max(b_vec)){
-    b_vec <- seq(min(b_vec) - 0.5,
-                 max(b_vec) + 0.5,
-                 b_vec_inc)
-
-    b_conf <- calc_confidence_interval(min_ll = min_ll,
-                                       x = x,
-                                       n = n,
-                                       x_min = x_min,
-                                       x_max = x_max,
-                                       sum_log_x = sum_log_x,
-                                       b_vec = b_vec)
-  }
-
-  res <- list(b_mle = b_mle,
-              b_conf = b_conf,
+  res <- list(b_mle = mle_and_conf$mle,
+              b_conf = mle_and_conf$conf,
               x = x)
 
   class(res) = c("size_spectrum_numeric",

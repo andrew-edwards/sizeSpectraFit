@@ -19,19 +19,40 @@ fit_size_spectrum(dat, ...)
 \arguments{
 \item{dat}{One of:
 \itemize{
-\item \code{numeric} vector of values (such as individual body masses), which uses
+\item \code{numeric} vector of values (such as individual body masses of lengths), which uses
 the MLE method (via the function \code{\link[=fit_size_spectrum.numeric]{fit_size_spectrum.numeric()}};
-}}
+\item \code{data.frame} that can be either
+\itemize{
+\item individual measurements for a strata
+(such as a year), for which column names are given by \code{strata} (default
+is \code{year}, user can specify) and \code{x} for the measurements. More column
+names can be in the data.frame but will not be used. In this case the MLE
+method \code{fit_size_spectrum.numeric()} will be applied separately to each
+year. TODO - need the functions OR
+\item count data for MLEbin method. At a minimum this has to include the columns:
+\itemize{
+\item \code{bin_min}
+\item \code{bin_max}
+\item \code{bin_count}
+}
+}
+}
+
+TODO}
 
 \item{x_min}{minimum value of data to fit the PLB distribution to. If \code{NULL}
 (the default) then it is set to the minimum value of the data (if \code{dat} is
-\code{numeric}), else to the minimum bin break of the lowest bin or ??any
-other options? Mention species-specific}
+\code{numeric}), else to the minimum bin break of the lowest bin or ??TODO any
+other options? If not NULL then the fitting is restricted to value above
+\code{x_min} (and for the MLEbin method this has to be at one of the bin
+breaks). TODO check the MLEbinfunction when finished. TODO Mention species-specific}
 
 \item{x_max}{maximum value of data to fit the PLB distribution to. If \code{NULL}
 (the default) then it is set to the maximum value of the data (if \code{dat} is
-\code{numeric}), else to the maximum bin break of the highest bin or ??any
-other options? Mention species-specific...}
+\code{numeric}), else to the maximum bin break of the highest bin or ??TODOany
+other options? If not NULL then the fitting is restricted to values below
+\code{x_max} (and for the MLEbin method this has to be at one of the bin
+breaks). Mention species-specific...}
 }
 \value{
 \itemize{
@@ -96,15 +117,7 @@ column names of \code{dat_mcmc} contain non-digits (e.g. represents years).
 }
 \description{
 The function automatically uses the method...
-}
-\details{
-TODO Works for a numeric vector (e.g. MCMC samples of an estimated population size) or
-a data frame (such as MCMC samples of an estimated population size in 10
-different years -- years would be the named columns, each row would be an
-MCMC sample). Calculate the ETI, HDI (using appropriate functions from
-HDInterval), their respective widths, kernel density, and other useful
-information. See our manuscript, Appendix, and vignettes for
-further background and uses.
+For tibble, need \code{strata} if the data are different
 }
 \examples{
 \dontrun{

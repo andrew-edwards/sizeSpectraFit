@@ -4,20 +4,10 @@
 \alias{calc_confidence_interval}
 \title{Calculate confidence interval}
 \usage{
-calc_confidence_interval(min_ll, x, n, x_min, x_max, sum_log_x, b_vec)
+calc_confidence_interval(neg_ll_fn, min_neg_ll_value, b_vec, ...)
 }
 \arguments{
 \item{min_ll}{list output from \code{\link[=nlm]{nlm()}}.}
-
-\item{x_min}{minimum value of data to fit the PLB distribution to. If \code{NULL}
-(the default) then it is set to the minimum value of the data (if \code{dat} is
-\code{numeric}), else to the minimum bin break of the lowest bin or ??any
-other options? Mention species-specific}
-
-\item{x_max}{maximum value of data to fit the PLB distribution to. If \code{NULL}
-(the default) then it is set to the maximum value of the data (if \code{dat} is
-\code{numeric}), else to the maximum bin break of the highest bin or ??any
-other options? Mention species-specific...}
 }
 \description{
 Gets called from \code{\link[=fit_size_spectrum.numeric]{fit_size_spectrum.numeric()}}. TODO may need to be explicit
