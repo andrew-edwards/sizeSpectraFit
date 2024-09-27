@@ -137,25 +137,28 @@ instruments).
 TODO actually, just include a simple example data set of binned values. Move the
 above to later.
 
-TODO HERE Basically am redoing the MLEbin_recommend vignette but with more
+Basically am redoing the MLEbin_recommend vignette but with more
 usable functions.
 
-NEXT: want `fit_size_spectrum()` to detect that we are applying it to a tibble,
-and then apply MLEbin automatically. Need to decide on a standard for input. And
-create a function to make into that if we have a vector of counts and binbreaks.
+TODO: create a function to make into bin_data formatthat if we have a vector of
+counts and binbreaks. - check if `bin_data.data.frame()` works, check when wrote it.
 
+NEXT: make `bin_data()` not sort the `bin_for_each_x`, just the `bin_vals`
 
 ```{r mlebin}
 res_binned <- fit_size_spectrum(sim_vec_binned$bin_vals)
 ```
-Got to HERE in `fit-size-spectrum.data.frame.R`, but need to :
+
+Might still need to:
 
  D make a general `calc_mle_conf` function based on previous `calcLike` (see
    `fit-size-spectrum.numeric.R` also, and move some ideas from that into
    `calc_mle_conf()`, plus replace that code with `calc_mle_conf()`.). Need to make `prof_like()`.
  - use that in `fit-size-spectrum.numeric.R` instead of current
  - back to `fit-size-spectrum.data.frame.R` to carry on. See HERE.
-Think that's all mostly done, need to set up tests.
+Think that's all mostly done, need to set up tests. NEXT fix tests, may have to
+tidy up what I just did, though writing tests will help; change any negll ->
+neg_ll. Check results with paper.
 
 And then also consider that we want to also allow for a tibble that has year or
 another heading (maybe allow it to be called strata, or let user add that as an
