@@ -20,7 +20,7 @@
 ##' @return negative log-likelihood of the parameters given the data
 ##' @export
 ##' @author Andrew Edwards
-negll_mlebin_method <- function(b,
+neg_ll_mlebin_method <- function(b,
                                 x_min,
                                 x_max,
                                 w,

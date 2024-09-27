@@ -31,7 +31,7 @@ fit_size_spectrum.numeric <- function(dat,
   pl_b_mle <- 1/( log(x_min) - sum_log_x/length(x)) - 1
 
 
-  mle_and_conf <- calc_mle_conf(this_neg_ll_fn = neg_ll_mle,  # TODO change to _method
+  mle_and_conf <- calc_mle_conf(this_neg_ll_fn = neg_ll_mle_method,  # TODO change to _method
                                 p = pl_b_mle,
                                 vec = b_vec,
                                 vec_inc = b_vec_inc,
@@ -40,18 +40,6 @@ fit_size_spectrum.numeric <- function(dat,
                                 x_min = x_min,
                                 x_max = x_max,
                                 sum_log_x = sum_log_x)
-
-
-  # Did have this, replacing with calc_mle_conf() call:
-#  min_ll <- nlm(negll_mle,
-#                p = pl_b_mle,
-#                x = x,
-#                n = n,
-#                x_min = x_min,
-#                x_max = x_max,
-#                sum_log_x = sum_log_x)
-
-#  b_mle <- min_ll$estimate
 
   res <- list(b_mle = mle_and_conf$mle,
               b_conf = mle_and_conf$conf,

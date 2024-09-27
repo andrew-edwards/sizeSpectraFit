@@ -144,14 +144,18 @@ NEXT: want `fit_size_spectrum()` to detect that we are applying it to a tibble,
 and then apply MLEbin automatically. Need to decide on a standard for input. And
 create a function to make into that if we have a vector of counts and binbreaks.
 
+
+```{r mlebin}
+res_binned <- fit_size_spectrum(sim_vec_binned$bin_vals)
+```
 Got to HERE in `fit-size-spectrum.data.frame.R`, but need to :
 
-[have moved works-in-progress files to R-temp/]
- - make a general `calc_mle_conf` function based on previous `calcLike` (see
+ D make a general `calc_mle_conf` function based on previous `calcLike` (see
    `fit-size-spectrum.numeric.R` also, and move some ideas from that into
    `calc_mle_conf()`, plus replace that code with `calc_mle_conf()`.). Need to make `prof_like()`.
  - use that in `fit-size-spectrum.numeric.R` instead of current
  - back to `fit-size-spectrum.data.frame.R` to carry on. See HERE.
+Think that's all mostly done, need to set up tests.
 
 And then also consider that we want to also allow for a tibble that has year or
 another heading (maybe allow it to be called strata, or let user add that as an
