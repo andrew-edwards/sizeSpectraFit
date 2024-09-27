@@ -25,7 +25,7 @@ fit_size_spectrum.data.frame <- function(dat,
 
 ##' @rdname fit_size_spectrum
 ##' @export
-fit_size_spectrum.mlebin <- function(dat,
+fit_size_spectrum.mlebin <- function(dat,              # TODO change to _mlebin prob
                                      x_min = NULL,
                                      x_max = NULL,
                                      b_vec = NULL,
@@ -37,14 +37,15 @@ fit_size_spectrum.mlebin <- function(dat,
   df <- tibble::as_tibble(dat)     # df is tibble to be fitted, can get
                                    # restricted in next lines
 
-  # TODO might have to take out 0 counts in end bins
+  # TODO sort the bins into order of bin_min
+  # TODO might have to take out 0 counts in end bins. Check here or reduce the bins
   if(!is.null(x_min)){
     df <- dplyr::filter(df,
-                        bin_min >= x_min)
+                        bin_min >= x_min)     # TODO add to help, restrict full
+                                        # bins with [`x_min`, `x_max`]   spell out
   } else {
     x_min <- min(bin_min)
   }
-
 
   if(!is.null(x_max)){
     df <- dplyr::filter(df,
@@ -59,73 +60,43 @@ fit_size_spectrum.mlebin <- function(dat,
               x_min < x_max)
 
 
+  # Adapting from MLE in sizeSpectra2:
 
-  HERE
+  # To match equations:
+  w <- c(df$bin_min,
+         max(df$bin_max))   # TODO when done sorting in
+                             # fit_size_spectrum.mlebin change this to the last
+                             # value since then will be the max
+  d <- df$bin_count
+  J <- length(J)             # Number of bins
+  n <- sum(d)     # TODO check if can be non-integer, think maybe. Check GoF stuff.
 
-  This was from sizeSpectra: need to [see .Rmd for next steps]
+  if(x_min <= 0 | x_min >= x_max | d[1] == 0 | d[J] == 0 | min(d) < 0){
+    stop("Parameters out of bounds in fit_size_spectrum.data.frame()")
+  }
 
-    MLEbin.res <- calcLike(negLL.PLB.binned,
-                           p = p,
-                           w = c(bins_this_seg$wmin,
-                                 max(bins_this_seg$wmax)),
-                           d = bins_this_seg$binCount,
-                           vecDiff = 1,             # increase this if hit a bound
-                           vecInc = 1e-10)
-
-
-
-# This was MLE in sizeSpectra2:
-  sum_log_x  <- sum(log(x))
 
   # Use analytical value of MLE b for PL model (Box 1, Edwards et al. 2007)
   #  as a starting point for nlm for MLE of b for PLB model. Everything after
   #  this is for PLB.
   pl_b_mle = 1/( log(x_min) - sum_log_x/length(x)) - 1
 
-  min_ll <- nlm(negll_mle,
-                p = pl_b_mle,
-                x = x,
-                n = n,
-                x_min = x_min,
-                x_max = x_max,
-                sum_log_x = sum_log_x)
+  mle_and_conf <- calc_mle_conf(this_neg_ll_fn = neg_ll_mlebin_method,
+                                p = pl_b_mle,
+                                vec = b_vec, # can specify if like TODO check
+                                vec_inc = b_vec_inc,   # figure out vec_diff also
+                                x_min = x_min,
+                                x_max = x_max,
+                                w = w,
+                                d = d,
+                                J = J,
+                                n = n)
 
-  b_mle <- min_ll$estimate
+  res <- list(b_mle = mle_and_conf$mle,
+              b_conf = mle_and_conf$conf,
+              data = df)    # TODO mention can be different to dat
 
-  if(is.null(b_vec)){
-    b_vec <- seq(b_mle - 0.5,
-                 b_mle + 0.5,
-                 b_vec_inc)
-  }
-
-  b_conf <- calc_confidence_interval(min_ll = min_ll,
-                                     x = x,
-                                     n = n,
-                                     x_min = x_min,
-                                     x_max = x_max,
-                                     sum_log_x = sum_log_x,
-                                     b_vec = b_vec)
-
-  # If confidence interval hits a bound then redo it over a larger range
-  while(b_conf[1] == min(b_vec) | b_conf[2] == max(b_vec)){
-    b_vec <- seq(min(b_vec) - 0.5,
-                 max(b_vec) + 0.5,
-                 b_vec_inc)
-
-    b_conf <- calc_confidence_interval(min_ll = min_ll,
-                                       x = x,
-                                       n = n,
-                                       x_min = x_min,
-                                       x_max = x_max,
-                                       sum_log_x = sum_log_x,
-                                       b_vec = b_vec)
-  }
-
-  res <- list(b_mle = b_mle,
-              b_conf = b_conf,
-              x = x)
-
-  class(res) = c("size_spectrum_numeric",
+  class(res) = c("size_spectrum_data_frame",
                  class(res))
 
   return(res)

@@ -23,10 +23,10 @@ neg_ll_mle = function(b,
                       sum_log_x){
   if(x_min <= 0 | x_min >= x_max) stop("Parameters out of bounds in negLL.PLB")
   if(b != -1){
-    negll = -n * log( ( b + 1) / (x_max^(b + 1) - x_min^(b + 1)) ) -
+    neg_ll = -n * log( ( b + 1) / (x_max^(b + 1) - x_min^(b + 1)) ) -
       b * sum_log_x
   } else {
-    negll = n * log( log(x_max) - log(x_min) ) + sum_log_x
+    neg_ll = n * log( log(x_max) - log(x_min) ) + sum_log_x
   }
-  return(negll)
+  return(neg_ll)
 }

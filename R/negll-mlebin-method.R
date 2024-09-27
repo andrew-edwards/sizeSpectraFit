@@ -1,11 +1,9 @@
-Can delete, have copied to adapt in R/
-
 ##' Calculate negative log-likelihood for the bounded power-law
-##'   distribution given binned data
+##'   distribution given binned data, using the MLEbin method
 ##'
 ##' Calculates the negative log-likelihood of the parameters `b`, `x_min` and
 ##' `x_max` given binned data for the PLB model. Returns the negative
-##' log-likelihood. Will be called by `nlm()` or similar, but `x_min` and `x_max`
+##' log-likelihood. Will be called by `calc_mle_conf()` via `fit_size_spectrum.data.frame()`, or similar, but `x_min` and `x_max`
 ##' will just be estimated as the minimum of lowest bin and maximum of the
 ##' largest bin, respectively, (since they are the MLEs), no need to do
 ##' numerically. Specifically this is the negative of the log-likelihood
@@ -22,24 +20,19 @@ Can delete, have copied to adapt in R/
 ##' @return negative log-likelihood of the parameters given the data
 ##' @export
 ##' @author Andrew Edwards
-negll_MLEbin = function(b,
-                        w,
-                        d,
-                        J = length(d),
-                        x_min = min(w), # TODO maybe remove, and always speicfy
-                        x_max = max(w)){
-  # Ideally should fix those J=length(d) type things in args, that messed me up in
-  # another project.
-    if(xmin <= 0 | xmin >= xmax | length(d) != J | length(w) != J+1 |
-         d[1] == 0 | d[J] == 0 | min(d) < 0)
-         stop("Parameters out of bounds in negLL.PLB")
-    n = sum(d)
-    if(b != -1)
-      { neglogLL = n * log( abs( w[J+1]^(b+1) - w[1]^(b+1) ) ) -
-            sum( d * log( abs( w[-1]^(b+1) - w[-(J+1)]^(b+1) ) ) )
-      } else
-      { neglogLL = n * log( log(w[J+1]) - log(w[1]) ) -
-            sum( d * log( ( log(w[-1]) - log(w[-(J+1)]) ) ) )
-      }
-    return(neglogLL)
+negll_mlebin_method <- function(b,
+                                x_min,
+                                x_max,
+                                w,
+                                d,
+                                J,
+                                n){
+  if(b != -1){
+    neg_ll <- n * log( abs( w[J+1]^(b+1) - w[1]^(b+1) ) ) -
+      sum( d * log( abs( w[-1]^(b+1) - w[-(J+1)]^(b+1) ) ) )
+  } else {
+    neg_ll <- n * log( log(w[J+1]) - log(w[1]) ) -
+      sum( d * log( ( log(w[-1]) - log(w[-(J+1)]) ) ) )
   }
+  return(neg_ll)
+}

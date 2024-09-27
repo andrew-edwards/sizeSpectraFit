@@ -66,7 +66,7 @@ calc_mle_conf <- function(this_neg_ll_fn,   # needed to avoid partial matching
   }
 
   conf <- calc_confidence_interval(this_neg_ll_fn = this_neg_ll_fn,
-                                     min_neg_ll_value = min_neg_ll$minimum,
+                                   min_neg_ll_value = min_neg_ll$minimum,
                                      # x = x,
                                      # n = n,
                                      # x_min = x_min,
@@ -99,7 +99,7 @@ calc_mle_conf <- function(this_neg_ll_fn,   # needed to avoid partial matching
 #                   vec_diff = vec_diff,
 #                   ...)
 
-  res = list(mle = mle,
-             conf = conf)
+  res <- list(mle = mle,
+              conf = conf)
   return(res)
 }

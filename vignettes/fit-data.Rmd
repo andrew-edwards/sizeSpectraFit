@@ -155,7 +155,7 @@ Got to HERE in `fit-size-spectrum.data.frame.R`, but need to :
 
 And then also consider that we want to also allow for a tibble that has year or
 another heading (maybe allow it to be called strata, or let user add that as an
-option - yes, strata = year as the default).
+option - yes, strata = year as the default, or maybe strata = NULL is the default).
 
 
 our [MEE paper](http://onlinelibrary.wiley.com/doi/10.1111/2041-210X.12641/full)
