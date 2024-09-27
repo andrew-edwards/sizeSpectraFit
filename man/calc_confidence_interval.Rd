@@ -4,7 +4,7 @@
 \alias{calc_confidence_interval}
 \title{Calculate confidence interval}
 \usage{
-calc_confidence_interval(neg_ll_fn, min_neg_ll_value, b_vec, ...)
+calc_confidence_interval(this_neg_ll_fn, min_neg_ll_value, vec, ...)
 }
 \arguments{
 \item{min_ll}{list output from \code{\link[=nlm]{nlm()}}.}

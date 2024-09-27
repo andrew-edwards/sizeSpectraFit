@@ -6,13 +6,12 @@
 interval}
 \usage{
 calc_mle_conf(
-  neg_ll_fn,
+  this_neg_ll_fn,
   p,
+  vec = NULL,
   vec_diff = 0.5,
-  vec_inc = 0.001,
+  vec_inc = 1e-05,
   suppress_warnings = FALSE,
-  b_vec,
-  b_vec_inc,
   ...
 )
 }
@@ -41,7 +40,7 @@ presumably when searching some very very very unlikely region of paramater space
 
 \item{...}{further arguments (including parameters and data) to \code{negll_fn()}}
 
-\item{negll_fn}{negative log-likelihood function that take arguments
+\item{neg_ll_fn}{negative log-likelihood function that take arguments
 (parameters and data) in ... and returns a negative
 log-likelihood value.}
 }
@@ -59,6 +58,8 @@ interval using the profile log-likelihood method, for a given
 negative log-likelihood function and its arguments (other parameters and data).
 TODO Will likely give warnings that can safely be ignored (see
 \code{suppress.warnings} description below). Decide what to do, maybe like for hdiAnalysis.
+This should be a general function, i.e. not just applicable to size
+spectra. TODO check that I did that.
 }
 \author{
 Andrew Edwards
