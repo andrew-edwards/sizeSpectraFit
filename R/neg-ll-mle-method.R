@@ -1,4 +1,4 @@
-##' Calculate negative log-likelihood for the bounded power-law
+##' Calculate negative log-likelihood of a vector of values for the bounded power-law
 ##'   distribution
 ##'
 ##' Calculate the negative log-likelihood of the parameters `b`, `x_min` and
@@ -15,13 +15,13 @@
 ##' @return numeric negative log-likelihood of the parameters given the data
 ##' @export
 ##' @author Andrew Edwards
-neg_ll_mle = function(b,
-                      x,
-                      n,
-                      x_min,
-                      x_max,
-                      sum_log_x){
-  if(x_min <= 0 | x_min >= x_max) stop("Parameters out of bounds in negLL.PLB")
+neg_ll_mle_method = function(b,
+                             x,
+                             n,
+                             x_min,
+                             x_max,
+                             sum_log_x){
+  if(x_min <= 0 | x_min >= x_max) stop("Parameters out of bounds in neg_ll_mle_method()")
   if(b != -1){
     neg_ll = -n * log( ( b + 1) / (x_max^(b + 1) - x_min^(b + 1)) ) -
       b * sum_log_x

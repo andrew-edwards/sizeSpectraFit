@@ -31,7 +31,7 @@ fit_size_spectrum.numeric <- function(dat,
   pl_b_mle <- 1/( log(x_min) - sum_log_x/length(x)) - 1
 
 
-  mle_and_conf <- calc_mle_conf(this_neg_ll_fn = neg_ll_mle_method,  # TODO change to _method
+  mle_and_conf <- calc_mle_conf(this_neg_ll_fn = neg_ll_mle_method,
                                 p = pl_b_mle,
                                 vec = b_vec,
                                 vec_inc = b_vec_inc,
