@@ -42,4 +42,13 @@ test_that("rPLB() etc. functions work with different settings", {
   expect_equal(qPLB(b = -1),
                1.58489319)
 
+  expect_error(dPL(b = -1))
+  expect_error(pPL(b = -1))
+  expect_error(rPL(b = -1))
+
+  expect_error(dPLB(xmin = -1))
+  expect_error(pPLB(xmin = -1))
+  expect_error(rPLB(xmin = -1))
+  expect_error(qPLB(xmin = -1))
+  expect_error(qPLB(p = 1.5))
 })
