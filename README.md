@@ -9,6 +9,7 @@ save figures.
 
 <!-- badges: start -->
 
+[![](https://img.shields.io/badge/lifecycle-under%20development-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#under%20development)
 [![R-CMD-check](https://github.com/andrew-edwards/sizeSpectra2/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/andrew-edwards/sizeSpectra2/actions/workflows/R-CMD-check.yaml)
 [![Codecov test
 coverage](https://codecov.io/gh/andrew-edwards/sizeSpectra2/branch/main/graph/badge.svg)](https://app.codecov.io/gh/andrew-edwards/sizeSpectra2?branch=main)
@@ -17,7 +18,7 @@ coverage](https://codecov.io/gh/andrew-edwards/sizeSpectra2/branch/main/graph/ba
 
 A streamlined R package for fitting size spectra to ecological data
 
-**Under development**
+**Under development – do not try to use yet (maybe soon)**
 
 Provides code for fitting size spectra to ecological data using maximum
 likelihood methods. This is a more user-friendly version of
@@ -37,6 +38,19 @@ terrestrial systems. Various methods have been used to fit size spectra
 over the past decades, and in \[1\] we tested eight of them and
 recommend the use of maximum likelihood. In \[2\] we extended the
 likelihood method to properly account for the bin structure of data.
+
+### Notes to self
+
+These are not committed:
+
+R-hdiAnalyis/ is just the functions from hdiAnalysis to use as
+templates. Delete one once moved it.
+
+R-sizeSpectra/ is the functions from sizeSpectra, some of which will get
+moved over and standardised into R/. Remove each once have used it. Some
+won’t be needed.
+
+tests/testhat-hdiAnalysis/ for templates.
 
 ### References
 

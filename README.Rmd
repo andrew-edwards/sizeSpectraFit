@@ -22,11 +22,13 @@ knitr::opts_chunk$set(
   out.width = "60%"
 )
 library(tibble)
+library(badger)
 ```
 
 # sizeSpectra2
 
 <!-- badges: start -->
+`r badge_lifecycle("under development", "orange")`
 [![R-CMD-check](https://github.com/andrew-edwards/sizeSpectra2/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/andrew-edwards/sizeSpectra2/actions/workflows/R-CMD-check.yaml)
 [![Codecov test coverage](https://codecov.io/gh/andrew-edwards/sizeSpectra2/branch/main/graph/badge.svg)](https://app.codecov.io/gh/andrew-edwards/sizeSpectra2?branch=main)
 ![Visitors](https://api.visitorbadge.io/api/visitors?path=https%3A%2F%2Fgithub.com%2Fandrew-edwards%2FsizeSpectra2&label=VISITORS&countColor=%23263759&style=flat&labelStyle=lower)
@@ -34,7 +36,7 @@ library(tibble)
 
 A streamlined R package for fitting size spectra to ecological data
 
-**Under development -- do not try to use yet**
+**Under development -- do not try to use yet (maybe soon)**
 
 Provides code for fitting size spectra to ecological data using maximum
 likelihood methods. This is a more user-friendly version of [sizeSpectra](https://github.com/andrew-edwards/sizeSpectra), being
