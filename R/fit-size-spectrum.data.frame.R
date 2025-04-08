@@ -8,15 +8,19 @@ fit_size_spectrum.data.frame <- function(dat,
 #                                         b_vec = NULL,
 #                                         b_vec_inc = 0.00001){
 
+  # TODO could check if bin_min is in column names, in which case treat as
+  # definitely needing mlebin - may want to do mlebin and each strata/year
+  # though. Be nice to make strata = "year" the default.
+
   if(!is.null(strata)){
-    # then do each strata separately and then combine. Still need to pick a
-    # method TODO. May want user to specify, or maybe not. Need mlebin done first
-    res <- fit_size_spectrum.mle.strata(dat,
-                                    strata = strata,
-                                    ...)  # TODO
+    # Individual measurements, x, for a strata, do MLE for each strata
+    # separately and then combine results.
+    res <- fit_size_spectrum_mle_strata(dat,
+                                        strata = strata,
+                                        ...)  # TODO set up a loop
   } else {
-    res <- fit_size_spectrum.mlebin(dat,
-                                    ...)
+    res <- fit_size_spectrum_mlebin(dat,
+                                    ...) # TODO
   }
 
   return(res)

@@ -1,12 +1,11 @@
 ##' Single plot of individual size distribution of values and the MLE fit with
 ##' confidence intervals. TODO call this from plot.size_spectrum_numeric, this
-##' currently copies that.
+##' currently copies that. NOT SURE THIS IS REALLY NEEDED?
 ##'
 ##' Plot the results from a PLB fit to a vector of values, as in Figure 2h and 6b of
 ##' [1](http://onlinelibrary.wiley.com/doi/10.1111/2041-210X.12641/full). Also
 ##' shows PLB fits using the values of `b` at the ends of the confidence
 ##' intervals. Gets called from [plot_size_spectrum.numeric()].
-##'
 ##'
 ##' @param res size_spectrum_numeric object, as output from
 ##'   [fit_size_spectrum.numeric()], which gets called when applying

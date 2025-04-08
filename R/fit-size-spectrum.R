@@ -1,15 +1,15 @@
 ##' Fit a size spectrum to data using maximum likelihood
 ##'
-##' The function automatically uses the method...
+##' The function automatically uses the appropriate method depending on the data...
 ##' For tibble, need `strata` if the data are different
 ##'
 ##' @param dat One of:
-##' * `numeric` vector of values (such as individual body masses of lengths), which uses
+##' * `numeric` vector of values (such as individual body masses or lengths), which uses
 ##'   the MLE method (via the function [fit_size_spectrum.numeric()];
 ##' * `data.frame` that can be either
-##'   * individual measurements for a strata
-##'   (such as a year), for which column names are given by `strata` (default
-##'   is `year`, user can specify) and `x` for the measurements. More column
+##'   * individual measurements for a strata (such as a year), for which column
+##'   names are given by `strata` (user has to specify TODO or make it year and
+##'   check other columns ) and `x` for the measurements. More column
 ##'   names can be in the data.frame but will not be used. In this case the MLE
 ##'   method `fit_size_spectrum.numeric()` will be applied separately to each
 ##'   year. TODO - need the functions OR
@@ -24,18 +24,24 @@
 ##'   (the default) then it is set to the minimum value of the data (if `dat` is
 ##'   `numeric`), else to the minimum bin break of the lowest bin or ??TODO any
 ##'   other options? If not NULL then the fitting is restricted to value above
-##'   `x_min` (and for the MLEbin method this has to be at one of the bin
-##'   breaks). TODO check the MLEbinfunction when finished. TODO Mention species-specific
+##'   `x_min`; for the MLEbin method this is the first full bin equal to or above `x_min`
+##'   (i.e. first bin with `bin_min >= x_min`). Similarly for `x_max` (fitting
+##'   is restricted to including the largest bin for which `bin_max <= x_max`).
+##' TODO check the MLEbinfunction when finished. TODO Mention species-specific
 ##' @param x_max maximum value of data to fit the PLB distribution to. If `NULL`
 ##'   (the default) then it is set to the maximum value of the data (if `dat` is
 ##'   `numeric`), else to the maximum bin break of the highest bin or ??TODOany
-##'   other options? If not NULL then the fitting is restricted to values below
-##'   `x_max` (and for the MLEbin method this has to be at one of the bin
-##'   breaks). Mention species-specific...
+##'   other options? If not NULL then the fitting is restricted to value below
+##'   `x_max`; for the MLEbin method this includes the largest bin for which
+##'   `bin_max <= x_max`. TODO  Mention species-specific...
+##'
 ##' @return
 ##' * If `dat` is numeric then returns a list object of class
 ##'   `size_spectrum_numeric` (such that we can plot it
-##'   with [plot.size_spectrum_numeric()], with objects:
+##'   with [plot.size_spectrum_numeric()], with objects.... (adapt below), also
+##'   mention that data output can change with MLEbin method due to x_min and
+##'   x_max; though could still keep them I guess. Prob best to keep.
+##' :
 ##'   * TODOintervals: one-row tibble with columns:
 ##'     * median: median of the data
 ##'     * eti_lower: lower end of the ETI

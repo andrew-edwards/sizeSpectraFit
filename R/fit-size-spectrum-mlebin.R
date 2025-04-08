@@ -1,6 +1,6 @@
 ##' @rdname fit_size_spectrum
 ##' @export
-fit_size_spectrum.mlebin <- function(dat,              # TODO change to _mlebin prob
+fit_size_spectrum_mlebin <- function(dat,
                                      x_min = NULL,
                                      x_max = NULL,
                                      b_start = -1.9,   # Starting estimate for
@@ -13,13 +13,14 @@ fit_size_spectrum.mlebin <- function(dat,              # TODO change to _mlebin 
 
   df <- tibble::as_tibble(dat)     # df is tibble to be fitted, can get
                                    # restricted in next lines
+  df <- dplyr::arrange(df,
+                       bin_min)
 
-  # TODO sort the bins into order of bin_min
-  # TODO might have to take out 0 counts in end bins. Check here or reduce the bins
+  # TODO might have to take out 0 counts in end bins. Check here or reduce the
+  # bins. And add to help.
   if(!is.null(x_min)){
     df <- dplyr::filter(df,
-                        bin_min >= x_min)     # TODO add to help, restrict full
-                                        # bins with [`x_min`, `x_max`]   spell out
+                        bin_min >= x_min)
   } else {
     x_min <- min(df$bin_min)
   }
@@ -36,9 +37,8 @@ fit_size_spectrum.mlebin <- function(dat,              # TODO change to _mlebin 
 
   # To match equations:
   w <- c(df$bin_min,
-         max(df$bin_max))   # TODO when done sorting in
-                             # fit_size_spectrum.mlebin change this to the last
-                             # value since then will be the max
+         max(df$bin_max))
+
   d <- df$bin_count
   J <- length(d)             # Number of bins
   n <- sum(d)     # TODO check if can be non-integer, think maybe. Check GoF stuff.
@@ -49,8 +49,8 @@ fit_size_spectrum.mlebin <- function(dat,              # TODO change to _mlebin 
 
   mle_and_conf <- calc_mle_conf(this_neg_ll_fn = neg_ll_mlebin_method,
                                 p = b_start,
-                                vec = b_vec, # can specify if like TODO check
-                                vec_inc = b_vec_inc,   # figure out vec_diff also
+                                vec = b_vec,
+                                vec_inc = b_vec_inc,
                                 x_min = x_min,
                                 x_max = x_max,
                                 w = w,
@@ -62,7 +62,7 @@ fit_size_spectrum.mlebin <- function(dat,              # TODO change to _mlebin 
               b_conf = mle_and_conf$conf,
               data = df)    # TODO mention can be different to dat
 
-  class(res) = c("size_spectrum_data_frame",
+  class(res) = c("size_spectrum_mlebin",
                  class(res))
 
   return(res)

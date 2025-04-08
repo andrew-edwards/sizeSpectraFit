@@ -103,7 +103,12 @@ the same simulated data as used above, bin it, and then use the MLEbin
 method. Then we will do an example with real data.
 
 The function `bin_data()` takes a vector of values and assigns it to bins:
+MOVING to data object
 ```{r, MLEbin1}
+
+fit_size_spectrum(sim_vec_binned$bin_vals)
+
+
 sim_vec_binned <- bin_data(sim_vec,
                            bin_width = "2k")
 sim_vec_binned
