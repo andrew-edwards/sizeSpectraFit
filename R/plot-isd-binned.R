@@ -10,6 +10,12 @@
 ##' @}
 plot_isd_binned <- function(res_mlebin,
                             log_y_axis,
+                            xlim,
+                            ylim,
+                            x_plb,
+                            y_plb,
+                            y_plb_conf_min,
+                            y_plb_conf_max,
                             plot_conf_ints = TRUE,
                             xlab = expression(paste("Values, ", italic(x))),
                             ylab = expression( paste("Number of ", values >= x),
@@ -33,59 +39,56 @@ plot_isd_binned <- function(res_mlebin,
                             y_small_ticks = NULL,
                             y_small_ticks_by = NULL,
                             y_small_ticks_labels = NULL,
+                            y_scaling = 0.75,
                             par_mai = c(0.4, 0.5, 0.05, 0.3),
                             par_cex = 0.7,
-
-
-
-
+                            inset_a = c(0, 0),
+                            inset_year = c(0, 0.04),
+                            seg_col = "green",   # want these parsed along if
+                                        # they're changed by users in original
+                                        # call - useArgs or something? TODO
+                            rect_col = "grey",
+                            fit_col = "red",
+                            fit_lwd = 2,
+                            conf_lty = 2,
+                            mle_round = 2
                             # decide if want to have , ...)
-
-
                             # From sizeSpectra::ISD_bin_plot, may want some
-                                      xlim = NA,
-                                      xmin = NA,
-                                      xmax = NA,
-                                      yScaling = 0.75,
-                                      MLE.round = 2,
-                                      xLabel.small = c(5, 50, 500, 5000),
-                                      yBig.inc = 1000,
-                                      yBig.max = 10,
-                                      ySmall.inc = NA,
-                                      ySmall.tcl = -0.2,
-                                      inset.a = c(0, 0),
-                                      inset.year = c(0, 0.04),
-                                      seg.col = "green",
-                                      rect.col = "grey",
-                                      fit.col = "red",
-                                      fit.lwd = 2,
-                                      conf.lty = 2,
-                                      par.mfrow = c(2, 1),
-                                      mgp.vals = c(1.6,0.5,0),
-                                      IBTS_MEPS_figs = FALSE,
-                                      x.PLB = NA
-
+                              #        xlim = NA,
+                              #       xmin = NA,
+                              #        xmax = NA,
+                              # xLabel.small = c(5, 50, 500, 5000),
+                              #        yBig.inc = 1000,
+                              #        yBig.max = 10,
+                              #        ySmall.inc = NA,
+                              #        ySmall.tcl = -0.2,
+                            #mgp.vals = c(1.6,0.5,0),
                             ){
+  # Not sure if needed, see plot_isd() also.
+  stopifnot("Cannot define both x_small_ticks and x_small_ticks_by" =
+              !(!is.null(x_small_ticks) & !is.null(x_small_ticks_by)))
+  stopifnot("Cannot define both y_small_ticks and y_small_ticks_by" =
+              !(!is.null(y_small_ticks) & !is.null(y_small_ticks_by)))
 
   par(mai = par_mai,
       cex = par_cex)  # Affects all figures, TODO reset after
-
+# mgp maybe need - see above commented option
 # From ISD_bin_plot to adapt here, this is for linear y-axis, then have to tweak
   # to have the log option also:
 
   dat <- res_mlebin$dat
 
     # y-axis not logged
-  plot(dat$bin_min,      #    nothing plotted anyway as type = "n"
-       dat$count_gte_bin_min,
-       log = "x",
-       xlab = xlab,
-       ylab = ylab,
-       xlim = xlim,
-       ylim = ylim,
-       type = "n",
-       axes = FALSE,
-       mgp = mgp.vals) # TODO
+  plot.default(dat$bin_min,      #    nothing plotted anyway as type = "n"
+               dat$count_gte_bin_min,
+               log = "x",
+               xlab = xlab,
+               ylab = ylab,
+               xlim = xlim,
+               ylim = ylim,
+               type = "n",
+               axes = FALSE,
+               mgp = mgp_val) # TODO
 
   # Add tickmarks and labels, replacing what was in ISD_bin_plot with this
   add_ticks(#x_lim = x_lim,
@@ -105,45 +108,42 @@ plot_isd_binned <- function(res_mlebin,
     y_small_ticks_labels = y_small_ticks_labels)
 
   rect(xleft = dat$bin_min,
-       ybottom = dat$lowCount,
-       xright = dat$wmax,
-       ytop = dat$highCount,
-       col = rect.col)
+       ybottom = dat$low_count,
+       xright = dat$bin_max,
+       ytop = dat$high_count,
+       col = rect_col)
   segments(x0 = dat$bin_min,
-           y0 = dat$countGTEbin_min,
-           x1 = dat$wmax,
-           y1 = dat$countGTEbin_min,
-           col = seg.col)
-  lines(x.PLB, y.PLB, col = fit.col, lwd = fit.lwd)   # Plot line last so can see it
-  lines(x.PLB, y.PLB.confMin, col = fit.col, lty = conf.lty)
-  lines(x.PLB, y.PLB.confMax, col = fit.col, lty = conf.lty)
+           y0 = dat$count_gte_bin_min,
+           x1 = dat$bin_max,
+           y1 = dat$count_gte_bin_min,
+           col = seg_col)
+  lines(x_plb, y_plb, col = fit_col, lwd = fit_lwd)   # Plot line last so can see it
+  lines(x_plb, y_plb_conf_min, col = fit_col, lty = conf_lty)
+  lines(x_plb, y_plb_conf_max, col = fit_col, lty = conf_lty)
 
   legend("topright", "(a)",
          bty = "n",
-         inset = inset.a)
-  if(!is.na(year)){  # might need if keep strata/year in there
-    legend("topright",
-           legend = year,
-           bty = "n",
-           inset = inset.year)
-  }
+         inset = inset_a)
+# TODO if needed
+#  if(!is.na(year)){  # might need if keep strata/year in there
+#    legend("topright",
+#           legend = year,
+#           bty = "n",
+#           inset = inset_year)
+#  }
 
   legend("topright",
-         legend = paste0("b=", round(b.MLE, MLE.round)),
+         legend = paste0("b=",
+                         round(res_mlebin$b_mle, mle_round)),
          bty = "n",
-         inset = 2 * inset.year)
+         inset = 2 * inset_year)
 
   legend("topright",
-         legend = paste0("n=", round(yRange[2], 2)),
+         legend = paste0("n=", round(sum(res_mlebin$bin_count))),    # TODO was round(yRange[2], 2)),
          bty = "n",
-         inset = 3 * inset.year)
+         inset = 3 * inset_year)
+
   box()     # to redraw axes over any boxes
 
-
-
-
-    if(is.na(ySmall.inc)){
-    ySmall.inc = yBig.inc/4
-  }
-
+  # Prob need to return some things
 }

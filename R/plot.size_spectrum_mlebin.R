@@ -28,37 +28,29 @@ plot.size_spectrum_mlebin <- function(res_mlebin,
                                       ylim = NA,
                                       x_plb = NA,
                                       y_scaling = 0.75,
+                                      ...
                                       ){   # TODO decide if want ...
 
-  stopifnot("Cannot define both x_small_ticks and x_small_ticks_by" =
-              !(!is.null(x_small_ticks) & !is.null(x_small_ticks_by)))
-  stopifnot("Cannot define both y_small_ticks and y_small_ticks_by" =
-              !(!is.null(y_small_ticks) & !is.null(y_small_ticks_by)))
   stopifnot("log_y_axis must be both, yes, or no" =
               log_y_axis %in% c("both", "yes","no"))
 
   # Work out calculations needed for both types of plot and then pass them on to
   # plot_isd_binned()
 
-  dat <- res_binned$data
+  dat <- res_mlebin$data
   n <- sum(dat$bin_count)
 
   # Cpying from sizeSpectra::ISD_bin_plot()
 
-  # Used later, but not may have functions for that
-  # if(is.na(ySmall.inc)){
-  #   ySmall.inc = yBig.inc/4
-  #}
-
   # Think I can just put in arguments as defaults
-#  if(missing(xlim)){
-#    xlim = c(min(dat$bin_min),
-#             max(dat$bin_max))
-#  }
+  #  if(missing(xlim)){
+  #    xlim = c(min(dat$bin_min),
+  #             max(dat$bin_max))
+  #  }
 
   # TODO don't think want to be able to define these, are they have been by
   # definition when do the mlebin calculation.
-#  if(is.na(xmin)){
+  #  if(is.na(xmin)){
   x_min = min(dat$bin_min)
 
   #if(is.na(xmax)){
@@ -66,8 +58,8 @@ plot.size_spectrum_mlebin <- function(res_mlebin,
 
   # x values to plot PLB if not provided; need high resolution for both plots.
   if(is.na(x_plb)){
-    x_plb <- exp(seq(log(xmin),
-                     log(xmax),
+    x_plb <- exp(seq(log(x_min),
+                     log(x_max),
                      length = 10000))
 
     #  Need to insert value close to xmax to make log-log curve go down further;
@@ -79,59 +71,56 @@ plot.size_spectrum_mlebin <- function(res_mlebin,
   }
 
   y_plb = (1 - pPLB(x = x_plb,
-                    b = b_MLE,
+                    b = res_mlebin$b_mle,
                     xmin = min(x_plb),
                     xmax = max(x_plb))) * n
   # To add curves for the limits of the 95% confidence interval of b:
   y_plb_conf_min = (1 - pPLB(x = x_plb,
-                             b = res_binned$b_conf[1],
-                            xmin = min(x_plb),
-                            xmax = max(x_plb))) * n
+                             b = res_mlebin$b_conf[1],
+                             xmin = min(x_plb),
+                             xmax = max(x_plb))) * n
   y_plb_conf_max = (1 - pPLB(x = x_plb,
-                             b = res_binned$b_conf[1],
+                             b = res_mlebin$b_conf[1],
                              xmin = min(x_plb),
                              xmax = max(x_plb))) * n
 
-  # yRange = c(min(data_year$lowCount), max(data_year$highCount))
-  # The above does not work because first val is 0 which is not permissable on
-  #  log axis_ Which also means that the rectangle that goes to 0 has to be
-  #  added manually (below)_ Picking the y-axis to go down to 0_75 of the
-  #  minimum value of CountGTEwmin_
 
-
-    for(iii in 1:length(count_gte_bin_min)){
-      count_gte_bin_min[iii] <- sum( (dat$bin_min >= dat$bin_min[iii]) * dat$bin_count)
-      low_count[iii] <- sum( (dat$bin_min >= dat$bin_max[iii]) * dat$bin_count)
-      high_count[iii] <- sum( (dat$bin_max > dat$bin_min[iii]) * dat$bin_count)
-      # TODO understand high_count again
-    }
-
-
-    if(is.na(ylim)){
-      ylim <- c(y_scaling * min(count_gte_bin_min),
-                max(high_count))
-    }
-
+  if(is.na(ylim)){
+    ylim <- c(y_scaling * min(dat$count_gte_bin_min),
+              max(dat$high_count))
+  }
 
   if(log_y_axis == "both"){
     par(mfrow = c(2,1))
     plot_isd_binned(res_mlebin = res_mlebin,
                     log_y_axis = "no",
-                    ylim = ylim,   # TODO copy these to next options
+                    xlim = xlim,
+                    ylim = ylim,
                     x_plb = x_plb,
+                    y_plb = y_plb,
                     y_plb_conf_min = y_plb_conf_min,
                     y_plb_conf_max = y_plb_conf_max,
-
-                    ...)
+                    ...)  # ADD in more options maybe, see plot_isd_binned; figure out
+                          # useArgs() thing. Copy to next ones
 
     plot_isd_binned(res_mlebin = res_mlebin,
                     log_y_axis = "yes",
+                    xlim = xlim,
                     ylim = ylim,
+                    x_plb = x_plb,
+                    y_plb = y_plb,
+                    y_plb_conf_min = y_plb_conf_min,
+                    y_plb_conf_max = y_plb_conf_max,
                     ...)
   } else {
     plot_isd_binned(res_mlebin = res_mlebin,
                     log_y_axis = log_y_axis,  # should automatically work
+                    xlim = xlim,
                     ylim = ylim,
+                    x_plb = x_plb,
+                    y_plb = y_plb,
+                    y_plb_conf_min = y_plb_conf_min,
+                    y_plb_conf_max = y_plb_conf_max,
                     ...)
   }
 }

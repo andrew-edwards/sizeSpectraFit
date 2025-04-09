@@ -35,7 +35,10 @@ fit_size_spectrum_mlebin <- function(dat,
   stopifnot("Need x_min < x_max (if not NULL)" =
               x_min < x_max)
 
-  # To match equations:
+  # To match equations, especially for internal tricky computations, but stick
+  # with bin_min and bin_max for user code. TODO though I replace wmin and wmax
+  # maybe with bin_min and bin_max, but not sure if the former was actually a
+  # thing. w is actually all the bin breaks.
   w <- c(df$bin_min,
          max(df$bin_max))
 
@@ -66,9 +69,25 @@ fit_size_spectrum_mlebin <- function(dat,
 
   # count_gte_bin_min is, for a given bin, the total counts >= than that bin's minimum.
 
-  df$count_gte_bin_min <- rep(NA, length = J)
-  df$low_count <- count_gte_bin_min
-  df$high_count <- count_gte_bin_min
+  count_gte_bin_min <- rep(NA, length = J)
+  low_count <- count_gte_bin_min
+  high_count <- count_gte_bin_min
+
+  # yRange = c(min(data_year$lowCount), max(data_year$highCount))
+  # The above does not work because first val is 0 which is not permissable on
+  #  log axis_ Which also means that the rectangle that goes to 0 has to be
+  #  added manually (below)_ Picking the y-axis to go down to 0_75 of the
+  #  minimum value of CountGTEwmin_
+  for(iii in 1:length(count_gte_bin_min)){
+    count_gte_bin_min[iii] <- sum( (dat$bin_min >= dat$bin_min[iii]) * dat$bin_count)
+    low_count[iii] <- sum( (dat$bin_min >= dat$bin_max[iii]) * dat$bin_count)
+    high_count[iii] <- sum( (dat$bin_max > dat$bin_min[iii]) * dat$bin_count)
+    # TODO understand high_count again
+  }
+
+  df$count_gte_bin_min <- count_gte_bin_min
+  df$low_count <- low_count
+  df$high_count <- high_count
 
   res <- list(b_mle = mle_and_conf$mle,
               b_conf = mle_and_conf$conf,
@@ -79,4 +98,5 @@ fit_size_spectrum_mlebin <- function(dat,
                  class(res))
 
   return(res)
+
 }

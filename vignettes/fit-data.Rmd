@@ -120,7 +120,7 @@ in our MEPS paper (but a bit simpler because here we do not have overlapping
 bins).
 TODO take some from `MLEbin_recommend` vignette.
 ```{r, MLEbinplot}
-plot(res_binned) # working on next
+plot(res_binned) # working on now
 ```
 
 

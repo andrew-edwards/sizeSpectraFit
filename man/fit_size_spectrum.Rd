@@ -2,14 +2,14 @@
 % Please edit documentation in R/fit-size-spectrum-mlebin.R,
 %   R/fit-size-spectrum.R, R/fit-size-spectrum.data.frame.R,
 %   R/fit-size-spectrum.numeric.R
-\name{fit_size_spectrum.mlebin}
-\alias{fit_size_spectrum.mlebin}
+\name{fit_size_spectrum_mlebin}
+\alias{fit_size_spectrum_mlebin}
 \alias{fit_size_spectrum}
 \alias{fit_size_spectrum.data.frame}
 \alias{fit_size_spectrum.numeric}
 \title{Fit a size spectrum to data using maximum likelihood}
 \usage{
-\method{fit_size_spectrum}{mlebin}(
+fit_size_spectrum_mlebin(
   dat,
   x_min = NULL,
   x_max = NULL,
@@ -33,13 +33,13 @@ fit_size_spectrum(dat, ...)
 \arguments{
 \item{dat}{One of:
 \itemize{
-\item \code{numeric} vector of values (such as individual body masses of lengths), which uses
+\item \code{numeric} vector of values (such as individual body masses or lengths), which uses
 the MLE method (via the function \code{\link[=fit_size_spectrum.numeric]{fit_size_spectrum.numeric()}};
 \item \code{data.frame} that can be either
 \itemize{
-\item individual measurements for a strata
-(such as a year), for which column names are given by \code{strata} (default
-is \code{year}, user can specify) and \code{x} for the measurements. More column
+\item individual measurements for a strata (such as a year), for which column
+names are given by \code{strata} (user has to specify TODO or make it year and
+check other columns ) and \code{x} for the measurements. More column
 names can be in the data.frame but will not be used. In this case the MLE
 method \code{fit_size_spectrum.numeric()} will be applied separately to each
 year. TODO - need the functions OR
@@ -58,21 +58,26 @@ TODO}
 (the default) then it is set to the minimum value of the data (if \code{dat} is
 \code{numeric}), else to the minimum bin break of the lowest bin or ??TODO any
 other options? If not NULL then the fitting is restricted to value above
-\code{x_min} (and for the MLEbin method this has to be at one of the bin
-breaks). TODO check the MLEbinfunction when finished. TODO Mention species-specific}
+\code{x_min}; for the MLEbin method this is the first full bin equal to or above \code{x_min}
+(i.e. first bin with \code{bin_min >= x_min}). Similarly for \code{x_max} (fitting
+is restricted to including the largest bin for which \code{bin_max <= x_max}).
+TODO check the MLEbinfunction when finished. TODO Mention species-specific}
 
 \item{x_max}{maximum value of data to fit the PLB distribution to. If \code{NULL}
 (the default) then it is set to the maximum value of the data (if \code{dat} is
 \code{numeric}), else to the maximum bin break of the highest bin or ??TODOany
-other options? If not NULL then the fitting is restricted to values below
-\code{x_max} (and for the MLEbin method this has to be at one of the bin
-breaks). Mention species-specific...}
+other options? If not NULL then the fitting is restricted to value below
+\code{x_max}; for the MLEbin method this includes the largest bin for which
+\code{bin_max <= x_max}. TODO  Mention species-specific...}
 }
 \value{
 \itemize{
 \item If \code{dat} is numeric then returns a list object of class
 \code{size_spectrum_numeric} (such that we can plot it
-with \code{\link[=plot.size_spectrum_numeric]{plot.size_spectrum_numeric()}}, with objects:
+with \code{\link[=plot.size_spectrum_numeric]{plot.size_spectrum_numeric()}}, with objects.... (adapt below), also
+mention that data output can change with MLEbin method due to x_min and
+x_max; though could still keep them I guess. Prob best to keep.
+:
 \itemize{
 \item TODOintervals: one-row tibble with columns:
 \itemize{
@@ -130,7 +135,7 @@ column names of \code{dat_mcmc} contain non-digits (e.g. represents years).
 }
 }
 \description{
-The function automatically uses the method...
+The function automatically uses the appropriate method depending on the data...
 For tibble, need \code{strata} if the data are different
 }
 \examples{

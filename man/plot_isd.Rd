@@ -4,7 +4,7 @@
 \alias{plot_isd}
 \title{Single plot of individual size distribution of values and the MLE fit with
 confidence intervals. TODO call this from plot.size_spectrum_numeric, this
-currently copies that.}
+currently copies that. NOT SURE THIS IS REALLY NEEDED?}
 \usage{
 plot_isd(
   res,
