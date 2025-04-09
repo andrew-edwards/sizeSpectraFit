@@ -93,26 +93,47 @@ plot(res_vec,
      x_small_ticks_labels = c(5, 50, 500))
 ```
 
-TODO After doing MLEbin below , then come back and add extra options for this one (since will first
-create binned figures for MLEbin). TODO
+TODO After doing MLEbin below , then come back and add extra options for biomass
+LBN type plot for this one (since will first
+create binned figures for MLEbin).
 
 ### Binned data of counts in bins
 
 Now we demonstrate the MLEbin method, which is for binned data. Let's just take
-the same simulated data as used above, bin it, and then use the MLEbin
-method. Then we will do an example with real data.
-
-The function `bin_data()` takes a vector of values and assigns it to bins:
-MOVING to data object
+the same simulated data as used abov but only available in binned form. This is
+saved in the package as a tibble as a list object (see `?sim_vec_binned` for details), for which we will fit the tibble:
 ```{r, MLEbin1}
+sim_vec_binned$bin_vals
 
-fit_size_spectrum(sim_vec_binned$bin_vals)
+res_binned <- fit_size_spectrum(sim_vec_binned$bin_vals)
 
-
-sim_vec_binned <- bin_data(sim_vec,
-                           bin_width = "2k")
-sim_vec_binned
+res_binned
 ```
+As you can see, `res_binned` is a list object that contains objects `b_mle`, the
+maximum likelihood estimate of the exponent $b$, `b_conf` which gives the 95%
+confidence interval of $b$, and `data` which gives the data used TODO note that
+it might be different, have to check if do end up removing 0's in end
+bins. Maybe do an example.
+
+We have a built in plotting function to generate a plot in the style of Figure 7
+in our MEPS paper (but a bit simpler because here we do not have overlapping
+bins).
+TODO take some from `MLEbin_recommend` vignette.
+```{r, MLEbinplot}
+plot(res_binned) # working on next
+```
+
+
+
+
+
+
+
+
+Can delete, or maybe use some above to explain the tibble. To get your data into
+the required format use `bin_data()` or whatever - see data-raw/.
+
+
 The `bin_width = "2k"` argument says to assign bin widths that double in width.
 The function returns a list of two tibbles, the first (`$bin_for_each_x` above) shows each
 original value of `sim_vec`, the counts of that value (just 1 here because in

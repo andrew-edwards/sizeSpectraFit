@@ -58,13 +58,25 @@ fit_size_spectrum_mlebin <- function(dat,
                                 J = J,
                                 n = n)
 
+  # Need for plotting rectangles in ISD type plots, so calculate here to be able
+  # to extract values and to simplify passing through functions.
+
+    # For non-overlapping in sizeSpectra highCount and countGWEwmin will be the same since only one set of
+    # bin breaks; but did them both to save adapting ISD_bin_plot(). So might need lowCount and highCount for overlapping bins, but just do nonoverlapping for now.
+
+  # count_gte_bin_min is, for a given bin, the total counts >= than that bin's minimum.
+
+  df$count_gte_bin_min <- rep(NA, length = J)
+  df$low_count <- count_gte_bin_min
+  df$high_count <- count_gte_bin_min
+
   res <- list(b_mle = mle_and_conf$mle,
               b_conf = mle_and_conf$conf,
-              data = df)    # TODO mention can be different to dat
+              data = df)    # TODO mention can be different to dat, document,
+                            # including low_count etc.
 
   class(res) = c("size_spectrum_mlebin",
                  class(res))
 
   return(res)
-
 }
