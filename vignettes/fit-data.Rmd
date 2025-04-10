@@ -99,6 +99,8 @@ create binned figures for MLEbin).
 
 ### Binned data of counts in bins
 
+HERE - check all this.
+
 Now we demonstrate the MLEbin method, which is for binned data. Let's just take
 the same simulated data as used abov but only available in binned form. This is
 saved in the package as a tibble as a list object (see `?sim_vec_binned` for details), for which we will fit the tibble:
@@ -120,8 +122,14 @@ in our MEPS paper (but a bit simpler because here we do not have overlapping
 bins).
 TODO take some from `MLEbin_recommend` vignette.
 ```{r, MLEbinplot}
-plot(res_binned) # working on now
+plot(res_binned) # working on now HERE - done, need to tidy up
+
+plot(res_binned,
+     x_small_ticks_labels = c(5, 50, 500))
 ```
+
+
+
 
 
 

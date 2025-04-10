@@ -22,7 +22,8 @@
 plot.size_spectrum_mlebin <- function(res_mlebin,
                                       # from plot.size_spectrum_numeric(), best
                                       # to use these for consistency
-                                      log_y_axis = "both", # or yes, or no
+                                      log_y_axis = "both", # do two plots, or
+                                        # yes or no for just the one
                                       xlim = c(min(res_mlebin$data$bin_min),
                                                max(res_mlebin$data$bin_max)),
                                       ylim = NA,
@@ -80,7 +81,7 @@ plot.size_spectrum_mlebin <- function(res_mlebin,
                              xmin = min(x_plb),
                              xmax = max(x_plb))) * n
   y_plb_conf_max = (1 - pPLB(x = x_plb,
-                             b = res_mlebin$b_conf[1],
+                             b = res_mlebin$b_conf[2],
                              xmin = min(x_plb),
                              xmax = max(x_plb))) * n
 
@@ -93,7 +94,7 @@ plot.size_spectrum_mlebin <- function(res_mlebin,
   if(log_y_axis == "both"){
     par(mfrow = c(2,1))
     plot_isd_binned(res_mlebin = res_mlebin,
-                    log_y_axis = "no",
+                    log = "x",
                     xlim = xlim,
                     ylim = ylim,
                     x_plb = x_plb,
@@ -104,7 +105,7 @@ plot.size_spectrum_mlebin <- function(res_mlebin,
                           # useArgs() thing. Copy to next ones
 
     plot_isd_binned(res_mlebin = res_mlebin,
-                    log_y_axis = "yes",
+                    log = "xy",
                     xlim = xlim,
                     ylim = ylim,
                     x_plb = x_plb,
@@ -114,7 +115,9 @@ plot.size_spectrum_mlebin <- function(res_mlebin,
                     ...)
   } else {
     plot_isd_binned(res_mlebin = res_mlebin,
-                    log_y_axis = log_y_axis,  # should automatically work
+                    log = ifelse(log_y_axis == "yes",
+                                 "xy",
+                                 "x"),
                     xlim = xlim,
                     ylim = ylim,
                     x_plb = x_plb,

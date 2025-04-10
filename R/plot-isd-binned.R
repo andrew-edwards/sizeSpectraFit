@@ -9,7 +9,7 @@
 ##' @
 ##' @}
 plot_isd_binned <- function(res_mlebin,
-                            log_y_axis,
+                            log,
                             xlim,
                             ylim,
                             x_plb,
@@ -81,7 +81,7 @@ plot_isd_binned <- function(res_mlebin,
     # y-axis not logged
   plot.default(dat$bin_min,      #    nothing plotted anyway as type = "n"
                dat$count_gte_bin_min,
-               log = "x",
+               log = log,
                xlab = xlab,
                ylab = ylab,
                xlim = xlim,
@@ -93,7 +93,7 @@ plot_isd_binned <- function(res_mlebin,
   # Add tickmarks and labels, replacing what was in ISD_bin_plot with this
   add_ticks(#x_lim = x_lim,
     #y_lim = y_lim,
-    log = "x",   # TODO make general, unless making big if switches
+    log = log,   # TODO make general, unless making big if switches
     tcl_small = tcl_small,
     mgp_val = mgp_val,
     x_big_ticks = x_big_ticks,
@@ -121,6 +121,8 @@ plot_isd_binned <- function(res_mlebin,
   lines(x_plb, y_plb_conf_min, col = fit_col, lty = conf_lty)
   lines(x_plb, y_plb_conf_max, col = fit_col, lty = conf_lty)
 
+# TODO fix the legend
+
   legend("topright", "(a)",
          bty = "n",
          inset = inset_a)
@@ -139,7 +141,7 @@ plot_isd_binned <- function(res_mlebin,
          inset = 2 * inset_year)
 
   legend("topright",
-         legend = paste0("n=", round(sum(res_mlebin$bin_count))),    # TODO was round(yRange[2], 2)),
+         legend = paste0("n=", round(sum(res_mlebin$data$bin_count))),    # TODO was round(yRange[2], 2)),
          bty = "n",
          inset = 3 * inset_year)
 
