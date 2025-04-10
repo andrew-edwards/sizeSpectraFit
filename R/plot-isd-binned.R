@@ -23,12 +23,12 @@ plot_isd_binned <- function(res_mlebin,
                                                 # it as optional but feed through.
                             mgp_val = c(1.6, 0.5, 0),
                             tcl_small = -0.2,
-                            legend_text = expression(paste("b=",
-                                                           signif(res$b_mle,
-                                                                  3),
-                                                           sep="")),
+                            inset_label = c(0, 0),
+                            inset_text = c(0, 0.04),
+                            legend_label = NULL,
+                            legend_text = NULL,
+                            legend_text_n = NULL,
                             legend_position = "topright",
-                            inset = c(0, 0),
                             x_big_ticks = NULL,
                             x_big_ticks_labels = NULL,
                             x_small_ticks = NULL,
@@ -42,16 +42,13 @@ plot_isd_binned <- function(res_mlebin,
                             y_scaling = 0.75,
                             par_mai = c(0.4, 0.5, 0.05, 0.3),
                             par_cex = 0.7,
-                            inset_a = c(0, 0),
-                            inset_year = c(0, 0.04),
                             seg_col = "green",   # want these parsed along if
                                         # they're changed by users in original
                                         # call - useArgs or something? TODO
                             rect_col = "grey",
                             fit_col = "red",
                             fit_lwd = 2,
-                            conf_lty = 2,
-                            mle_round = 2
+                            conf_lty = 2
                             # decide if want to have , ...)
                             # From sizeSpectra::ISD_bin_plot, may want some
                               #        xlim = NA,
@@ -123,9 +120,12 @@ plot_isd_binned <- function(res_mlebin,
 
 # TODO fix the legend
 
-  legend("topright", "(a)",
-         bty = "n",
-         inset = inset_a)
+  if(!is.null(legend_label)){
+    legend("topright",
+           legend_label,
+           bty = "n",
+           inset = inset_label)
+  }
 # TODO if needed
 #  if(!is.na(year)){  # might need if keep strata/year in there
 #    legend("topright",
@@ -134,16 +134,21 @@ plot_isd_binned <- function(res_mlebin,
 #           inset = inset_year)
 #  }
 
+  if(!is.null(legend_text)){
   legend("topright",
-         legend = paste0("b=",
-                         round(res_mlebin$b_mle, mle_round)),
+         legend = legend_text,
          bty = "n",
-         inset = 2 * inset_year)
+         inset = inset_text)
+  }
 
+
+  # Add n
+  if(!is.null(legend_text_n)){
   legend("topright",
-         legend = paste0("n=", round(sum(res_mlebin$data$bin_count))),    # TODO was round(yRange[2], 2)),
+         legend = legend_text_n,
          bty = "n",
-         inset = 3 * inset_year)
+         inset = 2 * inset_text)
+  }
 
   box()     # to redraw axes over any boxes
 

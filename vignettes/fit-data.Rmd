@@ -120,14 +120,30 @@ bins. Maybe do an example.
 We have a built in plotting function to generate a plot in the style of Figure 7
 in our MEPS paper (but a bit simpler because here we do not have overlapping
 bins).
-TODO take some from `MLEbin_recommend` vignette.
+
+TODO take some text from `MLEbin_recommend` vignette, next plot matches the
+figure (almost completely).
 ```{r, MLEbinplot}
 plot(res_binned) # working on now HERE - done, need to tidy up
+```
 
+Can add options, and also just plot one or other of the panels:
+```{r, MLEbinplot2}
 plot(res_binned,
      x_small_ticks_labels = c(5, 50, 500))
 ```
 
+```{r, MLEbinplot3}
+plot(res_binned,
+     log_y_axis = "yes")
+```
+
+```{r, MLEbinplot4}
+plot(res_binned,
+     log_y_axis = "no")
+```
+
+For more options, see `?plot.size_spectrum_mlebin` TODO check that links with `?plot_isd_binned`.
 
 
 

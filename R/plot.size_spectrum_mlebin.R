@@ -29,8 +29,24 @@ plot.size_spectrum_mlebin <- function(res_mlebin,
                                       ylim = NA,
                                       x_plb = NA,
                                       y_scaling = 0.75,
+                                      mle_round = 2,
+                                      legend_label_a = "(a)",
+                                      legend_label_b = "(b)",
+                                      legend_label_single = NULL, # for just one
+                                      # panel
+                                      # Use the a ones for single also TODO in help
+                                      legend_text_a = paste0("b=",
+                                                           signif(res_mlebin$b_mle,
+                                                                  mle_round)),
+                                      legend_text_a_n = paste0("n=",
+                                                               round(sum(res_mlebin$data$bin_count))),
+                                      legend_text_b = NULL,
+                                      legend_text_b_n = NULL, # Used for second
+                                        # of double plot b and
+                                        # single plot
                                       ...
-                                      ){   # TODO decide if want ...
+                                      ){   # TODO decide if want ... yes, just
+                                        # make sure help files link to all functions
 
   stopifnot("log_y_axis must be both, yes, or no" =
               log_y_axis %in% c("both", "yes","no"))
@@ -101,6 +117,9 @@ plot.size_spectrum_mlebin <- function(res_mlebin,
                     y_plb = y_plb,
                     y_plb_conf_min = y_plb_conf_min,
                     y_plb_conf_max = y_plb_conf_max,
+                    legend_label = legend_label_a,
+                    legend_text = legend_text_a,
+                    legend_text_n = legend_text_a_n,
                     ...)  # ADD in more options maybe, see plot_isd_binned; figure out
                           # useArgs() thing. Copy to next ones
 
@@ -112,6 +131,9 @@ plot.size_spectrum_mlebin <- function(res_mlebin,
                     y_plb = y_plb,
                     y_plb_conf_min = y_plb_conf_min,
                     y_plb_conf_max = y_plb_conf_max,
+                    legend_label = legend_label_b,
+                    legend_text = legend_text_b,
+                    legend_text_n = legend_text_b_n,
                     ...)
   } else {
     plot_isd_binned(res_mlebin = res_mlebin,
@@ -124,6 +146,9 @@ plot.size_spectrum_mlebin <- function(res_mlebin,
                     y_plb = y_plb,
                     y_plb_conf_min = y_plb_conf_min,
                     y_plb_conf_max = y_plb_conf_max,
+                    legend_label = legend_label_single,
+                    legend_text = legend_text_a,
+                    legend_text_n = legend_text_a_n,
                     ...)
   }
 }
