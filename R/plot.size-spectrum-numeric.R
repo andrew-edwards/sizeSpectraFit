@@ -43,7 +43,7 @@
 ##' @param ... Further arguments for `plot()`
 ##' @return Single figure of ISD on log-log plot (or log-linear depending on the
 ##'   options given), with values as points and PLB fit (and fits of confidence
-##'   limits) as solid (and dashed) lines.
+##'   limits) as solid (and dashed) lines; returns nothing.
 ##'
 ##' @export
 ##' @author Andrew Edwards

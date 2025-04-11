@@ -1,13 +1,35 @@
 ##' Plot a single binned ISD plot, as called from `plot.size_spectrum_mlebin()`
 ##'
-##' ##'
-##' @return
+##' @inheritParams plot.size_spectrum_numeric
+##' @inheritParams plot.size_spectrum_mlebin
+##' @param x_plb vector of values to use to plot the fitted PLB curve; if NA then
+##'   automatically calculated (sometimes need to manually extend it to hit the
+##'   x-axis, but tricky to automate that on a log-scale
+##' @param y_plb vector of values corresponding to the MLE fit of the PLB
+##'   distribution at each value of `x_PLB`
+##' @param y_plb_conf_min, y_plb_conf_max vector of values corresponding to the fit, using the
+##'   minimum/maximum value confidence interval for exponent b, of the PLB
+##'   distribution at each value of `x_PLB`
+##' @param y_scaling numeric scaling of y-minimum of y-axis. Axis can't go to zero on
+##'   log-log plot, but goes to the proportion `y_scaling` (<1)
+##'   of the minimum value of counts greater than the highest `bin_min` value. Do
+##'   such that can see the right-most bin in all plots.
+##' @param plot_conf_ints logical whether to plot confidence intervals or not
+##' @param par_mai vector of values to use for `par(mai)`
+##' @param par_cex numeric value to use for `par(cex)` (font size)
+##' @param seg_col colour to use for the segments (green in Fig. 7 of
+##'   MEPS paper).
+##' @param fit_col colour to use for fitted curves
+##' @param fit_lwd line thickness to use for fitted curves
+##' @param conf_lty line type to use for confidence intervals
+##' @return single panel plot of the ISD with data in binned form like in
+##'   Fig. 7a or 7b of MEPS paper, but with nonoverlapping bins; returns nothing.
 ##' @export
 ##' @author Andrew Edwards
 ##' @examples
-##' @ontrun{
-##' @
-##' @}
+##' \dontrun{
+##'
+##' }
 plot_isd_binned <- function(res_mlebin,
                             log,
                             xlim,

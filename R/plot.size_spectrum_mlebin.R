@@ -1,29 +1,42 @@
 ##' Plot a binned ISD plots similar to MEPS Figure 7 (but with nonoverlapping bins)
 ##'
-##' ##'
-##' @return
+##' @inheritParams plot.size_spectrum_numeric
+##' @inheritParams plot_isd_binned
+##' @param res_mlebin size_spectrum_mlebin object resulting from running
+##'   `fit_size_spectrum()` on binned data (such that the function
+##'   `fit_size_spectrum_mlebin()` is used; see vignette TODO). # TODO link help
+##'   to plot.size_spectrum_numeric - may want to put them all together
+##' @param log_y_axis character either `"both"`, do two plots (like Fig. 7 of
+##'   MEPS paper), `"no"` for single plot with linear y axis (like Fig. 7a of
+##'   MEPS paper), `"yes"` for single plot with logarithmic y axis (like Fig. 7b
+##'   of MEPS paper). Legends are automatically set, but can be tailored with the
+##'   arguments defined below.
+##' @param legend_label_a character label (default `"(a)"`) to use for panel a for two-panel plot
+##'   (`log_y_axis = "both"`).
+##' @param legend_label_b character label to use for panel b for two-panel plot
+##'   (`log_y_axis = "both"`).
+##' @param legend_label_single character label to use for the only panel for a one-panel plot (`log_y_axis = "yes"` or `"no"`).
+##' @param legend_text_a text to include in the legend for panel
+##'   a for two-panel plot (`log_y_axis = "both"`), the `b = -1.58` in Fig. 7a
+##'   of MEPS paper, or the only panel for a one-panel plot (`log_y_axis =
+##'   "yes"` or `"no"`).
+##' @param legend_text_b text to include in the legend for panel
+##'   b for two-panel plot (`log_y_axis = "both"`); ignored for one-panel plot
+##' @param legend_text_a_n, legend_text_b_n as for `legend_text_a` and
+##'   `legend_text_b` but for another row of information, default being `n =
+##'   <sample size>` as in Fig. 7a of MEPS paper.
+##' @return one- or two-panel plot of the ISD with data in binned form like in
+##'   Fig. 7, 7a or 7b (depending on settings) of MEPS paper, but with nonoverlapping bins; returns nothing.
 ##' @export
 ##' @author Andrew Edwards
 ##' @examples
 ##' \dontrun{
 ##'
 ##' }
-##' @param res_list size_spectrum_mlebin object resulting from running
-##'   `fit_size_spectrum()` on binned data (such that the function
-##'   `fit_size_spectrum_mlebin()` is used; see vignette TODO). # TODO link help
-##'   to plot.size_spectrum_numeric()
-##' @param x_plb vector of values to use to plot the fitted PLB curve; if NA then
-##'   automatically calculated (sometimes need to manually extend it to hit the
-##'   x-axis, but tricky to automate that on a log-scale
-##' @param y_scaling numeric scaling of y-minimum of y-axis. Axis can't go to zero on
-##'   log-log plot, but goes to the proportion `y_scaling` (<1)
-##'   of the minimum value of counts greater than the highest `bin_min` value. Do
-##'   such that can see the right-most bin in all plots.
 plot.size_spectrum_mlebin <- function(res_mlebin,
-                                      # from plot.size_spectrum_numeric(), best
+                                     # from plot.size_spectrum_numeric(), best
                                       # to use these for consistency
-                                      log_y_axis = "both", # do two plots, or
-                                        # yes or no for just the one
+                                      log_y_axis = "both",
                                       xlim = c(min(res_mlebin$data$bin_min),
                                                max(res_mlebin$data$bin_max)),
                                       ylim = NA,
@@ -41,9 +54,7 @@ plot.size_spectrum_mlebin <- function(res_mlebin,
                                       legend_text_a_n = paste0("n=",
                                                                round(sum(res_mlebin$data$bin_count))),
                                       legend_text_b = NULL,
-                                      legend_text_b_n = NULL, # Used for second
-                                        # of double plot b and
-                                        # single plot
+                                      legend_text_b_n = NULL,
                                       ...
                                       ){   # TODO decide if want ... yes, just
                                         # make sure help files link to all functions
@@ -52,7 +63,7 @@ plot.size_spectrum_mlebin <- function(res_mlebin,
               log_y_axis %in% c("both", "yes","no"))
 
   # Work out calculations needed for both types of plot and then pass them on to
-  # plot_isd_binned()
+  # plot_isd_binned():
 
   dat <- res_mlebin$data
   n <- sum(dat$bin_count)
