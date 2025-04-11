@@ -36,14 +36,15 @@ the simplicity, and refer to vignette for more details.
 
 ### Vector of individual measurements
 
-The simplest data is just a vector  of measurements, such as body masses or
+The simplest data is just a vector of measurements, such as body masses or
 body lengths. We fit the size spectrum by calculating the maximum likelihood estimate
 (the MLE method) of the size-spectrum exponent, along with its 95% confidence intervals.
 
-The simulated data used from a bounded power-law distribution as used for Figures 1 and 2 of
-our [MEE paper](http://onlinelibrary.wiley.com/doi/10.1111/2041-210X.12641/full)
-are included as the data object `sim_vec` (which stands for simulated vector) in
-sizeSpectra2, and so we can just use that. Note that the fit will be good
+As an example we use the simulated data from a bounded power-law distribution as used for Figures 1 and 2 of
+our [MEE
+paper](http://onlinelibrary.wiley.com/doi/10.1111/2041-210X.12641/full). The
+values are included in sizeSpectra2 as the data object `sim_vec` (which stands
+for simulated vector). Note that the fit will be great
 because the data are sampled from the expected power-law distribution.
 
 So let's print the first 15 values, check
@@ -61,7 +62,7 @@ res_vec
 ```
 
 So `res_vec` is a list that contains the MLE and confidence intervals for $b$,
-as components `b_mle` and `b_conf` ,respectively,
+as components `b_mle` and `b_conf`, respectively,
 plus also the original data as component `x`. When printing I have set it up to just show the
 first 10 values of the original data. You can check that all 1000 values are in
 `res_vec$x` with simply:
@@ -79,10 +80,10 @@ our [MEE paper](http://onlinelibrary.wiley.com/doi/10.1111/2041-210X.12641/full)
 includes the PLB fits using the values of $b$ at the bounds of the confidence
 interval for `b`.
 
-The plot is as shown because we have written a function
+If you want to tweak options beyond the default shown then read this. The plot is as shown because we have written a function
 `plot.size_spectrum_numeric()` which gets automatically used on `res_vec`
-because `res_vec` has class `size_spectrum_numeric`, which we assigned
-automatically in the function `fit_size_spectrum()` that was used above to
+because `res_vec` has class `size_spectrum_numeric`. That was assigned
+automatically in the function `fit_size_spectrum()` used above to
 create `res_vec`. This all happens behind the scenes but it is useful for users
 to know about this. In particular, to see the help you need to do
 `?plot.size_spectrum_numeric()`. There you can see lots of customisable options
@@ -99,40 +100,82 @@ create binned figures for MLEbin).
 
 ### Binned data of counts in bins
 
-HERE - check all this.
-
 Now we demonstrate the MLEbin method, which is for binned data. Let's just take
-the same simulated data as used abov but only available in binned form. This is
-saved in the package as a tibble as a list object (see `?sim_vec_binned` for details), for which we will fit the tibble:
+the same simulated data as above but assume that we only have it available in
+binned form (e.g. measurements may have been made at a coarse scale to save
+time). The binned data are saved in the package as
+```{r, MLEbinned}
+sim_vec_binned
+```
+which is a list object (see `?sim_vec_binned` for details), for which we only need the binned values:
 ```{r, MLEbin1}
 sim_vec_binned$bin_vals
+```
 
+We fit these again using the generic `fit_size_spectrum()` function, which will
+automatically pick the MLEbin method:
+```{r MLEbin1a}
 res_binned <- fit_size_spectrum(sim_vec_binned$bin_vals)
 
 res_binned
 ```
-As you can see, `res_binned` is a list object that contains objects `b_mle`, the
+
+So `res_binned` is a list object that contains objects `b_mle`, the
 maximum likelihood estimate of the exponent $b$, `b_conf` which gives the 95%
-confidence interval of $b$, and `data` which gives the data used TODO note that
-it might be different, have to check if do end up removing 0's in end
-bins. Maybe do an example.
+confidence interval of $b$, and `data` which gives the data used for the fit (in
+this case the same as `sim_vec_binned$bin_vals`).
 
-We have a built in plotting function to generate a plot in the style of Figure 7
+We have a built-in plotting function to generate a plot in the style of Figure 7
 in our MEPS paper (but a bit simpler because here we do not have overlapping
-bins).
+bins), which is accessed by simply doing:
 
-TODO take some text from `MLEbin_recommend` vignette, next plot matches the
-figure (almost completely).
-```{r, MLEbinplot}
-plot(res_binned) # working on now HERE - done, need to tidy up
+```{r, MLEbinplot, fig.height = 10}
+plot(res_binned)
 ```
 
-Can add options, and also just plot one or other of the panels:
-```{r, MLEbinplot2}
+The y-axis is (a) linear and (b) logarithmic, and the grey rectangles indicate
+the uncertainty in numbers of values due to the binning. For each bin, the horizontal green
+line shows the range of body masses of that bin, with its value
+on the y-axis corresponding to the total number of individuals in bins whose
+minima are $\geq$ the bin's minimum. By definition, this includes all individuals
+in that bin. For example, all $n = 1000$ individuals are $\geq$ the minimum of
+the first (left-most) bin, so that bin is at $1000$ on the y-axis. The vertical
+span of each grey rectangle shows the possible numbers of
+individuals with body mass $\geq$ the
+body mass of individuals in that bin (horizontal
+span is the same as for the green lines). The maximum number of such individuals
+is the same as the green line, and the minimum number (bottom of grey rectangle)
+is the total number of individuals $\geq$ the bin's maximum. By definition, this is then the
+green line for the next bin. This plotting method allows us to properly represent the
+discrete binned data on a continuous scale. For example, for a body mass of 1.5
+g we can see that the number (on the y-axis) of possible individual individuals with
+body mass $\geq$ 1.5 g is between
+`r sum(res_binned$data$bin_count) - res_binned$data$bin_count[1]`
+(all individuals could conceivably be 1.7 g and therefore all are $\geq$ 1.5 g)
+and `r sum(res_binned$data$bin_count)` (all individuals in the first bin are
+actually $<$ 1.5 g).
+
+
+HERE
+
+The text
+in (a) gives the MLE for the size-spectrum exponent
+$b$, and the sample size $n$.
+
+Both figures show that the PLB distribution is an excellent fit for these data
+the red curves go through the top-left and bottom-right corners of the grey
+boxes. Of course, the data are simulated from a PLB distribution and so should
+be a good fit, but these figures show the benefit of the plotting approach
+(which may not have been so obvious in MEPS Fig. 7 for data with a complex bin
+structure).
+
+
+We can easily add options:
+```{r, MLEbinplot2, fig.height = 10}
 plot(res_binned,
      x_small_ticks_labels = c(5, 50, 500))
 ```
-
+and also just plot one or other of the panels:
 ```{r, MLEbinplot3}
 plot(res_binned,
      log_y_axis = "yes")
@@ -148,14 +191,20 @@ For more options, see `?plot.size_spectrum_mlebin` TODO check that links with `?
 
 
 
+TODO output might be different, have to check if do end up removing 0's in end
+bins. Maybe do an example.
 
 
+TODO To get your data into
+the required format use `bin_data()` or whatever - see data-raw/. maybe take
+some of what's below
 
 
+## LBN plot if data are body-masses
 
+TODO can take some text from `MLEbin_recommend` vignette.
 
-Can delete, or maybe use some above to explain the tibble. To get your data into
-the required format use `bin_data()` or whatever - see data-raw/.
+HERE -- maybe use some of this and uput it above.
 
 
 The `bin_width = "2k"` argument says to assign bin widths that double in width.
@@ -187,17 +236,11 @@ instruments).
 TODO actually, just include a simple example data set of binned values. Move the
 above to later.
 
-Basically am redoing the MLEbin_recommend vignette but with more
-usable functions.
-
 TODO: create a function to make into bin_data formatthat if we have a vector of
 counts and binbreaks. - check if `bin_data.data.frame()` works, check when wrote it.
 
 NEXT: make `bin_data()` not sort the `bin_for_each_x`, just the `bin_vals`
 
-```{r mlebin}
-res_binned <- fit_size_spectrum(sim_vec_binned$bin_vals)
-```
 
 Might still need to:
 
