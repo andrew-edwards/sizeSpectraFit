@@ -1,6 +1,9 @@
 ##' Single plot of individual size distribution of values and the MLE fit with
 ##' confidence intervals TODO Going to simplify this and call plot_isd(), which
-##' is a copy of this right now.
+##' is a copy of this right now. THen maybe this defaults to doing log-log and
+##' lin plot like Fig 7 MEPS default that we also have for MLEbin. And add
+##' option for recommended plot from MEE if it's biomass. Can always bin anyway
+##' and just not normalise.
 ##'
 ##' Plot the results from a PLB fit to a vector of values, as in Figure 2h and 6b of
 ##' [1](http://onlinelibrary.wiley.com/doi/10.1111/2041-210X.12641/full). Also
