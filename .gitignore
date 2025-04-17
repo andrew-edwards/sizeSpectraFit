@@ -8,6 +8,7 @@
 
 R-hdiAnalysis/
 R-sizeSpectra/
+R-sizeSpectraHake/
 tests/testthat-hdiAnalysis/
 
 data-raw/hake-2024/*

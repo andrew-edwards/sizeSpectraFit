@@ -43,7 +43,8 @@ fit_size_spectrum.numeric <- function(dat,
 
   res <- list(b_mle = mle_and_conf$mle,
               b_conf = mle_and_conf$conf,
-              x = x)
+              x = x)                 # TODO prob want to return xmin and xmax,
+                                     # even though they are imported.
 
   class(res) = c("size_spectrum_numeric",
                  class(res))
