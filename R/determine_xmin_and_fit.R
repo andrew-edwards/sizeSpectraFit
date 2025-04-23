@@ -24,6 +24,10 @@
 ##' @examples
 ##' \dontrun{
 ##' # see .Rmd file
+##' HERE:
+##' res <- determine_xmin_and_fit(sim_vec)
+##' plot(res)
+##'
 ##' TODO  res_all_strata <- fit_all_years(raw_simp_prop,
 ##'                     bin_width_each_year = bin_width_each_year)
 ##' }
