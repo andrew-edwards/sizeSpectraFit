@@ -98,7 +98,7 @@ delete_Name <- "Liocarcinus depurator"
 resnep <- resnep %>%
   filter(!(CodiPesca == delete_CodiPesca & NomEspecie == delete_Name))
 
-# exclude from resnep21_fg trawls done beside the MPA -- too close
+# exclude from resnep21_fg trawls done beside the NTR -- too close
 resnep <- subset(resnep, CodiPesca != "20210826_64500_ESP000023428_09" &
                    CodiPesca != "20210824_64500_ESP000023428_01" &
                    CodiPesca != "20210831_64500_ESP000023428_16")
@@ -144,10 +144,10 @@ summary(dplyr::select(resnep_temp,
                       frecuencia_final))
 
 
-# separate resnep 2017 and 2021 (MPA & FG),
+# separate resnep 2017 and 2021 (NTR & FG),
 resnep17 <- subset(resnep, Any != "2021")
 resnep21 <- subset(resnep, Any != "2017")
-resnep21_mpa <- subset(resnep21, Site == "MPA")
+resnep21_ntr <- subset(resnep21, Site == "NTR")
 resnep21_fg <- subset(resnep21, Site == "FG")
 
 
@@ -178,14 +178,14 @@ resnep21_fg_chondrichthyes <- subset(resnep21_fg, AgrupamentTaxonomic == "Chondr
 resnep21_fg_cephalopoda_small <- subset(resnep21_fg_cephalopoda, PesoIndividual < 10)
 resnep21_fg_cephalopoda_big <- subset(resnep21_fg_cephalopoda, PesoIndividual > 10)
 
-# resnep21_mpa
-resnep21_mpa_crustacea <- subset(resnep21_mpa, AgrupamentTaxonomic == "Crustacea")
-resnep21_mpa_cephalopoda <- subset(resnep21_mpa, AgrupamentTaxonomic == "Cephalopoda")
-resnep21_mpa_actinopterygii <- subset(resnep21_mpa, AgrupamentTaxonomic == "Actinopterygii")
-resnep21_mpa_chondrichthyes <- subset(resnep21_mpa, AgrupamentTaxonomic == "Chondrichthyes")
+# resnep21_ntr
+resnep21_ntr_crustacea <- subset(resnep21_ntr, AgrupamentTaxonomic == "Crustacea")
+resnep21_ntr_cephalopoda <- subset(resnep21_ntr, AgrupamentTaxonomic == "Cephalopoda")
+resnep21_ntr_actinopterygii <- subset(resnep21_ntr, AgrupamentTaxonomic == "Actinopterygii")
+resnep21_ntr_chondrichthyes <- subset(resnep21_ntr, AgrupamentTaxonomic == "Chondrichthyes")
 
-resnep21_mpa_cephalopoda_small <- subset(resnep21_mpa_cephalopoda, PesoIndividual < 10)
-resnep21_mpa_cephalopoda_big <- subset(resnep21_mpa_cephalopoda, PesoIndividual > 10)
+resnep21_ntr_cephalopoda_small <- subset(resnep21_ntr_cephalopoda, PesoIndividual < 10)
+resnep21_ntr_cephalopoda_big <- subset(resnep21_ntr_cephalopoda, PesoIndividual > 10)
 
 
 # Don't want these as they're the whole tables:
@@ -202,12 +202,12 @@ usethis::use_data(resnep17_actinopterygii,
                   resnep21_fg_cephalopoda_small,
                   resnep21_fg_chondrichthyes,
                   resnep21_fg_crustacea,
-                  resnep21_mpa_actinopterygii,
-                  resnep21_mpa_cephalopoda,
-                  resnep21_mpa_cephalopoda_big,
-                  resnep21_mpa_cephalopoda_small,
-                  resnep21_mpa_chondrichthyes,
-                  resnep21_mpa_crustacea,
+                  resnep21_ntr_actinopterygii,
+                  resnep21_ntr_cephalopoda,
+                  resnep21_ntr_cephalopoda_big,
+                  resnep21_ntr_cephalopoda_small,
+                  resnep21_ntr_chondrichthyes,
+                  resnep21_ntr_crustacea,
                   overwrite = TRUE)
 
 
@@ -215,17 +215,17 @@ stop()
 
 
 
-### 2021 MPA ###
+### 2021 NTR ###
 # define factors --- change according to analysis to be made ---
-x_community_mpa <- na.omit(resnep21_mpa$PesoIndividual)
-range(x_community_mpa)
+x_community_ntr <- na.omit(resnep21_ntr$PesoIndividual)
+range(x_community_ntr)
 
-res_community_mpa <- fit_size_spectrum(x_community_mpa,
+res_community_ntr <- fit_size_spectrum(x_community_ntr,
                                  x_min = 0.2,
                                  x_max = 1000)
-res_community_mpa
-plot(res_community_mpa,
-     col = col_mpa)
+res_community_ntr
+plot(res_community_ntr,
+     col = col_ntr)
 ```
 
 # Chondrichthyes
@@ -262,21 +262,21 @@ res_chondr_fg
 plot(res_chondr_fg,
      col = col_fg)
 
-### 2021 MPA ###
+### 2021 NTR ###
 # define factors --- change according to analysis to be made ---
-x_chondr_mpa <- na.omit(resnep21_mpa_chondrichthyes$PesoIndividual)
-range(x_chondr_mpa)
+x_chondr_ntr <- na.omit(resnep21_ntr_chondrichthyes$PesoIndividual)
+range(x_chondr_ntr)
 # SELECTING RANGE - commented out by Juliana
 # X = X[X > 5]
 # X = X[X < 400]
 # range(X)
 
-res_chondr_mpa <- fit_size_spectrum(x_chondr_mpa)
+res_chondr_ntr <- fit_size_spectrum(x_chondr_ntr)
 
-res_chondr_mpa
+res_chondr_ntr
 
-plot(res_chondr_mpa,
-     col = col_mpa)
+plot(res_chondr_ntr,
+     col = col_ntr)
 ```
 
 # Cephalopoda -- All
@@ -307,23 +307,23 @@ res_ceph_all_fg
 plot(res_ceph_all_fg,
      col = col_fg)
 
-### 2021 MPA ###
+### 2021 NTR ###
 # NTR#
 # define factors --- change according to analysis to be made ---
-x_ceph_all_mpa <- na.omit(resnep21_mpa_cephalopoda$PesoIndividual)
+x_ceph_all_ntr <- na.omit(resnep21_ntr_cephalopoda$PesoIndividual)
 
-range(x_ceph_all_mpa)
+range(x_ceph_all_ntr)
 # SELECTING RANGE - doing in function
 # X = X[X > 2]
 # X = X[X < 200]
 # range(X)
 
-res_ceph_all_mpa <- fit_size_spectrum(x_ceph_all_mpa,
+res_ceph_all_ntr <- fit_size_spectrum(x_ceph_all_ntr,
                                            x_min = 2,
                                            x_max = 200)
-res_ceph_all_mpa
-plot(res_ceph_all_mpa,
-     col = col_mpa)
+res_ceph_all_ntr
+plot(res_ceph_all_ntr,
+     col = col_ntr)
 ```
 
 # Cephalopoda -- Large
@@ -351,18 +351,18 @@ res_ceph_large_fg
 plot(res_ceph_large_fg,
      col = col_fg)
 
-### 2021 MPA ###
+### 2021 NTR ###
 # NTR#
 # define factors --- change according to analysis to be made ---
-x_ceph_large_mpa <- na.omit(resnep21_mpa_cephalopoda_big$PesoIndividual)
+x_ceph_large_ntr <- na.omit(resnep21_ntr_cephalopoda_big$PesoIndividual)
 
-range(x_ceph_large_mpa)
+range(x_ceph_large_ntr)
 
-res_ceph_large_mpa <- fit_size_spectrum(x_ceph_large_mpa)
+res_ceph_large_ntr <- fit_size_spectrum(x_ceph_large_ntr)
 
-res_ceph_large_mpa
-plot(res_ceph_large_mpa,
-     col = col_mpa)
+res_ceph_large_ntr
+plot(res_ceph_large_ntr,
+     col = col_ntr)
 ```
 
 # Cephalopoda -- Small
@@ -389,16 +389,16 @@ res_ceph_small_fg
 plot(res_ceph_small_fg,
      col = col_fg)
 
-### 2021 MPA ###
-x_ceph_small_mpa <- na.omit(resnep21_mpa_cephalopoda_small$PesoIndividual)
+### 2021 NTR ###
+x_ceph_small_ntr <- na.omit(resnep21_ntr_cephalopoda_small$PesoIndividual)
 
-range(x_ceph_small_mpa)
+range(x_ceph_small_ntr)
 
-res_ceph_small_mpa <- fit_size_spectrum(x_ceph_small_mpa)
+res_ceph_small_ntr <- fit_size_spectrum(x_ceph_small_ntr)
 
-res_ceph_small_mpa
-plot(res_ceph_small_mpa,
-     col = col_mpa)
+res_ceph_small_ntr
+plot(res_ceph_small_ntr,
+     col = col_ntr)
 ```
 
 # Actinopterygii
@@ -429,17 +429,17 @@ res_actin_fg
 plot(res_actin_fg,
      col = col_fg)
 
-# 2021 MPA
-resnep21_mpa_actinopterygii <- subset(resnep21_mpa_actinopterygii, Talla_mm >40)
-x_actin_mpa <- na.omit(resnep21_mpa_actinopterygii$PesoIndividual)
+# 2021 NTR
+resnep21_ntr_actinopterygii <- subset(resnep21_ntr_actinopterygii, Talla_mm >40)
+x_actin_ntr <- na.omit(resnep21_ntr_actinopterygii$PesoIndividual)
 
-range(x_actin_mpa)
+range(x_actin_ntr)
 
-res_actin_mpa <- fit_size_spectrum(x_actin_mpa)
+res_actin_ntr <- fit_size_spectrum(x_actin_ntr)
 
-res_actin_mpa
-plot(res_actin_mpa,
-     col = col_mpa)
+res_actin_ntr
+plot(res_actin_ntr,
+     col = col_ntr)
 ```
 
 # Crustacea
@@ -469,15 +469,15 @@ res_crust_fg
 plot(res_crust_fg,
      col = col_fg)
 
-# 2021 MPA
-x_crust_mpa <- na.omit(resnep21_mpa_crustacea$PesoIndividual)
+# 2021 NTR
+x_crust_ntr <- na.omit(resnep21_ntr_crustacea$PesoIndividual)
 
-range(x_crust_mpa)
+range(x_crust_ntr)
 
-res_crust_mpa <- fit_size_spectrum(x_crust_mpa,
+res_crust_ntr <- fit_size_spectrum(x_crust_ntr,
                                    x_min = 0.3)
 
-res_crust_mpa
-plot(res_crust_mpa,
-     col = col_mpa)
+res_crust_ntr
+plot(res_crust_ntr,
+     col = col_ntr)
 ```
