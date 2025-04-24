@@ -1,0 +1,382 @@
+;---
+title: "Analyses of Juliana's data based on her original R code and now using sizeSpectra2"
+author: "Andrew Edwards"
+output: pdf_document
+fontsize: 12pt
+date: "Last compiled on `r format(Sys.time(), '%d %B, %Y')`"
+---
+
+```{r, setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "",
+  cache = TRUE,
+  cache_path = "mediterranean-analysis-cache/",
+  fig.path = "mediterranean-analysis-figs-cache/",
+  fig.width = 7,
+  fig.height = 6
+)
+  # comment = "#>",
+```
+
+
+```
+
+```{r, build, echo = FALSE, eval = FALSE}
+# To build either run this line or click knit button in RStudio:
+rmarkdown::render("mediterranean-analysis.Rmd")
+```
+
+```{r, packages, echo = FALSE}
+load_all()                 # Or comment out and uncomment next line if not in
+                           #  the sizeSpectra2 folder.
+# library(sizeSpectra2)    # Need latest version
+library(tibble)
+```
+
+```{r, todo}
+# TODO - things to confirm:
+# 1. TODO - determine xmin and xmax, best to look at each in turn, maybe using
+# hake lengths approach. See new determine_xmin and make_hist functions.
+# 2. TODO - check all xmin xmax match the new spreadsheet.
+# 3. TODO - want consistent x_min for all three crustacea, they are currently
+#  different. Also need to think about x_min a little maybe. Andy could do the
+# idea from the hake analyses to set x_min.
+```
+
+# Outline
+
+For each species group (that might not be the best word!) we look at the
+baseline (data from 2017 before implementation of the no-take reserve), the
+fishing grounds (data from 2021 after implementation of the no-take reserve but
+outside of the reserve, abbreviated as 'fg') and the no-take reserve (data from 2021 after
+implementation of the no-take reserve, inside the no-take reserve, abbreviated
+as 'ntr').
+
+Data are in the package in a list, which we will unpack here:
+```{r unpackdata}
+list2env(mediterranean_megafauna,
+         .GlobalEnv)
+
+# Plotting colours
+col_baseline <- adjustcolor("blue4", alpha.f = 0.5)
+col_fg <- adjustcolor("#00BF7D", alpha.f = 0.5)
+col_ntr <- adjustcolor("#bc5090", alpha.f = 0.5)
+```
+
+We will step through each group in turn, then summarise the results to use at
+the end.
+
+TODO We also need to investigate the values to use for $x_\text{min}$ and
+$x_\text{max}$ for each group, presumably wanting to keep them consistent
+through time within a group.
+
+
+## Full community (though not going to use)
+
+Showing that we need the stitching together idea later.
+
+HERE return xmin and xmax from MLE calculation, also add an element describing
+the method used, which will be helpful for users if it gets somewhat automated.;
+Then no need to return from determine_xmin_and_fit_().
+
+TODO `print.determine_xmin_and_fit()` or similar.
+
+```{r, community}
+range(x_community_baseline)
+
+
+# Start with setting this bin_width to 1, but then decrease it if
+# appropriate. Don't want to get too small, and this will depend on the data.
+# Juliana had 0.2 as a minimum, so use that as bin width
+res_community_baseline <- determine_xmin_and_fit(x_community_baseline,
+                                                 bin_width = 0.2)
+
+plot(res_community_baseline,
+     xlim_hist = c(0, 20))
+
+
+
+res_community_baseline <- fit_size_spectrum(x_community_baseline,
+                                            x_min = 0.2,
+                                            x_max = 1000)
+res_community_baseline
+plot(res_community_baseline,
+     col = col_baseline,
+     main = "Community")
+
+res_community_fg <- fit_size_spectrum(x_community_fg,
+                                      x_min = 0.2,
+                                      x_max = 1000)
+res_community_fg
+plot(res_community_fg,
+     col = col_fg)
+
+range(x_community_ntr)
+
+res_community_ntr <- fit_size_spectrum(x_community_ntr,
+                                 x_min = 0.2,
+                                 x_max = 1000)
+res_community_ntr
+plot(res_community_ntr,
+     col = col_ntr)
+```
+
+```{r stop}
+knitr::knitr_exit()
+```
+
+
+# Chondrichthyes
+
+```{r, chondr}
+resnep17_chondrichthyes <- subset(resnep17_chondrichthyes, Talla_mm >100)
+x_chondr_baseline <- na.omit(resnep17_chondrichthyes$PesoIndividual)
+range(x_chondr_baseline)
+# SELECTING RANGE - were commented out in Juliana's code
+# X = X[X > 5]
+# X = X[X < 400]
+# range(X)
+
+range(x_chondr_baseline)
+
+res_chondr_baseline <- fit_size_spectrum(x_chondr_baseline)
+
+res_chondr_baseline
+plot(res_chondr_baseline,
+     col = col_baseline,
+     main = "Chondrichthyes")
+
+### 2021 FG ###
+x_chondr_fg <- na.omit(resnep21_fg_chondrichthyes$PesoIndividual)
+range(x_chondr_fg)
+# SELECTING RANGE - were commented out in Juliana's code
+# X = X[X > 5]
+# X = X[X < 400]
+# range(X)
+
+res_chondr_fg <- fit_size_spectrum(x_chondr_fg)
+
+res_chondr_fg
+plot(res_chondr_fg,
+     col = col_fg)
+
+### 2021 NTR ###
+# define factors --- change according to analysis to be made ---
+x_chondr_ntr <- na.omit(resnep21_ntr_chondrichthyes$PesoIndividual)
+range(x_chondr_ntr)
+# SELECTING RANGE - commented out by Juliana
+# X = X[X > 5]
+# X = X[X < 400]
+# range(X)
+
+res_chondr_ntr <- fit_size_spectrum(x_chondr_ntr)
+
+res_chondr_ntr
+
+plot(res_chondr_ntr,
+     col = col_ntr)
+```
+
+# Cephalopoda -- All
+
+```{r cephall}
+### 2017 ###
+x_ceph_all_baseline <- na.omit(resnep17_cephalopoda$PesoIndividual)
+range(x_ceph_all_baseline)
+
+res_ceph_all_baseline <- fit_size_spectrum(x_ceph_all_baseline,
+                                           x_min = 2,
+                                           x_max = 200)
+res_ceph_all_baseline
+plot(res_ceph_all_baseline,
+     col = col_baseline,
+     main = "Cephalopoda all")
+
+### 2021 FG ###
+# define factors --- change according to analysis to be made ---
+x_ceph_all_fg <- na.omit(resnep21_fg_cephalopoda$PesoIndividual)
+
+range(x_ceph_all_fg)
+
+res_ceph_all_fg <- fit_size_spectrum(x_ceph_all_fg,
+                                           x_min = 2,
+                                           x_max = 200)
+res_ceph_all_fg
+plot(res_ceph_all_fg,
+     col = col_fg)
+
+### 2021 NTR ###
+# NTR#
+# define factors --- change according to analysis to be made ---
+x_ceph_all_ntr <- na.omit(resnep21_ntr_cephalopoda$PesoIndividual)
+
+range(x_ceph_all_ntr)
+# SELECTING RANGE - doing in function
+# X = X[X > 2]
+# X = X[X < 200]
+# range(X)
+
+res_ceph_all_ntr <- fit_size_spectrum(x_ceph_all_ntr,
+                                           x_min = 2,
+                                           x_max = 200)
+res_ceph_all_ntr
+plot(res_ceph_all_ntr,
+     col = col_ntr)
+```
+
+# Cephalopoda -- Large
+
+```{r, cephlarge}
+x_ceph_large_baseline <- na.omit(resnep17_cephalopodaBIG$PesoIndividual)
+range(x_ceph_large_baseline)
+
+res_ceph_large_baseline <- fit_size_spectrum(x_ceph_large_baseline)
+
+res_ceph_large_baseline
+plot(res_ceph_large_baseline,
+     col = col_baseline,
+     main = "Cephalopoda large")
+
+### 2021 FG ###
+# define factors --- change according to analysis to be made ---
+x_ceph_large_fg <- na.omit(resnep21_fg_cephalopodaBIG$PesoIndividual)
+
+range(x_ceph_large_fg)
+
+res_ceph_large_fg <- fit_size_spectrum(x_ceph_large_fg)
+
+res_ceph_large_fg
+plot(res_ceph_large_fg,
+     col = col_fg)
+
+### 2021 NTR ###
+# NTR#
+# define factors --- change according to analysis to be made ---
+x_ceph_large_ntr <- na.omit(resnep21_ntr_cephalopodaBIG$PesoIndividual)
+
+range(x_ceph_large_ntr)
+
+res_ceph_large_ntr <- fit_size_spectrum(x_ceph_large_ntr)
+
+res_ceph_large_ntr
+plot(res_ceph_large_ntr,
+     col = col_ntr)
+```
+
+# Cephalopoda -- Small
+
+```{r, cephsmall}
+x_ceph_small_baseline <- na.omit(resnep17_cephalopodaSMALL$PesoIndividual)
+range(x_ceph_small_baseline)
+
+res_ceph_small_baseline <- fit_size_spectrum(x_ceph_small_baseline)
+
+res_ceph_small_baseline
+plot(res_ceph_small_baseline,
+     col = col_baseline,
+     main = "Cephalopoda small")
+
+### 2021 FG ###
+x_ceph_small_fg <- na.omit(resnep21_fg_cephalopodaSMALL$PesoIndividual)
+
+range(x_ceph_small_fg)
+
+res_ceph_small_fg <- fit_size_spectrum(x_ceph_small_fg)
+
+res_ceph_small_fg
+plot(res_ceph_small_fg,
+     col = col_fg)
+
+### 2021 NTR ###
+x_ceph_small_ntr <- na.omit(resnep21_ntr_cephalopodaSMALL$PesoIndividual)
+
+range(x_ceph_small_ntr)
+
+res_ceph_small_ntr <- fit_size_spectrum(x_ceph_small_ntr)
+
+res_ceph_small_ntr
+plot(res_ceph_small_ntr,
+     col = col_ntr)
+```
+
+# Actinopterygii
+
+```{r, actin}
+# 2017
+resnep17_actinopterygii <- subset(resnep17_actinopterygii, Talla_mm > 40)
+x_actin_baseline <- na.omit(resnep17_actinopterygii$PesoIndividual)
+
+range(x_actin_baseline)
+
+res_actin_baseline <- fit_size_spectrum(x_actin_baseline)
+
+res_actin_baseline
+plot(res_actin_baseline,
+     col = col_baseline,
+     main = "actinopterygii")
+
+# 2021 FG
+resnep21_fg_actinopterygii <- subset(resnep21_fg_actinopterygii, Talla_mm > 40)
+x_actin_fg <- na.omit(resnep21_fg_actinopterygii$PesoIndividual)
+
+range(x_actin_fg)
+
+res_actin_fg <- fit_size_spectrum(x_actin_fg)
+
+res_actin_fg
+plot(res_actin_fg,
+     col = col_fg)
+
+# 2021 NTR
+resnep21_ntr_actinopterygii <- subset(resnep21_ntr_actinopterygii, Talla_mm >40)
+x_actin_ntr <- na.omit(resnep21_ntr_actinopterygii$PesoIndividual)
+
+range(x_actin_ntr)
+
+res_actin_ntr <- fit_size_spectrum(x_actin_ntr)
+
+res_actin_ntr
+plot(res_actin_ntr,
+     col = col_ntr)
+```
+
+# Crustacea
+
+```{r, crust}
+# 2017
+x_crust_baseline <- na.omit(resnep17_crustacea$PesoIndividual)
+
+range(x_crust_baseline)
+
+res_crust_baseline <- fit_size_spectrum(x_crust_baseline)
+
+res_crust_baseline
+plot(res_crust_baseline,
+     col = col_baseline,
+     main = "Crustacea")
+
+# 2021 FG
+x_crust_fg <- na.omit(resnep21_fg_crustacea$PesoIndividual)
+
+range(x_crust_fg)
+
+res_crust_fg <- fit_size_spectrum(x_crust_fg,
+                                  x_min = 0.4)
+
+res_crust_fg
+plot(res_crust_fg,
+     col = col_fg)
+
+# 2021 NTR
+x_crust_ntr <- na.omit(resnep21_ntr_crustacea$PesoIndividual)
+
+range(x_crust_ntr)
+
+res_crust_ntr <- fit_size_spectrum(x_crust_ntr,
+                                   x_min = 0.3)
+
+res_crust_ntr
+plot(res_crust_ntr,
+     col = col_ntr)
+```

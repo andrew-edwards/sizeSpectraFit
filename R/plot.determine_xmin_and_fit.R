@@ -1,6 +1,10 @@
-##' Plot results from determining xmin by mode method and then fitting use MLEhake spectra results
+##' Plot results from determining xmin by mode method and then fitting use MLE hake spectra results
 ##'
 ##' @param res list of class `determine_xmin_and_fit` as output from `determine_xmin_and_fit()`
+##' @param xlim_hist numeric vector of two values representing `xlim` for histogram plot; default is the full range
+##'   of breaks (which might be too large for a clear figure, especially given
+##'   the linear axis). TODO could maybe add in log-x axis, but not option in
+##'   `plot.hist()` so would have to make it up here.
 ##' @param ... arguments to passed onto TODO `sizeSpectra::ISD_bin_plot_nonoverlapping()`
 ##' @return figure in current device
 ##' @export
@@ -10,6 +14,7 @@
 ##' See .Rmd
 ##' }
 plot.determine_xmin_and_fit <- function(res,
+                                        xlim_hist = NULL,
                                         ...){
 
   # Global xlim, might want to add functionality at some point
@@ -43,10 +48,21 @@ plot.determine_xmin_and_fit <- function(res,
   #  border_col = col_hist
   #}
 
-  plot(res$h,
-       # xlim = xlim_global,
-       col = col_hist,
-       border = border_col)
+  if(is.null(xlim_hist)){
+    plot(res$h,
+         # xlim = xlim_global,
+         col = col_hist,
+         border = border_col)} else {
+    plot(res$h,
+         # xlim = xlim_global,
+         col = col_hist,
+         border = border_col,
+         xlim = xlim_hist)
+ }
+
+
+
+
 
   plot(res$mle_fit)
 
