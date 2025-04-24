@@ -2,10 +2,12 @@
 *.docx
 *.pdf
 *.xlsx
+*cache*
+*.Rproj
 
 .Rproj.user
 
-*.Rproj
+
 
 R-hdiAnalysis/
 R-sizeSpectra/
@@ -15,3 +17,4 @@ tests/testthat-hdiAnalysis/
 data-raw/hake-2024/*
 
 data-raw/zabala-data/using-sizeSpectra2.Rmd
+report/using-sizeSpectra2.Rmd

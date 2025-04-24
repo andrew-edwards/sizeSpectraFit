@@ -4,7 +4,10 @@
 \alias{plot.size_spectrum_numeric}
 \title{Single plot of individual size distribution of values and the MLE fit with
 confidence intervals TODO Going to simplify this and call plot_isd(), which
-is a copy of this right now.}
+is a copy of this right now. THen maybe this defaults to doing log-log and
+lin plot like Fig 7 MEPS default that we also have for MLEbin. And add
+option for recommended plot from MEE if it's biomass. Can always bin anyway
+and just not normalise.}
 \usage{
 \method{plot}{size_spectrum_numeric}(
   res,

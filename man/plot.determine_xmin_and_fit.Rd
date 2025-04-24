@@ -2,20 +2,26 @@
 % Please edit documentation in R/plot.determine_xmin_and_fit.R
 \name{plot.determine_xmin_and_fit}
 \alias{plot.determine_xmin_and_fit}
-\title{Plot results from determining xmin by mode method and then fitting use MLEhake spectra results}
+\title{Plot results from determining xmin by mode method and then fitting use MLE hake spectra results}
 \usage{
-\method{plot}{determine_xmin_and_fit}(res, ...)
+\method{plot}{determine_xmin_and_fit}(res, xlim_hist = NULL, ...)
 }
 \arguments{
 \item{res}{list of class \code{determine_xmin_and_fit} as output from \code{determine_xmin_and_fit()}}
 
-\item{...}{arguments to passed onto TODO \code{sizeSpectra::ISD_bin_plot_nonoverlapping()}}
+\item{xlim_hist}{numeric vector of two values representing \code{xlim} for histogram plot; default is the full range
+of breaks (which might be too large for a clear figure, especially given
+the linear axis). TODO could maybe add in log-x axis, but not option in
+\code{plot.hist()} so would have to make it up here.}
+
+\item{...}{arguments to passed onto \code{\link[=hist]{hist()}} for now, but probably want
+more. TODO \code{sizeSpectra::ISD_bin_plot_nonoverlapping()}}
 }
 \value{
 figure in current device
 }
 \description{
-Plot results from determining xmin by mode method and then fitting use MLEhake spectra results
+Plot results from determining xmin by mode method and then fitting use MLE hake spectra results
 }
 \examples{
 \dontrun{

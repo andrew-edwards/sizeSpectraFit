@@ -17,10 +17,10 @@ fit_size_spectrum.data.frame <- function(dat,
     # separately and then combine results.
     res <- fit_size_spectrum_mle_strata(dat,
                                         strata = strata,
-                                        ...)  # TODO set up a loop
+                                        ...)  # TODO set up a loop, or the function.
   } else {
     res <- fit_size_spectrum_mlebin(dat,
-                                    ...) # TODO
+                                    ...)
   }
 
   return(res)

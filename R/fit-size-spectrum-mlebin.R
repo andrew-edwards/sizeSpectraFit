@@ -91,7 +91,11 @@ fit_size_spectrum_mlebin <- function(dat,
 
   res <- list(b_mle = mle_and_conf$mle,
               b_conf = mle_and_conf$conf,
-              data = df)    # TODO mention can be different to dat, document,
+              data = df,
+              x_min = x_min,
+              x_max = x_max,
+              method = "MLEbin")
+          # TODO mention data can be different to dat, document,
                             # including low_count etc.
 
   class(res) = c("size_spectrum_mlebin",

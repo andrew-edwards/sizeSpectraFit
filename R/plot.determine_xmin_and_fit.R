@@ -5,7 +5,8 @@
 ##'   of breaks (which might be too large for a clear figure, especially given
 ##'   the linear axis). TODO could maybe add in log-x axis, but not option in
 ##'   `plot.hist()` so would have to make it up here.
-##' @param ... arguments to passed onto TODO `sizeSpectra::ISD_bin_plot_nonoverlapping()`
+##' @param ... arguments to passed onto [hist()] for now, but probably want
+##'   more. TODO `sizeSpectra::ISD_bin_plot_nonoverlapping()`
 ##' @return figure in current device
 ##' @export
 ##' @author Andrew Edwards
@@ -52,17 +53,15 @@ plot.determine_xmin_and_fit <- function(res,
     plot(res$h,
          # xlim = xlim_global,
          col = col_hist,
-         border = border_col)} else {
+         border = border_col,
+         ...)} else {
     plot(res$h,
          # xlim = xlim_global,
          col = col_hist,
          border = border_col,
-         xlim = xlim_hist)
+         xlim = xlim_hist,
+         ...)
  }
-
-
-
-
 
   plot(res$mle_fit)
 

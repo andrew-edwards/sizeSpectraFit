@@ -1,4 +1,4 @@
-;---
+---
 title: "Analyses of Juliana's data based on her original R code and now using sizeSpectra2"
 author: "Andrew Edwards"
 output: pdf_document
@@ -72,7 +72,7 @@ $x_\text{max}$ for each group, presumably wanting to keep them consistent
 through time within a group.
 
 
-## Full community (though not going to use)
+# Full community (though not going to use)
 
 Showing that we need the stitching together idea later.
 
@@ -82,9 +82,10 @@ Then no need to return from determine_xmin_and_fit_().
 
 TODO `print.determine_xmin_and_fit()` or similar.
 
-```{r, community}
-range(x_community_baseline)
+## Community baseline
 
+```{r, communitybaseline}
+range(x_community_baseline)
 
 # Start with setting this bin_width to 1, but then decrease it if
 # appropriate. Don't want to get too small, and this will depend on the data.
@@ -93,39 +94,63 @@ res_community_baseline <- determine_xmin_and_fit(x_community_baseline,
                                                  bin_width = 0.2)
 
 plot(res_community_baseline,
-     xlim_hist = c(0, 20))
+     xlim_hist = c(0, 20),
+     main = "Community baseline")
+```
 
+```{r, table, results = "asis"}
+summary_mle_table(res_community_baseline)
+```
 
+Juliana had xmin of 0.2 and xmax of 1000. Leave for now as not going to use
+anyway, but come back to if needed (she did have the justification for xmax
+explained). Same values for FG and NTR. We do need same values for all
+three. TODO think about.
 
-res_community_baseline <- fit_size_spectrum(x_community_baseline,
-                                            x_min = 0.2,
-                                            x_max = 1000)
-res_community_baseline
-plot(res_community_baseline,
-     col = col_baseline,
-     main = "Community")
+## Community FG
 
-res_community_fg <- fit_size_spectrum(x_community_fg,
-                                      x_min = 0.2,
-                                      x_max = 1000)
-res_community_fg
+```{r, communityfg}
+range(x_community_fg)
+
+res_community_fg <- determine_xmin_and_fit(x_community_fg,
+                                           bin_width = 0.2)
+
 plot(res_community_fg,
-     col = col_fg)
+     xlim_hist = c(0, 20),
+     main = "Community fg")
+```
 
+```{r, tablecommunityfg, results = "asis"}
+summary_mle_table(res_community_fg)
+```
+
+## Community NTR
+
+And for NTR:
+```{r, communitntr}
 range(x_community_ntr)
 
-res_community_ntr <- fit_size_spectrum(x_community_ntr,
-                                 x_min = 0.2,
-                                 x_max = 1000)
-res_community_ntr
+# Start with setting this bin_width to 1, but then decrease it if
+# appropriate. Don't want to get too small, and this will depend on the data.
+# Juliana had 0.2 as a minimum, so use that as bin width
+res_community_ntr <- determine_xmin_and_fit(x_community_ntr,
+                                           bin_width = 0.2)
+
 plot(res_community_ntr,
-     col = col_ntr)
+     xlim_hist = c(0, 20),
+     main = "Community ntr")
 ```
 
-```{r stop}
-knitr::knitr_exit()
+```{r, tablecommunityntr, results = "asis"}
+summary_mle_table(res_community_ntr)
 ```
 
+
+
+
+```{r, stop, cache = FALSE}
+knitr::knit_exit()
+```
 
 # Chondrichthyes
 
