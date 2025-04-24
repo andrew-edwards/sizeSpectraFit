@@ -10,9 +10,9 @@ date: "Last compiled on `r format(Sys.time(), '%d %B, %Y')`"
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "",
-  cache = TRUE,
-  cache_path = "zabala-data-cache/",
-  fig.path = "zabala-data-figs-cache/",
+  cache = FALSE,
+  # cache_path = "zabala-data-cache/",
+  # fig.path = "zabala-data-figs-cache/",
   fig.width = 7,
   fig.height = 6
 )
@@ -147,7 +147,7 @@ summary(dplyr::select(resnep_temp,
 # separate resnep 2017 and 2021 (NTR & FG),
 resnep17 <- subset(resnep, Any != "2021")
 resnep21 <- subset(resnep, Any != "2017")
-resnep21_ntr <- subset(resnep21, Site == "NTR")
+resnep21_ntr <- subset(resnep21, Site == "MPA")
 resnep21_fg <- subset(resnep21, Site == "FG")
 
 
@@ -166,6 +166,7 @@ resnep17_cephalopoda <- subset(resnep17, AgrupamentTaxonomic == "Cephalopoda")
 resnep17_actinopterygii <- subset(resnep17, AgrupamentTaxonomic == "Actinopterygii")
 resnep17_chondrichthyes <- subset(resnep17, AgrupamentTaxonomic == "Chondrichthyes")
 
+# TODO make these >=10 and elsewhere; check if makes a difference.
 resnep17_cephalopoda_small <- subset(resnep17_cephalopoda, PesoIndividual < 10)
 resnep17_cephalopoda_big <- subset(resnep17_cephalopoda, PesoIndividual > 10)
 
@@ -186,298 +187,99 @@ resnep21_ntr_chondrichthyes <- subset(resnep21_ntr, AgrupamentTaxonomic == "Chon
 
 resnep21_ntr_cephalopoda_small <- subset(resnep21_ntr_cephalopoda, PesoIndividual < 10)
 resnep21_ntr_cephalopoda_big <- subset(resnep21_ntr_cephalopoda, PesoIndividual > 10)
-
-
-# Don't want these as they're the whole tables:
-# This is alphabetical (from using ls()):
-usethis::use_data(resnep17_actinopterygii,
-                  resnep17_cephalopoda,
-                  resnep17_cephalopoda_big,
-                  resnep17_cephalopoda_small,
-                  resnep17_chondrichthyes,
-                  resnep17_crustacea,
-                  resnep21_fg_actinopterygii,
-                  resnep21_fg_cephalopoda,
-                  resnep21_fg_cephalopoda_big,
-                  resnep21_fg_cephalopoda_small,
-                  resnep21_fg_chondrichthyes,
-                  resnep21_fg_crustacea,
-                  resnep21_ntr_actinopterygii,
-                  resnep21_ntr_cephalopoda,
-                  resnep21_ntr_cephalopoda_big,
-                  resnep21_ntr_cephalopoda_small,
-                  resnep21_ntr_chondrichthyes,
-                  resnep21_ntr_crustacea,
-                  overwrite = TRUE)
-
-
-stop()
-
-
-
-### 2021 NTR ###
-# define factors --- change according to analysis to be made ---
-x_community_ntr <- na.omit(resnep21_ntr$PesoIndividual)
-range(x_community_ntr)
-
-res_community_ntr <- fit_size_spectrum(x_community_ntr,
-                                 x_min = 0.2,
-                                 x_max = 1000)
-res_community_ntr
-plot(res_community_ntr,
-     col = col_ntr)
 ```
+
+Now just extracting and then saving the `PesoIndividual` column for each species
+group and data set ("baseline", "fg", or "ntr"), as, for example,
+`x_community_ntr`. Using the first syllable or so for the longer complex species
+group names.
+
+Baseline corresponds to 2017, but don't need to have the
+date in the variable name. Doing the analyses in
+`report/`, here just saving the data into the package. Each is then just a
+vector of individual body masses. Andy adding in `as.numeric()` as just using
+`na.omit()` keeps information (as attributes) about the indices (I presume) of
+the omitted NA's, which we do not need.
+
+```{r extractjustmasses}
+x_community_baseline <- na.omit(resnep17$PesoIndividual) %>% as.numeric()
+x_community_fg <- na.omit(resnep21_fg$PesoIndividual) %>% as.numeric()
+x_community_ntr <- na.omit(resnep21_ntr$PesoIndividual) %>% as.numeric()
+
 
 # Chondrichthyes
-
-```{r, chondr}
 resnep17_chondrichthyes <- subset(resnep17_chondrichthyes, Talla_mm >100)
-x_chondr_baseline <- na.omit(resnep17_chondrichthyes$PesoIndividual)
-range(x_chondr_baseline)
-# SELECTING RANGE - were commented out in Juliana's code
-# X = X[X > 5]
-# X = X[X < 400]
-# range(X)
+x_chondr_baseline <- na.omit(resnep17_chondrichthyes$PesoIndividual) %>% as.numeric()
 
-range(x_chondr_baseline)
-
-res_chondr_baseline <- fit_size_spectrum(x_chondr_baseline)
-
-res_chondr_baseline
-plot(res_chondr_baseline,
-     col = col_baseline,
-     main = "Chondrichthyes")
-
-### 2021 FG ###
-x_chondr_fg <- na.omit(resnep21_fg_chondrichthyes$PesoIndividual)
-range(x_chondr_fg)
-# SELECTING RANGE - were commented out in Juliana's code
-# X = X[X > 5]
-# X = X[X < 400]
-# range(X)
-
-res_chondr_fg <- fit_size_spectrum(x_chondr_fg)
-
-res_chondr_fg
-plot(res_chondr_fg,
-     col = col_fg)
-
-### 2021 NTR ###
-# define factors --- change according to analysis to be made ---
-x_chondr_ntr <- na.omit(resnep21_ntr_chondrichthyes$PesoIndividual)
-range(x_chondr_ntr)
-# SELECTING RANGE - commented out by Juliana
-# X = X[X > 5]
-# X = X[X < 400]
-# range(X)
-
-res_chondr_ntr <- fit_size_spectrum(x_chondr_ntr)
-
-res_chondr_ntr
-
-plot(res_chondr_ntr,
-     col = col_ntr)
-```
+x_chondr_fg <- na.omit(resnep21_fg_chondrichthyes$PesoIndividual) %>% as.numeric()
+# TODO not
+                                        # sure why not >100
+x_chondr_ntr <- na.omit(resnep21_ntr_chondrichthyes$PesoIndividual) %>% as.numeric()
+  # TODO not sure why not >100
 
 # Cephalopoda -- All
-
-```{r cephall}
-### 2017 ###
-x_ceph_all_baseline <- na.omit(resnep17_cephalopoda$PesoIndividual)
-range(x_ceph_all_baseline)
-
-res_ceph_all_baseline <- fit_size_spectrum(x_ceph_all_baseline,
-                                           x_min = 2,
-                                           x_max = 200)
-res_ceph_all_baseline
-plot(res_ceph_all_baseline,
-     col = col_baseline,
-     main = "Cephalopoda all")
-
-### 2021 FG ###
-# define factors --- change according to analysis to be made ---
-x_ceph_all_fg <- na.omit(resnep21_fg_cephalopoda$PesoIndividual)
-
-range(x_ceph_all_fg)
-
-res_ceph_all_fg <- fit_size_spectrum(x_ceph_all_fg,
-                                           x_min = 2,
-                                           x_max = 200)
-res_ceph_all_fg
-plot(res_ceph_all_fg,
-     col = col_fg)
-
-### 2021 NTR ###
-# NTR#
-# define factors --- change according to analysis to be made ---
-x_ceph_all_ntr <- na.omit(resnep21_ntr_cephalopoda$PesoIndividual)
-
-range(x_ceph_all_ntr)
-# SELECTING RANGE - doing in function
-# X = X[X > 2]
-# X = X[X < 200]
-# range(X)
-
-res_ceph_all_ntr <- fit_size_spectrum(x_ceph_all_ntr,
-                                           x_min = 2,
-                                           x_max = 200)
-res_ceph_all_ntr
-plot(res_ceph_all_ntr,
-     col = col_ntr)
+x_ceph_all_baseline <- na.omit(resnep17_cephalopoda$PesoIndividual) %>% as.numeric()
+x_ceph_all_fg <- na.omit(resnep21_fg_cephalopoda$PesoIndividual) %>% as.numeric()
+x_ceph_all_ntr <- na.omit(resnep21_ntr_cephalopoda$PesoIndividual) %>% as.numeric()
 ```
 
+Carrying on...
+
+
+```{r continue}
 # Cephalopoda -- Large
-
-```{r, cephlarge}
-x_ceph_large_baseline <- na.omit(resnep17_cephalopoda_big$PesoIndividual)
-range(x_ceph_large_baseline)
-
-res_ceph_large_baseline <- fit_size_spectrum(x_ceph_large_baseline)
-
-res_ceph_large_baseline
-plot(res_ceph_large_baseline,
-     col = col_baseline,
-     main = "Cephalopoda large")
-
-### 2021 FG ###
-# define factors --- change according to analysis to be made ---
-x_ceph_large_fg <- na.omit(resnep21_fg_cephalopoda_big$PesoIndividual)
-
-range(x_ceph_large_fg)
-
-res_ceph_large_fg <- fit_size_spectrum(x_ceph_large_fg)
-
-res_ceph_large_fg
-plot(res_ceph_large_fg,
-     col = col_fg)
-
-### 2021 NTR ###
-# NTR#
-# define factors --- change according to analysis to be made ---
-x_ceph_large_ntr <- na.omit(resnep21_ntr_cephalopoda_big$PesoIndividual)
-
-range(x_ceph_large_ntr)
-
-res_ceph_large_ntr <- fit_size_spectrum(x_ceph_large_ntr)
-
-res_ceph_large_ntr
-plot(res_ceph_large_ntr,
-     col = col_ntr)
-```
+x_ceph_large_baseline <- na.omit(resnep17_cephalopoda_big$PesoIndividual) %>% as.numeric()
+x_ceph_large_fg <- na.omit(resnep21_fg_cephalopoda_big$PesoIndividual) %>% as.numeric()
+x_ceph_large_ntr <- na.omit(resnep21_ntr_cephalopoda_big$PesoIndividual) %>% as.numeric()
 
 # Cephalopoda -- Small
-
-```{r, cephsmall}
-x_ceph_small_baseline <- na.omit(resnep17_cephalopoda_small$PesoIndividual)
-range(x_ceph_small_baseline)
-
-res_ceph_small_baseline <- fit_size_spectrum(x_ceph_small_baseline)
-
-res_ceph_small_baseline
-plot(res_ceph_small_baseline,
-     col = col_baseline,
-     main = "Cephalopoda small")
-
-### 2021 FG ###
-x_ceph_small_fg <- na.omit(resnep21_fg_cephalopoda_small$PesoIndividual)
-
-range(x_ceph_small_fg)
-
-res_ceph_small_fg <- fit_size_spectrum(x_ceph_small_fg)
-
-res_ceph_small_fg
-plot(res_ceph_small_fg,
-     col = col_fg)
-
-### 2021 NTR ###
-x_ceph_small_ntr <- na.omit(resnep21_ntr_cephalopoda_small$PesoIndividual)
-
-range(x_ceph_small_ntr)
-
-res_ceph_small_ntr <- fit_size_spectrum(x_ceph_small_ntr)
-
-res_ceph_small_ntr
-plot(res_ceph_small_ntr,
-     col = col_ntr)
-```
+x_ceph_small_baseline <- na.omit(resnep17_cephalopoda_small$PesoIndividual) %>% as.numeric()
+x_ceph_small_fg <- na.omit(resnep21_fg_cephalopoda_small$PesoIndividual) %>% as.numeric()
+x_ceph_small_ntr <- na.omit(resnep21_ntr_cephalopoda_small$PesoIndividual) %>% as.numeric()
 
 # Actinopterygii
-
-```{r, actin}
-# 2017
 resnep17_actinopterygii <- subset(resnep17_actinopterygii, Talla_mm > 40)
-x_actin_baseline <- na.omit(resnep17_actinopterygii$PesoIndividual)
+x_actin_baseline <- na.omit(resnep17_actinopterygii$PesoIndividual) %>% as.numeric()
 
-range(x_actin_baseline)
-
-res_actin_baseline <- fit_size_spectrum(x_actin_baseline)
-
-res_actin_baseline
-plot(res_actin_baseline,
-     col = col_baseline,
-     main = "actinopterygii")
-
-# 2021 FG
 resnep21_fg_actinopterygii <- subset(resnep21_fg_actinopterygii, Talla_mm > 40)
-x_actin_fg <- na.omit(resnep21_fg_actinopterygii$PesoIndividual)
+x_actin_fg <- na.omit(resnep21_fg_actinopterygii$PesoIndividual) %>% as.numeric()
 
-range(x_actin_fg)
-
-res_actin_fg <- fit_size_spectrum(x_actin_fg)
-
-res_actin_fg
-plot(res_actin_fg,
-     col = col_fg)
-
-# 2021 NTR
 resnep21_ntr_actinopterygii <- subset(resnep21_ntr_actinopterygii, Talla_mm >40)
-x_actin_ntr <- na.omit(resnep21_ntr_actinopterygii$PesoIndividual)
-
-range(x_actin_ntr)
-
-res_actin_ntr <- fit_size_spectrum(x_actin_ntr)
-
-res_actin_ntr
-plot(res_actin_ntr,
-     col = col_ntr)
-```
+x_actin_ntr <- na.omit(resnep21_ntr_actinopterygii$PesoIndividual) %>% as.numeric()
 
 # Crustacea
+x_crust_baseline <- na.omit(resnep17_crustacea$PesoIndividual) %>% as.numeric()
+x_crust_fg <- na.omit(resnep21_fg_crustacea$PesoIndividual) %>% as.numeric()
+x_crust_ntr <- na.omit(resnep21_ntr_crustacea$PesoIndividual) %>% as.numeric()
+```
 
-```{r, crust}
-# 2017
-x_crust_baseline <- na.omit(resnep17_crustacea$PesoIndividual)
+Now save the values in the package. Maybe do as a single list. Then use list2env
+in analysis.
 
-range(x_crust_baseline)
+```{r, savedata}
+# This is alphabetical (from using ls()):
+mediterranean_megafauna <- tibble::lst(x_actin_baseline,
+                                       x_actin_fg,
+                                       x_actin_ntr,
+                                       x_ceph_all_baseline,
+                                       x_ceph_all_fg,
+                                       x_ceph_all_ntr,
+                                       x_ceph_large_baseline,
+                                       x_ceph_large_fg,
+                                       x_ceph_large_ntr,
+                                       x_ceph_small_baseline,
+                                       x_ceph_small_fg,
+                                       x_ceph_small_ntr,
+                                       x_chondr_baseline,
+                                       x_chondr_fg,
+                                       x_chondr_ntr,
+                                       x_community_baseline,
+                                       x_community_fg,
+                                       x_community_ntr,
+                                       x_crust_baseline,
+                                       x_crust_fg,
+                                       x_crust_ntr)
 
-res_crust_baseline <- fit_size_spectrum(x_crust_baseline)
-
-res_crust_baseline
-plot(res_crust_baseline,
-     col = col_baseline,
-     main = "Crustacea")
-
-# 2021 FG
-x_crust_fg <- na.omit(resnep21_fg_crustacea$PesoIndividual)
-
-range(x_crust_fg)
-
-res_crust_fg <- fit_size_spectrum(x_crust_fg,
-                                  x_min = 0.4)
-
-res_crust_fg
-plot(res_crust_fg,
-     col = col_fg)
-
-# 2021 NTR
-x_crust_ntr <- na.omit(resnep21_ntr_crustacea$PesoIndividual)
-
-range(x_crust_ntr)
-
-res_crust_ntr <- fit_size_spectrum(x_crust_ntr,
-                                   x_min = 0.3)
-
-res_crust_ntr
-plot(res_crust_ntr,
-     col = col_ntr)
+usethis::use_data(mediterranean_megafauna,
+                  overwrite = TRUE)
 ```
