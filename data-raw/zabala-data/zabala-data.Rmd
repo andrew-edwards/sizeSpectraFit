@@ -1,0 +1,483 @@
+---
+title: "Putting Juliana Zabala's datainto sizeSpectra2"
+author: "Andrew Edwards and Juliana Zabala"
+output: pdf_document
+fontsize: 12pt
+date: "Last compiled on `r format(Sys.time(), '%d %B, %Y')`"
+---
+
+```{r, setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "",
+  cache = TRUE,
+  cache_path = "zabala-data-cache/",
+  fig.path = "zabala-data-figs-cache/",
+  fig.width = 7,
+  fig.height = 6
+)
+  # comment = "#>",
+```
+
+```{r, build, echo = FALSE, eval = FALSE}
+# To build either run this line or click knit button in RStudio:
+rmarkdown::render("zabala-data.Rmd")
+```
+
+```{r, packages, echo = FALSE}
+library(dplyr)
+load_all()
+#library(sizeSpectra2)    # Need latest version
+# LIBRARIES ####
+# Andy commenting some of these that I think aren't needed here (I didn't have
+# some installed and the code still ran):
+library(tidyverse)      # not sure all these are needed
+library(readxl)
+library(plyr)           # gives a warning of conflicts with dplyr
+library(caret)
+# library(vegan)
+# library(ggvegan)  # Juliana had this commented out already
+# library(forams)
+library(tibble)
+library(ggplot2)
+```
+
+```{r, notes, echo = FALSE}
+# Notes from R file:
+
+# Adapting this from using-sizeSpectra2.R in size-spectra-applications, and also
+#  using that file for the analyses that are being done in report/
+# using-sizeSpectra2.R - size spectrum fits using sizeSpectra2 functions.
+#  Run from the same directory as 2023-03-22_Dades_RESNEP.xlsx, or setwd to the
+#  required directory.
+# Starting from analysis-juliana-2024-12-05.R
+# which Andy tweaked (just commented out setwd in the end I think) to get
+#  SizeSpectra_TaxonomicGroups_AE - x_min_12mm
+# working on his machine. Juliana had sent that on 2024-12-05.
+
+# Size spectra - Andy's code
+# Only size spectra Analyses - without GADICULUS ARGENTEUS
+# Palamós 2017, 2021
+# Juliana Quevedo Zabala
+# 08 Oct 2023
+
+#setwd("~/Desktop/ICM-CSIC/New size spectra - Andy")
+# setwd("C:/Users/jqz96/OneDrive/Desktop/PhD/Publications/Quevedo et al. SIZE SPECTRA/Data")
+```
+
+# Data preparation
+
+Juliana's code to load in and define the data. Not showing code or output
+here.
+
+```{r, datapreparation, echo = FALSE, warning = FALSE}
+# DATA PREPARATION #############################################################
+# DATA PREPARATION: FrequenciaDeTalles tab
+resnep <- readxl::read_excel("2023-03-22_Dades_RESNEP.xlsx",3)
+
+resnep$Any <- as.character(resnep$Any)
+
+# no cover data
+resnep <- subset(resnep, CodiPesca != "20170823_64500_ESP000023428_03")
+
+# exclude vessel: MEDAN in resnep due to different fishing technique which leads to bias in analysis
+resnep <- subset(resnep, NomBarca != "MEDAN")
+
+# exclude species whose length-weight relationship overestimate their weight by more then 200%
+resnep <- subset(resnep, NomEspecie != "Sepietta spp." &
+                   NomEspecie != "Sepietta oweniana" &
+                   NomEspecie != "Histoteutis bonelli" &
+                   NomEspecie != "Eledone cirrhosa" &
+                   NomEspecie != "Macropipus tuberculatus" &
+                   NomEspecie != "Squilla mantis" &
+                   NomEspecie != "Scaeurgus unicirrhus" &
+                   NomEspecie != "Gadiculus argenteus") # Gadiculus because it can be pelagic and amounts to a lot of variability in 2021
+delete_CodiPesca <- "20170824_64500_ESP000023428_04"
+delete_Name <- "Liocarcinus depurator"
+# Delete rows matching the specified ID and Name
+resnep <- resnep %>%
+  filter(!(CodiPesca == delete_CodiPesca & NomEspecie == delete_Name))
+
+# exclude from resnep21_fg trawls done beside the MPA -- too close
+resnep <- subset(resnep, CodiPesca != "20210826_64500_ESP000023428_09" &
+                   CodiPesca != "20210824_64500_ESP000023428_01" &
+                   CodiPesca != "20210831_64500_ESP000023428_16")
+
+# Make df smaller
+resnep <- select(resnep, CodiPesca, NomPort, Data, Any, NumeroPesca, TipusDeFons, ProfunditatMitjana_m,
+                 NomEspecie, ClassificacioCaptura, AgrupamentTaxonomic, Categoria, Talla_mm,
+                 FrequenciaCalculada, Abundancia_NIndividusTalla_Km2, PesTotalCalculatRelacioTallaPes_g,
+                 Biomassa_KgTalla_Km2, AreaEscombrada_km2, TipusMalla, Site)
+
+# Spread datasets: FrequenciaCalculada - extrapolate subsamples and compute individual weights
+resnep <- mutate(resnep, PesoIndividual = PesTotalCalculatRelacioTallaPes_g/FrequenciaCalculada)
+resnep <- as.data.frame(lapply(resnep, rep, resnep$FrequenciaCalculada))
+resnep['frecuencia_final'] = 1 # new column, frecuencias finales = 1
+
+# Exclude sizes smaller than 12mm, as the net size was 12x12mm, we assume organisms <12mm are not well sampled
+resnep <- subset(resnep, Talla_mm > 12)
+
+# Andy doing this to create factors, to ask Juliana about some of the columns.
+resnep_temp <- tibble::as_tibble(resnep) %>%
+  dplyr::mutate_at(vars(CodiPesca,
+                        NomPort,
+                        Data,
+                        Any,
+                        TipusDeFons,
+                        NomEspecie,
+                        ClassificacioCaptura,
+                        AgrupamentTaxonomic,
+                        Categoria,
+                        TipusMalla, # not sure, says logical but also NA's
+                        Site),
+                   factor)
+
+summary(dplyr::select(resnep_temp,
+                      NumeroPesca,
+                      Talla_mm,
+                      FrequenciaCalculada,
+                      Abundancia_NIndividusTalla_Km2,
+                      PesTotalCalculatRelacioTallaPes_g,
+                      Biomassa_KgTalla_Km2,
+                      AreaEscombrada_km2,
+                      PesoIndividual,
+                      frecuencia_final))
+
+
+# separate resnep 2017 and 2021 (MPA & FG),
+resnep17 <- subset(resnep, Any != "2021")
+resnep21 <- subset(resnep, Any != "2017")
+resnep21_mpa <- subset(resnep21, Site == "MPA")
+resnep21_fg <- subset(resnep21, Site == "FG")
+
+
+# FREQUENCY BARPLOTS, ABUNDANCIA VS TALLA PLOTS, ABUNDANCIA VS PESO PLOTS, METADATA ANALYSES,
+# Weight and size supperposed histograms - see relationship, DENSITY HISTOGRAMS BY 'AGRUPAMENT TAXONOMIC':
+# find in "SizeSpectra_Analyses_v5.R" ***
+
+
+# SELECT DATASETS BY 'AGRUPAMENT TAXONOMIC'
+# "Crustacea"  "Cephalopoda"  "Actinopterygii"  "Chondrichthyes"  "Echinodermata"
+# Exclude Echinidermata due to very low organisms. max 10.
+
+# resnep17
+resnep17_crustacea <- subset(resnep17, AgrupamentTaxonomic == "Crustacea")
+resnep17_cephalopoda <- subset(resnep17, AgrupamentTaxonomic == "Cephalopoda")
+resnep17_actinopterygii <- subset(resnep17, AgrupamentTaxonomic == "Actinopterygii")
+resnep17_chondrichthyes <- subset(resnep17, AgrupamentTaxonomic == "Chondrichthyes")
+
+resnep17_cephalopoda_small <- subset(resnep17_cephalopoda, PesoIndividual < 10)
+resnep17_cephalopoda_big <- subset(resnep17_cephalopoda, PesoIndividual > 10)
+
+# resnep21_fg
+resnep21_fg_crustacea <- subset(resnep21_fg, AgrupamentTaxonomic == "Crustacea")
+resnep21_fg_cephalopoda <- subset(resnep21_fg, AgrupamentTaxonomic == "Cephalopoda")
+resnep21_fg_actinopterygii <- subset(resnep21_fg, AgrupamentTaxonomic == "Actinopterygii")
+resnep21_fg_chondrichthyes <- subset(resnep21_fg, AgrupamentTaxonomic == "Chondrichthyes")
+
+resnep21_fg_cephalopoda_small <- subset(resnep21_fg_cephalopoda, PesoIndividual < 10)
+resnep21_fg_cephalopoda_big <- subset(resnep21_fg_cephalopoda, PesoIndividual > 10)
+
+# resnep21_mpa
+resnep21_mpa_crustacea <- subset(resnep21_mpa, AgrupamentTaxonomic == "Crustacea")
+resnep21_mpa_cephalopoda <- subset(resnep21_mpa, AgrupamentTaxonomic == "Cephalopoda")
+resnep21_mpa_actinopterygii <- subset(resnep21_mpa, AgrupamentTaxonomic == "Actinopterygii")
+resnep21_mpa_chondrichthyes <- subset(resnep21_mpa, AgrupamentTaxonomic == "Chondrichthyes")
+
+resnep21_mpa_cephalopoda_small <- subset(resnep21_mpa_cephalopoda, PesoIndividual < 10)
+resnep21_mpa_cephalopoda_big <- subset(resnep21_mpa_cephalopoda, PesoIndividual > 10)
+
+
+# Don't want these as they're the whole tables:
+# This is alphabetical (from using ls()):
+usethis::use_data(resnep17_actinopterygii,
+                  resnep17_cephalopoda,
+                  resnep17_cephalopoda_big,
+                  resnep17_cephalopoda_small,
+                  resnep17_chondrichthyes,
+                  resnep17_crustacea,
+                  resnep21_fg_actinopterygii,
+                  resnep21_fg_cephalopoda,
+                  resnep21_fg_cephalopoda_big,
+                  resnep21_fg_cephalopoda_small,
+                  resnep21_fg_chondrichthyes,
+                  resnep21_fg_crustacea,
+                  resnep21_mpa_actinopterygii,
+                  resnep21_mpa_cephalopoda,
+                  resnep21_mpa_cephalopoda_big,
+                  resnep21_mpa_cephalopoda_small,
+                  resnep21_mpa_chondrichthyes,
+                  resnep21_mpa_crustacea,
+                  overwrite = TRUE)
+
+
+stop()
+
+
+
+### 2021 MPA ###
+# define factors --- change according to analysis to be made ---
+x_community_mpa <- na.omit(resnep21_mpa$PesoIndividual)
+range(x_community_mpa)
+
+res_community_mpa <- fit_size_spectrum(x_community_mpa,
+                                 x_min = 0.2,
+                                 x_max = 1000)
+res_community_mpa
+plot(res_community_mpa,
+     col = col_mpa)
+```
+
+# Chondrichthyes
+
+```{r, chondr}
+resnep17_chondrichthyes <- subset(resnep17_chondrichthyes, Talla_mm >100)
+x_chondr_baseline <- na.omit(resnep17_chondrichthyes$PesoIndividual)
+range(x_chondr_baseline)
+# SELECTING RANGE - were commented out in Juliana's code
+# X = X[X > 5]
+# X = X[X < 400]
+# range(X)
+
+range(x_chondr_baseline)
+
+res_chondr_baseline <- fit_size_spectrum(x_chondr_baseline)
+
+res_chondr_baseline
+plot(res_chondr_baseline,
+     col = col_baseline,
+     main = "Chondrichthyes")
+
+### 2021 FG ###
+x_chondr_fg <- na.omit(resnep21_fg_chondrichthyes$PesoIndividual)
+range(x_chondr_fg)
+# SELECTING RANGE - were commented out in Juliana's code
+# X = X[X > 5]
+# X = X[X < 400]
+# range(X)
+
+res_chondr_fg <- fit_size_spectrum(x_chondr_fg)
+
+res_chondr_fg
+plot(res_chondr_fg,
+     col = col_fg)
+
+### 2021 MPA ###
+# define factors --- change according to analysis to be made ---
+x_chondr_mpa <- na.omit(resnep21_mpa_chondrichthyes$PesoIndividual)
+range(x_chondr_mpa)
+# SELECTING RANGE - commented out by Juliana
+# X = X[X > 5]
+# X = X[X < 400]
+# range(X)
+
+res_chondr_mpa <- fit_size_spectrum(x_chondr_mpa)
+
+res_chondr_mpa
+
+plot(res_chondr_mpa,
+     col = col_mpa)
+```
+
+# Cephalopoda -- All
+
+```{r cephall}
+### 2017 ###
+x_ceph_all_baseline <- na.omit(resnep17_cephalopoda$PesoIndividual)
+range(x_ceph_all_baseline)
+
+res_ceph_all_baseline <- fit_size_spectrum(x_ceph_all_baseline,
+                                           x_min = 2,
+                                           x_max = 200)
+res_ceph_all_baseline
+plot(res_ceph_all_baseline,
+     col = col_baseline,
+     main = "Cephalopoda all")
+
+### 2021 FG ###
+# define factors --- change according to analysis to be made ---
+x_ceph_all_fg <- na.omit(resnep21_fg_cephalopoda$PesoIndividual)
+
+range(x_ceph_all_fg)
+
+res_ceph_all_fg <- fit_size_spectrum(x_ceph_all_fg,
+                                           x_min = 2,
+                                           x_max = 200)
+res_ceph_all_fg
+plot(res_ceph_all_fg,
+     col = col_fg)
+
+### 2021 MPA ###
+# NTR#
+# define factors --- change according to analysis to be made ---
+x_ceph_all_mpa <- na.omit(resnep21_mpa_cephalopoda$PesoIndividual)
+
+range(x_ceph_all_mpa)
+# SELECTING RANGE - doing in function
+# X = X[X > 2]
+# X = X[X < 200]
+# range(X)
+
+res_ceph_all_mpa <- fit_size_spectrum(x_ceph_all_mpa,
+                                           x_min = 2,
+                                           x_max = 200)
+res_ceph_all_mpa
+plot(res_ceph_all_mpa,
+     col = col_mpa)
+```
+
+# Cephalopoda -- Large
+
+```{r, cephlarge}
+x_ceph_large_baseline <- na.omit(resnep17_cephalopoda_big$PesoIndividual)
+range(x_ceph_large_baseline)
+
+res_ceph_large_baseline <- fit_size_spectrum(x_ceph_large_baseline)
+
+res_ceph_large_baseline
+plot(res_ceph_large_baseline,
+     col = col_baseline,
+     main = "Cephalopoda large")
+
+### 2021 FG ###
+# define factors --- change according to analysis to be made ---
+x_ceph_large_fg <- na.omit(resnep21_fg_cephalopoda_big$PesoIndividual)
+
+range(x_ceph_large_fg)
+
+res_ceph_large_fg <- fit_size_spectrum(x_ceph_large_fg)
+
+res_ceph_large_fg
+plot(res_ceph_large_fg,
+     col = col_fg)
+
+### 2021 MPA ###
+# NTR#
+# define factors --- change according to analysis to be made ---
+x_ceph_large_mpa <- na.omit(resnep21_mpa_cephalopoda_big$PesoIndividual)
+
+range(x_ceph_large_mpa)
+
+res_ceph_large_mpa <- fit_size_spectrum(x_ceph_large_mpa)
+
+res_ceph_large_mpa
+plot(res_ceph_large_mpa,
+     col = col_mpa)
+```
+
+# Cephalopoda -- Small
+
+```{r, cephsmall}
+x_ceph_small_baseline <- na.omit(resnep17_cephalopoda_small$PesoIndividual)
+range(x_ceph_small_baseline)
+
+res_ceph_small_baseline <- fit_size_spectrum(x_ceph_small_baseline)
+
+res_ceph_small_baseline
+plot(res_ceph_small_baseline,
+     col = col_baseline,
+     main = "Cephalopoda small")
+
+### 2021 FG ###
+x_ceph_small_fg <- na.omit(resnep21_fg_cephalopoda_small$PesoIndividual)
+
+range(x_ceph_small_fg)
+
+res_ceph_small_fg <- fit_size_spectrum(x_ceph_small_fg)
+
+res_ceph_small_fg
+plot(res_ceph_small_fg,
+     col = col_fg)
+
+### 2021 MPA ###
+x_ceph_small_mpa <- na.omit(resnep21_mpa_cephalopoda_small$PesoIndividual)
+
+range(x_ceph_small_mpa)
+
+res_ceph_small_mpa <- fit_size_spectrum(x_ceph_small_mpa)
+
+res_ceph_small_mpa
+plot(res_ceph_small_mpa,
+     col = col_mpa)
+```
+
+# Actinopterygii
+
+```{r, actin}
+# 2017
+resnep17_actinopterygii <- subset(resnep17_actinopterygii, Talla_mm > 40)
+x_actin_baseline <- na.omit(resnep17_actinopterygii$PesoIndividual)
+
+range(x_actin_baseline)
+
+res_actin_baseline <- fit_size_spectrum(x_actin_baseline)
+
+res_actin_baseline
+plot(res_actin_baseline,
+     col = col_baseline,
+     main = "actinopterygii")
+
+# 2021 FG
+resnep21_fg_actinopterygii <- subset(resnep21_fg_actinopterygii, Talla_mm > 40)
+x_actin_fg <- na.omit(resnep21_fg_actinopterygii$PesoIndividual)
+
+range(x_actin_fg)
+
+res_actin_fg <- fit_size_spectrum(x_actin_fg)
+
+res_actin_fg
+plot(res_actin_fg,
+     col = col_fg)
+
+# 2021 MPA
+resnep21_mpa_actinopterygii <- subset(resnep21_mpa_actinopterygii, Talla_mm >40)
+x_actin_mpa <- na.omit(resnep21_mpa_actinopterygii$PesoIndividual)
+
+range(x_actin_mpa)
+
+res_actin_mpa <- fit_size_spectrum(x_actin_mpa)
+
+res_actin_mpa
+plot(res_actin_mpa,
+     col = col_mpa)
+```
+
+# Crustacea
+
+```{r, crust}
+# 2017
+x_crust_baseline <- na.omit(resnep17_crustacea$PesoIndividual)
+
+range(x_crust_baseline)
+
+res_crust_baseline <- fit_size_spectrum(x_crust_baseline)
+
+res_crust_baseline
+plot(res_crust_baseline,
+     col = col_baseline,
+     main = "Crustacea")
+
+# 2021 FG
+x_crust_fg <- na.omit(resnep21_fg_crustacea$PesoIndividual)
+
+range(x_crust_fg)
+
+res_crust_fg <- fit_size_spectrum(x_crust_fg,
+                                  x_min = 0.4)
+
+res_crust_fg
+plot(res_crust_fg,
+     col = col_fg)
+
+# 2021 MPA
+x_crust_mpa <- na.omit(resnep21_mpa_crustacea$PesoIndividual)
+
+range(x_crust_mpa)
+
+res_crust_mpa <- fit_size_spectrum(x_crust_mpa,
+                                   x_min = 0.3)
+
+res_crust_mpa
+plot(res_crust_mpa,
+     col = col_mpa)
+```
