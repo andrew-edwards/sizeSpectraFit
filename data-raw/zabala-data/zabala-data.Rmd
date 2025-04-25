@@ -73,7 +73,9 @@ here.
 ```{r, datapreparation, echo = FALSE, warning = FALSE}
 # DATA PREPARATION #############################################################
 # DATA PREPARATION: FrequenciaDeTalles tab
-resnep <- readxl::read_excel("2023-03-22_Dades_RESNEP.xlsx",3)
+resnep_raw <- readxl::read_excel("2023-03-22_Dades_RESNEP.xlsx",3)
+
+resnep <- resnep_raw
 
 resnep$Any <- as.character(resnep$Any)
 
@@ -102,6 +104,9 @@ resnep <- resnep %>%
 resnep <- subset(resnep, CodiPesca != "20210826_64500_ESP000023428_09" &
                    CodiPesca != "20210824_64500_ESP000023428_01" &
                    CodiPesca != "20210831_64500_ESP000023428_16")
+
+resnep_for_length_weight_coefficients <- resnep    # To then extract what we
+                                        # need below
 
 # Make df smaller
 resnep <- select(resnep, CodiPesca, NomPort, Data, Any, NumeroPesca, TipusDeFons, ProfunditatMitjana_m,
@@ -283,3 +288,47 @@ mediterranean_megafauna <- tibble::lst(x_actin_baseline,
 usethis::use_data(mediterranean_megafauna,
                   overwrite = TRUE)
 ```
+
+# For MLEbins method, need tibble of species-specific length-weight coefficients
+
+Juliana already did the length-to-weight calculations in the spreadsheet. But we
+need to explicitly do them as want the min and max possible weight for each
+length bin.
+
+So, using a version of the data that is saved above:
+
+```{r, lwcoeffs}
+length_weight_coefficients <- resnep_for_length_weight_coefficients %>%
+  dplyr::select(species = NomEspecie,
+                alpha = ConstantA_TallaPes,
+                beta = ConstantB_TallaPes) %>%
+  dplyr::mutate_at(vars(species),
+                   factor)
+
+length_weight_coefficients <-
+  dplyr::summarise(dplyr::group_by(length_weight_coefficients,
+                                   species),
+                   alpha = unique(alpha),
+                   beta = unique(beta))
+
+length_weight_coefficients
+summary(length_weight_coefficients)
+
+mediterranean_length_weight_coefficients <-
+  dplyr::filter(length_weight_coefficients,
+                !is.na(alpha))
+
+summary(mediterranean_length_weight_coefficients)
+
+usethis::use_data(mediterranean_length_weight_coefficients,
+                  overwrite = TRUE)
+# TODO document, alpha and beta are the coeffcicients; need to describe units.
+```
+
+Thought about leaving the NA's in there for now, as a check with Juliana's that
+none make it through to the analyses. But remove and just check that she has
+none of the NA species TODO.
+
+
+
+# For MLEbins method, need strata, species, weight bin min, weight bin max,

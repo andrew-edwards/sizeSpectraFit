@@ -46,6 +46,77 @@ library(tibble)
 
 # Outline
 
+HERE -- Wonder if I really should move to using MLEbins. Think I have all the
+info. Yes - Juliana agrees. Keeping track here of steps, see section below for
+write up and detailed plan
+
+And she did use length-weight relationships for all individuals. And we can also
+keep the standardisations also.
+
+Next steps:
+ D read MEPS again
+ - look at code for that, use `MEPS_IBTS_all_min_100.Rmd` as template. Walk
+   through it, understand what's needed.
+ - back to data wrangling, need:
+   - species-specific length-weight relationships
+   - the necessary data from the spreadsheets. Load in and save the necessary
+     columns for the analysis, doing the wrangling first.
+
+
+HERE -- xmin should really be the minimum actual value within a bin that
+contains the mode. No need for it to be a somewhat artificial bin break. That
+was for MLE on individuals, need to think what to do for MLEbins.
+
+HERE -- see Crustacea first. Doing amalgamation of all data to just determine xmin
+(resulting size spectrum doesn't really make sense).
+
+HERE -- see other HERE's down below; this won't build right now. Might when fix crustacea.
+
+# Methods development (keeping notes here, then deleting as make progress)
+
+sizeSpectra::negLL.PLB.bins.species() needs (just the first year here):
+
+> dataBinForLike
+# A tibble: 907 × 4
+   SpecCode  wmin  wmax  Number
+      <int> <dbl> <dbl>   <dbl>
+ 1   105814  315.  337. 0.00714
+ 2   105814  337.  360. 0.00714
+ 3   105814  434.  461. 0.00714
+ 4   105814  489.  518. 0.0293
+ 5   105814  518.  548. 0.0109
+ 6   105814  548.  579. 0.0113
+ 7   105814  612.  646. 0.0218
+ 8   105814  646.  680. 0.0188
+ 9   105814  680.  717. 0.0381
+10   105814  717.  754. 0.0327
+# ℹ 897 more rows
+
+So actually have year/strata first also, to make it generalisable.
+
+
+To get to that need to have already done the length-weight wrangling.
+
+So steps are:
+1. Get species-specific length-weight coefficients in a tibble. All we need is
+   species, alpha, beta. Makes sense to have that on it's own, not repeated like
+   in Fung data or Juliana's - this will what people would have, it's not part
+   of collected data. Do for Fung and Juliana's in parallel. Maybe.
+
+2. Get data in a tibble.   dataBinForLike is what was done for Fung data for
+   first year.
+3. Combine the two to end up with something in format of the above, but
+   consistent with sizeSpectra2 formatting.
+4. Copy the loglikelihood function over to sizeSpectra2.
+
+
+
+
+
+
+# Data analysis
+
+
 For each species group (that might not be the best word!) we look at the
 baseline (data from 2017 before implementation of the no-take reserve), the
 fishing grounds (data from 2021 after implementation of the no-take reserve but
@@ -98,7 +169,7 @@ plot(res_community_baseline,
      main = "Community baseline")
 ```
 
-```{r, table, results = "asis"}
+```{r, tablecommunitybaseline, results = "asis"}
 summary_mle_table(res_community_baseline)
 ```
 
@@ -117,7 +188,7 @@ res_community_fg <- determine_xmin_and_fit(x_community_fg,
 
 plot(res_community_fg,
      xlim_hist = c(0, 20),
-     main = "Community fg")
+     main = "Community FG")
 ```
 
 ```{r, tablecommunityfg, results = "asis"}
@@ -138,270 +209,435 @@ res_community_ntr <- determine_xmin_and_fit(x_community_ntr,
 
 plot(res_community_ntr,
      xlim_hist = c(0, 20),
-     main = "Community ntr")
+     main = "Community NTR")
 ```
 
 ```{r, tablecommunityntr, results = "asis"}
 summary_mle_table(res_community_ntr)
 ```
 
-
-
-
-```{r, stop, cache = FALSE}
-knitr::knit_exit()
-```
-
 # Chondrichthyes
 
-```{r, chondr}
-resnep17_chondrichthyes <- subset(resnep17_chondrichthyes, Talla_mm >100)
-x_chondr_baseline <- na.omit(resnep17_chondrichthyes$PesoIndividual)
-range(x_chondr_baseline)
-# SELECTING RANGE - were commented out in Juliana's code
-# X = X[X > 5]
-# X = X[X < 400]
-# range(X)
+TODO Juliana removed lengths <100mm. Should really remove body masses < some
+value. TODO. Look into reasoning.
 
+## Chondrichthyes baseline
+
+```{r, chondrichthyesbaseline}
 range(x_chondr_baseline)
 
-res_chondr_baseline <- fit_size_spectrum(x_chondr_baseline)
+# Use 0.2 as looked good for full Community. Probably want to be consistent
+# across everything.
 
-res_chondr_baseline
+res_chondr_baseline <- determine_xmin_and_fit(x_chondr_baseline,
+                                              bin_width = 0.2)
+
 plot(res_chondr_baseline,
-     col = col_baseline,
-     main = "Chondrichthyes")
+     xlim_hist = c(0, 20),
+     main = "Chondrichthyes baseline")
+```
 
-### 2021 FG ###
-x_chondr_fg <- na.omit(resnep21_fg_chondrichthyes$PesoIndividual)
+```{r, tablechondrbaseline, results = "asis"}
+summary_mle_table(res_chondr_baseline)
+```
+
+## Chondrichthyes FG
+
+This isn't great, shows need for communal xmin.
+
+```{r, chondrichthyesfg}
 range(x_chondr_fg)
-# SELECTING RANGE - were commented out in Juliana's code
-# X = X[X > 5]
-# X = X[X < 400]
-# range(X)
 
-res_chondr_fg <- fit_size_spectrum(x_chondr_fg)
+# Increasing bin width here
+res_chondr_fg <- determine_xmin_and_fit(x_chondr_fg,
+                                           bin_width = 5)
 
-res_chondr_fg
 plot(res_chondr_fg,
-     col = col_fg)
+     xlim_hist = c(0, 20),
+     main = "Chondrichthyes FG")
+```
 
-### 2021 NTR ###
-# define factors --- change according to analysis to be made ---
-x_chondr_ntr <- na.omit(resnep21_ntr_chondrichthyes$PesoIndividual)
+```{r, tablechondrfg, results = "asis"}
+summary_mle_table(res_chondr_fg)
+```
+
+## Chondrichthyes NTR
+
+And for NTR:
+```{r, chondrichthyesntr}
 range(x_chondr_ntr)
-# SELECTING RANGE - commented out by Juliana
-# X = X[X > 5]
-# X = X[X < 400]
-# range(X)
 
-res_chondr_ntr <- fit_size_spectrum(x_chondr_ntr)
-
-res_chondr_ntr
+res_chondr_ntr <- determine_xmin_and_fit(x_chondr_ntr,
+                                           bin_width = 0.2)
 
 plot(res_chondr_ntr,
-     col = col_ntr)
+     xlim_hist = c(0, 20),
+     main = "Chondrichthyes NTR")
 ```
+
+```{r, tablechondrntr, results = "asis"}
+summary_mle_table(res_chondr_ntr)
+```
+
 
 # Cephalopoda -- All
 
-```{r cephall}
-### 2017 ###
-x_ceph_all_baseline <- na.omit(resnep17_cephalopoda$PesoIndividual)
+These results show clearly why Juliana then split up into small and large. Not
+digging into results too much here then.
+
+Juliana had xmin of 2 and xmax 200. See what the mode method gives first:
+
+## Cephalopoda all baseline
+
+```{r, cephbaseline}
 range(x_ceph_all_baseline)
 
-res_ceph_all_baseline <- fit_size_spectrum(x_ceph_all_baseline,
-                                           x_min = 2,
-                                           x_max = 200)
-res_ceph_all_baseline
+# Use 0.2 as looked good for full Community. Probably want to be consistent
+# across everything.
+
+res_ceph_all_baseline <- determine_xmin_and_fit(x_ceph_all_baseline,
+                                                bin_width = 0.2)
+
 plot(res_ceph_all_baseline,
-     col = col_baseline,
-     main = "Cephalopoda all")
+     xlim_hist = c(0, 20),
+     main = "Cephalopoda all baseline")
+```
 
-### 2021 FG ###
-# define factors --- change according to analysis to be made ---
-x_ceph_all_fg <- na.omit(resnep21_fg_cephalopoda$PesoIndividual)
+```{r, tablecephallbaseline, results = "asis"}
+summary_mle_table(res_ceph_all_baseline)
+```
 
+## Cephalopoda all FG
+
+```{r, cephallfg}
 range(x_ceph_all_fg)
 
-res_ceph_all_fg <- fit_size_spectrum(x_ceph_all_fg,
-                                           x_min = 2,
-                                           x_max = 200)
-res_ceph_all_fg
+# Increasing bin width here
+res_ceph_all_fg <- determine_xmin_and_fit(x_ceph_all_fg,
+                                           bin_width = 0.2)
+
 plot(res_ceph_all_fg,
-     col = col_fg)
+     xlim_hist = c(0, 20),
+     main = "Cephalopoda all FG")
+```
 
-### 2021 NTR ###
-# NTR#
-# define factors --- change according to analysis to be made ---
-x_ceph_all_ntr <- na.omit(resnep21_ntr_cephalopoda$PesoIndividual)
+```{r, tablecephallfg, results = "asis"}
+summary_mle_table(res_ceph_all_fg)
+```
 
+## Cephalopoda all NTR
+
+And for NTR:
+```{r, cephallntr}
 range(x_ceph_all_ntr)
-# SELECTING RANGE - doing in function
-# X = X[X > 2]
-# X = X[X < 200]
-# range(X)
 
-res_ceph_all_ntr <- fit_size_spectrum(x_ceph_all_ntr,
-                                           x_min = 2,
-                                           x_max = 200)
-res_ceph_all_ntr
+res_ceph_all_ntr <- determine_xmin_and_fit(x_ceph_all_ntr,
+                                           bin_width = 0.2)
+
 plot(res_ceph_all_ntr,
-     col = col_ntr)
+     xlim_hist = c(0, 20),
+     main = "Cephalopoda all NTR")
+```
+
+```{r, tablecephallntr, results = "asis"}
+summary_mle_table(res_ceph_all_ntr)
 ```
 
 # Cephalopoda -- Large
 
-```{r, cephlarge}
-x_ceph_large_baseline <- na.omit(resnep17_cephalopodaBIG$PesoIndividual)
+Now doing just the large individuals. Probably should do MLEbin.
+
+TODO and large/small cut off could be 20.
+
+## Cephalopoda large baseline
+
+```{r, cephlargebaseline}
 range(x_ceph_large_baseline)
 
-res_ceph_large_baseline <- fit_size_spectrum(x_ceph_large_baseline)
+res_ceph_large_baseline <- determine_xmin_and_fit(x_ceph_large_baseline,
+                                                  bin_width = 10)
 
-res_ceph_large_baseline
 plot(res_ceph_large_baseline,
-     col = col_baseline,
-     main = "Cephalopoda large")
+     xlim_hist = c(0, 100),
+     main = "Cephalopoda large baseline")
+```
 
-### 2021 FG ###
-# define factors --- change according to analysis to be made ---
-x_ceph_large_fg <- na.omit(resnep21_fg_cephalopodaBIG$PesoIndividual)
+```{r, tablecephlargebaseline, results = "asis"}
+summary_mle_table(res_ceph_large_baseline)
+```
 
+## Cephalopoda large FG
+
+```{r, cephlargefg}
 range(x_ceph_large_fg)
 
-res_ceph_large_fg <- fit_size_spectrum(x_ceph_large_fg)
+# Increasing bin width here
+res_ceph_large_fg <- determine_xmin_and_fit(x_ceph_large_fg,
+                                           bin_width = 10)
 
-res_ceph_large_fg
 plot(res_ceph_large_fg,
-     col = col_fg)
+     xlim_hist = c(0, 100),
+     main = "Cephalopoda large FG")
+```
 
-### 2021 NTR ###
-# NTR#
-# define factors --- change according to analysis to be made ---
-x_ceph_large_ntr <- na.omit(resnep21_ntr_cephalopodaBIG$PesoIndividual)
+```{r, tablecephlargefg, results = "asis"}
+summary_mle_table(res_ceph_large_fg)
+```
 
+## Cephalopoda large NTR
+
+And for NTR:
+```{r, cephlargentr}
 range(x_ceph_large_ntr)
 
-res_ceph_large_ntr <- fit_size_spectrum(x_ceph_large_ntr)
+res_ceph_large_ntr <- determine_xmin_and_fit(x_ceph_large_ntr,
+                                             bin_width = 10)
 
-res_ceph_large_ntr
 plot(res_ceph_large_ntr,
-     col = col_ntr)
+     xlim_hist = c(0, 100),
+     main = "Cephalopoda large NTR")
+```
+
+```{r, tablecephlargentr, results = "asis"}
+summary_mle_table(res_ceph_large_ntr)
 ```
 
 # Cephalopoda -- Small
 
-```{r, cephsmall}
-x_ceph_small_baseline <- na.omit(resnep17_cephalopodaSMALL$PesoIndividual)
+Now doing just the small individuals. Probably should do MLEbin.
+
+TODO and large/small cut off could be 20.
+
+## Cephalopoda small baseline
+
+```{r, cephsmallbaseline}
 range(x_ceph_small_baseline)
 
-res_ceph_small_baseline <- fit_size_spectrum(x_ceph_small_baseline)
+res_ceph_small_baseline <- determine_xmin_and_fit(x_ceph_small_baseline,
+                                                  bin_width = 1)
 
-res_ceph_small_baseline
 plot(res_ceph_small_baseline,
-     col = col_baseline,
-     main = "Cephalopoda small")
+     xlim_hist = c(0, 10),
+     main = "Cephalopoda small baseline")
+```
 
-### 2021 FG ###
-x_ceph_small_fg <- na.omit(resnep21_fg_cephalopodaSMALL$PesoIndividual)
+```{r, tablecephsmallbaseline, results = "asis"}
+summary_mle_table(res_ceph_small_baseline)
+```
 
+## Cephalopoda small FG
+
+```{r, cephsmallfg}
 range(x_ceph_small_fg)
 
-res_ceph_small_fg <- fit_size_spectrum(x_ceph_small_fg)
+# Increasing bin width here
+res_ceph_small_fg <- determine_xmin_and_fit(x_ceph_small_fg,
+                                           bin_width = 1)
 
-res_ceph_small_fg
 plot(res_ceph_small_fg,
-     col = col_fg)
+     xlim_hist = c(0, 10),
+     main = "Cephalopoda small FG")
+```
 
-### 2021 NTR ###
-x_ceph_small_ntr <- na.omit(resnep21_ntr_cephalopodaSMALL$PesoIndividual)
+```{r, tablecephsmallfg, results = "asis"}
+summary_mle_table(res_ceph_small_fg)
+```
 
+## Cephalopoda small NTR
+
+And for NTR:
+```{r, cephsmallntr}
 range(x_ceph_small_ntr)
 
-res_ceph_small_ntr <- fit_size_spectrum(x_ceph_small_ntr)
+res_ceph_small_ntr <- determine_xmin_and_fit(x_ceph_small_ntr,
+                                             bin_width = 1)
 
-res_ceph_small_ntr
 plot(res_ceph_small_ntr,
-     col = col_ntr)
+     xlim_hist = c(0, 10),
+     main = "Cephalopoda small NTR")
 ```
+
+```{r, tablecephsmallntr, results = "asis"}
+summary_mle_table(res_ceph_small_ntr)
+```
+
 
 # Actinopterygii
 
-```{r, actin}
-# 2017
-resnep17_actinopterygii <- subset(resnep17_actinopterygii, Talla_mm > 40)
-x_actin_baseline <- na.omit(resnep17_actinopterygii$PesoIndividual)
+TODO Juliana removed lengths <100mm. Should really remove body masses < some
+value. TODO. Look into reasoning.
 
+## Actinopterygii baseline
+
+```{r, actinichthyesbaseline}
 range(x_actin_baseline)
 
-res_actin_baseline <- fit_size_spectrum(x_actin_baseline)
+# Use 0.2 as looked good for full Community. Probably want to be consistent
+# across everything.
 
-res_actin_baseline
+res_actin_baseline <- determine_xmin_and_fit(x_actin_baseline,
+                                              bin_width = 0.2)
+
 plot(res_actin_baseline,
-     col = col_baseline,
-     main = "actinopterygii")
+     xlim_hist = c(0, 20),
+     main = "Actinopterygii baseline")
+```
 
-# 2021 FG
-resnep21_fg_actinopterygii <- subset(resnep21_fg_actinopterygii, Talla_mm > 40)
-x_actin_fg <- na.omit(resnep21_fg_actinopterygii$PesoIndividual)
+```{r, tableactinbaseline, results = "asis"}
+summary_mle_table(res_actin_baseline)
+```
 
+## Actinopterygii FG
+
+```{r, actinichthyesfg}
 range(x_actin_fg)
 
-res_actin_fg <- fit_size_spectrum(x_actin_fg)
+# Increasing bin width here
+res_actin_fg <- determine_xmin_and_fit(x_actin_fg,
+                                           bin_width = 5)
 
-res_actin_fg
 plot(res_actin_fg,
-     col = col_fg)
+     xlim_hist = c(0, 20),
+     main = "Actinopterygii FG")
+```
 
-# 2021 NTR
-resnep21_ntr_actinopterygii <- subset(resnep21_ntr_actinopterygii, Talla_mm >40)
-x_actin_ntr <- na.omit(resnep21_ntr_actinopterygii$PesoIndividual)
+```{r, tableactinfg, results = "asis"}
+summary_mle_table(res_actin_fg)
+```
 
+## Actinopterygii NTR
+
+And for NTR:
+```{r, actinichthyesntr}
 range(x_actin_ntr)
 
-res_actin_ntr <- fit_size_spectrum(x_actin_ntr)
+res_actin_ntr <- determine_xmin_and_fit(x_actin_ntr,
+                                           bin_width = 0.2)
 
-res_actin_ntr
 plot(res_actin_ntr,
-     col = col_ntr)
+     xlim_hist = c(0, 20),
+     main = "Actinopterygii NTR")
+```
+
+```{r, tableactinntr, results = "asis"}
+summary_mle_table(res_actin_ntr)
 ```
 
 # Crustacea
 
-```{r, crust}
-# 2017
-x_crust_baseline <- na.omit(resnep17_crustacea$PesoIndividual)
+Juliana had xmin as 0.4 for FG and 0.3 for NTR; check what it was for baseline.
 
+## Crustacea amalgamate
+
+```{r, crustamalgamate}
+x_crust_amalgamate <- c(x_crust_baseline,
+                        x_crust_fg,
+                        x_crust_ntr)
+
+range(x_crust_amalgamate)
+
+res_crust_amalgamate <- determine_xmin_and_fit(x_crust_amalgamate,
+                                               bin_width = 0.4)
+
+plot(res_crust_amalgamate,
+     xlim_hist = c(0, 20),
+     main = "Crustacea amalgamate")
+x_min_crust <- res_crust_amalgamate$x_min
+x_max_crust <- res_crust_amalgamate$x_max
+```
+
+```{r, tablecrustamalgamate, results = "asis"}
+summary_mle_table(res_crust_amalgamate)
+```
+
+
+## Crustacea baseline
+
+```{r, crustichthyesbaseline}
 range(x_crust_baseline)
 
-res_crust_baseline <- fit_size_spectrum(x_crust_baseline)
+# Use 0.2 as looked good for full Community. Probably want to be consistent
+# across everything.
 
-res_crust_baseline
+# res_crust_baseline <- determine_xmin_and_fit(x_crust_baseline,
+#                                              bin_width = 0.2,
+#                                             x_min = x_min_crust)
+
+res_crust_baseline <- fit_size_spectrum(x_crust_baseline,
+                                        x_min = x_min_crust,
+                                        x_max = x_max_crust)
+
 plot(res_crust_baseline,
-     col = col_baseline,
-     main = "Crustacea")
+     # xlim_hist = c(0, 20),
+     main = "Crustacea baseline")
+```
 
-# 2021 FG
-x_crust_fg <- na.omit(resnep21_fg_crustacea$PesoIndividual)
+```{r, tablecrustbaseline, results = "asis"}
+summary_mle_table(res_crust_baseline)   # HERE won't work now, need a new type
+```
 
+## Crustacea FG
+
+```{r, crustichthyesfg}
 range(x_crust_fg)
 
 res_crust_fg <- fit_size_spectrum(x_crust_fg,
-                                  x_min = 0.4)
+                                        x_min = x_min_crust,
+                                        x_max = x_max_crust)
 
-res_crust_fg
 plot(res_crust_fg,
-     col = col_fg)
+     # xlim_hist = c(0, 20),
+     main = "Crustacea FG")
 
-# 2021 NTR
-x_crust_ntr <- na.omit(resnep21_ntr_crustacea$PesoIndividual)
 
+
+HERE
+# TODO remove this I expect:
+
+# Increasing bin width here
+res_crust_fg <- determine_xmin_and_fit(x_crust_fg,
+                                           bin_width = 0.2)
+
+plot(res_crust_fg,
+     xlim_hist = c(0, 20),
+     main = "Crustacea FG")
+```
+
+```{r, tablecrustfg, results = "asis"}
+summary_mle_table(res_crust_fg)
+```
+
+## Crustacea NTR
+
+And for NTR:
+```{r, crustntr}
 range(x_crust_ntr)
 
-res_crust_ntr <- fit_size_spectrum(x_crust_ntr,
-                                   x_min = 0.3)
 
-res_crust_ntr
+res_crust_ntr <- fit_size_spectrum(x_crust_ntr,
+                                        x_min = x_min_crust,
+                                        x_max = x_max_crust)
+
 plot(res_crust_ntr,
-     col = col_ntr)
+     # xlim_hist = c(0, 20),
+     main = "Crustacea NTR")
+
+
+
+# HERE won't need, as above:
+res_crust_ntr <- determine_xmin_and_fit(x_crust_ntr,
+                                           bin_width = 0.2)
+
+plot(res_crust_ntr,
+     xlim_hist = c(0, 20),
+     main = "Crustacea NTR")
+```
+
+```{r, tablecrustntr, results = "asis"}
+summary_mle_table(res_crust_ntr)
+```
+
+
+```{r, stop, cache = FALSE, eval = FALSE}
+knitr::knit_exit()
 ```
