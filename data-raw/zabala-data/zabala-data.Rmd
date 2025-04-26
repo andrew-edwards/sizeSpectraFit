@@ -39,7 +39,7 @@ library(caret)
 # library(ggvegan)  # Juliana had this commented out already
 # library(forams)
 library(tibble)
-library(ggplot2)
+# library(ggplot2)
 ```
 
 ```{r, notes, echo = FALSE}
@@ -261,6 +261,8 @@ x_crust_ntr <- na.omit(resnep21_ntr_crustacea$PesoIndividual) %>% as.numeric()
 Now save the values in the package. Maybe do as a single list. Then use list2env
 in analysis.
 
+TODO might not actually want this in the end.
+
 ```{r, savedata}
 # This is alphabetical (from using ls()):
 mediterranean_megafauna <- tibble::lst(x_actin_baseline,
@@ -323,6 +325,7 @@ summary(mediterranean_length_weight_coefficients)
 usethis::use_data(mediterranean_length_weight_coefficients,
                   overwrite = TRUE)
 # TODO document, alpha and beta are the coeffcicients; need to describe units.
+# This should be the standard way of using length-weight coefficients.
 ```
 
 Thought about leaving the NA's in there for now, as a check with Juliana's that
@@ -331,4 +334,154 @@ none of the NA species TODO.
 
 
 
-# For MLEbins method, need strata, species, weight bin min, weight bin max,
+# For MLEbins method, need the following, looking at Table 1 in MEPS:
+
+species, strata, length bin min, standardised count -- from data
+
+then calculate:
+weight bin min, weight bin max, biomass in that bin based on standardised count
+(not actually need for likelihood, can leave the calc to plotting functions if
+it's needed).
+
+Take the full data set and then save what we need.
+```{r, wrangling}
+# Exclude sizes smaller than 12mm, as the net size was 12x12mm, we assume organisms <12mm are not well sampled
+
+data_full <- dplyr::filter(resnep_for_length_weight_coefficients,
+                           Talla_mm > 12)
+summary(as.factor(data_full$Site))   # Just need these as strata, TBA is baseline for
+                                # the 4051 in 2017:
+nrow(dplyr::filter(data_full, Site == "TBA" & Any == 2017))
+
+
+expect_equal(data_full$Abundancia_NIndividusTalla_Km2,
+             data_full$FrequenciaCalculada / data_full$AreaEscombrada_km2,
+             tolerance = 0.0001)
+# So I can just use Abundancia_NIndividusTalla_Km2, though would need
+# FrequenciaCalculada for MLE method
+
+data <- dplyr::select(data_full,
+                      Site,
+                      NomEspecie,
+                      Talla_mm,
+                      Abundancia_NIndividusTalla_Km2) %>%
+  dplyr::mutate_at(vars(Site,
+                        NomEspecie),
+                   factor) %>%
+  dplyr::rename(strata = Site,
+                species = NomEspecie,
+                length = Talla_mm,
+                number = Abundancia_NIndividusTalla_Km2)
+
+# Rename in last bit to give standard general names (applicable to other data
+# sets). TODO need to document what these mean in the help for the data object.
+
+data
+
+mediterranean_data <- data
+
+summary(mediterranean_data)
+
+usethis::use_data(mediterranean_data)
+```
+
+```{r, notes}
+# Notes from Juliana's email:
+
+# Frequenciecaculada: 3 means measured 1/3 of the
+# catch, or, equivalently (I think)
+# there were 3 fish but only 1 was
+# measured. So Juliana then creates 3
+# individual identical rows in such a
+# situation. 1 means no subsampling.
+
+# Each tow covers a different area, we tried to make it so that eachtow last 1
+# hour, but there were variations, so we use the trawled area km2 to standardize
+# biomass and abundance data.
+
+
+# 'PesTotalCalculatRelacioTallaPes_g' is the total weight of that species taking
+# into account the subsample, meaning that if the total weight is 100g and the
+# subsample is 5, 5 organisms of that species weight 100g, so each organism here
+# weights 20g. - we won't need that as using length-weight relationships.
+
+# NumeroPesca is Haul Number - not needed
+
+# FrequenciaCalculada - The number of fish of a given length, species and haul is represented in FrequenciaCalculada. That's why I did the calculations on the first question, so that there would be one row for each individual, so using PesoIndividual accounts for everything.
+
+
+# Abundancia_NIndividusTalla_Km2 this looks to be freq scaled by area of
+# trawl, as verified in expect_equal above. If you just do MLE you can't
+# take this into account though.
+
+```
+
+HERE - above R code works, haven't run full .Rmd.
+
+Now combine length-weight coefficients and data. Then functionalise it once
+worked out.
+
+First, some lengths in original spreadsheet are to 0.01 mm and some to 1mm. Check
+what we get after the refinements here. Given to mm scale, maybe MLEbins is
+overkill. But I think the scaling by trawl area will result in non-integer
+counts. And given the mixture does seem worth doing.
+
+Can presume that a length to 2 decimal places is measured at resolution of 0.01,
+whereas ones that are to integers were measured at resolution of 1 (except for
+the 1 in 100 that come out as .00). Though when printed as tibble it keeps the
+original format.
+
+```{r, calcbins}
+dat <- mediterranean_data[1:100, ]   # Just doing first 100
+
+# Can see that have two 140s, so would be worth combining at this point. Maybe
+# not for now though, as will be harder to compare results to Juliana's? Could
+# do it and then comment out if want to compare.
+dplyr::filter(dat, species == "Lepidorhombus boscii", length == 140)
+
+dat_bin_breaks <- calc_max_of_bin(dat$length,
+                                  bin_widths = c(0.01, 1))
+
+# These are lengths, might want to note that, TODO prob want one big function to
+# generalise, with an input being whether data are lengths or weights, to then
+# automatically pick methods.
+
+dat <- cbind(dat,
+             dat_bin_breaks) %>% tibble::as_tibble() %>%
+       dplyr::rename(length_bin_min = bin_min,
+                     length_bin_max = bin_max)
+
+dat_joined <- dplyr::left_join(dat,
+                               mediterranean_length_weight_coefficients,
+                               by = "species") %>%
+  dplyr::mutate(weight_bin_min = alpha * (length_bin_min/10)^beta,
+                weight_bin_max = alpha * (length_bin_max/10)^beta,
+                biomass_bin_min = number * weight_bin_min,
+                biomass_bin_max = number * weight_bin_max)
+
+
+# TODO numbers look funny, expect need to be more careful with units. GUESSING
+# that alpha and beta refer to cm, hence the /10 above. Then I think body
+# weights are in grammes - have asked Juliana.
+
+# TODO don't think biomass in bin is actually needed as input for likelihood
+# function. Might be needed for plotting.
+dat_joined[1:3, ] %>% a()
+
+```
+
+This would seem to have the data in the format required for analysis. We would
+actually functionalise some of the above steps, and just require the raw data
+and l-w coefficients.
+
+HERE see above TODOs, check with spreadsheet, though wait for reply.
+
+HERE HERE HERE - do
+
+Just want to analyse one strata at a time. For a given data set to be fit, do a
+function to combine numbers for which we have the same species and length
+bin. Can actually do that early on.
+
+
+Next - adapt the likelihod function presumably next. See lkelihood.R from
+sizeSpectra. Need to get similar format to new sizeSpectra2 code.
