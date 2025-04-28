@@ -1,7 +1,8 @@
 ##' Fit a size spectrum to data using maximum likelihood
 ##'
 ##' The function automatically uses the appropriate method depending on the data...
-##' For tibble, need `strata` if the data are different
+##' For tibble, need `strata` if the data are different, and TODO check species
+##' if MLEbins.
 ##'
 ##' @param dat One of:
 ##' * `numeric` vector of values (such as individual body masses or lengths), which uses
@@ -16,7 +17,11 @@
 ##'   * count data for MLEbin method. At a minimum this has to include the columns:
 ##'     * `bin_min`
 ##'     * `bin_max`
-##'     * `bin_count`
+##'     * `bin_count`.
+##'   If `species` is in `names(dat)` then uses the MLEbins method, else uses
+##'   MLEbin for which we do not care about the species. TODO
+##'   `bin_min` and `bin_max` in a row correspond to `w_sj` for that species and
+##'   bin in MEPS supp infor -- see other help that spells it out.
 ##'
 ##'
 ##' TODO

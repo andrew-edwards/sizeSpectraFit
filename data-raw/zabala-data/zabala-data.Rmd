@@ -428,19 +428,20 @@ Combine rows that have the same strata, species, and length.
 # definitely need to do this. TODO include automatically in a function somehwere.
 # Also mention that this sorts them alphabetically by strata, species, and then
 # length.
-dat <- dplyr::summarise(group_by(mediterranean_data[1:100, ],
+dat <- dplyr::summarise(group_by(mediterranean_data[1:1000, ],
                                  # Just doing first 100  TODO
                                  strata,
                                  species,
                                  length),
-                        number = sum(number)) %>%
+                        bin_count = sum(number)) %>%
   dplyr::ungroup()
 dat
 ```
 
 
 HERE (but  - above R code works, haven't run full .Rmd.), though stuff below
-works also.
+works also.  And the Fung
+example NEXT
 
 Now combine length-weight coefficients and data. Then functionalise it once
 worked out.
@@ -475,8 +476,9 @@ dat_joined <- dplyr::left_join(dat,
                                by = "species") %>%
   dplyr::mutate(weight_bin_min = alpha * (length_bin_min/10)^beta,
                 weight_bin_max = alpha * (length_bin_max/10)^beta,
-                biomass_bin_min = number * weight_bin_min,
-                biomass_bin_max = number * weight_bin_max)
+                biomass_bin_min = bin_count * weight_bin_min,
+                biomass_bin_max = bin_count * weight_bin_max) %>%
+  dplyr::filter(!is.na(alpha))  # remove species with no length-weight coefficients
 
 
 # TODO numbers look funny, expect need to be more careful with units. GUESSING
@@ -515,7 +517,7 @@ dplyr::select(example,
               Talla_mm,
               Biomassa_KgTalla_Km2)[1,"Biomassa_KgTalla_Km2"] %>% a()
 
-dat_joined[1, c("length", "number", "biomass_bin_min")]
+dat_joined[1, c("length", "bin_count", "biomass_bin_min")]
 # Looks like ours is still grammes, as expected, so convert to kg:
 dat_joined[1, "biomass_bin_min"]/1000
 
@@ -535,7 +537,7 @@ and l-w coefficients.
 
 HERE see above TODOs, check with spreadsheet, though wait for reply.
 
-HERE HERE HERE - do
+HERE HERE HERE - redo this when done later HERE's
 
 Just want to analyse one strata at a time. Do baseline here then functionalise
 to make a loop. TODO. Or maybe do each in turn to keep track for this example.
@@ -548,10 +550,102 @@ bin. Can actually do that early on.
 dat_baseline <- dplyr::filter(dat_joined,
                               strata == "TBA")
 
+dat_for_mlebins <- dplyr::select(dat_baseline,
+                                 species,
+                                 bin_count,
+                                 bin_min = weight_bin_min,
+                                 bin_max = weight_bin_max)
+
+res_mlebins <- fit_size_spectrum(dat_for_mlebins)
+```
+
+The plot below seemed to work on first plot, but need to dig into code to check it's
+correct. See what I did in sizeSpectra when had to adapt MLEbins code to plot
+MLEbin results. HERE HERE - actually do Fung first to then check figure and
+results match.
+
+```{r plotmlebins}
+plot(res_mlebins)
 
 ```
 
 
 
-Next - adapt the likelihod function presumably next. See lkelihood.R from
-sizeSpectra. Need to get similar format to new sizeSpectra2 code.
+
+# Check code using dataOrig from sizeSpectra, which is Fung data.
+
+Need to accomodate the 0.5 cm bins though. Just do one year for now. Then write
+functions to reproduce resutls for all years, and automatically do all stratea
+for Med data.
+
+```{r fungdata}
+fung_1999 <- sizeSpectra::dataOrig %>%
+  dplyr::filter(Year == 1999)
+
+fung_use <- dplyr::select(fung_1999,
+                          species = Species,
+                          length = LngtClas,
+                          alpha = a,
+                          beta = b,
+                          bin_count = CPUE_bio_per_hour)
+
+fung_use_simplify <- dplyr::summarise(group_by(fung_use,
+                                               species,
+                                               length),
+                                      alpha = unique(alpha),
+                                      beta = unique(beta),
+                                      bin_count = sum(bin_count)) %>%
+  dplyr::ungroup()
+# TODO check that I did something like this in MEPS vignette, summing duplicate
+# combinations.
+
+# Lengths are in mm here
+fung_use_simplify
+
+fung_bin_breaks <- calc_max_of_bin(fung_use_simplify$length,
+                                   bin_widths = 10)    # 10 mm
+# TODO ignoring Atlantic Herring and European Sprat which are 0.5
+#  So expect results to be slightly different until do that.
+
+# Again, /10 as lengths are in mm but lenght-weight coefficients are cm
+fung_dat <- cbind(fung_use_simplify,
+                  fung_bin_breaks) %>%
+  tibble::as_tibble() %>%
+  dplyr::rename(length_bin_min = bin_min,
+                length_bin_max = bin_max) %>%
+  dplyr::mutate(weight_bin_min = alpha * (length_bin_min/10)^beta,
+                weight_bin_max = alpha * (length_bin_max/10)^beta,
+                biomass_bin_min = bin_count * weight_bin_min,
+                biomass_bin_max = bin_count * weight_bin_max) %>%
+  dplyr::filter(!is.na(alpha),  # remove species with no length-weight coefficients
+                bin_count != 0,
+                biomass_bin_min >= 4)    # 4g and above.
+
+fung_dat[1:10, ] %>% a()
+
+sum(fung_dat$bin_count)   # This should equal n = 7199.6 I think, from MEPS
+# Figure 7.
+HERE - figure this out NEXT TODO
+
+```
+
+ TODO put a remove bin count or number of 0 in somewhere early when
+ functionalising especially.
+
+Now to do the calculations:
+```{r fungcalcs}
+fung_dat_for_mlebins <- dplyr::select(fung_dat,
+                                      species,
+                                      bin_count,
+                                      bin_min = weight_bin_min,
+                                      bin_max = weight_bin_max)
+
+fung_dat_for_mlebins
+
+res_fung_mlebins <- fit_size_spectrum(fung_dat_for_mlebins)
+
+res_fung_mlebins
+```
+
+TODO HERE may ahve to go back and think about units again. Set up some rules,
+maybe convert to cm straight away.
