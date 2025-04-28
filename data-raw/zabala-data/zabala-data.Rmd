@@ -372,7 +372,6 @@ data <- dplyr::select(data_full,
                 species = NomEspecie,
                 length = Talla_mm,
                 number = Abundancia_NIndividusTalla_Km2)
-
 # Rename in last bit to give standard general names (applicable to other data
 # sets). TODO need to document what these mean in the help for the data object.
 
@@ -416,7 +415,32 @@ usethis::use_data(mediterranean_data)
 
 ```
 
-HERE - above R code works, haven't run full .Rmd.
+
+
+Combine rows that have the same strata, species, and length.
+```{r, combinerows}
+# Can see that have two 140s in same strata of same species:
+#   dplyr::filter(mediterranean_data[1:100, ], species == "Lepidorhombus boscii", length == 140)
+# so worth combining at this
+# point. Might be harder to compare results to Juliana's (maybe not?), so can
+# always comment this out, though MLEbins figures will be strange -- actually
+# wrong as won't be able to see overlapping bins that are the same. So
+# definitely need to do this. TODO include automatically in a function somehwere.
+# Also mention that this sorts them alphabetically by strata, species, and then
+# length.
+dat <- dplyr::summarise(group_by(mediterranean_data[1:100, ],
+                                 # Just doing first 100  TODO
+                                 strata,
+                                 species,
+                                 length),
+                        number = sum(number)) %>%
+  dplyr::ungroup()
+dat
+```
+
+
+HERE (but  - above R code works, haven't run full .Rmd.), though stuff below
+works also.
 
 Now combine length-weight coefficients and data. Then functionalise it once
 worked out.
@@ -432,13 +456,6 @@ the 1 in 100 that come out as .00). Though when printed as tibble it keeps the
 original format.
 
 ```{r, calcbins}
-dat <- mediterranean_data[1:100, ]   # Just doing first 100
-
-# Can see that have two 140s, so would be worth combining at this point. Maybe
-# not for now though, as will be harder to compare results to Juliana's? Could
-# do it and then comment out if want to compare.
-dplyr::filter(dat, species == "Lepidorhombus boscii", length == 140)
-
 dat_bin_breaks <- calc_max_of_bin(dat$length,
                                   bin_widths = c(0.01, 1))
 
@@ -446,6 +463,8 @@ dat_bin_breaks <- calc_max_of_bin(dat$length,
 # generalise, with an input being whether data are lengths or weights, to then
 # automatically pick methods.
 
+# TODO also assuming length values are minimum, wait to hear from Juliana.
+# TODO generalise function to include the different options
 dat <- cbind(dat,
              dat_bin_breaks) %>% tibble::as_tibble() %>%
        dplyr::rename(length_bin_min = bin_min,
@@ -462,13 +481,53 @@ dat_joined <- dplyr::left_join(dat,
 
 # TODO numbers look funny, expect need to be more careful with units. GUESSING
 # that alpha and beta refer to cm, hence the /10 above. Then I think body
-# weights are in grammes - have asked Juliana.
+# weights are in grammes - have asked Juliana. But then she gives
+# Biomassa_KgTalla_Km2 which is kg, so I need to scale to match that. But I
+# don't think I need biomass in a bin (see next), so just keep for now to check
+# calculations.
 
 # TODO don't think biomass in bin is actually needed as input for likelihood
 # function. Might be needed for plotting.
-dat_joined[1:3, ] %>% a()
+dat_joined[1, ] %>% a()
 
+# Check a value:
+
+example <- dplyr::filter(resnep_raw,
+                         NomEspecie == "Abralia veranyi",
+                         Talla_mm == 28,
+                         Site == "TBA") %>%
+  dplyr::select(NomEspecie,
+                Talla_mm,
+                Abundancia_NIndividusTalla_Km2,
+                ConstantA_TallaPes,
+                ConstantB_TallaPes,
+                Biomassa_KgTalla_Km2)
+example %>% a()
+
+# These should match:
+dplyr::select(example,
+              Abundancia_NIndividusTalla_Km2,
+              Talla_mm,
+              Biomassa_KgTalla_Km2)[1,]
+
+dplyr::select(example,
+              Abundancia_NIndividusTalla_Km2,
+              Talla_mm,
+              Biomassa_KgTalla_Km2)[1,"Biomassa_KgTalla_Km2"] %>% a()
+
+dat_joined[1, c("length", "number", "biomass_bin_min")]
+# Looks like ours is still grammes, as expected, so convert to kg:
+dat_joined[1, "biomass_bin_min"]/1000
+
+# Slightly off, likely just rounding, just check:
+dplyr::select(example,
+              Abundancia_NIndividusTalla_Km2,
+              Talla_mm,
+              Biomassa_KgTalla_Km2)[1,"Biomassa_KgTalla_Km2"] - 0.09
+# Don't worry though.
 ```
+Okay, so lengths in mm are converted to cm for the length-weight calculations,
+and then for total biomass converted to kg, though we won't actually need that directly.
 
 This would seem to have the data in the format required for analysis. We would
 actually functionalise some of the above steps, and just require the raw data
@@ -478,9 +537,20 @@ HERE see above TODOs, check with spreadsheet, though wait for reply.
 
 HERE HERE HERE - do
 
-Just want to analyse one strata at a time. For a given data set to be fit, do a
+Just want to analyse one strata at a time. Do baseline here then functionalise
+to make a loop. TODO. Or maybe do each in turn to keep track for this example.
+
+For a given data set to be fit, do a
 function to combine numbers for which we have the same species and length
 bin. Can actually do that early on.
+
+```{r, analyse}
+dat_baseline <- dplyr::filter(dat_joined,
+                              strata == "TBA")
+
+
+```
+
 
 
 Next - adapt the likelihod function presumably next. See lkelihood.R from
