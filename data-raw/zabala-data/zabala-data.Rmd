@@ -638,9 +638,10 @@ fung_dat <- cbind(fung_use_simplify,
                 biomass_bin_max = bin_count * weight_bin_max) %>%
   dplyr::filter(!is.na(alpha),  # remove species with no length-weight coefficients
                 bin_count != 0,
-                weight_bin_min >= 4)    # 4g and above. TODO TODO this should
-                                        # work as now corrected biomass_bin_min
-                                        # to weight_bin_min.
+                weight_bin_min >= 4) %>%    # 4g and above.
+  dplyr::arrange(weight_bin_min)      # Makes sense to order in terms of bins,
+                                      # as don't care about species now. Then
+                                      # makes figure plot in the order as in MEPS.
 
 fung_dat[1:10, ] %>% a()
 
@@ -655,6 +656,8 @@ fung_dat_for_mlebins <- dplyr::select(fung_dat,
 
 fung_dat_for_mlebins
 
+stopifnot(min(diff(fung_dat_for_mlebins$bin_min)) <= 0)  # check it's ascedning
+
 res_fung_mlebins_1999 <- fit_size_spectrum(fung_dat_for_mlebins)
 
 res_fung_mlebins_1999
@@ -663,7 +666,10 @@ res_fung_mlebins_1999
 Woo-hoo, matches Table S.2
 
 
-HERE - check plot, commit, then work out which version to keep (which is more
+For figure to work as for MEPS, need to sort by `weight_bin_min` somewhere
+above. Makes sense to do at once the weight bins have been calculated.
+
+HERE - D check plot, D commit, then work out which version to keep (which is more
 generalisable), then simplify this. Actually make
 a new vignette showing it reproduces results from MEPS. Should then
 functionalise approach with a strata option.

@@ -20,7 +20,9 @@ fit_size_spectrum_mlebins <- function(dat,
 
 
   df <- dplyr::arrange(df,
-                       species,
+                       # species,    # don't want to do that as it messes up
+                       # plotting, and kind of don't care about specific species
+                       # as have already dealt with the species-specific aspects
                        bin_min)
 
   # TODO might have to take out 0 counts in end bins. Check here or reduce the

@@ -95,7 +95,12 @@ plot_isd_binned <- function(res_mlebin,
 # From ISD_bin_plot to adapt here, this is for linear y-axis, then have to tweak
   # to have the log option also:
 
-  dat <- res_mlebin$dat
+  dat <- res_mlebin$dat %>%
+    dplyr::arrange(desc(bin_min))
+                                   # Should overlay rectangles like in MEPS
+                                  # Fig. 7, and not matter for
+                                  # non-overlapping. TODO check.
+
 
     # y-axis not logged
   plot.default(dat$bin_min,      #    nothing plotted anyway as type = "n"
@@ -136,6 +141,28 @@ plot_isd_binned <- function(res_mlebin,
            x1 = dat$bin_max,
            y1 = dat$count_gte_bin_min,
            col = seg_col)
+
+  if(log == "xy"){    # TODO didn't have for MLEbin plot, think if we need it
+                      # for that, need to test
+    # Need to manually draw the rectangle with low_count = 0 since it doesn't
+    #  get plotted on log-log plot
+    extra_rect <- dplyr::filter(dat,
+                                low_count == 0)
+    # if(nrow(extra.rect) > 1) stop("Check rows of extra rect.")
+    rect(xleft = extra_rect$bin_min,
+         ybottom = rep(0.01 * ylim[1],
+                       nrow(extra_rect)),
+         xright = extra_rect$bin_max,
+         ytop = extra_rect$high_count,
+         col = rect_col)
+
+  segments(x0 = dat$bin_min,
+           y0 = dat$count_gte_bin_min,
+           x1 = dat$bin_max,
+           y1 = dat$count_gte_bin_min,
+           col = seg_col)
+  }
+
   lines(x_plb, y_plb, col = fit_col, lwd = fit_lwd)   # Plot line last so can see it
   lines(x_plb, y_plb_conf_min, col = fit_col, lty = conf_lty)
   lines(x_plb, y_plb_conf_max, col = fit_col, lty = conf_lty)
