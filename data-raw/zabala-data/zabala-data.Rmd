@@ -381,7 +381,8 @@ mediterranean_data <- data
 
 summary(mediterranean_data)
 
-usethis::use_data(mediterranean_data)
+usethis::use_data(mediterranean_data,
+                  overwrite = TRUE)
 ```
 
 ```{r, notes}
@@ -578,7 +579,17 @@ Need to accomodate the 0.5 cm bins though. Just do one year for now. Then write
 functions to reproduce resutls for all years, and automatically do all stratea
 for Med data.
 
-```{r fungdata}
+Note that LngtClas is in mm, not cm, but that a and b are the length-weight
+coefficients for the length being in cm. For sizeSpectra vignette used cm as
+units later in that code.
+
+First attempt here was using `dataOrig`, but I'd already tidied it up in
+`IBTS_data` so second attempt is trying that.
+
+Figured out the bug in this, see the TODO towards the end, but for now carrying
+on with chunk after this, as this still has some data-specific wrangling in it.
+
+```{r fungdata, eval = FALSE, echo = FALSE}
 fung_1999 <- sizeSpectra::dataOrig %>%
   dplyr::filter(Year == 1999)
 
@@ -587,15 +598,17 @@ fung_use <- dplyr::select(fung_1999,
                           length = LngtClas,
                           alpha = a,
                           beta = b,
-                          bin_count = CPUE_bio_per_hour)
+                          bin_count = CPUE_number_per_hour)
 
 fung_use_simplify <- dplyr::summarise(group_by(fung_use,
                                                species,
                                                length),
                                       alpha = unique(alpha),
                                       beta = unique(beta),
-                                      bin_count = sum(bin_count)) %>%
+                                      bin_count = sum(bin_count)/7) %>%
   dplyr::ungroup()
+# Divide by 7 is because there were 7 areas, so it's really a mean. Did that in
+# the MEPS_IBTS_1.html vignette.
 # TODO check that I did something like this in MEPS vignette, summing duplicate
 # combinations.
 
@@ -604,8 +617,14 @@ fung_use_simplify
 
 fung_bin_breaks <- calc_max_of_bin(fung_use_simplify$length,
                                    bin_widths = 10)    # 10 mm
-# TODO ignoring Atlantic Herring and European Sprat which are 0.5
-#  So expect results to be slightly different until do that.
+
+herring_and_sprat_indices <- which(fung_use_simplify$species %in%
+                                   c("Clupea harengus", "Sprattus sprattus"))
+
+herring_and_sprat_indices
+
+fung_bin_breaks[herring_and_sprat_indices, "bin_max"] =
+  fung_bin_breaks[herring_and_sprat_indices, "bin_max"] - 5
 
 # Again, /10 as lengths are in mm but lenght-weight coefficients are cm
 fung_dat <- cbind(fung_use_simplify,
@@ -619,15 +638,122 @@ fung_dat <- cbind(fung_use_simplify,
                 biomass_bin_max = bin_count * weight_bin_max) %>%
   dplyr::filter(!is.na(alpha),  # remove species with no length-weight coefficients
                 bin_count != 0,
-                biomass_bin_min >= 4)    # 4g and above.
+                weight_bin_min >= 4)    # 4g and above. TODO TODO this should
+                                        # work as now corrected biomass_bin_min
+                                        # to weight_bin_min.
 
 fung_dat[1:10, ] %>% a()
 
-sum(fung_dat$bin_count)   # This should equal n = 7199.6 I think, from MEPS
-# Figure 7.
-HERE - figure this out NEXT TODO
+sum(fung_dat$bin_count)   # This should equal n = 7199.6 for 1999I think, from MEPS
+# Figure 7. DOES.
 
+fung_dat_for_mlebins <- dplyr::select(fung_dat,
+                                      species,
+                                      bin_count,
+                                      bin_min = weight_bin_min,
+                                      bin_max = weight_bin_max)
+
+fung_dat_for_mlebins
+
+res_fung_mlebins_1999 <- fit_size_spectrum(fung_dat_for_mlebins)
+
+res_fung_mlebins_1999
 ```
+
+Woo-hoo, matches Table S.2
+
+
+HERE - check plot, commit, then work out which version to keep (which is more
+generalisable), then simplify this. Actually make
+a new vignette showing it reproduces results from MEPS. Should then
+functionalise approach with a strata option.
+
+
+
+Trying with `IBTS_data`:
+
+```{r, fungibtsdata}
+
+fung_1986 <- sizeSpectra::IBTS_data %>%
+  dplyr::filter(Year == 1986)
+
+fung_use <- dplyr::select(fung_1986,
+                          species = SpecCode,
+                          length = LngtClass,
+                          alpha = LWa,
+                          beta = LWb,
+                          bin_count = Number)
+
+# This checking of dulpication was already done, but keep here as want to
+# include in a function:
+fung_use_simplify <- dplyr::summarise(group_by(fung_use,
+                                               species,
+                                               length),
+                                      alpha = unique(alpha),
+                                      beta = unique(beta),
+                                      bin_count = sum(bin_count)) %>%
+  dplyr::ungroup()
+
+
+
+attributes(fung_use) <- attributes(fung_use_simplify) # so expect equal works
+
+expect_equal(fung_use,
+             fung_use_simplify)
+
+
+# NOT NEEDED NOW: Divide by 7 is because there were 7 areas, so it's really a mean. Did that in
+# the MEPS_IBTS_1.html vignette.
+# TODO check that I did something like this in MEPS vignette, summing duplicate
+# combinations.
+
+# Lengths are in cm
+fung_use_simplify
+
+fung_bin_breaks <- calc_max_of_bin(fung_use_simplify$length,
+                                   bin_widths = 1)    # 10 mm
+
+# Indices corresponding to herring and sprat (bin breaks of 0.5 cm); could let people add this in in an
+# extra step, doesn't really need including in calc_max_of_bin. Okay to do here
+# as order not changing for next tibble.
+herring_and_sprat_indices <- which(fung_use_simplify$species %in% c(126417, 126425))
+
+herring_and_sprat_indices
+
+fung_bin_breaks[herring_and_sprat_indices, "bin_max"] =
+  fung_bin_breaks[herring_and_sprat_indices, "bin_max"] - 0.5
+
+# TODO ignoring Atlantic Herring and European Sprat which are 0.5
+#  So expect results to be slightly different until do that. But total sum of
+#  counts should be the same, the bins will just be defined slightly wrong.
+
+# Lengths are in cm as for length-weight coefficients are cm, probably a good
+# rule of thumb to do
+fung_dat <- cbind(fung_use_simplify,
+                  fung_bin_breaks) %>%
+  tibble::as_tibble() %>%
+  dplyr::rename(length_bin_min = bin_min,
+                length_bin_max = bin_max) %>%
+  dplyr::mutate(weight_bin_min = alpha * length_bin_min^beta,
+                weight_bin_max = alpha * length_bin_max^beta,
+                biomass_bin_min = bin_count * weight_bin_min,
+                biomass_bin_max = bin_count * weight_bin_max) %>%
+  dplyr::filter(!is.na(alpha),  # remove species with no length-weight coefficients
+                bin_count != 0,
+                weight_bin_min >= 4)    # 4g and above.
+
+fung_dat[1:10, ] %>% a()
+
+sum(fung_dat$bin_count)   # This should equal n = 7199.6 for 1999I think, from MEPS
+# Figure 7. BUT check what data I'm using, switching to 1986 as results are
+# shown in vignettes. 1986 should be 4799.29, at least after the
+# calculations. Matches. 1999 should now also, as should above calcs.
+
+
+# [30/4/2025 Started new R session, old one is still open in another buffer]
+```
+
+
 
  TODO put a remove bin count or number of 0 in somewhere early when
  functionalising especially.
@@ -647,5 +773,9 @@ res_fung_mlebins <- fit_size_spectrum(fung_dat_for_mlebins)
 res_fung_mlebins
 ```
 
+Woo-hoo, that matches Table S.2 of MEPS paper.
+
+
+
 TODO HERE may ahve to go back and think about units again. Set up some rules,
-maybe convert to cm straight away.
+maybe convert to cm straight away. Think that's best.
