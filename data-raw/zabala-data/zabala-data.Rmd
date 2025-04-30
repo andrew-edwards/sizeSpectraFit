@@ -661,21 +661,28 @@ stopifnot(min(diff(fung_dat_for_mlebins$bin_min)) <= 0)  # check it's ascedning
 res_fung_mlebins_1999 <- fit_size_spectrum(fung_dat_for_mlebins)
 
 res_fung_mlebins_1999
+
+# plot.size_spectrum_mlebin(res_fung_mlebins_1999)  # TODO so think we can just
+# say
+
+# Now have just:
+plot(res_fung_mlebins_1999)
 ```
 
-Woo-hoo, matches Table S.2
-
+Woo-hoo, matches Table S.2 and Figure 7.
 
 For figure to work as for MEPS, need to sort by `weight_bin_min` somewhere
-above. Makes sense to do at once the weight bins have been calculated.
+above. Makes sense to do at once the weight bins have been calculated. Doing
+that in plotting code.
 
-HERE - D check plot, D commit, then work out which version to keep (which is more
-generalisable), then simplify this. Actually make
+HERE - D check plot, D commit,
+then work out which version to keep (which is more
+generalisable), this one or the next. Then simplify this down, and apply to Med data. Actually make
 a new vignette showing it reproduces results from MEPS. Should then
 functionalise approach with a strata option.
 
 
-
+TODO decide which to keep, this or the above one:
 Trying with `IBTS_data`:
 
 ```{r, fungibtsdata}
