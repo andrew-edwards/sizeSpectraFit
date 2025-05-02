@@ -8,6 +8,8 @@ fit_size_spectrum.data.frame <- function(dat,
 #                                         b_vec = NULL,
 #                                         b_vec_inc = 0.00001){
 
+HERE - this is what is messing up. May need to get people to specify method, bit
+  hard to fully automate, and no guarantee what other column names people have.
   # TODO could check if bin_min is in column names, in which case treat as
   # definitely needing mlebin - may want to do mlebin and each strata/year
   # though. Be nice to make strata = "year" the default.
@@ -21,7 +23,7 @@ fit_size_spectrum.data.frame <- function(dat,
                                         strata = strata,
                                         ...)  # TODO set up a loop, or the function.
   } else {
-    if(!("species" %in% names(dat))){
+    if(!("species" %in% names(dat))){   # TODO  risky approach
       # MLEbin
       res <- fit_size_spectrum_mlebin(dat,
                                       ...)

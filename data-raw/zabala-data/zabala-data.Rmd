@@ -31,14 +31,14 @@ load_all()
 # LIBRARIES ####
 # Andy commenting some of these that I think aren't needed here (I didn't have
 # some installed and the code still ran):
-library(tidyverse)      # not sure all these are needed
+# library(tidyverse)      # not sure all these are needed
 library(readxl)
-library(plyr)           # gives a warning of conflicts with dplyr
-library(caret)
+# library(plyr)           # gives a warning of conflicts with dplyr
+# library(caret)
 # library(vegan)
 # library(ggvegan)  # Juliana had this commented out already
 # library(forams)
-library(tibble)
+#library(tibble)
 # library(ggplot2)
 ```
 
@@ -457,6 +457,17 @@ whereas ones that are to integers were measured at resolution of 1 (except for
 the 1 in 100 that come out as .00). Though when printed as tibble it keeps the
 original format.
 
+Juliana: The lengths with 0.01mm accuracy are all measured crustaceans, as
+they're typically small and its the standard to measure them with a vernier
+caliper. All other species were measured to the 1mm accuracy, as we used a
+standard lab metric tape. So if we have 27 its correct to say it is 27.00. With
+this in mind, I would define b) 26.5 - 27.5 mm as the bin value for 27.00.
+
+And for the 0.01 mm accuracy it really isn't going to make much difference
+exactly how
+we define the bin, so say 26.13 is 26.125-26.135 for consistency. (Have to
+assume this for `calc_max_of_bin()`.
+
 ```{r, calcbins}
 dat_bin_breaks <- calc_max_of_bin(dat$length,
                                   bin_widths = c(0.01, 1))
@@ -465,8 +476,6 @@ dat_bin_breaks <- calc_max_of_bin(dat$length,
 # generalise, with an input being whether data are lengths or weights, to then
 # automatically pick methods.
 
-# TODO also assuming length values are minimum, wait to hear from Juliana.
-# TODO generalise function to include the different options
 dat <- cbind(dat,
              dat_bin_breaks) %>% tibble::as_tibble() %>%
        dplyr::rename(length_bin_min = bin_min,
@@ -476,10 +485,14 @@ dat_joined <- dplyr::left_join(dat,
                                mediterranean_length_weight_coefficients,
                                by = "species") %>%
   dplyr::mutate(weight_bin_min = alpha * (length_bin_min/10)^beta,
-                weight_bin_max = alpha * (length_bin_max/10)^beta,
-                biomass_bin_min = bin_count * weight_bin_min,
-                biomass_bin_max = bin_count * weight_bin_max) %>%
-  dplyr::filter(!is.na(alpha))  # remove species with no length-weight coefficients
+                weight_bin_max = alpha * (length_bin_max/10)^beta) %>%
+  dplyr::filter(!is.na(alpha))  # remove species with no length-weight
+                                # coefficients
+
+                # biomass_bin_min = bin_count * weight_bin_min,  # TODO get rid of
+                                        # these I think.
+                # biomass_bin_max = bin_count * weight_bin_max) %>%
+
 
 
 # TODO numbers look funny, expect need to be more careful with units. GUESSING
@@ -508,25 +521,25 @@ example <- dplyr::filter(resnep_raw,
 example %>% a()
 
 # These should match:
-dplyr::select(example,
-              Abundancia_NIndividusTalla_Km2,
-              Talla_mm,
-              Biomassa_KgTalla_Km2)[1,]
+#dplyr::select(example,
+#              Abundancia_NIndividusTalla_Km2,
+#              Talla_mm,
+#              Biomassa_KgTalla_Km2)[1,]
 
-dplyr::select(example,
-              Abundancia_NIndividusTalla_Km2,
-              Talla_mm,
-              Biomassa_KgTalla_Km2)[1,"Biomassa_KgTalla_Km2"] %>% a()
+#dplyr::select(example,
+#              Abundancia_NIndividusTalla_Km2,
+#              Talla_mm,
+#             Biomassa_KgTalla_Km2)[1,"Biomassa_KgTalla_Km2"] %>% a()
 
-dat_joined[1, c("length", "bin_count", "biomass_bin_min")]
+#dat_joined[1, c("length", "bin_count", "biomass_bin_min")]
 # Looks like ours is still grammes, as expected, so convert to kg:
-dat_joined[1, "biomass_bin_min"]/1000
+#dat_joined[1, "biomass_bin_min"]/1000
 
 # Slightly off, likely just rounding, just check:
-dplyr::select(example,
-              Abundancia_NIndividusTalla_Km2,
-              Talla_mm,
-              Biomassa_KgTalla_Km2)[1,"Biomassa_KgTalla_Km2"] - 0.09
+#dplyr::select(example,
+#              Abundancia_NIndividusTalla_Km2,
+#              Talla_mm,
+#              Biomassa_KgTalla_Km2)[1,"Biomassa_KgTalla_Km2"] - 0.09
 # Don't worry though.
 ```
 Okay, so lengths in mm are converted to cm for the length-weight calculations,
@@ -558,7 +571,13 @@ dat_for_mlebins <- dplyr::select(dat_baseline,
                                  bin_max = weight_bin_max)
 
 res_mlebins <- fit_size_spectrum(dat_for_mlebins)
+
+> res_mlebins <- fit_size_spectrum_mlebins(dat_for_mlebins)  # should work
+
+res_mlebins
 ```
+
+HERE HERE HERE Think it's L96 of fit-size-spectrum-mlebins.R
 
 The plot below seemed to work on first plot, but need to dig into code to check it's
 correct. See what I did in sizeSpectra when had to adapt MLEbins code to plot
@@ -567,9 +586,11 @@ results match.
 
 ```{r plotmlebins}
 plot(res_mlebins)
-
 ```
 
+## Functionalising those last calculations
+
+Have length-weight coefficients and data in a standard form.
 
 
 
@@ -675,7 +696,9 @@ For figure to work as for MEPS, need to sort by `weight_bin_min` somewhere
 above. Makes sense to do at once the weight bins have been calculated. Doing
 that in plotting code.
 
-HERE - D check plot, D commit,
+HERE HERE HERE: -
+  D check plot,
+  D commit,
 then work out which version to keep (which is more
 generalisable), this one or the next. Then simplify this down, and apply to Med data. Actually make
 a new vignette showing it reproduces results from MEPS. Should then

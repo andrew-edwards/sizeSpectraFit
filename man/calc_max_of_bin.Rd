@@ -2,15 +2,15 @@
 % Please edit documentation in R/calc-max-of_bin.R
 \name{calc_max_of_bin}
 \alias{calc_max_of_bin}
-\title{Calculate the maximum value of a bin given a value (that can represent the
+\title{Calculate the maximum value of each bin
 minimum or midpoint)}
 \usage{
-calc_max_of_bin(vec, bin_widths = 1, vec_represents_bin_min = TRUE)
+calc_max_of_bin(vec, bin_widths = 1, vec_represents_bin_mid = TRUE)
 }
 \arguments{
 \item{vec}{vector of values corresponding to bins}
 
-\item{bin_widths}{numeric of length 1 for all bins having same widths, or
+\item{bin_widths}{numeric of length 1 to specify all bins having same widths, or
 vector of two different allowed bin widths TODO think if need more, or
 generalise. Or tell people to do manually if not simply two options.}
 }
@@ -18,7 +18,19 @@ generalise. Or tell people to do manually if not simply two options.}
 tibble of bin_min, bin_max
 }
 \description{
-Also depends on binbreak.
+Given a vector of values representing either the midpoing or the minimum of
+each bin, calculate the correponding maximum value of each bin. The defined
+bin widths can be specified (currently either all identical or some are 0.01
+and some 1).
+}
+\examples{
+\dontrun{
+calc_max_of_bin(c(1:5, 7, 9.83, 11.24)) \%>\% a()
+calc_max_of_bin(c(1:5, 7, 9.83, 11.24), bin_widths = c(0.01, 1))  \%>\% a()
+calc_max_of_bin(c(1:5, 7, 9.83, 11.24), vec_represents_bin_mid = FALSE)  \%>\% a()
+calc_max_of_bin(c(1:5, 7, 9.83, 11.24), vec_represents_bin_mid = FALSE, bin_widths = c(0.01, 1))  \%>\% a()
+
+}
 }
 \author{
 Andrew Edwards

@@ -19,5 +19,5 @@ plot.size_spectrum_mlebins <- function(res_mlebins,
                                         # functions; check it all works.
   plot.size_spectrum_mlebin(res_mlebin = res_mlebins,
                             ...)    # want to have mlebins in class, hence need
-                                    # this separate function.
+  # this separate function.
 }
