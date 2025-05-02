@@ -20,10 +20,11 @@ fit_size_spectrum_mlebins <- function(dat,
 
 
   df <- dplyr::arrange(df,
+                       bin_min)
                        # species,    # don't want to do that as it messes up
                        # plotting, and kind of don't care about specific species
                        # as have already dealt with the species-specific aspects
-                       bin_min)
+
 
   # TODO might have to take out 0 counts in end bins. Check here or reduce the
   # bins. And add to help. SEe also mlebin
@@ -93,9 +94,9 @@ fit_size_spectrum_mlebins <- function(dat,
   #  minimum value of CountGTEwmin_   TODO can prob delete that if dealt with in
   # plotting functions, though prob best to do here to then not have to calc in plots.
   for(iii in 1:length(count_gte_bin_min)){
-    count_gte_bin_min[iii] <- sum( (dat$bin_min >= dat$bin_min[iii]) * dat$bin_count)
-    low_count[iii] <- sum( (dat$bin_min >= dat$bin_max[iii]) * dat$bin_count)
-    high_count[iii] <- sum( (dat$bin_max > dat$bin_min[iii]) * dat$bin_count)
+    count_gte_bin_min[iii] <- sum( (df$bin_min >= df$bin_min[iii]) * df$bin_count)
+    low_count[iii] <- sum( (df$bin_min >= df$bin_max[iii]) * df$bin_count)
+    high_count[iii] <- sum( (df$bin_max > df$bin_min[iii]) * df$bin_count)
   }
 
   df$count_gte_bin_min <- count_gte_bin_min

@@ -1,0 +1,156 @@
+---
+title: "Analysing Juliana Zabala's data having wrangled it"
+author: "Andrew Edwards and Juliana Zabala"
+output: pdf_document
+fontsize: 12pt
+date: "Last compiled on `r format(Sys.time(), '%d %B, %Y')`"
+---
+
+```{r, setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "",
+  cache = FALSE,
+  # cache_path = "zabala-data-cache/",
+  # fig.path = "zabala-data-figs-cache/",
+  fig.width = 7,
+  fig.height = 6
+)
+  # comment = "#>",
+```
+
+```{r, build, echo = FALSE, eval = FALSE}
+# To build either run this line or click knit button in RStudio:
+rmarkdown::render("zabala-data-analysis.Rmd")
+```
+
+```{r, packages, echo = FALSE}
+library(dplyr)
+load_all()
+#library(sizeSpectra2)    # Need latest version
+```
+
+Having saved the data in the package via `zabala-data.Rmd`, do the size spectra
+analyses here. TODO then move this to report or vignette folder.
+
+## Data
+
+We have data and the length-weight coefficients in a standard form. Had analysed
+in `zabala-data.Rmd` but want to reduce and functionalise those steps here.
+
+TODO then use same functions to check
+Fung results.
+
+So we have three pieces of information. First is the measurements:
+```{r medcalcs}
+mediterranean_data
+summary(mediterranean_data)
+```
+which we want to fit the size spectrum for each strata-group
+combination. The data can have repeated measurements for the same
+strata-group-length combination. We will aggregate such examples at the analysis
+stage (could do earlier but best to keep data similar to original format).
+
+Second piece is the definition of lengths. They are in mm, with integers measured to nearest mm and ones
+with decimals measured to 0.01 mm (assuming this will mis-specify, presumably
+1%, a few mm ones,
+but that's okay). And the lengths assumed to be midpoints (e.g. 10 mm represents
+9.5-10.5 mm).
+
+Thirdly, we have species-specific length-weight coefficients.
+```{r lwcoeffs}
+mediterranean_length_weight_coefficients
+```
+which assume units of cm (not mm) and grammes.
+
+## Analyses
+
+Pick one combination first, functionalise what we can, then make a loop (or
+wrapper function) TODO
+
+1. Create weight bins
+```{r onestratagroup}
+dat_bin_breaks <- calc_max_of_bin(mediterranean_data$length,
+                                  bin_widths = c(0.01, 1))
+dat_bin_breaks
+
+dat_all <- cbind(mediterranean_data,
+                 dat_bin_breaks) %>% tibble::as_tibble() %>%
+           dplyr::rename(length_bin_min = bin_min,
+                         length_bin_max = bin_max)
+
+dat_joined <- dplyr::left_join(dat_all,
+                               mediterranean_length_weight_coefficients,
+                               by = "species") %>%
+  dplyr::mutate(weight_bin_min = alpha * (length_bin_min/10)^beta,
+                weight_bin_max = alpha * (length_bin_max/10)^beta) %>%
+  dplyr::filter(!is.na(alpha))  # remove species with no length-weight
+  # coefficients
+    # Add argument for 10 depending on mm or cm
+
+dat_joined[1:5, ] %>% a()
+
+# Useful for users to be able to see all this, even though only some of it is
+# needed for the likelihood fitting.
+
+
+```
+
+Just want to analyse one strata at a time. Do baseline-actin here as an example then functionalise
+to make a loop. TODO. Or maybe do each in turn to keep track for this example.
+
+```{r, analyse}
+dat_baseline_actin <- dplyr::filter(dat_joined,
+                                    strata == "TBA",
+                                    group == "Actinopterygii")
+
+
+
+
+# Now strip down to just what's needed, just need counts and bin definitions for
+# weights, but keep species for understandability as am outputting the data in
+# results, though am combining results of same species and bin_min (so do need
+# species at this stage)...
+dat_for_mlebins_pre <- dplyr::select(dat_baseline_actin,
+                                     species,
+                                     bin_count = number,
+                                     bin_min = weight_bin_min,
+                                     bin_max = weight_bin_max)
+
+dat_for_mlebins_pre
+xx <- table(table(dat_for_mlebins_pre$bin_min))
+xx
+
+dat_for_mlebins <- dplyr::summarise(dplyr::group_by(dat_for_mlebins_pre,
+                                                    species,
+                                                    bin_min,
+                                                    bin_max),    # not needed
+                                                      # for grouping but need to retain
+                                    bin_count = sum(bin_count)) %>%
+  dplyr::ungroup()
+
+dat_for_mlebins
+
+expect_equal(sum(xx),             # expected resulting number of rows, based on
+                                  # unique counts
+             nrow(dat_for_mlebins))
+
+
+res_mlebins <- fit_size_spectrum(dat_for_mlebins)
+
+res_mlebins
+```
+
+```{r plotmlebins}
+plot(res_mlebins)   # worked, but hadn't done the groups yet.
+```
+
+This works for calculating xmin:
+
+```{r xminand fit}
+mlebins_fit <- determine_xmin_for_mlebins_and_fit(dat_for_mlebins)
+
+plot.determine_xmin_for_mlebins_and_fit(mlebins_fit, xlim_hist = c(0, 60))
+```
+
+Above can become just plot once functionalise.

@@ -141,6 +141,7 @@ summary(dplyr::select(resnep_temp,
                       NumeroPesca,
                       Talla_mm,
                       FrequenciaCalculada,
+                      AgrupamentTaxonomic,
                       Abundancia_NIndividusTalla_Km2,
                       PesTotalCalculatRelacioTallaPes_g,
                       Biomassa_KgTalla_Km2,
@@ -348,7 +349,11 @@ Take the full data set and then save what we need.
 # Exclude sizes smaller than 12mm, as the net size was 12x12mm, we assume organisms <12mm are not well sampled
 
 data_full <- dplyr::filter(resnep_for_length_weight_coefficients,
-                           Talla_mm > 12)
+                           Talla_mm > 12,
+                           !(AgrupamentTaxonomic %in% c("Echinodermata",
+                                                        "Tunicata")))
+                                # Exclude only 21
+                                # and 24 rows for each
 summary(as.factor(data_full$Site))   # Just need these as strata, TBA is baseline for
                                 # the 4051 in 2017:
 nrow(dplyr::filter(data_full, Site == "TBA" & Any == 2017))
@@ -362,18 +367,22 @@ expect_equal(data_full$Abundancia_NIndividusTalla_Km2,
 
 data <- dplyr::select(data_full,
                       Site,
+                      AgrupamentTaxonomic,
                       NomEspecie,
                       Talla_mm,
                       Abundancia_NIndividusTalla_Km2) %>%
   dplyr::mutate_at(vars(Site,
+                        AgrupamentTaxonomic,
                         NomEspecie),
                    factor) %>%
   dplyr::rename(strata = Site,
+                group = AgrupamentTaxonomic,
                 species = NomEspecie,
                 length = Talla_mm,
                 number = Abundancia_NIndividusTalla_Km2)
-# Rename in last bit to give standard general names (applicable to other data
-# sets). TODO need to document what these mean in the help for the data object.
+# Rename in last bit to give standard general names (was thinking maybe applicable to other data
+# sets, but here we still want to think of group as a strata, so maybe don't aim
+# to get too clever and have a function to do everything, let people create a loop). TODO need to document what these mean in the help for the data object.
 
 data
 
@@ -419,6 +428,9 @@ usethis::use_data(mediterranean_data,
 
 
 Combine rows that have the same strata, species, and length.
+NO, had forgot about species groups when first doing this. So need to link this into a function for fitting (but do
+each strata-group combination separately), having
+done the data wrangling.
 ```{r, combinerows}
 # Can see that have two 140s in same strata of same species:
 #   dplyr::filter(mediterranean_data[1:100, ], species == "Lepidorhombus boscii", length == 140)
@@ -429,20 +441,17 @@ Combine rows that have the same strata, species, and length.
 # definitely need to do this. TODO include automatically in a function somehwere.
 # Also mention that this sorts them alphabetically by strata, species, and then
 # length.
-dat <- dplyr::summarise(group_by(mediterranean_data[1:1000, ],
-                                 # Just doing first 100  TODO
-                                 strata,
-                                 species,
-                                 length),
-                        bin_count = sum(number)) %>%
-  dplyr::ungroup()
-dat
+
+# So deferring this to analysis by strata-group
+#dat <- dplyr::summarise(group_by(mediterranean_data[1:1000, ],
+#                                 # Just doing first 100  TODO
+#                                 strata,
+#                                 species,
+#                                 length),
+#                        bin_count = sum(number)) %>%
+#  dplyr::ungroup()
+#dat
 ```
-
-
-HERE (but  - above R code works, haven't run full .Rmd.), though stuff below
-works also.  And the Fung
-example NEXT
 
 Now combine length-weight coefficients and data. Then functionalise it once
 worked out.
@@ -468,13 +477,15 @@ exactly how
 we define the bin, so say 26.13 is 26.125-26.135 for consistency. (Have to
 assume this for `calc_max_of_bin()`.
 
+
+
 ```{r, calcbins}
 dat_bin_breaks <- calc_max_of_bin(dat$length,
                                   bin_widths = c(0.01, 1))
 
 # These are lengths, might want to note that, TODO prob want one big function to
 # generalise, with an input being whether data are lengths or weights, to then
-# automatically pick methods.
+# automatically pick methods. Might get a bit fiddly.
 
 dat <- cbind(dat,
              dat_bin_breaks) %>% tibble::as_tibble() %>%
@@ -549,9 +560,7 @@ This would seem to have the data in the format required for analysis. We would
 actually functionalise some of the above steps, and just require the raw data
 and l-w coefficients.
 
-HERE see above TODOs, check with spreadsheet, though wait for reply.
-
-HERE HERE HERE - redo this when done later HERE's
+HERE HERE HERE - redo this when done later HERE's (maybe done?)
 
 Just want to analyse one strata at a time. Do baseline here then functionalise
 to make a loop. TODO. Or maybe do each in turn to keep track for this example.
@@ -577,20 +586,20 @@ res_mlebins <- fit_size_spectrum(dat_for_mlebins)
 res_mlebins
 ```
 
-HERE HERE HERE Think it's L96 of fit-size-spectrum-mlebins.R
-
-The plot below seemed to work on first plot, but need to dig into code to check it's
-correct. See what I did in sizeSpectra when had to adapt MLEbins code to plot
-MLEbin results. HERE HERE - actually do Fung first to then check figure and
-results match.
-
 ```{r plotmlebins}
-plot(res_mlebins)
+plot(res_mlebins)   # worked, but hadn't done the groups yet.
 ```
 
 ## Functionalising those last calculations
 
-Have length-weight coefficients and data in a standard form.
+MOVING to zabala-data-analysis.Rmd to keep separate from the data wrangling, as
+data is saved in the package.
+
+
+
+
+
+
 
 
 
