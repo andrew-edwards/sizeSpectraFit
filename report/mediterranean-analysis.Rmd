@@ -142,6 +142,8 @@ TODO We also need to investigate the values to use for $x_\text{min}$ and
 $x_\text{max}$ for each group, presumably wanting to keep them consistent
 through time within a group.
 
+USING lots of this as template for zabala-data-analysis.Rmd which does the
+MLEbins method instead.
 
 # Full community (though not going to use)
 

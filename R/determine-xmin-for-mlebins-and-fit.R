@@ -4,7 +4,7 @@
 ##'
 ##' @param dat_for_mlebins tibble of data in the format required for fitting
 ##'   using MLEbins method. TODO
-##' @return list of class `determine_xmin_and_fit` for plotting, containing TODO
+##' @return list of class `determine_xmin_and_fit_mlebins` for plotting, containing TODO
 ##'   see [determine_xmin_and_fit()] also
 ##' @export
 ##' @author Andrew Edwards
@@ -12,10 +12,10 @@
 ##' \dontrun{
 ##'  TODO
 ##' }
-determine_xmin_for_mlebins_and_fit <- function(dat_for_mlebins,
-                                               bin_width = 1,
-                                               bin_start = 0,
-                                               ...){
+determine_xmin_and_fit_mlebins <- function(dat_for_mlebins,
+                                           bin_width = 1,
+                                           bin_start = 0,
+                                           ...){
   # Need to be pragmatic, since have overlapping bins. Since assuming a power
   # law, kind of expect counts to be shifted to the low end of the bin. Use this
   # thought to just create simple histograms of counts based on bin_min values.
@@ -34,7 +34,7 @@ determine_xmin_for_mlebins_and_fit <- function(dat_for_mlebins,
   res <- list(mlebins_fit = mlebins_fit,
               h = hh)
 
-  class(res) <- c("determine_xmin_for_mlebins_and_fit",  # TODO prob simplify
+  class(res) <- c("determine_xmin_and_fit_mlebins",  # TODO prob simplify
                   class(res))
   return(res)
 }

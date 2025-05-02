@@ -18,9 +18,9 @@
 ##' \dontrun{
 ##' See .Rmd
 ##' }
-plot.determine_xmin_for_mlebins_and_fit <- function(res,
-                                                    xlim_hist = NULL,
-                                                    ...){
+plot.determine_xmin_and_fit_mlebins <- function(res,
+                                                xlim_hist = NULL,
+                                                ...){
 
   # Global xlim, might want to add functionality at some point
   #xlim_global <- c(min(unlist(lapply(res, '[[',
@@ -67,7 +67,8 @@ plot.determine_xmin_for_mlebins_and_fit <- function(res,
          ...)
  }
 
-  plot(mlebins_fit$mlebins_fit, log_y_axis = "yes")
+  plot(res$mlebins_fit,
+       log_y_axis = "yes")
   # plot(res$mle_fit)  # TODO this changes for mlebins, could functionalise the
   # hist plot above since needed for all data types
 
