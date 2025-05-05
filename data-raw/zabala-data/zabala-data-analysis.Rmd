@@ -34,7 +34,6 @@ Having saved the data in the package via `zabala-data.Rmd`, do the size spectra
 analyses here. TODO then move this to report or vignette folder.
 
 ## Data
-
 We have data and the length-weight coefficients in a standard form. Had analysed
 in `zabala-data.Rmd` but want to reduce and functionalise those steps here.
 
@@ -85,9 +84,13 @@ dat_joined <- dplyr::left_join(dat_all,
                                by = "species") %>%
   dplyr::mutate(weight_bin_min = alpha * (length_bin_min/10)^beta,
                 weight_bin_max = alpha * (length_bin_max/10)^beta) %>%
-  dplyr::filter(!is.na(alpha))  # remove species with no length-weight
-  # coefficients
-    # Add argument for 10 depending on mm or cm
+  dplyr::filter(!is.na(alpha)) %>%  # remove species with no length-weight
+                                # coefficients
+                                # Add argument for 10 depending on mm or cm
+  dplyr::mutate(strata = recode(strata,
+                                TBA = "baseline",
+                                FG = "fg",
+                                mpa = "ntr")       # lower case and be consistent
 
 dat_joined[1:5, ] %>% a()
 
@@ -137,6 +140,8 @@ res_mlebins <- fit_size_spectrum(dat_for_mlebins)
 res_mlebins
 ```
 
+
+
 ```{r plotmlebins}
 plot(res_mlebins)   # worked, but hadn't done the groups yet.
 ```
@@ -161,8 +166,8 @@ Repeat the above but write a function for it.
 ```{r functionalised}
 
 data_baseline_actin <- mediterranean_for_mlebins(dat_joined,
-                                                 strata == "TBA",
-                                                 group == "Actinopterygii")
+                                                 strata_name = "TBA",
+                                                 group_name = "Actinopterygii")
 
 expect_equal(dat_for_mlebins,
              data_baseline_actin)
@@ -211,6 +216,8 @@ res_crust_baseline$mlebins_fit     # full list includes histogram values, TODO
                                    # could make a print function
 ```
 
+\clearpage
+
 ```{r, crustbaselineplot}
 plot(res_crust_baseline,
      xlim_hist = c(0, 60),
@@ -233,6 +240,8 @@ res_crust_fg <- determine_xmin_and_fit_mlebins(data_crust_fg)
 
 res_crust_fg$mlebins_fit
 ```
+
+\clearpage
 
 ```{r, crustfgplot}
 plot(res_crust_fg,
@@ -257,6 +266,8 @@ res_crust_ntr <- determine_xmin_and_fit_mlebins(data_crust_ntr)
 res_crust_ntr$mlebins_fit
 ```
 
+\clearpage
+
 ```{r, crustntrplot}
 plot(res_crust_ntr,
      xlim_hist = c(0, 60),
@@ -265,16 +276,45 @@ plot(res_crust_ntr,
 
 Now to compare the three strata for Crustacea.
 
-TODO HERE next make a table of the results. See summary-table function, though
-best to make a tibble.
-
 ```{r, crustsumm}
 res_crust_baseline$mlebins_fit$b_mle
 res_crust_fg$mlebins_fit$b_mle
 res_crust_ntr$mlebins_fit$b_mle
 
-#res_crust_summary <-
+add_row_to_summary_table <- function(summary, res, group, strata){
+  rbind(summary,
+        dplyr::tibble("Group" = group,
+                      "Strata" = strata,
+                      "x_min" = res$mlebins_fit$x_min,
+                      "x_max" = res$mlebins_fit$x_max,
+                      "Low b" = res$mlebins_fit$b_conf[1],
+                      "MLE b" = res$mlebins_fit$b_mle,
+                      "High b" = res$mlebins_fit$b_conf[2]))
+}
+
+res_table <- dplyr::tibble()
+res_table <- add_row_to_summary_table(res_table,
+                                      res_crust_baseline,
+                                      "Crustacea",
+                                      "Baseline")
+
+res_table <- add_row_to_summary_table(res_table,
+                                      res_crust_fg,
+                                      "Crustacea",
+                                      "FG")
+res_table <- add_row_to_summary_table(res_table,
+                                      res_crust_ntr,
+                                      "Crustacea",
+                                      "NTR")
 ```
+
+Results combined are:
+
+```{r, rescrusttable}
+knitr::kable(res_table, digits = 2)
+```
+
+
 
 Looks like both steepened, but ntr not as much (though barely). Need to think
 about common xmin though. TODO do that next, once have results summarised. And
