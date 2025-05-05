@@ -103,7 +103,7 @@ to help explain then functionalise and do each in turn.
 
 ```{r, analyse}
 dat_baseline_actin <- dplyr::filter(dat_joined,
-                                    strata == "TBA",
+                                    strata == "baseline",
                                     group == "Actinopterygii")
 
 # Now strip down to just what's needed, just need counts and bin definitions for
@@ -166,7 +166,7 @@ Repeat the above but write a function for it.
 ```{r functionalised}
 
 data_baseline_actin <- mediterranean_for_mlebins(dat_joined,
-                                                 strata_name = "TBA",
+                                                 strata_name = "baseline",
                                                  group_name = "Actinopterygii")
 
 expect_equal(dat_for_mlebins,
@@ -197,6 +197,8 @@ Need to do these manually to check results, and decide on a communal xmin (and
 maybe xmax TODO) for
 each species group.
 
+\clearpage
+
 # Crustacea
 
 Juliana had xmin as 0.4 for FG and 0.3 for NTR; check what it was for
@@ -207,7 +209,7 @@ baseline. But determining explicitly here.
 ```{r, crustbaseline}
 data_crust_baseline <- mediterranean_for_mlebins(dat_joined,
                                                  group_name = "Crustacea",
-                                                 strata_name = "TBA")
+                                                 strata_name = "baseline")
 
 
 res_crust_baseline <- determine_xmin_and_fit_mlebins(data_crust_baseline)
@@ -224,17 +226,12 @@ plot(res_crust_baseline,
      main = "Crustacea baseline")
 ```
 
-
-```{r, tablecrustbaseline, results = "asis"}
-# summary_mle_table(res_crust_baseline)   # HERE won't work now, need a new type
-```
-
 ## Crustacea FG
 
 ```{r, crustfg}
 data_crust_fg <- mediterranean_for_mlebins(dat_joined,
                                            group_name = "Crustacea",
-                                           strata_name = "FG")
+                                           strata_name = "fg")
 
 res_crust_fg <- determine_xmin_and_fit_mlebins(data_crust_fg)
 
@@ -256,10 +253,7 @@ plot(res_crust_fg,
 ```{r, crustntr}
 data_crust_ntr <- mediterranean_for_mlebins(dat_joined,
                                             group_name = "Crustacea",
-                                            strata_name = "MPA")   # TODO change
-                                              # in data wrangling, also do ntr,
-                                              # fg, and baseline. Then simpler
-                                              # when doing find and replace
+                                            strata_name = "ntr")
 
 res_crust_ntr <- determine_xmin_and_fit_mlebins(data_crust_ntr)
 
@@ -292,34 +286,115 @@ add_row_to_summary_table <- function(summary, res, group, strata){
                       "High b" = res$mlebins_fit$b_conf[2]))
 }
 
-res_table <- dplyr::tibble()
-res_table <- add_row_to_summary_table(res_table,
+res_table_crust <- dplyr::tibble()
+res_table_crust <- add_row_to_summary_table(res_table_crust,
                                       res_crust_baseline,
                                       "Crustacea",
                                       "Baseline")
 
-res_table <- add_row_to_summary_table(res_table,
+res_table_crust <- add_row_to_summary_table(res_table_crust,
                                       res_crust_fg,
                                       "Crustacea",
-                                      "FG")
-res_table <- add_row_to_summary_table(res_table,
+                                      "fg")
+res_table_crust <- add_row_to_summary_table(res_table_crust,
                                       res_crust_ntr,
                                       "Crustacea",
-                                      "NTR")
+                                      "ntr")
 ```
 
 Results combined are:
 
 ```{r, rescrusttable}
-knitr::kable(res_table, digits = 2)
+knitr::kable(res_table_crust, digits = 2)
 ```
 
+## Global xmax for Crustacea
 
+So doing the modal approach gave the same xmin for each strata, which is
+great. xmax was set independently, so we should select the globally largest for
+this species group.
 
-Looks like both steepened, but ntr not as much (though barely). Need to think
-about common xmin though. TODO do that next, once have results summarised. And
-confirm that xmin are communal, looks like they are.
+```{r, crustxmax}
+crust_xmax <- max(res_table_crust$x_max)
+crust_xmax
+```
+We know that is for NTR, so redo the other two with this xmax value.
 
+## Crustacea baseline with fixed xmax
+
+```{r, crustbaselinexmax}
+res_crust_baseline_fix_xmax <-
+  determine_xmin_and_fit_mlebins(data_crust_baseline,
+                                 x_max = crust_xmax)
+```
+
+\clearpage
+
+```{r, crustbaselineplotxmax}
+plot(res_crust_baseline_fix_xmax,
+     xlim_hist = c(0, 60),
+     main = "Crustacea baseline")
+```
+
+## Crustacea FG with fixed xmax
+
+```{r, crustfgxmax}
+res_crust_fg_fix_xmax <- determine_xmin_and_fit_mlebins(data_crust_fg,
+                                               x_max = crust_xmax)
+```
+
+\clearpage
+
+```{r, crustfgplotxmax}
+plot(res_crust_fg_fix_xmax,
+     xlim_hist = c(0, 60),
+     main = "Crustacea FG")
+```
+
+## Crustacea NTR figure again (communal xmax, which is based on max in NTR)
+
+```{r, crustbaelinexmax}
+res_crust_ntr_fix_xmax <- res_crust_ntr
+```
+
+```{r, crustntrplotxmax}
+plot(res_crust_ntr,
+     xlim_hist = c(0, 60),
+     main = "Crustacea NTR")
+```
+
+Now to compare the three strata for Crustacea with xmax fixed:
+
+```{r, crustsummfix}
+res_table_crust_fix_xmax <- dplyr::tibble()
+res_table_crust_fix_xmax <- add_row_to_summary_table(res_table_crust_fix_xmax,
+                                      res_crust_baseline_fix_xmax,
+                                      "Crustacea",
+                                      "Baseline")
+
+res_table_crust_fix_xmax <- add_row_to_summary_table(res_table_crust_fix_xmax,
+                                      res_crust_fg_fix_xmax,
+                                      "Crustacea",
+                                      "fg")
+res_table_crust_fix_xmax <- add_row_to_summary_table(res_table_crust_fix_xmax,
+                                      res_crust_ntr,
+                                      "Crustacea",
+                                      "ntr")
+```
+
+Results combined are:
+
+```{r, rescrusttable}
+knitr::kable(res_table_crust_fix_xmax, digits = 2)
+```
+
+So the FG size spectra steepened from the baseline, but the NTR remained
+unchanged.
+
+## Further communities
+
+For each one, copy the above, find and replace relevant community name, but then
+manually determine the xmax.
 
 ```{r, stopagain, cache = FALSE, eval = TRUE}
 knitr::knit_exit()
@@ -329,62 +404,7 @@ knitr::knit_exit()
 
 
 
-## Crustacea FG
 
-```{r, crustichthyesfgold}
-range(x_crust_fg)
-
-res_crust_fg <- fit_size_spectrum(x_crust_fg,
-                                        x_min = x_min_crust,
-                                        x_max = x_max_crust)
-
-plot(res_crust_fg,
-     # xlim_hist = c(0, 20),
-     main = "Crustacea FG")
-
-
-# Increasing bin width here
-res_crust_fg <- determine_xmin_and_fit(x_crust_fg,
-                                           bin_width = 0.2)
-
-plot(res_crust_fg,
-     xlim_hist = c(0, 20),
-     main = "Crustacea FG")
-```
-
-```{r, tablecrustfgold, results = "asis"}
-summary_mle_table(res_crust_fg)
-```
-
-## Crustacea NTR
-
-And for NTR:
-```{r, crustntrold}
-range(x_crust_ntr)
-
-
-res_crust_ntr <- fit_size_spectrum(x_crust_ntr,
-                                        x_min = x_min_crust,
-                                        x_max = x_max_crust)
-
-plot(res_crust_ntr,
-     # xlim_hist = c(0, 20),
-     main = "Crustacea NTR")
-
-
-
-# HERE won't need, as above:
-res_crust_ntr <- determine_xmin_and_fit(x_crust_ntr,
-                                           bin_width = 0.2)
-
-plot(res_crust_ntr,
-     xlim_hist = c(0, 20),
-     main = "Crustacea NTR")
-```
-
-```{r, tablecrustntr, results = "asis"}
-summary_mle_table(res_crust_ntr)
-```
 
 
 
