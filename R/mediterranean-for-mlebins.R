@@ -16,15 +16,23 @@
 ##' }
 mediterranean_for_mlebins <- function(dat,
                                       group_name,
-                                      strata_name){
-# Could write a function for this, probably worth it:
+                                      strata_name,
+                                      minimum_length = NULL){
+
   temp <- dplyr::filter(dat,
                         group == group_name,
-                        strata == strata_name) %>%
-    dplyr::select(species,
-                  bin_count = number,
-                  bin_min = weight_bin_min,
-                  bin_max = weight_bin_max)
+                        strata == strata_name)
+
+  if(!is.null(minimum_length)){
+    temp <- dplyr::filter(temp,
+                          length >= minimum_length)
+  }
+
+  temp <- dplyr::select(temp,
+                        species,
+                        bin_count = number,
+                        bin_min = weight_bin_min,
+                        bin_max = weight_bin_max)
 
   res <- dplyr::summarise(dplyr::group_by(temp,
                                           species,
