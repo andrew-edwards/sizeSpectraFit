@@ -19,12 +19,12 @@ determine_xmin_and_fit_mlebins <- function(dat_for_mlebins,
                                            ...){
   # Need to be pragmatic, since have overlapping bins. Since assuming a power
   # law, kind of expect counts to be shifted to the low end of the bin. Use this
-  # thought to just create simple histograms of counts based on bin_min values.
+  # though to just create simple histograms of counts based on bin_min values.
 
-  # Can just treat the bin_min values as components of a single vector
-  hh <- make_hist(dat_for_mlebins$bin_min,
-                  bin_width = bin_width,
-                  bin_start = bin_start)
+  # Can't just treat the bin_min values as components of a single vector
+  hh <- make_hist_for_binned_counts(dat_for_mlebins,
+                                    bin_width = bin_width,
+                                    bin_start = bin_start)
 
   if(is.null(x_min)){
     x_min <- determine_xmin(hh)
