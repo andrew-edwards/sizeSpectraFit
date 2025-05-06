@@ -30,8 +30,17 @@ load_all()
 #library(sizeSpectra2)    # Need latest version
 ```
 
+HERE TODO need to have `make_hist()` working for bin counts, not just counting
+the number of binmin values. See `determine_xmin_and_fit_mlebins()` and then
+rerun all this. Have saved previous .pdf.
+
 Having saved the data in the package via `zabala-data.Rmd`, do the size spectra
 analyses here. TODO then move this to report or vignette folder.
+
+Copy and pasting analysis for a particular species group, then just find and
+replacing the group name and the short name. Need to examine results and so
+can't just make one giant function. The later groups are probably best to use as
+templates as the analyses and code got refined along the way.
 
 ## Data
 We have data and the length-weight coefficients in a standard form. Had analysed
@@ -401,7 +410,7 @@ manually determine the xmax.
 
 # Actinopterygii
 
-TODO Juliana removed lengths <100mm.
+Juliana removed lengths <100mm, so doing that here.
 
 ## Actinopterygii baseline
 
@@ -588,157 +597,418 @@ Results combined are:
 knitr::kable(res_table_actin_fix_xmax, digits = 2)
 ```
 
-```{r, stopagain, cache = FALSE, eval = TRUE}
-knitr::knit_exit()
-```
-
-
-
-
-
-
-
-
-
-
-
-
-
-Can delete this, all from x values approach.
-
-
-
-# Full community could maybe do
-
-Showing that we need the stitching together idea later.
-
 
 # Chondrichthyes
 
-TODO Juliana removed lengths <100mm. Should really remove body masses < some
-value. TODO. Look into reasoning.
+Juliana removed lengths <100mm, so doing that here.
 
 ## Chondrichthyes baseline
 
-```{r, chondrichthyesbaseline}
-range(x_chondr_baseline)
+```{r, chondrbaseline}
+data_chondr_baseline <- mediterranean_for_mlebins(dat_joined,
+                                                 group_name = "Chondrichthyes",
+                                                 strata_name = "baseline",
+                                                 minimum_length = 100)
 
-# Use 0.2 as looked good for full Community. Probably want to be consistent
-# across everything.
 
-res_chondr_baseline <- determine_xmin_and_fit(x_chondr_baseline,
-                                              bin_width = 0.2)
+res_chondr_baseline <- determine_xmin_and_fit_mlebins(data_chondr_baseline)
 
-plot(res_chondr_baseline,
-     xlim_hist = c(0, 20),
-     main = "Chondrichthyes baseline")
+res_chondr_baseline$mlebins_fit
 ```
 
-```{r, tablechondrbaseline, results = "asis"}
-summary_mle_table(res_chondr_baseline)
+\clearpage
+
+```{r, chondrbaselineplot}
+plot(res_chondr_baseline,
+     xlim_hist = c(0, 60),
+     main = "Chondrichthyes baseline")
 ```
 
 ## Chondrichthyes FG
 
-This isn't great, shows need for communal xmin.
+```{r, chondrfg}
+data_chondr_fg <- mediterranean_for_mlebins(dat_joined,
+                                           group_name = "Chondrichthyes",
+                                           strata_name = "fg",
+                                           minimum_length = 100)
 
-```{r, chondrichthyesfg}
-range(x_chondr_fg)
+res_chondr_fg <- determine_xmin_and_fit_mlebins(data_chondr_fg)
 
-# Increasing bin width here
-res_chondr_fg <- determine_xmin_and_fit(x_chondr_fg,
-                                           bin_width = 5)
+res_chondr_fg$mlebins_fit
+```
 
+\clearpage
+
+```{r, chondrfgplot}
 plot(res_chondr_fg,
-     xlim_hist = c(0, 20),
+     xlim_hist = c(0, 60),
      main = "Chondrichthyes FG")
 ```
 
-```{r, tablechondrfg, results = "asis"}
-summary_mle_table(res_chondr_fg)
-```
+
 
 ## Chondrichthyes NTR
 
-And for NTR:
-```{r, chondrichthyesntr}
-range(x_chondr_ntr)
+```{r, chondrntr}
+data_chondr_ntr <- mediterranean_for_mlebins(dat_joined,
+                                            group_name = "Chondrichthyes",
+                                            strata_name = "ntr",
+                                            minimum_length = 100)
 
-res_chondr_ntr <- determine_xmin_and_fit(x_chondr_ntr,
-                                           bin_width = 0.2)
+res_chondr_ntr <- determine_xmin_and_fit_mlebins(data_chondr_ntr)
 
+res_chondr_ntr$mlebins_fit
+```
+
+\clearpage
+
+```{r, chondrntrplot}
 plot(res_chondr_ntr,
-     xlim_hist = c(0, 20),
+     xlim_hist = c(0, 60),
      main = "Chondrichthyes NTR")
 ```
 
-```{r, tablechondrntr, results = "asis"}
-summary_mle_table(res_chondr_ntr)
+Now to compare the three strata for Chondrichthyes.
+
+```{r, chondrsumm}
+res_table_chondr <- dplyr::tibble()
+res_table_chondr <- add_row_to_summary_table(res_table_chondr,
+                                      res_chondr_baseline,
+                                      "Chondrichthyes",
+                                      "Baseline")
+
+res_table_chondr <- add_row_to_summary_table(res_table_chondr,
+                                      res_chondr_fg,
+                                      "Chondrichthyes",
+                                      "fg")
+res_table_chondr <- add_row_to_summary_table(res_table_chondr,
+                                      res_chondr_ntr,
+                                      "Chondrichthyes",
+                                      "ntr")
+```
+
+Results combined are:
+
+```{r, reschondrtable}
+knitr::kable(res_table_chondr, digits = 2)
 ```
 
 
-# Cephalopoda -- All
 
-These results show clearly why Juliana then split up into small and large. Not
-digging into results too much here then.
+## Global xmax for Chondrichthyes
 
-Juliana had xmin of 2 and xmax 200. See what the mode method gives first:
+So doing the modal approach gave different xmin between baseline and other two;
+should go with the largest of those. Though might give quite shallow power law
+for baseline.
 
-## Cephalopoda all baseline
+Alternative is to use xmin for the aggregated data, TODO try that also.
 
-```{r, cephbaseline}
-range(x_ceph_all_baseline)
+xmax was set independently, so we should select the globally largest for
+this species group.
 
-# Use 0.2 as looked good for full Community. Probably want to be consistent
-# across everything.
-
-res_ceph_all_baseline <- determine_xmin_and_fit(x_ceph_all_baseline,
-                                                bin_width = 0.2)
-
-plot(res_ceph_all_baseline,
-     xlim_hist = c(0, 20),
-     main = "Cephalopoda all baseline")
+```{r, chondrxmax}
+chondr_xmin <- max(res_table_chondr$x_min)
+chondr_xmin
+chondr_xmax <- max(res_table_chondr$x_max)
+chondr_xmax
 ```
 
-```{r, tablecephallbaseline, results = "asis"}
-summary_mle_table(res_ceph_all_baseline)
+## Chondrichthyes baseline with fixed xmin and xmax
+
+```{r, chondrbaselinexmax}
+res_chondr_baseline_fix_xmax <-
+  determine_xmin_and_fit_mlebins(data_chondr_baseline,
+                                 x_min = chondr_xmin,
+                                 x_max = chondr_xmax)
 ```
 
-## Cephalopoda all FG
+\clearpage
+
+```{r, chondrbaselineplotxmax}
+plot(res_chondr_baseline_fix_xmax,
+     xlim_hist = c(0, 60),
+     main = "Chondrichthyes baseline")
+```
+
+## Chondrichthyes FG with fixed xmin and xmax
+
+```{r, chondrfgxmax}
+res_chondr_fg_fix_xmax <- determine_xmin_and_fit_mlebins(data_chondr_fg,
+                                                        x_min = chondr_xmin,
+                                                        x_max = chondr_xmax)
+```
+
+\clearpage
+
+```{r, chondrfgplotxmax}
+plot(res_chondr_fg_fix_xmax,
+     xlim_hist = c(0, 60),
+     main = "Chondrichthyes FG")
+```
+
+## Chondrichthyes NTR with fixed xmin and xmax
+
+TODO need to recompuate is xmin and
+```{r, chondrbaelinexmax}
+res_chondr_ntr_fix_xmax <- determine_xmin_and_fit_mlebins(data_chondr_ntr,
+                                                         x_min = chondr_xmin,
+                                                         x_max = chondr_xmax)
+```
+
+```{r, chondrntrplotxmax}
+plot(res_chondr_ntr,
+     xlim_hist = c(0, 60),
+     main = "Chondrichthyes NTR")
+```
+
+Now to compare the three strata for Chondrichthyes with xmax fixed:
+
+```{r, chondrsummfix}
+res_table_chondr_fix_xmax <- dplyr::tibble()
+res_table_chondr_fix_xmax <- add_row_to_summary_table(res_table_chondr_fix_xmax,
+                                      res_chondr_baseline_fix_xmax,
+                                      "Chondrichthyes",
+                                      "Baseline")
+
+res_table_chondr_fix_xmax <- add_row_to_summary_table(res_table_chondr_fix_xmax,
+                                      res_chondr_fg_fix_xmax,
+                                      "Chondrichthyes",
+                                      "fg")
+res_table_chondr_fix_xmax <- add_row_to_summary_table(res_table_chondr_fix_xmax,
+                                      res_chondr_ntr_fix_xmax,
+                                      "Chondrichthyes",
+                                      "ntr")
+```
+
+Results combined are:
+
+```{r, reschondrtablexmax}
+knitr::kable(res_table_chondr_fix_xmax, digits = 2)
+```
+
+
+HERE
+
+# Cephalopoda (all)
+
+Juliana had xmin of 2 and xmax 200 (TODO check if lengths or weights). For
+consistency we should first analyse the full data in one go first. Results for
+MLE (not MLEbins) clearly showed the need to split up.
+
+Small was body weights $<10$ and large was $>10$. First do all together; expect
+it will show up the natural disconnect.
+
+## Cephalopoda (all) baseline
+
+```{r, cephallbaseline}
+data_cephall_baseline <- mediterranean_for_mlebins(dat_joined,
+                                                   group_name = "Cephalopoda",
+                                                   strata_name = "baseline")
+
+res_cephall_baseline <- determine_xmin_and_fit_mlebins(data_cephall_baseline)
+
+res_cephall_baseline$mlebins_fit
+```
+
+\clearpage
+
+```{r, cephallbaselineplot}
+plot(res_cephall_baseline,
+     xlim_hist = c(0, 60),
+     main = "Cephalopoda (all) baseline")
+```
+
+## Cephalopoda (all) FG
 
 ```{r, cephallfg}
-range(x_ceph_all_fg)
+data_cephall_fg <- mediterranean_for_mlebins(dat_joined,
+                                             group_name = "Cephalopoda",
+                                             strata_name = "fg")
 
-# Increasing bin width here
-res_ceph_all_fg <- determine_xmin_and_fit(x_ceph_all_fg,
-                                           bin_width = 0.2)
+res_cephall_fg <- determine_xmin_and_fit_mlebins(data_cephall_fg)
 
-plot(res_ceph_all_fg,
-     xlim_hist = c(0, 20),
-     main = "Cephalopoda all FG")
+res_cephall_fg$mlebins_fit
 ```
 
-```{r, tablecephallfg, results = "asis"}
-summary_mle_table(res_ceph_all_fg)
+\clearpage
+
+```{r, cephallfgplot}
+plot(res_cephall_fg,
+     xlim_hist = c(0, 60),
+     main = "Cephalopoda (all) FG")
 ```
 
-## Cephalopoda all NTR
 
-And for NTR:
+
+## Cephalopoda (all) NTR
+
 ```{r, cephallntr}
-range(x_ceph_all_ntr)
+data_cephall_ntr <- mediterranean_for_mlebins(dat_joined,
+                                            group_name = "Cephalopoda",
+                                            strata_name = "ntr")
 
-res_ceph_all_ntr <- determine_xmin_and_fit(x_ceph_all_ntr,
-                                           bin_width = 0.2)
+res_cephall_ntr <- determine_xmin_and_fit_mlebins(data_cephall_ntr)
 
-plot(res_ceph_all_ntr,
-     xlim_hist = c(0, 20),
-     main = "Cephalopoda all NTR")
+res_cephall_ntr$mlebins_fit
 ```
 
-```{r, tablecephallntr, results = "asis"}
-summary_mle_table(res_ceph_all_ntr)
+\clearpage
+
+```{r, cephallntrplot}
+plot(res_cephall_ntr,
+     xlim_hist = c(0, 60),
+     main = "Cephalopoda (all) NTR")
 ```
+
+Now to compare the three strata for Cephalopoda (all).
+
+```{r, cephallsumm}
+res_table_cephall <- dplyr::tibble()
+res_table_cephall <- add_row_to_summary_table(res_table_cephall,
+                                      res_cephall_baseline,
+                                      "Cephalopoda",
+                                      "Baseline")
+
+res_table_cephall <- add_row_to_summary_table(res_table_cephall,
+                                      res_cephall_fg,
+                                      "Cephalopoda",
+                                      "fg")
+res_table_cephall <- add_row_to_summary_table(res_table_cephall,
+                                      res_cephall_ntr,
+                                      "Cephalopoda",
+                                      "ntr")
+```
+
+Results combined are:
+
+```{r, rescephalltable}
+knitr::kable(res_table_cephall, digits = 2)
+```
+
+
+
+## Global xmax for Cephalopoda (all)
+
+So doing the modal approach gave different xmin between baseline and other two;
+should go with the largest of those. Though might give quite shallow power law
+for baseline.
+
+Alternative is to use xmin for the aggregated data, TODO try that also.
+
+xmax was set independently, so we should select the globally largest for
+this species group.
+
+```{r, cephallxmax}
+cephall_xmin <- max(res_table_cephall$x_min)
+cephall_xmin
+cephall_xmax <- max(res_table_cephall$x_max)
+cephall_xmax
+```
+
+## Cephalopoda (all) baseline with fixed xmin and xmax
+
+```{r, cephallbaselinexmax}
+res_cephall_baseline_fix_xmax <-
+  determine_xmin_and_fit_mlebins(data_cephall_baseline,
+                                 x_min = cephall_xmin,
+                                 x_max = cephall_xmax)
+```
+
+\clearpage
+
+```{r, cephallbaselineplotxmax}
+plot(res_cephall_baseline_fix_xmax,
+     xlim_hist = c(0, 60),
+     main = "Cephalopoda (all) baseline")
+```
+
+## Cephalopoda (all) FG with fixed xmin and xmax
+
+```{r, cephallfgxmax}
+res_cephall_fg_fix_xmax <- determine_xmin_and_fit_mlebins(data_cephall_fg,
+                                                        x_min = cephall_xmin,
+                                                        x_max = cephall_xmax)
+```
+
+\clearpage
+
+```{r, cephallfgplotxmax}
+plot(res_cephall_fg_fix_xmax,
+     xlim_hist = c(0, 60),
+     main = "Cephalopoda (all) FG")
+```
+
+## Cephalopoda (all) NTR with fixed xmin and xmax
+
+TODO need to recompuate is xmin and
+```{r, cephallbaelinexmax}
+res_cephall_ntr_fix_xmax <- determine_xmin_and_fit_mlebins(data_cephall_ntr,
+                                                         x_min = cephall_xmin,
+                                                         x_max = cephall_xmax)
+```
+
+```{r, cephallntrplotxmax}
+plot(res_cephall_ntr,
+     xlim_hist = c(0, 60),
+     main = "Cephalopoda (all) NTR")
+```
+
+Now to compare the three strata for Cephalopoda (all) with xmax fixed:
+
+```{r, cephallsummfix}
+res_table_cephall_fix_xmax <- dplyr::tibble()
+res_table_cephall_fix_xmax <- add_row_to_summary_table(res_table_cephall_fix_xmax,
+                                      res_cephall_baseline_fix_xmax,
+                                      "Cephalopoda",
+                                      "Baseline")
+
+res_table_cephall_fix_xmax <- add_row_to_summary_table(res_table_cephall_fix_xmax,
+                                      res_cephall_fg_fix_xmax,
+                                      "Cephalopoda",
+                                      "fg")
+res_table_cephall_fix_xmax <- add_row_to_summary_table(res_table_cephall_fix_xmax,
+                                      res_cephall_ntr_fix_xmax,
+                                      "Cephalopoda",
+                                      "ntr")
+```
+
+Results combined are:
+
+```{r, rescephalltablexmax}
+knitr::kable(res_table_cephall_fix_xmax, digits = 2)
+```
+
+
+TODO then repeat the above for small and large separately, if those results
+warrant it. The first baseline plot suggests a natural break, explicitly at
+20.89, with fg and ntr saying maybe something similar; 24 might be a sensible
+consistent way of breaking up the data.
+```{r, cephallbaselinebreak}
+dplyr::arrange(data_cephall_baseline, bin_min) %>% a()
+
+dplyr::arrange(data_cephall_fg, bin_min) %>% a()
+
+dplyr::arrange(data_cephall_ntr, bin_min) %>% a()
+
+
+
+
+
+
+```{r, stopagain, cache = FALSE, eval = TRUE}
+knitr::knit_exit()
+```
+
+# Full community could maybe do
+
+TODO Showing that we need the stitching together idea later.
+
+
+Can delete this once used any info when copying to above, all from x values approach:
+
+
+
+
 
 # Cephalopoda -- Large
 
