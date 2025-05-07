@@ -40,7 +40,7 @@ plot_isd_binned <- function(res_mlebin,
                             y_plb_conf_max,
                             plot_conf_ints = TRUE,
                             xlab = expression(paste("Values, ", italic(x))),
-                            ylab = expression( paste("Number of ", values >= x),
+                            ylab = expression( paste("Total ", counts >= x),
                                               sep=""),  # Figure out how to do
                                                 # it as optional but feed through.
                             mgp_val = c(1.6, 0.5, 0),

@@ -30,10 +30,6 @@ load_all()
 #library(sizeSpectra2)    # Need latest version
 ```
 
-HERE TODO need to have `make_hist()` working for bin counts, not just counting
-the number of binmin values. See `determine_xmin_and_fit_mlebins()` and then
-rerun all this. Have saved previous .pdf.
-
 Having saved the data in the package via `zabala-data.Rmd`, do the size spectra
 analyses here. TODO then move this to report or vignette folder.
 
@@ -319,23 +315,27 @@ Results combined are:
 knitr::kable(res_table_crust, digits = 2)
 ```
 
-## Global xmax for Crustacea
+## Global xmin and xmax for Crustacea
 
 So doing the modal approach gave the same xmin for each strata, which is
 great. xmax was set independently, so we should select the globally largest for
 this species group.
 
 ```{r, crustxmax}
+crust_xmin <- max(res_table_crust$x_min)
+crust_xmin
+
 crust_xmax <- max(res_table_crust$x_max)
 crust_xmax
 ```
 We know that is for NTR, so redo the other two with this xmax value.
 
-## Crustacea baseline with fixed xmax
+## Crustacea baseline with fixed xmin and xmax
 
 ```{r, crustbaselinexmax}
 res_crust_baseline_fix_xmax <-
   determine_xmin_and_fit_mlebins(data_crust_baseline,
+                                 x_min = crust_xmin,
                                  x_max = crust_xmax)
 ```
 
@@ -347,10 +347,11 @@ plot(res_crust_baseline_fix_xmax,
      main = "Crustacea baseline")
 ```
 
-## Crustacea FG with fixed xmax
+## Crustacea FG with fixed xmin and xmax
 
 ```{r, crustfgxmax}
 res_crust_fg_fix_xmax <- determine_xmin_and_fit_mlebins(data_crust_fg,
+                                                        x_min = crust_xmin,
                                                         x_max = crust_xmax)
 ```
 
@@ -362,14 +363,16 @@ plot(res_crust_fg_fix_xmax,
      main = "Crustacea FG")
 ```
 
-## Crustacea NTR figure again (communal xmax, which is based on max in NTR)
+## Crustacea NTR with fixed xmin and xmax
 
 ```{r, crustbaelinexmax}
-res_crust_ntr_fix_xmax <- res_crust_ntr
+res_crust_ntr_fix_xmax <- determine_xmin_and_fit_mlebins(data_crust_ntr,
+                                                         x_min = crust_xmin,
+                                                         x_max = crust_xmax)
 ```
 
 ```{r, crustntrplotxmax}
-plot(res_crust_ntr,
+plot(res_crust_ntr_fix_xmax,
      xlim_hist = c(0, 60),
      main = "Crustacea NTR")
 ```
@@ -506,7 +509,7 @@ knitr::kable(res_table_actin, digits = 2)
 
 
 
-## Global xmax for Actinopterygii
+## Global xmin and xmax for Actinopterygii
 
 So doing the modal approach gave different xmin between baseline and other two;
 should go with the largest of those. Though might give quite shallow power law
@@ -620,7 +623,7 @@ res_chondr_baseline$mlebins_fit
 
 ```{r, chondrbaselineplot}
 plot(res_chondr_baseline,
-     xlim_hist = c(0, 60),
+     xlim_hist = c(0, 300),
      main = "Chondrichthyes baseline")
 ```
 
@@ -641,7 +644,7 @@ res_chondr_fg$mlebins_fit
 
 ```{r, chondrfgplot}
 plot(res_chondr_fg,
-     xlim_hist = c(0, 60),
+     xlim_hist = c(0, 300),
      main = "Chondrichthyes FG")
 ```
 
@@ -664,7 +667,7 @@ res_chondr_ntr$mlebins_fit
 
 ```{r, chondrntrplot}
 plot(res_chondr_ntr,
-     xlim_hist = c(0, 60),
+     xlim_hist = c(0, 300),
      main = "Chondrichthyes NTR")
 ```
 
@@ -695,7 +698,7 @@ knitr::kable(res_table_chondr, digits = 2)
 
 
 
-## Global xmax for Chondrichthyes
+## Global xmin and xmax for Chondrichthyes
 
 So doing the modal approach gave different xmin between baseline and other two;
 should go with the largest of those. Though might give quite shallow power law
@@ -726,7 +729,7 @@ res_chondr_baseline_fix_xmax <-
 
 ```{r, chondrbaselineplotxmax}
 plot(res_chondr_baseline_fix_xmax,
-     xlim_hist = c(0, 60),
+     xlim_hist = c(0, 300),
      main = "Chondrichthyes baseline")
 ```
 
@@ -742,13 +745,12 @@ res_chondr_fg_fix_xmax <- determine_xmin_and_fit_mlebins(data_chondr_fg,
 
 ```{r, chondrfgplotxmax}
 plot(res_chondr_fg_fix_xmax,
-     xlim_hist = c(0, 60),
+     xlim_hist = c(0, 300),
      main = "Chondrichthyes FG")
 ```
 
 ## Chondrichthyes NTR with fixed xmin and xmax
 
-TODO need to recompuate is xmin and
 ```{r, chondrbaelinexmax}
 res_chondr_ntr_fix_xmax <- determine_xmin_and_fit_mlebins(data_chondr_ntr,
                                                          x_min = chondr_xmin,
@@ -756,8 +758,8 @@ res_chondr_ntr_fix_xmax <- determine_xmin_and_fit_mlebins(data_chondr_ntr,
 ```
 
 ```{r, chondrntrplotxmax}
-plot(res_chondr_ntr,
-     xlim_hist = c(0, 60),
+plot(res_chondr_ntr_fix_xmax,
+     xlim_hist = c(0, 300),
      main = "Chondrichthyes NTR")
 ```
 
@@ -787,7 +789,130 @@ knitr::kable(res_table_chondr_fix_xmax, digits = 2)
 ```
 
 
-HERE
+
+## Global xmin and xmax for Chondrichthyes -- try higher bin width for xmin since xmin came out very high and data span a huge range
+
+Just do the xmin calculations and plots, then use those to determine
+xmin. Don't really help though. But the above-calculated xmin is not
+helpful. TODO Ask Juliana about the data.
+
+```{r, chondrlargerbinwidth}
+h_chondr_baseline <- make_hist_for_binned_counts(data_chondr_baseline,
+                                                 bin_width = 10,
+                                                 bin_start = 0)
+x_min_chondr_baseline <- determine_xmin(h_chondr_baseline)
+
+x_min_chondr_baseline
+
+plot(h_chondr_baseline)   # Just doesn't have the colours
+
+# fg
+
+h_chondr_fg <- make_hist_for_binned_counts(data_chondr_fg,
+                                                 bin_width = 10,
+                                                 bin_start = 0)
+x_min_chondr_fg <- determine_xmin(h_chondr_fg)
+
+x_min_chondr_fg
+
+plot(h_chondr_fg)   # Just doesn't have the colours
+
+# ntr
+
+h_chondr_ntr <- make_hist_for_binned_counts(data_chondr_ntr,
+                                                 bin_width = 10,
+                                                 bin_start = 0)
+x_min_chondr_ntr <- determine_xmin(h_chondr_ntr)
+
+x_min_chondr_ntr
+
+plot(h_chondr_ntr)   # Just doesn't have the colours
+```
+
+## Global xmin and xmax for Chondrichthyes -- try basing on baseline, which had a very clear xmin
+
+If the large individuals are now showing up in NTR in relatively higher numbers,
+it's a bit inconsistent to use that as the starting point for xmin.
+
+```{r, chondrxmax2}
+chondr_xmin2 <- dplyr::filter(res_table_chondr, Strata == "Baseline")$x_min
+chondr_xmin2
+chondr_xmax    # same
+```
+
+Appending results and code chunk names with 2.
+
+## Chondrichthyes baseline with fixed xmin and xmax
+
+```{r, chondrbaselinexmax2}
+res_chondr_baseline_fix_xmax2 <-
+  determine_xmin_and_fit_mlebins(data_chondr_baseline,
+                                 x_min = chondr_xmin2,
+                                 x_max = chondr_xmax)
+```
+
+\clearpage
+
+```{r, chondrbaselineplotxmax2}
+plot(res_chondr_baseline_fix_xmax2,
+     xlim_hist = c(0, 300),
+     main = "Chondrichthyes baseline")
+```
+
+## Chondrichthyes FG with fixed xmin and xmax
+
+```{r, chondrfgxmax2}
+res_chondr_fg_fix_xmax2 <- determine_xmin_and_fit_mlebins(data_chondr_fg,
+                                                          x_min = chondr_xmin2,
+                                                          x_max = chondr_xmax)
+```
+
+\clearpage
+
+```{r, chondrfgplotxmax2}
+plot(res_chondr_fg_fix_xmax2,
+     xlim_hist = c(0, 300),
+     main = "Chondrichthyes FG")
+```
+
+## Chondrichthyes NTR with fixed xmin and xmax
+
+```{r, chondrbaelinexmax2}
+res_chondr_ntr_fix_xmax2 <- determine_xmin_and_fit_mlebins(data_chondr_ntr,
+                                                           x_min = chondr_xmin2,
+                                                           x_max = chondr_xmax)
+```
+
+```{r, chondrntrplotxmax2}
+plot(res_chondr_ntr_fix_xmax2,
+     xlim_hist = c(0, 300),
+     main = "Chondrichthyes NTR")
+```
+
+Now to compare the three strata for Chondrichthyes with xmin2 and xmax fixed:
+
+```{r, chondrsummfix2}
+res_table_chondr_fix_xmax2 <- dplyr::tibble()
+res_table_chondr_fix_xmax2 <- add_row_to_summary_table(res_table_chondr_fix_xmax2,
+                                      res_chondr_baseline_fix_xmax2,
+                                      "Chondrichthyes",
+                                      "Baseline")
+
+res_table_chondr_fix_xmax2 <- add_row_to_summary_table(res_table_chondr_fix_xmax2,
+                                      res_chondr_fg_fix_xmax2,
+                                      "Chondrichthyes",
+                                      "fg")
+res_table_chondr_fix_xmax2 <- add_row_to_summary_table(res_table_chondr_fix_xmax2,
+                                      res_chondr_ntr_fix_xmax2,
+                                      "Chondrichthyes",
+                                      "ntr")
+```
+
+Results combined are:
+
+```{r, reschondrtablexmax2}
+knitr::kable(res_table_chondr_fix_xmax2, digits = 2)
+```
 
 # Cephalopoda (all)
 
@@ -887,7 +1012,7 @@ knitr::kable(res_table_cephall, digits = 2)
 
 
 
-## Global xmax for Cephalopoda (all)
+## Global xmin and xmax for Cephalopoda (all)
 
 So doing the modal approach gave different xmin between baseline and other two;
 should go with the largest of those. Though might give quite shallow power law
@@ -948,7 +1073,7 @@ res_cephall_ntr_fix_xmax <- determine_xmin_and_fit_mlebins(data_cephall_ntr,
 ```
 
 ```{r, cephallntrplotxmax}
-plot(res_cephall_ntr,
+plot(res_cephall_ntr_fix_xmax,
      xlim_hist = c(0, 60),
      main = "Cephalopoda (all) NTR")
 ```
@@ -978,17 +1103,227 @@ Results combined are:
 knitr::kable(res_table_cephall_fix_xmax, digits = 2)
 ```
 
+## Determine cephalopod small/large cutoff
 
-TODO then repeat the above for small and large separately, if those results
+Now repeat the above for small and large separately, if those results
 warrant it. The first baseline plot suggests a natural break, explicitly at
-20.89, with fg and ntr saying maybe something similar; 24 might be a sensible
-consistent way of breaking up the data.
+20.89, with fg and ntr saying maybe something similar. 24 might be a sensible
+consistent way of breaking up the data, but 20.89 seems more
+obvious and occurs for all (so makes sense to use it for xmin).
+Specifically 20.892555.... Here are all the data:
+
 ```{r, cephallbaselinebreak}
 dplyr::arrange(data_cephall_baseline, bin_min) %>% a()
 
 dplyr::arrange(data_cephall_fg, bin_min) %>% a()
 
 dplyr::arrange(data_cephall_ntr, bin_min) %>% a()
+
+# And the rows in each for that xmin suggestion are:
+ceph_big_min <- dplyr::filter(data_cephall_baseline,
+                              species == "Illex coindetii",
+                              bin_min > 20,
+                              bin_min < 21)$bin_min  # to get the exact value
+
+dplyr::filter(data_cephall_baseline,
+              species == "Illex coindetii",
+              bin_min == ceph_big_min)
+dplyr::filter(data_cephall_fg,
+              species == "Illex coindetii",
+              bin_min == ceph_big_min)
+dplyr::filter(data_cephall_ntr,
+              species == "Illex coindetii",
+              bin_min == ceph_big_min)
+```
+
+Okay, use that for delineating small/big organisms. Make the xmax for small ones
+a little less than that to ensure the cutoff is correct.
+
+
+## Global xmin and xmax for Cephalopoda (small)
+
+
+```{r, cephsmallxmax}
+cephsmall_xmin <- max(res_table_cephall$x_min)
+cephsmall_xmin
+cephsmall_xmax <- floor(ceph_big_min*100)/100   # rounding down to 0.01
+cephsmall_xmax
+```
+
+## Cephalopoda (small) baseline with fixed xmin and xmax
+
+```{r, cephsmallbaselinexmax}
+data_cephsmall_baseline <- dplyr::filter(data_cephall_baseline,
+                                         bin_min < cephsmall_xmax)
+res_cephsmall_baseline_fix_xmax <-
+  determine_xmin_and_fit_mlebins(data_cephsmall_baseline,
+                                 x_min = cephsmall_xmin,
+                                 x_max = cephsmall_xmax)
+```
+
+\clearpage
+
+```{r, cephsmallbaselineplotxmax}
+plot(res_cephsmall_baseline_fix_xmax,
+     xlim_hist = c(0, 21),
+     main = "Cephalopoda (small) baseline")
+```
+
+## Cephalopoda (small) FG with fixed xmin and xmax
+
+```{r, cephsmallfgxmax}
+data_cephsmall_fg <- dplyr::filter(data_cephall_fg,
+                                   bin_min < cephsmall_xmax)
+
+res_cephsmall_fg_fix_xmax <- determine_xmin_and_fit_mlebins(data_cephsmall_fg,
+                                                            x_min = cephsmall_xmin,
+                                                            x_max = cephsmall_xmax)
+```
+
+\clearpage
+
+```{r, cephsmallfgplotxmax}
+plot(res_cephsmall_fg_fix_xmax,
+     xlim_hist = c(0, 21),
+     main = "Cephalopoda (small) FG")
+```
+
+## Cephalopoda (small) NTR with fixed xmin and xmax
+
+```{r, cephsmallbaelinexmax}
+data_cephsmall_ntr <- dplyr::filter(data_cephall_ntr,
+                                    bin_min < cephsmall_xmax)
+
+res_cephsmall_ntr_fix_xmax <- determine_xmin_and_fit_mlebins(data_cephsmall_ntr,
+                                                             x_min = cephsmall_xmin,
+                                                             x_max = cephsmall_xmax)
+```
+
+```{r, cephsmallntrplotxmax}
+plot(res_cephsmall_ntr_fix_xmax,
+     xlim_hist = c(0, 21),
+     main = "Cephalopoda (small) NTR")
+```
+
+Now to compare the three strata for Cephalopoda (small) with common xmin and
+xmax:
+
+```{r, cephsmallsummfix}
+res_table_cephsmall_fix_xmax <- dplyr::tibble()
+res_table_cephsmall_fix_xmax <- add_row_to_summary_table(res_table_cephsmall_fix_xmax,
+                                      res_cephsmall_baseline_fix_xmax,
+                                      "Cephalopoda",
+                                      "Baseline")
+
+res_table_cephsmall_fix_xmax <- add_row_to_summary_table(res_table_cephsmall_fix_xmax,
+                                      res_cephsmall_fg_fix_xmax,
+                                      "Cephalopoda",
+                                      "fg")
+res_table_cephsmall_fix_xmax <- add_row_to_summary_table(res_table_cephsmall_fix_xmax,
+                                      res_cephsmall_ntr_fix_xmax,
+                                      "Cephalopoda",
+                                      "ntr")
+```
+
+Results combined are:
+
+```{r, rescephsmalltablexmax}
+knitr::kable(res_table_cephsmall_fix_xmax, digits = 2)
+```
+
+## Global xmin and xmax for Cephalopoda (large)
+
+
+HERE copied code not checked results through. RERUN next.
+
+```{r, cephlargexmax}
+cephlarge_xmin <- ceph_big_min
+cephlarge_xmin
+cephlarge_xmax <- cephall_xmax
+cephlarge_xmax
+```
+
+## Cephalopoda (large) baseline with fixed xmin and xmax
+
+```{r, cephlargebaselinexmax}
+data_cephlarge_baseline <- dplyr::filter(data_cephall_baseline,
+                                         bin_min > cephsmall_xmax)
+res_cephlarge_baseline_fix_xmax <-
+  determine_xmin_and_fit_mlebins(data_cephlarge_baseline,
+                                 x_min = cephlarge_xmin,
+                                 x_max = cephlarge_xmax)
+```
+
+\clearpage
+
+```{r, cephlargebaselineplotxmax}
+plot(res_cephlarge_baseline_fix_xmax,
+     xlim_hist = c(0, 60),
+     main = "Cephalopoda (large) baseline")
+```
+
+## Cephalopoda (large) FG with fixed xmin and xmax
+
+```{r, cephlargefgxmax}
+data_cephlarge_fg <- dplyr::filter(data_cephall_fg,
+                                   bin_min > cephsmall_xmax)
+
+res_cephlarge_fg_fix_xmax <- determine_xmin_and_fit_mlebins(data_cephlarge_fg,
+                                                            x_min = cephlarge_xmin,
+                                                            x_max = cephlarge_xmax)
+```
+
+\clearpage
+
+```{r, cephlargefgplotxmax}
+plot(res_cephlarge_fg_fix_xmax,
+     xlim_hist = c(0, 60),
+     main = "Cephalopoda (large) FG")
+```
+
+## Cephalopoda (large) NTR with fixed xmin and xmax
+
+```{r, cephlargebaelinexmax}
+data_cephlarge_ntr <- dplyr::filter(data_cephall_ntr,
+                                    bin_min > cephsmall_xmax)
+
+res_cephlarge_ntr_fix_xmax <- determine_xmin_and_fit_mlebins(data_cephlarge_ntr,
+                                                             x_min = cephlarge_xmin,
+                                                             x_max = cephlarge_xmax)
+```
+
+```{r, cephlargentrplotxmax}
+plot(res_cephlarge_ntr_fix_xmax,
+     xlim_hist = c(0, 60),
+     main = "Cephalopoda (large) NTR")
+```
+
+Now to compare the three strata for Cephalopoda (large) with common xmin and
+xmax:
+
+```{r, cephlargesummfix}
+res_table_cephlarge_fix_xmax <- dplyr::tibble()
+res_table_cephlarge_fix_xmax <- add_row_to_summary_table(res_table_cephlarge_fix_xmax,
+                                      res_cephlarge_baseline_fix_xmax,
+                                      "Cephalopoda",
+                                      "Baseline")
+
+res_table_cephlarge_fix_xmax <- add_row_to_summary_table(res_table_cephlarge_fix_xmax,
+                                      res_cephlarge_fg_fix_xmax,
+                                      "Cephalopoda",
+                                      "fg")
+res_table_cephlarge_fix_xmax <- add_row_to_summary_table(res_table_cephlarge_fix_xmax,
+                                      res_cephlarge_ntr_fix_xmax,
+                                      "Cephalopoda",
+                                      "ntr")
+```
+
+Results combined are:
+
+```{r, rescephlargetablexmax}
+knitr::kable(res_table_cephlarge_fix_xmax, digits = 2)
+```
+
 
 
 

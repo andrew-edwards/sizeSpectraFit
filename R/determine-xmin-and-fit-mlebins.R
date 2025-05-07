@@ -30,6 +30,12 @@ determine_xmin_and_fit_mlebins <- function(dat_for_mlebins,
     x_min <- determine_xmin(hh)
   }
 
+  # Just set x_min to be the minimum value if it comes out as 0. TODO add to
+  #  MLEbin function probably.
+  if(x_min == 0){
+    x_min = min(dat_for_mlebins$bin_min)
+  }
+
   # Not determining x_max separately here so no need to mention it, it gets
   #  passed on in ...
 
