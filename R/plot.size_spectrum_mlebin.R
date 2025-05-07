@@ -51,7 +51,7 @@ plot.size_spectrum_mlebin <- function(res_mlebin,
                                       # panel
                                       # Use the a ones for single also TODO in help
                                       legend_text_a = paste0("b=",
-                                                           signif(res_mlebin$b_mle,
+                                                           round(res_mlebin$b_mle,
                                                                   mle_round)),
                                       legend_text_a_n = paste0("n=",
                                                                round(sum(res_mlebin$data$bin_count))),

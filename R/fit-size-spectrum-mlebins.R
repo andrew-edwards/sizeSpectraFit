@@ -113,7 +113,7 @@ fit_size_spectrum_mlebins <- function(dat,
                             # including low_count etc. Maybe call it something else?
 
   class(res) = c("size_spectrum_mlebins",
-                 class(res))    # TODO decide if can use same plotting code
+                 class(res))
 
   return(res)
 

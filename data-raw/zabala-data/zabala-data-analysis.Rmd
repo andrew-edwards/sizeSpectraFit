@@ -14,7 +14,7 @@ knitr::opts_chunk$set(
   cache_path = "zabala-data-analysis-cache/",
   fig.path = "zabala-data-analysis-figs-cache/",
   fig.width = 7,
-  fig.height = 6
+  fig.height = 9
 )
   # comment = "#>",
 ```
@@ -160,7 +160,7 @@ value for xmin.
 
 This works for calculating xmin:
 
-```{r xminandfit}
+```{r xminandfitplot}
 fit <- determine_xmin_and_fit_mlebins(dat_for_mlebins)
 
 plot(fit, xlim_hist = c(0, 60))
@@ -422,7 +422,7 @@ res_table_crust_fix_xmax <- add_row_to_summary_table(res_table_crust_fix_xmax,
                                       "Crustacea",
                                       "fg")
 res_table_crust_fix_xmax <- add_row_to_summary_table(res_table_crust_fix_xmax,
-                                      res_crust_ntr,
+                                      res_crust_ntr_fix_xmax,
                                       "Crustacea",
                                       "ntr")
 ```
@@ -1271,9 +1271,6 @@ knitr::kable(res_table_cephsmall_fix_xmax, digits = 2)
 
 ## Global xmin and xmax for Cephalopoda (large)
 
-
-HERE copied code not checked results through. RERUN next.
-
 ```{r, cephlargexmax}
 cephlarge_xmin <- ceph_small_large_delineation
 cephlarge_xmin
@@ -1361,3 +1358,75 @@ Results combined are:
 ```{r, rescephlargetablexmax}
 knitr::kable(res_table_cephlarge_fix_xmax, digits = 2)
 ```
+
+# Combining results
+
+
+HERE written this but not tested yet, since main code is still running. Maybe
+should save the required results here and make a new file to do the aggregation
+and the main plots.
+
+For each of baseline, FG, and NTR, can we produce an aggregated plot. Based on
+what I figured out in 'Aggregating size spectra' document. Here just focus on
+developing the code, based somewhat on that and code developed then.
+
+First, let's create a table of the main results from above that we want to move
+forward with. Just from the `res_table_***` objects. Then we'll need the raw
+data from each in turn. Could then functionalise this maybe, but probably best
+to keep explicit and tailored for different applications.
+
+```{r, aggregatetable}
+res_table_agg <- rbind(res_table_crust_fix_xmax,
+                       res_table_actin_fix_xmax,
+                       res_table_chondr_fix_xmax2,
+                       res_table_cephsmall_fix_xmax,
+                       res_table_cephlarge_fix_xmax)
+
+
+knitr::kable(res_table_agg,
+             digits = 2)
+```
+
+
+## Aggregated fit to data
+
+```{r, aggregatefit, eval = FALSE}
+x_min_global <- min(res_table_agg$x_min)
+x_max_global <- max(res_table_agg$x_max)
+
+baseline_agg <- aggregate_mlebins(list(crust = res_crust_baseline_fix_xmax,
+                                       actin = res_actin_baseline_fix_xmax,
+                                       chondr = res_chondr_baseline_fix_xmax2,
+                                       cephsmall = res_cephsmall_baseline_fix_xmax,
+                                       cephlarge = res_cephlarge_baseline_fix_xmax),
+                                  res_table_agg,
+                                  strata = "Baseline")
+
+# They include histograms that we don't need.
+
+
+# Already in res_table_agg: b_vec, n_vec, x_min_vec,
+
+# x_max_vec, for simplicity in plotting.
+# Save as a mlebins_list object, then create plotting function for that.
+
+# Plot all the data (should be the same way as MLEbins plot. So lots of boxes.
+# Could plot the five PLB fits like I did for MLE example.
+# Plot the aggregated fit.
+
+
+```
+
+Now to combine the data, do for each strata in turn.
+
+```{r, aggregatedata}
+```
+
+## Saving what is needed for plots and tables, and doing in zabala-summary.Rmd
+
+This file is very big and takes a while to run (also .pdf keeps hanging).
+
+
+
+TODO Need to summarise those results in a plot of $b$ with confidence
+intervals. Do in next .Rmd.

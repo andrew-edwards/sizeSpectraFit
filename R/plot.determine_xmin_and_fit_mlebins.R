@@ -29,7 +29,7 @@ plot.determine_xmin_and_fit_mlebins <- function(res,
   #                                 "xmax"))[years_indices]))
 
   mai_orig <- par("mai")
-  par(mfrow = c(2,1))
+  par(mfrow = c(3,1))
 
   par(mai = mai_orig)     # TODO (from sizeSpectraHake): think about Since gets reset by ISD_bin_plot(). Should clean
                           # up that function in sizeSpectra.
@@ -66,6 +66,9 @@ plot.determine_xmin_and_fit_mlebins <- function(res,
          xlim = xlim_hist,
          ...)
  }
+
+  plot(res$mlebins_fit,
+       log_y_axis = "no")
 
   plot(res$mlebins_fit,
        log_y_axis = "yes")
