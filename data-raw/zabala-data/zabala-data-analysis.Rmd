@@ -206,6 +206,37 @@ each species group.
 
 \clearpage
 
+
+# Full community
+
+Doing full community just to have a look. Know a priori that this is not
+appropriate because of the different sampling approaches on the different
+groups. Also, the results show clear distinct ranges of data. Just doing for the
+baseline.
+
+## Full Community baseline
+
+```{r, fullbaseline}
+data_full_baseline <- mediterranean_for_mlebins(dat_joined,
+                                                strata_name = "baseline")
+
+res_full_baseline <- determine_xmin_and_fit_mlebins(data_full_baseline)
+
+res_full_baseline$mlebins_fit      # full list includes histogram values,
+                                   # could make a print function TODO
+```
+
+\clearpage
+
+```{r, fullbaselineplot}
+plot(res_full_baseline,
+     xlim_hist = c(0, 60),
+     main = "Full Community baseline")
+```
+
+
+\clearpage
+
 # Crustacea
 
 Juliana had xmin as 0.4 for FG and 0.3 for NTR; check what it was for
@@ -920,8 +951,13 @@ Juliana had xmin of 2 and xmax 200 (TODO check if lengths or weights). For
 consistency we should first analyse the full data in one go first. Results for
 MLE (not MLEbins) clearly showed the need to split up.
 
-Small was body weights $<10$ and large was $>10$. First do all together; expect
-it will show up the natural disconnect.
+Small was body weights $<10$ and large was $>10$. First do all together, with
+xmin and xmax for each and then common xmin and xmax. These clearly show up the
+natural disconnect, motivating the need for doing small and large separately, as
+Juliana had aleady found.
+
+Then we work out the value to split them, and re-analyse small and large
+separately in the usual way.
 
 ## Cephalopoda (all) baseline
 
@@ -991,16 +1027,16 @@ Now to compare the three strata for Cephalopoda (all).
 res_table_cephall <- dplyr::tibble()
 res_table_cephall <- add_row_to_summary_table(res_table_cephall,
                                       res_cephall_baseline,
-                                      "Cephalopoda",
+                                      "Cephalopoda all",
                                       "Baseline")
 
 res_table_cephall <- add_row_to_summary_table(res_table_cephall,
                                       res_cephall_fg,
-                                      "Cephalopoda",
+                                      "Cephalopoda all",
                                       "fg")
 res_table_cephall <- add_row_to_summary_table(res_table_cephall,
                                       res_cephall_ntr,
-                                      "Cephalopoda",
+                                      "Cephalopoda all",
                                       "ntr")
 ```
 
@@ -1065,7 +1101,6 @@ plot(res_cephall_fg_fix_xmax,
 
 ## Cephalopoda (all) NTR with fixed xmin and xmax
 
-TODO need to recompuate is xmin and
 ```{r, cephallbaelinexmax}
 res_cephall_ntr_fix_xmax <- determine_xmin_and_fit_mlebins(data_cephall_ntr,
                                                          x_min = cephall_xmin,
@@ -1084,16 +1119,16 @@ Now to compare the three strata for Cephalopoda (all) with xmax fixed:
 res_table_cephall_fix_xmax <- dplyr::tibble()
 res_table_cephall_fix_xmax <- add_row_to_summary_table(res_table_cephall_fix_xmax,
                                       res_cephall_baseline_fix_xmax,
-                                      "Cephalopoda",
+                                      "Cephalopoda all",
                                       "Baseline")
 
 res_table_cephall_fix_xmax <- add_row_to_summary_table(res_table_cephall_fix_xmax,
                                       res_cephall_fg_fix_xmax,
-                                      "Cephalopoda",
+                                      "Cephalopoda all",
                                       "fg")
 res_table_cephall_fix_xmax <- add_row_to_summary_table(res_table_cephall_fix_xmax,
                                       res_cephall_ntr_fix_xmax,
-                                      "Cephalopoda",
+                                      "Cephalopoda all",
                                       "ntr")
 ```
 
@@ -1105,8 +1140,8 @@ knitr::kable(res_table_cephall_fix_xmax, digits = 2)
 
 ## Determine cephalopod small/large cutoff
 
-Now repeat the above for small and large separately, if those results
-warrant it. The first baseline plot suggests a natural break, explicitly at
+Now repeat the above for small and large separately, since the
+first baseline plot clearly suggests a natural break. Explicitly this is at
 20.89, with fg and ntr saying maybe something similar. 24 might be a sensible
 consistent way of breaking up the data, but 20.89 seems more
 obvious and occurs for all (so makes sense to use it for xmin).
@@ -1120,20 +1155,23 @@ dplyr::arrange(data_cephall_fg, bin_min) %>% a()
 dplyr::arrange(data_cephall_ntr, bin_min) %>% a()
 
 # And the rows in each for that xmin suggestion are:
-ceph_big_min <- dplyr::filter(data_cephall_baseline,
-                              species == "Illex coindetii",
-                              bin_min > 20,
-                              bin_min < 21)$bin_min  # to get the exact value
+ceph_small_large_delineation <- dplyr::filter(data_cephall_baseline,
+                                              species == "Illex coindetii",
+                                              bin_min > 20,
+                                              bin_min < 21)$bin_min  # to get
+                                              # the exact value
+
+ceph_small_large_delineation
 
 dplyr::filter(data_cephall_baseline,
               species == "Illex coindetii",
-              bin_min == ceph_big_min)
+              bin_min == ceph_small_large_delineation)
 dplyr::filter(data_cephall_fg,
               species == "Illex coindetii",
-              bin_min == ceph_big_min)
+              bin_min == ceph_small_large_delineation)
 dplyr::filter(data_cephall_ntr,
               species == "Illex coindetii",
-              bin_min == ceph_big_min)
+              bin_min == ceph_small_large_delineation)
 ```
 
 Okay, use that for delineating small/big organisms. Make the xmax for small ones
@@ -1146,7 +1184,7 @@ a little less than that to ensure the cutoff is correct.
 ```{r, cephsmallxmax}
 cephsmall_xmin <- max(res_table_cephall$x_min)
 cephsmall_xmin
-cephsmall_xmax <- floor(ceph_big_min*100)/100   # rounding down to 0.01
+cephsmall_xmax <- floor(ceph_small_large_delineation*100)/100   # rounding down to 0.01
 cephsmall_xmax
 ```
 
@@ -1212,16 +1250,16 @@ xmax:
 res_table_cephsmall_fix_xmax <- dplyr::tibble()
 res_table_cephsmall_fix_xmax <- add_row_to_summary_table(res_table_cephsmall_fix_xmax,
                                       res_cephsmall_baseline_fix_xmax,
-                                      "Cephalopoda",
+                                      "Cephalopoda small",
                                       "Baseline")
 
 res_table_cephsmall_fix_xmax <- add_row_to_summary_table(res_table_cephsmall_fix_xmax,
                                       res_cephsmall_fg_fix_xmax,
-                                      "Cephalopoda",
+                                      "Cephalopoda small",
                                       "fg")
 res_table_cephsmall_fix_xmax <- add_row_to_summary_table(res_table_cephsmall_fix_xmax,
                                       res_cephsmall_ntr_fix_xmax,
-                                      "Cephalopoda",
+                                      "Cephalopoda small",
                                       "ntr")
 ```
 
@@ -1237,7 +1275,7 @@ knitr::kable(res_table_cephsmall_fix_xmax, digits = 2)
 HERE copied code not checked results through. RERUN next.
 
 ```{r, cephlargexmax}
-cephlarge_xmin <- ceph_big_min
+cephlarge_xmin <- ceph_small_large_delineation
 cephlarge_xmin
 cephlarge_xmax <- cephall_xmax
 cephlarge_xmax
@@ -1258,7 +1296,7 @@ res_cephlarge_baseline_fix_xmax <-
 
 ```{r, cephlargebaselineplotxmax}
 plot(res_cephlarge_baseline_fix_xmax,
-     xlim_hist = c(0, 60),
+     xlim_hist = c(0, 100),
      main = "Cephalopoda (large) baseline")
 ```
 
@@ -1277,7 +1315,7 @@ res_cephlarge_fg_fix_xmax <- determine_xmin_and_fit_mlebins(data_cephlarge_fg,
 
 ```{r, cephlargefgplotxmax}
 plot(res_cephlarge_fg_fix_xmax,
-     xlim_hist = c(0, 60),
+     xlim_hist = c(0, 100),
      main = "Cephalopoda (large) FG")
 ```
 
@@ -1294,7 +1332,7 @@ res_cephlarge_ntr_fix_xmax <- determine_xmin_and_fit_mlebins(data_cephlarge_ntr,
 
 ```{r, cephlargentrplotxmax}
 plot(res_cephlarge_ntr_fix_xmax,
-     xlim_hist = c(0, 60),
+     xlim_hist = c(0, 100),
      main = "Cephalopoda (large) NTR")
 ```
 
@@ -1305,16 +1343,16 @@ xmax:
 res_table_cephlarge_fix_xmax <- dplyr::tibble()
 res_table_cephlarge_fix_xmax <- add_row_to_summary_table(res_table_cephlarge_fix_xmax,
                                       res_cephlarge_baseline_fix_xmax,
-                                      "Cephalopoda",
+                                      "Cephalopoda large",
                                       "Baseline")
 
 res_table_cephlarge_fix_xmax <- add_row_to_summary_table(res_table_cephlarge_fix_xmax,
                                       res_cephlarge_fg_fix_xmax,
-                                      "Cephalopoda",
+                                      "Cephalopoda large",
                                       "fg")
 res_table_cephlarge_fix_xmax <- add_row_to_summary_table(res_table_cephlarge_fix_xmax,
                                       res_cephlarge_ntr_fix_xmax,
-                                      "Cephalopoda",
+                                      "Cephalopoda large",
                                       "ntr")
 ```
 
@@ -1322,143 +1360,4 @@ Results combined are:
 
 ```{r, rescephlargetablexmax}
 knitr::kable(res_table_cephlarge_fix_xmax, digits = 2)
-```
-
-
-
-
-
-
-
-```{r, stopagain, cache = FALSE, eval = TRUE}
-knitr::knit_exit()
-```
-
-# Full community could maybe do
-
-TODO Showing that we need the stitching together idea later.
-
-
-Can delete this once used any info when copying to above, all from x values approach:
-
-
-
-
-
-# Cephalopoda -- Large
-
-Now doing just the large individuals. Probably should do MLEbin.
-
-TODO and large/small cut off could be 20.
-
-## Cephalopoda large baseline
-
-```{r, cephlargebaseline}
-range(x_ceph_large_baseline)
-
-res_ceph_large_baseline <- determine_xmin_and_fit(x_ceph_large_baseline,
-                                                  bin_width = 10)
-
-plot(res_ceph_large_baseline,
-     xlim_hist = c(0, 100),
-     main = "Cephalopoda large baseline")
-```
-
-```{r, tablecephlargebaseline, results = "asis"}
-summary_mle_table(res_ceph_large_baseline)
-```
-
-## Cephalopoda large FG
-
-```{r, cephlargefg}
-range(x_ceph_large_fg)
-
-# Increasing bin width here
-res_ceph_large_fg <- determine_xmin_and_fit(x_ceph_large_fg,
-                                           bin_width = 10)
-
-plot(res_ceph_large_fg,
-     xlim_hist = c(0, 100),
-     main = "Cephalopoda large FG")
-```
-
-```{r, tablecephlargefg, results = "asis"}
-summary_mle_table(res_ceph_large_fg)
-```
-
-## Cephalopoda large NTR
-
-And for NTR:
-```{r, cephlargentr}
-range(x_ceph_large_ntr)
-
-res_ceph_large_ntr <- determine_xmin_and_fit(x_ceph_large_ntr,
-                                             bin_width = 10)
-
-plot(res_ceph_large_ntr,
-     xlim_hist = c(0, 100),
-     main = "Cephalopoda large NTR")
-```
-
-```{r, tablecephlargentr, results = "asis"}
-summary_mle_table(res_ceph_large_ntr)
-```
-
-# Cephalopoda -- Small
-
-Now doing just the small individuals. Probably should do MLEbin.
-
-TODO and large/small cut off could be 20.
-
-## Cephalopoda small baseline
-
-```{r, cephsmallbaseline}
-range(x_ceph_small_baseline)
-
-res_ceph_small_baseline <- determine_xmin_and_fit(x_ceph_small_baseline,
-                                                  bin_width = 1)
-
-plot(res_ceph_small_baseline,
-     xlim_hist = c(0, 10),
-     main = "Cephalopoda small baseline")
-```
-
-```{r, tablecephsmallbaseline, results = "asis"}
-summary_mle_table(res_ceph_small_baseline)
-```
-
-## Cephalopoda small FG
-
-```{r, cephsmallfg}
-range(x_ceph_small_fg)
-
-# Increasing bin width here
-res_ceph_small_fg <- determine_xmin_and_fit(x_ceph_small_fg,
-                                           bin_width = 1)
-
-plot(res_ceph_small_fg,
-     xlim_hist = c(0, 10),
-     main = "Cephalopoda small FG")
-```
-
-```{r, tablecephsmallfg, results = "asis"}
-summary_mle_table(res_ceph_small_fg)
-```
-
-## Cephalopoda small NTR
-
-And for NTR:
-```{r, cephsmallntr}
-range(x_ceph_small_ntr)
-
-res_ceph_small_ntr <- determine_xmin_and_fit(x_ceph_small_ntr,
-                                             bin_width = 1)
-
-plot(res_ceph_small_ntr,
-     xlim_hist = c(0, 10),
-     main = "Cephalopoda small NTR")
-```
-
-```{r, tablecephsmallntr, results = "asis"}
-summary_mle_table(res_ceph_small_ntr)
 ```
