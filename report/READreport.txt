@@ -1,0 +1,17 @@
+mediterranean-analysis-1/ - first attempts based on Juliana's code, doing
+  individual body masses and MLE, but that doesn't take into account standardisation
+  that gives non-integer counts.
+
+mediterranean-analysis-2/ - pdf as discussed in our chat on 8/5/25. Figuring out
+  functionalisation and plotting and tables using MLEbins, with
+  different xmin and xmax approaches. Had excluded <100 mm, and
+  had kept in all fish but not going to now.
+  Note that rerunning this now might give different results if the .rda data
+  file has changed. Don't think it will (check the commit date), but I have to
+  re-run data-raw/zabala-data.Rmd (I'll rename it meditteranean-data.Rmd) as I
+  seemed to have run the code but not rebuilt the pdf.
+
+mediterranean-analysis-3/ - med-analysis.Rmd - renaming and adapting
+ med...-2/zabala-data-analysis.Rmd, same for med-summary.Rmd from
+ med...-2/zabala-summary.Rmd.
+ Doing what we discussed in the 8/5/25 discussion.
