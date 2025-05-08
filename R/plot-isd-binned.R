@@ -22,6 +22,8 @@
 ##' @param fit_col colour to use for fitted curves
 ##' @param fit_lwd line thickness to use for fitted curves
 ##' @param conf_lty line type to use for confidence intervals
+##' @param legend_text_second_row_multiplier numeric multiplier of the second
+##'   row of legend text to space it out, especially for smaller panel plots.
 ##' @return single panel plot of the ISD with data in binned form like in
 ##'   Fig. 7a or 7b of MEPS paper, but with nonoverlapping bins; returns nothing.
 ##' @export
@@ -50,6 +52,7 @@ plot_isd_binned <- function(res_mlebin,
                             legend_label = NULL,
                             legend_text = NULL,
                             legend_text_n = NULL,
+                            legend_text_second_row_multiplier = 2,
                             legend_position = "topright",
                             x_big_ticks = NULL,
                             x_big_ticks_labels = NULL,
@@ -196,7 +199,7 @@ plot_isd_binned <- function(res_mlebin,
   legend("topright",
          legend = legend_text_n,
          bty = "n",
-         inset = 2 * inset_text)
+         inset = legend_text_second_row_multiplier * inset_text)
   }
 
   box()     # to redraw axes over any boxes

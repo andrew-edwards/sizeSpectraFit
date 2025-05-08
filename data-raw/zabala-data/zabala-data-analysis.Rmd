@@ -200,9 +200,8 @@ Adapting the next sections from mediterranean-analysis.Rmd which used the MLE
 method. Shapes of resulting ISD plots should somewhat resemble those that
 Juliana produced, though we now have xmin more explicit and are using MLEbins.
 
-Need to do these manually to check results, and decide on a communal xmin (and
-maybe xmax TODO) for
-each species group.
+Need to do all these manually to check results and think about them, and to
+determine on a communal xmin (and maybe xmax ) for each species group.
 
 \clearpage
 
@@ -225,8 +224,6 @@ res_full_baseline <- determine_xmin_and_fit_mlebins(data_full_baseline)
 res_full_baseline$mlebins_fit      # full list includes histogram values,
                                    # could make a print function TODO
 ```
-
-\clearpage
 
 ```{r, fullbaselineplot}
 plot(res_full_baseline,
@@ -256,8 +253,6 @@ res_crust_baseline$mlebins_fit     # full list includes histogram values, TODO
                                    # could make a print function
 ```
 
-\clearpage
-
 ```{r, crustbaselineplot}
 plot(res_crust_baseline,
      xlim_hist = c(0, 60),
@@ -275,8 +270,6 @@ res_crust_fg <- determine_xmin_and_fit_mlebins(data_crust_fg)
 
 res_crust_fg$mlebins_fit
 ```
-
-\clearpage
 
 ```{r, crustfgplot}
 plot(res_crust_fg,
@@ -297,8 +290,6 @@ res_crust_ntr <- determine_xmin_and_fit_mlebins(data_crust_ntr)
 
 res_crust_ntr$mlebins_fit
 ```
-
-\clearpage
 
 ```{r, crustntrplot}
 plot(res_crust_ntr,
@@ -370,8 +361,6 @@ res_crust_baseline_fix_xmax <-
                                  x_max = crust_xmax)
 ```
 
-\clearpage
-
 ```{r, crustbaselineplotxmax}
 plot(res_crust_baseline_fix_xmax,
      xlim_hist = c(0, 60),
@@ -385,8 +374,6 @@ res_crust_fg_fix_xmax <- determine_xmin_and_fit_mlebins(data_crust_fg,
                                                         x_min = crust_xmin,
                                                         x_max = crust_xmax)
 ```
-
-\clearpage
 
 ```{r, crustfgplotxmax}
 plot(res_crust_fg_fix_xmax,
@@ -430,11 +417,9 @@ res_table_crust_fix_xmax <- add_row_to_summary_table(res_table_crust_fix_xmax,
 Results combined are:
 
 ```{r, rescrusttablexmax}
-knitr::kable(res_table_crust_fix_xmax, digits = 2)
+knitr::kable(res_table_crust_fix_xmax,
+             digits = 2)
 ```
-
-So the FG size spectra steepened from the baseline, but the NTR remained
-unchanged.
 
 ## Further communities
 
@@ -461,8 +446,6 @@ res_actin_baseline$mlebins_fit     # full list includes histogram values, TODO
                                    # could make a print function
 ```
 
-\clearpage
-
 ```{r, actinbaselineplot}
 plot(res_actin_baseline,
      xlim_hist = c(0, 60),
@@ -482,7 +465,7 @@ res_actin_fg <- determine_xmin_and_fit_mlebins(data_actin_fg)
 res_actin_fg$mlebins_fit
 ```
 
-\clearpage
+
 
 ```{r, actinfgplot}
 plot(res_actin_fg,
@@ -505,7 +488,7 @@ res_actin_ntr <- determine_xmin_and_fit_mlebins(data_actin_ntr)
 res_actin_ntr$mlebins_fit
 ```
 
-\clearpage
+
 
 ```{r, actinntrplot}
 plot(res_actin_ntr,
@@ -567,7 +550,7 @@ res_actin_baseline_fix_xmax <-
                                  x_max = actin_xmax)
 ```
 
-\clearpage
+
 
 ```{r, actinbaselineplotxmax}
 plot(res_actin_baseline_fix_xmax,
@@ -583,7 +566,7 @@ res_actin_fg_fix_xmax <- determine_xmin_and_fit_mlebins(data_actin_fg,
                                                         x_max = actin_xmax)
 ```
 
-\clearpage
+
 
 ```{r, actinfgplotxmax}
 plot(res_actin_fg_fix_xmax,
@@ -593,7 +576,6 @@ plot(res_actin_fg_fix_xmax,
 
 ## Actinopterygii NTR with fixed xmin and xmax
 
-TODO need to recompuate is xmin and
 ```{r, actinbaelinexmax}
 res_actin_ntr_fix_xmax <- determine_xmin_and_fit_mlebins(data_actin_ntr,
                                                          x_min = actin_xmin,
@@ -631,6 +613,7 @@ Results combined are:
 knitr::kable(res_table_actin_fix_xmax, digits = 2)
 ```
 
+\clearpage
 
 # Chondrichthyes
 
@@ -649,8 +632,6 @@ res_chondr_baseline <- determine_xmin_and_fit_mlebins(data_chondr_baseline)
 
 res_chondr_baseline$mlebins_fit
 ```
-
-\clearpage
 
 ```{r, chondrbaselineplot}
 plot(res_chondr_baseline,
@@ -671,7 +652,7 @@ res_chondr_fg <- determine_xmin_and_fit_mlebins(data_chondr_fg)
 res_chondr_fg$mlebins_fit
 ```
 
-\clearpage
+
 
 ```{r, chondrfgplot}
 plot(res_chondr_fg,
@@ -694,7 +675,7 @@ res_chondr_ntr <- determine_xmin_and_fit_mlebins(data_chondr_ntr)
 res_chondr_ntr$mlebins_fit
 ```
 
-\clearpage
+
 
 ```{r, chondrntrplot}
 plot(res_chondr_ntr,
@@ -756,7 +737,7 @@ res_chondr_baseline_fix_xmax <-
                                  x_max = chondr_xmax)
 ```
 
-\clearpage
+
 
 ```{r, chondrbaselineplotxmax}
 plot(res_chondr_baseline_fix_xmax,
@@ -772,7 +753,7 @@ res_chondr_fg_fix_xmax <- determine_xmin_and_fit_mlebins(data_chondr_fg,
                                                         x_max = chondr_xmax)
 ```
 
-\clearpage
+
 
 ```{r, chondrfgplotxmax}
 plot(res_chondr_fg_fix_xmax,
@@ -882,7 +863,7 @@ res_chondr_baseline_fix_xmax2 <-
                                  x_max = chondr_xmax)
 ```
 
-\clearpage
+
 
 ```{r, chondrbaselineplotxmax2}
 plot(res_chondr_baseline_fix_xmax2,
@@ -898,7 +879,7 @@ res_chondr_fg_fix_xmax2 <- determine_xmin_and_fit_mlebins(data_chondr_fg,
                                                           x_max = chondr_xmax)
 ```
 
-\clearpage
+
 
 ```{r, chondrfgplotxmax2}
 plot(res_chondr_fg_fix_xmax2,
@@ -971,7 +952,7 @@ res_cephall_baseline <- determine_xmin_and_fit_mlebins(data_cephall_baseline)
 res_cephall_baseline$mlebins_fit
 ```
 
-\clearpage
+
 
 ```{r, cephallbaselineplot}
 plot(res_cephall_baseline,
@@ -991,7 +972,7 @@ res_cephall_fg <- determine_xmin_and_fit_mlebins(data_cephall_fg)
 res_cephall_fg$mlebins_fit
 ```
 
-\clearpage
+
 
 ```{r, cephallfgplot}
 plot(res_cephall_fg,
@@ -1013,7 +994,7 @@ res_cephall_ntr <- determine_xmin_and_fit_mlebins(data_cephall_ntr)
 res_cephall_ntr$mlebins_fit
 ```
 
-\clearpage
+
 
 ```{r, cephallntrplot}
 plot(res_cephall_ntr,
@@ -1075,7 +1056,7 @@ res_cephall_baseline_fix_xmax <-
                                  x_max = cephall_xmax)
 ```
 
-\clearpage
+
 
 ```{r, cephallbaselineplotxmax}
 plot(res_cephall_baseline_fix_xmax,
@@ -1091,7 +1072,7 @@ res_cephall_fg_fix_xmax <- determine_xmin_and_fit_mlebins(data_cephall_fg,
                                                         x_max = cephall_xmax)
 ```
 
-\clearpage
+
 
 ```{r, cephallfgplotxmax}
 plot(res_cephall_fg_fix_xmax,
@@ -1199,7 +1180,7 @@ res_cephsmall_baseline_fix_xmax <-
                                  x_max = cephsmall_xmax)
 ```
 
-\clearpage
+
 
 ```{r, cephsmallbaselineplotxmax}
 plot(res_cephsmall_baseline_fix_xmax,
@@ -1218,7 +1199,7 @@ res_cephsmall_fg_fix_xmax <- determine_xmin_and_fit_mlebins(data_cephsmall_fg,
                                                             x_max = cephsmall_xmax)
 ```
 
-\clearpage
+
 
 ```{r, cephsmallfgplotxmax}
 plot(res_cephsmall_fg_fix_xmax,
@@ -1289,7 +1270,7 @@ res_cephlarge_baseline_fix_xmax <-
                                  x_max = cephlarge_xmax)
 ```
 
-\clearpage
+
 
 ```{r, cephlargebaselineplotxmax}
 plot(res_cephlarge_baseline_fix_xmax,
@@ -1308,7 +1289,7 @@ res_cephlarge_fg_fix_xmax <- determine_xmin_and_fit_mlebins(data_cephlarge_fg,
                                                             x_max = cephlarge_xmax)
 ```
 
-\clearpage
+
 
 ```{r, cephlargefgplotxmax}
 plot(res_cephlarge_fg_fix_xmax,
@@ -1391,9 +1372,6 @@ knitr::kable(res_table_agg,
 ## Aggregated fit to data
 
 ```{r, aggregatefit, eval = FALSE}
-x_min_global <- min(res_table_agg$x_min)
-x_max_global <- max(res_table_agg$x_max)
-
 baseline_agg <- aggregate_mlebins(list(crust = res_crust_baseline_fix_xmax,
                                        actin = res_actin_baseline_fix_xmax,
                                        chondr = res_chondr_baseline_fix_xmax2,
@@ -1402,31 +1380,39 @@ baseline_agg <- aggregate_mlebins(list(crust = res_crust_baseline_fix_xmax,
                                   res_table_agg,
                                   strata = "Baseline")
 
-# They include histograms that we don't need.
+fg_agg <- aggregate_mlebins(list(crust = res_crust_fg_fix_xmax,
+                                 actin = res_actin_fg_fix_xmax,
+                                 chondr = res_chondr_fg_fix_xmax2,
+                                 cephsmall = res_cephsmall_fg_fix_xmax,
+                                 cephlarge = res_cephlarge_fg_fix_xmax),
+                            res_table_agg,
+                            strata = "fg")
 
-
-# Already in res_table_agg: b_vec, n_vec, x_min_vec,
-
-# x_max_vec, for simplicity in plotting.
-# Save as a mlebins_list object, then create plotting function for that.
-
-# Plot all the data (should be the same way as MLEbins plot. So lots of boxes.
-# Could plot the five PLB fits like I did for MLE example.
-# Plot the aggregated fit.
-
-
+ntr_agg <- aggregate_mlebins(list(crust = res_crust_ntr_fix_xmax,
+                                  actin = res_actin_ntr_fix_xmax,
+                                  chondr = res_chondr_ntr_fix_xmax2,
+                                  cephsmall = res_cephsmall_ntr_fix_xmax,
+                                  cephlarge = res_cephlarge_ntr_fix_xmax),
+                             res_table_agg,
+                             strata = "ntr")
 ```
 
-Now to combine the data, do for each strata in turn.
+Each one is saved as a `mlebins_list object` to then create plotting function.
 
-```{r, aggregatedata}
-```
+
 
 ## Saving what is needed for plots and tables, and doing in zabala-summary.Rmd
 
-This file is very big and takes a while to run (also .pdf keeps hanging).
+```{r, saving}
+saveRDS(baseline_agg,
+        "baseline_agg.rds")
+saveRDS(fg_agg,
+        "fg_agg.rds")
+saveRDS(ntr_agg,
+        "ntr_agg.rds")
+saveRDS(res_table_agg,
+        "res_table_agg.rds")
+```
 
-
-
-TODO Need to summarise those results in a plot of $b$ with confidence
-intervals. Do in next .Rmd.
+The current file is very big and takes a while to run (also .pdf keeps hanging),
+so time to save what we need and do a clean one.
