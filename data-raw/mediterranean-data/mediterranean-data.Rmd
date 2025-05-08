@@ -1,0 +1,427 @@
+---
+title: "Putting Juliana Zabala's Mediterranean data into sizeSpectra2"
+author: "Andrew Edwards and Juliana Zabala"
+output: pdf_document
+fontsize: 12pt
+date: "Last compiled on `r format(Sys.time(), '%d %B, %Y')`"
+---
+
+```{r, setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "",
+  cache = FALSE,
+  # cache_path = "zabala-data-cache/",
+  # fig.path = "zabala-data-figs-cache/",
+  fig.width = 7,
+  fig.height = 6
+)
+  # comment = "#>",
+```
+
+```{r, build, echo = FALSE, eval = FALSE}
+# To build either run this line or click knit button in RStudio:
+rmarkdown::render("mediterranean-data.Rmd")
+```
+
+```{r, packages, echo = FALSE}
+library(dplyr)
+load_all()
+library(readxl)
+```
+
+```{r, notes, echo = FALSE}
+
+# Was originally data-raw/zabala-data/zabala-data.Rmd, moved to here,
+#  renamed, and rerun and simplifying
+
+# Notes from R file:
+
+# Adapting this from using-sizeSpectra2.R in size-spectra-applications, and also
+#  using that file for the analyses that are being done in report/
+# using-sizeSpectra2.R - size spectrum fits using sizeSpectra2 functions.
+#  Run from the same directory as 2023-03-22_Dades_RESNEP.xlsx, or setwd to the
+#  required directory.
+# Starting from analysis-juliana-2024-12-05.R
+# which Andy tweaked (just commented out setwd in the end I think) to get
+#  SizeSpectra_TaxonomicGroups_AE - x_min_12mm
+# working on his machine. Juliana had sent that on 2024-12-05.
+
+# Size spectra - Andy's code
+# Only size spectra Analyses - without GADICULUS ARGENTEUS
+# Palamós 2017, 2021
+# Juliana Quevedo Zabala
+# 08 Oct 2023
+```
+
+We are going to save the data as one big tibble, plus the lenght-weight
+coefficients.
+
+# Data preparation
+
+Juliana's code to load in and define the data.
+
+```{r, datapreparation, warning = FALSE}
+# DATA PREPARATION #############################################################
+# DATA PREPARATION: FrequenciaDeTalles tab
+resnep_raw <- readxl::read_excel("2023-03-22_Dades_RESNEP.xlsx",3)
+
+resnep <- resnep_raw
+
+resnep$Any <- as.character(resnep$Any)
+
+# no cover data
+resnep <- subset(resnep, CodiPesca != "20170823_64500_ESP000023428_03")
+
+# exclude vessel: MEDAN in resnep due to different fishing technique which leads to bias in analysis
+resnep <- subset(resnep, NomBarca != "MEDAN")
+
+# exclude species whose length-weight relationship overestimate their weight by more then 200%
+resnep <- subset(resnep, NomEspecie != "Sepietta spp." &
+                   NomEspecie != "Sepietta oweniana" &
+                   NomEspecie != "Histoteutis bonelli" &
+                   NomEspecie != "Eledone cirrhosa" &
+                   NomEspecie != "Macropipus tuberculatus" &
+                   NomEspecie != "Squilla mantis" &
+                   NomEspecie != "Scaeurgus unicirrhus" &
+                   NomEspecie != "Gadiculus argenteus") # Gadiculus because it can be pelagic and amounts to a lot of variability in 2021
+delete_CodiPesca <- "20170824_64500_ESP000023428_04"
+delete_Name <- "Liocarcinus depurator"
+# Delete rows matching the specified ID and Name
+resnep <- resnep %>%
+  filter(!(CodiPesca == delete_CodiPesca & NomEspecie == delete_Name))
+
+# exclude from resnep21_fg trawls done beside the NTR -- too close
+resnep <- subset(resnep, CodiPesca != "20210826_64500_ESP000023428_09" &
+                         CodiPesca != "20210824_64500_ESP000023428_01" &
+                         CodiPesca != "20210831_64500_ESP000023428_16")
+
+resnep_for_length_weight_coefficients <- resnep    # To then extract what we
+                                                   # need below
+```
+
+## Not needed
+
+The following is no longer needed, but keeping here to check I've included
+everything in the later code.
+
+```{r, resnepnotneeded}
+# Make df smaller
+resnep <- select(resnep, CodiPesca, NomPort, Data, Any, NumeroPesca, TipusDeFons, ProfunditatMitjana_m,
+                 NomEspecie, ClassificacioCaptura, AgrupamentTaxonomic, Categoria, Talla_mm,
+                 FrequenciaCalculada, Abundancia_NIndividusTalla_Km2, PesTotalCalculatRelacioTallaPes_g,
+                 Biomassa_KgTalla_Km2, AreaEscombrada_km2, TipusMalla, Site)
+
+# Spread datasets: FrequenciaCalculada - extrapolate subsamples and compute individual weights
+resnep <- mutate(resnep, PesoIndividual = PesTotalCalculatRelacioTallaPes_g/FrequenciaCalculada)
+resnep <- as.data.frame(lapply(resnep, rep, resnep$FrequenciaCalculada))
+resnep['frecuencia_final'] = 1 # new column, frecuencias finales = 1
+
+# Exclude sizes smaller than 12mm, as the net size was 12x12mm, we assume organisms <12mm are not well sampled
+resnep <- subset(resnep, Talla_mm > 12)
+
+# Andy doing this to create factors, to ask Juliana about some of the columns.
+resnep_temp <- tibble::as_tibble(resnep) %>%
+  dplyr::mutate_at(vars(CodiPesca,
+                        NomPort,
+                        Data,
+                        Any,
+                        TipusDeFons,
+                        NomEspecie,
+                        ClassificacioCaptura,
+                        AgrupamentTaxonomic,
+                        Categoria,
+                        TipusMalla, # not sure, says logical but also NA's
+                        Site),
+                   factor)
+
+summary(dplyr::select(resnep_temp,
+                      NumeroPesca,
+                      Talla_mm,
+                      FrequenciaCalculada,
+                      AgrupamentTaxonomic,
+                      Abundancia_NIndividusTalla_Km2,
+                      PesTotalCalculatRelacioTallaPes_g,
+                      Biomassa_KgTalla_Km2,
+                      AreaEscombrada_km2,
+                      PesoIndividual,
+                      frecuencia_final))
+
+
+# separate resnep 2017 and 2021 (NTR & FG),
+resnep17 <- subset(resnep, Any != "2021")
+resnep21 <- subset(resnep, Any != "2017")
+resnep21_ntr <- subset(resnep21, Site == "MPA")
+resnep21_fg <- subset(resnep21, Site == "FG")
+
+
+# FREQUENCY BARPLOTS, ABUNDANCIA VS TALLA PLOTS, ABUNDANCIA VS PESO PLOTS, METADATA ANALYSES,
+# Weight and size supperposed histograms - see relationship, DENSITY HISTOGRAMS BY 'AGRUPAMENT TAXONOMIC':
+# find in "SizeSpectra_Analyses_v5.R" ***
+
+
+# SELECT DATASETS BY 'AGRUPAMENT TAXONOMIC'
+# "Crustacea"  "Cephalopoda"  "Actinopterygii"  "Chondrichthyes"  "Echinodermata"
+# Exclude Echinidermata due to very low organisms. max 10.
+
+# resnep17
+resnep17_crustacea <- subset(resnep17, AgrupamentTaxonomic == "Crustacea")
+resnep17_cephalopoda <- subset(resnep17, AgrupamentTaxonomic == "Cephalopoda")
+resnep17_actinopterygii <- subset(resnep17, AgrupamentTaxonomic == "Actinopterygii")
+resnep17_chondrichthyes <- subset(resnep17, AgrupamentTaxonomic == "Chondrichthyes")
+
+# [Now doing the >10 and <10 at the analysis stage]
+resnep17_cephalopoda_small <- subset(resnep17_cephalopoda, PesoIndividual < 10)
+resnep17_cephalopoda_big <- subset(resnep17_cephalopoda, PesoIndividual > 10)
+
+# resnep21_fg
+resnep21_fg_crustacea <- subset(resnep21_fg, AgrupamentTaxonomic == "Crustacea")
+resnep21_fg_cephalopoda <- subset(resnep21_fg, AgrupamentTaxonomic == "Cephalopoda")
+resnep21_fg_actinopterygii <- subset(resnep21_fg, AgrupamentTaxonomic == "Actinopterygii")
+resnep21_fg_chondrichthyes <- subset(resnep21_fg, AgrupamentTaxonomic == "Chondrichthyes")
+
+resnep21_fg_cephalopoda_small <- subset(resnep21_fg_cephalopoda, PesoIndividual < 10)
+resnep21_fg_cephalopoda_big <- subset(resnep21_fg_cephalopoda, PesoIndividual > 10)
+
+# resnep21_ntr
+resnep21_ntr_crustacea <- subset(resnep21_ntr, AgrupamentTaxonomic == "Crustacea")
+resnep21_ntr_cephalopoda <- subset(resnep21_ntr, AgrupamentTaxonomic == "Cephalopoda")
+resnep21_ntr_actinopterygii <- subset(resnep21_ntr, AgrupamentTaxonomic == "Actinopterygii")
+resnep21_ntr_chondrichthyes <- subset(resnep21_ntr, AgrupamentTaxonomic == "Chondrichthyes")
+
+resnep21_ntr_cephalopoda_small <- subset(resnep21_ntr_cephalopoda, PesoIndividual < 10)
+resnep21_ntr_cephalopoda_big <- subset(resnep21_ntr_cephalopoda, PesoIndividual > 10)
+```
+
+Now just extracting and then saving the `PesoIndividual` column for each species
+group and data set ("baseline", "fg", or "ntr"), as, for example,
+`x_community_ntr`. Using the first syllable or so for the longer complex species
+group names.
+
+Baseline corresponds to 2017, but don't need to have the
+date in the variable name. Doing the analyses in
+`report/`, here just saving the data into the package. Each is then just a
+vector of individual body masses. Andy adding in `as.numeric()` as just using
+`na.omit()` keeps information (as attributes) about the indices (I presume) of
+the omitted NA's, which we do not need.
+
+```{r extractjustmasses}
+x_community_baseline <- na.omit(resnep17$PesoIndividual) %>% as.numeric()
+x_community_fg <- na.omit(resnep21_fg$PesoIndividual) %>% as.numeric()
+x_community_ntr <- na.omit(resnep21_ntr$PesoIndividual) %>% as.numeric()
+
+
+# Chondrichthyes
+resnep17_chondrichthyes <- subset(resnep17_chondrichthyes, Talla_mm >100)
+x_chondr_baseline <- na.omit(resnep17_chondrichthyes$PesoIndividual) %>% as.numeric()
+
+x_chondr_fg <- na.omit(resnep21_fg_chondrichthyes$PesoIndividual) %>% as.numeric()
+# TODO not
+                                        # sure why not >100
+x_chondr_ntr <- na.omit(resnep21_ntr_chondrichthyes$PesoIndividual) %>% as.numeric()
+  # TODO not sure why not >100
+
+# Cephalopoda -- All
+x_ceph_all_baseline <- na.omit(resnep17_cephalopoda$PesoIndividual) %>% as.numeric()
+x_ceph_all_fg <- na.omit(resnep21_fg_cephalopoda$PesoIndividual) %>% as.numeric()
+x_ceph_all_ntr <- na.omit(resnep21_ntr_cephalopoda$PesoIndividual) %>% as.numeric()
+```
+
+Carrying on...
+
+
+```{r continue}
+# Cephalopoda -- Large
+x_ceph_large_baseline <- na.omit(resnep17_cephalopoda_big$PesoIndividual) %>% as.numeric()
+x_ceph_large_fg <- na.omit(resnep21_fg_cephalopoda_big$PesoIndividual) %>% as.numeric()
+x_ceph_large_ntr <- na.omit(resnep21_ntr_cephalopoda_big$PesoIndividual) %>% as.numeric()
+
+# Cephalopoda -- Small
+x_ceph_small_baseline <- na.omit(resnep17_cephalopoda_small$PesoIndividual) %>% as.numeric()
+x_ceph_small_fg <- na.omit(resnep21_fg_cephalopoda_small$PesoIndividual) %>% as.numeric()
+x_ceph_small_ntr <- na.omit(resnep21_ntr_cephalopoda_small$PesoIndividual) %>% as.numeric()
+
+# Actinopterygii
+resnep17_actinopterygii <- subset(resnep17_actinopterygii, Talla_mm > 40)
+x_actin_baseline <- na.omit(resnep17_actinopterygii$PesoIndividual) %>% as.numeric()
+
+resnep21_fg_actinopterygii <- subset(resnep21_fg_actinopterygii, Talla_mm > 40)
+x_actin_fg <- na.omit(resnep21_fg_actinopterygii$PesoIndividual) %>% as.numeric()
+
+resnep21_ntr_actinopterygii <- subset(resnep21_ntr_actinopterygii, Talla_mm >40)
+x_actin_ntr <- na.omit(resnep21_ntr_actinopterygii$PesoIndividual) %>% as.numeric()
+
+# Crustacea
+x_crust_baseline <- na.omit(resnep17_crustacea$PesoIndividual) %>% as.numeric()
+x_crust_fg <- na.omit(resnep21_fg_crustacea$PesoIndividual) %>% as.numeric()
+x_crust_ntr <- na.omit(resnep21_ntr_crustacea$PesoIndividual) %>% as.numeric()
+```
+
+Do not actually need this, as this was assuming exact measurements for MLE
+method, which we are not using. Not running:
+
+```{r, savedata, eval = FALSE}
+# This is alphabetical (from using ls()):
+mediterranean_megafauna <- tibble::lst(x_actin_baseline,
+                                       x_actin_fg,
+                                       x_actin_ntr,
+                                       x_ceph_all_baseline,
+                                       x_ceph_all_fg,
+                                       x_ceph_all_ntr,
+                                       x_ceph_large_baseline,
+                                       x_ceph_large_fg,
+                                       x_ceph_large_ntr,
+                                       x_ceph_small_baseline,
+                                       x_ceph_small_fg,
+                                       x_ceph_small_ntr,
+                                       x_chondr_baseline,
+                                       x_chondr_fg,
+                                       x_chondr_ntr,
+                                       x_community_baseline,
+                                       x_community_fg,
+                                       x_community_ntr,
+                                       x_crust_baseline,
+                                       x_crust_fg,
+                                       x_crust_ntr)
+
+usethis::use_data(mediterranean_megafauna,
+                  overwrite = TRUE)
+```
+
+
+# For MLEbins method, need tibble of species-specific length-weight coefficients
+
+Juliana already did the length-to-weight calculations in the spreadsheet. But we
+need to explicitly do them as want the min and max possible weight for each
+length bin.
+
+So, using a version of the data that is saved above:
+
+```{r, lwcoeffs}
+length_weight_coefficients <- resnep_for_length_weight_coefficients %>%
+  dplyr::select(species = NomEspecie,
+                alpha = ConstantA_TallaPes,
+                beta = ConstantB_TallaPes) %>%
+  dplyr::mutate_at(vars(species),
+                   factor)
+
+length_weight_coefficients <-
+  dplyr::summarise(dplyr::group_by(length_weight_coefficients,
+                                   species),
+                   alpha = unique(alpha),
+                   beta = unique(beta))
+
+length_weight_coefficients
+summary(length_weight_coefficients)
+
+mediterranean_length_weight_coefficients <-
+  dplyr::filter(length_weight_coefficients,
+                !is.na(alpha))
+
+summary(mediterranean_length_weight_coefficients)
+
+usethis::use_data(mediterranean_length_weight_coefficients,
+                  overwrite = TRUE)
+# TODO document, alpha and beta are the coeffcicients; need to describe units.
+# This should be the standard way of using length-weight coefficients.
+```
+
+# For MLEbins method, need the data, somewhat similar to first four columns of Table 1 in MEPS paper
+
+We need the strata and group, species name (not actually needed for analyses but
+useful to keep track of), length (with documentation of what that really means),
+and number, which is the number of individuals per km2 (alread standardised by
+Juliana, confirming calculation below). The number can be non-integer, since it is standardised.
+
+Then in the analysis we will calculate the min and max for each length bin, and
+the corresponding min and max for each weight bin based on the species-specific
+length-weight coefficients.
+
+Taking the full data set and then save what we need.
+
+Excludings sizes smaller than 12mm, as the net size was 12x12mm, we assume
+organisms <12mm are not well sampled. And exclude Echinidermata and Tunicata
+groups due to very low number of organisms.
+
+```{r, wrangling}
+data_full <- dplyr::filter(resnep_for_length_weight_coefficients,
+                           Talla_mm > 12,
+                           !(AgrupamentTaxonomic %in% c("Echinodermata",
+                                                        "Tunicata")))
+                           # Excludes only 21 and 24 rows for each
+
+summary(as.factor(data_full$Site))   # Just need these as strata, TBA is baseline for
+                                     # the 4051 in 2017:
+nrow(dplyr::filter(data_full,
+                   Site == "TBA" & Any == 2017))
+
+# Check the standardisation already done:
+expect_equal(data_full$Abundancia_NIndividusTalla_Km2,
+             data_full$FrequenciaCalculada / data_full$AreaEscombrada_km2,
+             tolerance = 0.0001)
+# So I can just use Abundancia_NIndividusTalla_Km2, though would need
+# FrequenciaCalculada for MLE method
+
+data <- dplyr::select(data_full,
+                      Site,
+                      AgrupamentTaxonomic,
+                      NomEspecie,
+                      Talla_mm,
+                      Abundancia_NIndividusTalla_Km2) %>%
+  dplyr::mutate_at(vars(Site,
+                        AgrupamentTaxonomic,
+                        NomEspecie),
+                   factor) %>%
+  dplyr::rename(strata = Site,
+                group = AgrupamentTaxonomic,
+                species = NomEspecie,
+                length = Talla_mm,
+                number = Abundancia_NIndividusTalla_Km2)
+
+# Rename there to give standard general names for analyses, though likely will
+# sometimes have year and no strata or group. But people need to analyse
+# strata/year in turn and look at results, so probably not going to fully
+# functionalise that step.
+
+# TODO need to document what these mean in the help for the data object.
+
+data
+
+mediterranean_data <- data
+
+summary(mediterranean_data)
+
+usethis::use_data(mediterranean_data,
+                  overwrite = TRUE)
+```
+
+```{r, notes}
+# Notes from Juliana's email:
+
+# Frequenciecaculada: 3 means measured 1/3 of the
+# catch, or, equivalently (I think)
+# there were 3 fish but only 1 was
+# measured. So Juliana then creates 3
+# individual identical rows in such a
+# situation. 1 means no subsampling.
+
+# Each tow covers a different area, we tried to make it so that eachtow last 1
+# hour, but there were variations, so we use the trawled area km2 to standardize
+# biomass and abundance data.
+
+
+# 'PesTotalCalculatRelacioTallaPes_g' is the total weight of that species taking
+# into account the subsample, meaning that if the total weight is 100g and the
+# subsample is 5, 5 organisms of that species weight 100g, so each organism here
+# weights 20g. - we won't need that as using length-weight relationships.
+
+# NumeroPesca is Haul Number - not needed
+
+# FrequenciaCalculada - The number of fish of a given length, species and haul is represented in FrequenciaCalculada. That's why I did the calculations on the first question, so that there would be one row for each individual, so using PesoIndividual accounts for everything.
+
+
+# Abundancia_NIndividusTalla_Km2 this looks to be freq scaled by area of
+# trawl, as verified in expect_equal above. If you just do MLE you can't
+# take this into account though.
+
+```

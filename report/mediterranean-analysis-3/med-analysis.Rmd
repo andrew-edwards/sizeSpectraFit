@@ -56,10 +56,22 @@ strata-group-length combination. We will aggregate such examples at the analysis
 stage (could do earlier but best to keep data similar to original format).
 
 Second piece is the definition of lengths. They are in mm, with integers measured to nearest mm and ones
-with decimals measured to 0.01 mm (assuming this will mis-specify, presumably
+with decimals assumed to be measured to 0.01 mm (assuming this will mis-specify, presumably
 1%, a few mm ones,
 but that's okay). And the lengths assumed to be midpoints (e.g. 10 mm represents
 9.5-10.5 mm).
+
+Juliana: The lengths with 0.01mm accuracy are all measured crustaceans, as
+they're typically small and its the standard to measure them with a vernier
+caliper. All other species were measured to the 1mm accuracy, as we used a
+standard lab metric tape. So if we have 27 its correct to say it is 27.00. With
+this in mind, I would define b) 26.5 - 27.5 mm as the bin value for 27.00.
+
+And for the 0.01 mm accuracy it really isn't going to make much difference
+exactly how
+we define the bin, so say 26.13 is 26.125-26.135 for consistency. (Have to
+assume this for `calc_max_of_bin()` and need a weight range for each length).
+
 
 Thirdly, we have species-specific length-weight coefficients.
 ```{r lwcoeffs}
