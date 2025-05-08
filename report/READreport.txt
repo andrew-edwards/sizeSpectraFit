@@ -9,7 +9,10 @@ mediterranean-analysis-2/ - pdf as discussed in our chat on 8/5/25. Figuring out
   Have confirmed that the running of meditteranean-data.Rmd (renamed from
   data-raw/zabala-data.Rmd) has not change the data .rda files, so this code
   should still produce the same results (8/5/25, check the commit dates of .rda
-  files if looking to fully reproduce the results).
+  files if looking to fully reproduce the results). Not committing; if want
+  early version then get first version of
+  mediterranean-analysis-3/med-analysis.Rmd and med_summary.Rmd, as they are
+  copied into that directory before editing.
 
 mediterranean-analysis-3/
  med-analysis.Rmd - renaming and adapting med...-2/zabala-data-analysis.Rmd,

@@ -1,5 +1,5 @@
 ---
-title: "Analysing Juliana Zabala's data having wrangled it"
+title: "Analysing Mediterranean data using MLEbins"
 author: "Andrew Edwards and Juliana Zabala"
 output: pdf_document
 fontsize: 12pt
@@ -11,8 +11,8 @@ knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "",
   cache = TRUE,
-  cache_path = "zabala-data-analysis-cache/",
-  fig.path = "zabala-data-analysis-figs-cache/",
+  cache_path = "med-analysis-cache/",
+  fig.path = "med-analysis-figs-cache/",
   fig.width = 7,
   fig.height = 9
 )
@@ -21,7 +21,7 @@ knitr::opts_chunk$set(
 
 ```{r, build, echo = FALSE, eval = FALSE}
 # To build either run this line or click knit button in RStudio:
-rmarkdown::render("zabala-data-analysis.Rmd")
+rmarkdown::render("med-analysis.Rmd")
 ```
 
 ```{r, packages, echo = FALSE, cache = FALSE}
@@ -30,20 +30,27 @@ load_all()
 #library(sizeSpectra2)    # Need latest version
 ```
 
-Having saved the data in the package via `zabala-data.Rmd`, do the size spectra
-analyses here. TODO then move this to report or vignette folder.
+Data are saved in the package. Doing MLEbins on full community and then each
+species group in turn. Not worth fully functionalising as have to manually check
+some things.
 
-Copy and pasting analysis for a particular species group, then just find and
+In earlier analysis we had looked at determining a global xmin and xmax within
+each strata, but this ends up throwing out a lot of data (lots of small fish),
+so going to stick with determining xmin using the modal approach independently
+for each strata within a group. This is what we did for the North Sea data in
+the MEPS paper.
+
+TODO edit: Copy and pasting analysis for a particular species group, then just find and
 replacing the group name and the short name. Need to examine results and so
 can't just make one giant function. The later groups are probably best to use as
 templates as the analyses and code got refined along the way.
 
 ## Data
-We have data and the length-weight coefficients in a standard form. Had analysed
-in `zabala-data.Rmd` but want to reduce and functionalise those steps here.
 
-TODO then use same functions to check
-Fung results.
+We have data and the length-weight coefficients saved in a standard form in the
+package, and also knowledge of the accuracty of the measurements. We need to
+combine these to get the inputs required for MLEbins, namely counts in each
+species-specific weight bin.
 
 So we have three pieces of information. First is the measurements:
 ```{r medcalcs}
@@ -53,7 +60,7 @@ summary(mediterranean_data)
 which we want to fit the size spectrum for each strata-group
 combination. The data can have repeated measurements for the same
 strata-group-length combination. We will aggregate such examples at the analysis
-stage (could do earlier but best to keep data similar to original format).
+stage.
 
 Second piece is the definition of lengths. They are in mm, with integers measured to nearest mm and ones
 with decimals assumed to be measured to 0.01 mm (assuming this will mis-specify, presumably
@@ -79,13 +86,12 @@ mediterranean_length_weight_coefficients
 ```
 which assume units of cm (not mm) and grammes.
 
-## Analyses
 
-Pick one combination first, functionalise what we can, then do each in turn as
-do need to think about results and xmin choice (i.e. don't do one giant loop).
+## Combine data
 
-1. Create weight bins  TODO make a function that's general, but for now can just
-do once to get results for each strata-group combination
+Could functionalise this, but worth doing in steps since other data sets will
+have subtleties specific to them.
+
 ```{r onestratagroup}
 dat_bin_breaks <- calc_max_of_bin(mediterranean_data$length,
                                   bin_widths = c(0.01, 1))
@@ -103,11 +109,8 @@ dat_joined <- dplyr::left_join(dat_all,
   dplyr::mutate(weight_bin_min = alpha * (length_bin_min/10)^beta,
                 weight_bin_max = alpha * (length_bin_max/10)^beta) %>%
   # remove species with no length-weight coefficients:
-  dplyr::filter(!is.na(alpha)) %>%
-  dplyr::mutate(strata = recode(strata,
-                                TBA = "baseline",
-                                FG = "fg",
-                                MPA = "ntr"))       # lower case and be consistent
+  dplyr::filter(!is.na(alpha))
+
 
 # TODO Could add argument for 10 depending on mm or cm
 
@@ -244,6 +247,8 @@ plot(res_full_baseline,
 ```
 
 
+TODO edit: Also, the results show clear distinct ranges of data.
+
 \clearpage
 
 # Crustacea
@@ -257,7 +262,6 @@ baseline. But determining explicitly here.
 data_crust_baseline <- mediterranean_for_mlebins(dat_joined,
                                                  group_name = "Crustacea",
                                                  strata_name = "baseline")
-
 
 res_crust_baseline <- determine_xmin_and_fit_mlebins(data_crust_baseline)
 
