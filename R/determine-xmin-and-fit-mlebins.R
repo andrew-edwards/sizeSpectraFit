@@ -27,13 +27,16 @@ determine_xmin_and_fit_mlebins <- function(dat_for_mlebins,
                                     bin_start = bin_start)
 
   if(is.null(x_min)){
-    x_min <- determine_xmin(hh)
-  }
+    x_min_based_on_hist <- determine_xmin(hh)     # TODO change function name to
+                                                  # determine_xmin_based_on_hist
 
-  # Just set x_min to be the minimum value if it comes out as 0. TODO add to
-  #  MLEbin function probably.
-  if(x_min == 0){
-    x_min = min(dat_for_mlebins$bin_min)
+    # Now set x_min to be the minimum value that is above x_min_based_on_hist,
+    #  because the latter is based on histograms bin breaks (which are somewhat
+    #  arbitrary, though likely integers). This will also work for the case
+    #  where x_min_based_on_hist comes outt as 0.
+    # TODO add to  MLEbin function probably, though think this function can be used.
+    x_min = min(dplyr::filter(dat_for_mlebins,
+                              bin_min >= x_min_based_on_hist)$bin_min)
   }
 
   # Not determining x_max separately here so no need to mention it, it gets

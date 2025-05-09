@@ -40,8 +40,12 @@ determine_xmin_and_fit <- function(x,
                   bin_start = bin_start)
 
 
-  x_min <- determine_xmin(hh)
+  x_min <- determine_xmin(hh)      # TODO add in here what I did for MLEbins,
+                                   # and change determine_xmin() function name
+  # to determine_xmin_based_on_hist
 
+
+  # TODO change this to be the minimum x above that x_min
   mle_fit <- fit_size_spectrum.numeric(x,
                                        x_min = x_min,
                                        ...)

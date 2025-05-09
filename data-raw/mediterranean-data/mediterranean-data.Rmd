@@ -381,12 +381,10 @@ data <- dplyr::select(data_full,
                 species = NomEspecie,
                 length = Talla_mm,
                 number = Abundancia_NIndividusTalla_Km2) %>%
-
-HERE
-dplyr::mutate(strata = dplyr::recode(strata,
-                              TBA = "baseline",
-                              FG = "fg",
-                              MPA = "ntr"))       # lower case and be consistent
+  dplyr::mutate(strata = dplyr::recode(strata,
+                                       TBA = "baseline",
+                                       FG = "fg",
+                                       MPA = "ntr"))  # lower case and be consistent
 
 
 data

@@ -10,6 +10,8 @@
 ##'  TODO
 ##' }
 determine_xmin <- function(h){
+  # change function name to determine_xmin_based_on_hist, since adapting in the
+  # various calls to have xmin not be the bin break.
   stopifnot("h needs to be a histogram object" =
               class(h) == "histogram")
 

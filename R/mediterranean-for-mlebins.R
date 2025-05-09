@@ -4,8 +4,10 @@
 ##' See `zabala-data-analysis.Rmd`. This is specific to this data set, but can
 ##'   easily be adapted/generalised for others
 ##' @param dat tibble of data already with certain columns TODO
-##' @param strata strata to analyse, if not specified then use all
-##' @param group species group to analyse, if not specified then use all
+##' @param group_name group to analyse, if not specified then use all
+##' @param strata_name strata to analyse, if not specified then use all
+##' @param minimum_length remove fish shorter than this
+##' @param maximum_length  remove fish longer than this  TODO not incorporated yet
 ##' @return tibble to go into [fit_size_spectrum()], including the species
 ##'   column so it uses MLEbins method TODO double check that flow through
 ##' @export
@@ -17,7 +19,8 @@
 mediterranean_for_mlebins <- function(dat,
                                       group_name = NULL,
                                       strata_name = NULL,
-                                      minimum_length = NULL){
+                                      minimum_length = NULL,
+                                      maximum_length = NULL){
   if(is.null(group_name)){
     group_name <- unique(dat$group)
   }
