@@ -31,7 +31,10 @@ load_all()
 ```
 
 This is after setting xmin to be the min `bin_min` value above the histogram
-determined minimum. Still have big fish in there.
+determined minimum. Now removing the big fish. For Actin, big fish are very
+rare, not really sampling for them. Bit random to catch
+them, so suggest removing. We agreed a cut off of 1500 g because of the gaps
+in the sizes. Nothing between 1335 and 2396, clear gap. Can see details below.
 
 Data are saved in the package. Doing MLEbins on full community and then each
 species group in turn. Not worth fully functionalising as have to manually check
@@ -43,7 +46,7 @@ so going to stick with determining xmin using the modal approach independently
 for each strata within a group. This is what we did for the North Sea data in
 the MEPS paper.
 
-TODO edit: Copy and pasting analysis for a particular species group, then just find and
+Copy and pasting analysis for a particular species group, then just find and
 replacing the group name and the short name. Need to examine results and so
 can't just make one giant function. The later groups are probably best to use as
 templates as the analyses and code got refined along the way.
@@ -138,8 +141,11 @@ which are going to be sporadically caught. Given that, and the big jump, we
 determined that removing fish $>1500$~g is a sensible thing to do. Do it here in
 the data processing stage so it's done throughout.
 
-TODO not done yet, want to finish first to have something to compare with
-original results regarding the other changes to actin and chrond.
+```{r, largefish2}
+dat_joined <- dplyr::filter(dat_joined,
+                            weight_bin_min <= 1500)
+```
+That will get used in all the analyses.
 
 \clearpage
 

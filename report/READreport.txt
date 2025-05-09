@@ -19,6 +19,7 @@ mediterranean-analysis-3/
  med-summary.Rmd from - renaming and adapting med...-2/zabala-summary.Rmd.
  Doing what we discussed in the 8/5/25 discussion.
 
+ saving the .pdfs with new filenames in these:
  - xmin-still-integer/ - results saved (with <100 mm not excluded but big fish still
    included)  while still having xmin be the min of the
    integer bin, before changing to min bin_min above the min of the integer
@@ -27,4 +28,5 @@ mediterranean-analysis-3/
 
  - xmin-not-integer/ above run but setting xmin to be the min bin_min above the
    histogram determined version. Should note that when describing histograms.
-   NOT COMPARED wiht previous yet, copying over and running the no-large-fish fun.
+   NOT COMPARED wiht previous yet, copying over and running the no-large-fish
+   fun.
