@@ -1,9 +1,9 @@
 ---
-title: "Fit data and plot results"
+title: "Fit data and plot results - MLE and MLEbin methods"
 author: "Andrew Edwards"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Fit data and plot results}
+  %\VignetteIndexEntry{Fit data and plot results - MLE and MLEbin methods}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 date: "Last rendered on `r format(Sys.time(), '%d %B, %Y')`"
@@ -32,7 +32,8 @@ method to use based on the class of the data, as described by Table 2 in our
 
 TODO For README file. Let's have a simple vector of real measurements, and do
 the fitting and plotting functions, without extra explanation. This will show
-the simplicity, and refer to vignette for more details.
+the simplicity, and refer to vignette for more details. Can use the MLEbins
+vignette maybe (when it's done).
 
 ### Vector of individual measurements
 
@@ -154,9 +155,6 @@ body mass $\geq$ 1.5 g is between
 (all individuals could conceivably be 1.7 g and therefore all are $\geq$ 1.5 g)
 and `r sum(res_binned$data$bin_count)` (all individuals in the first bin are
 actually $<$ 1.5 g).
-
-
-HERE
 
 The text
 in (a) gives the MLE for the size-spectrum exponent

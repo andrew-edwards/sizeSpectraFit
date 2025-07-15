@@ -1,5 +1,7 @@
-##' Plot a binned ISD plots similar to MEPS Figure 7 (but with nonoverlapping
-##' bins). Also directly called from `plot.size_spectrum_mlebins()` with no
+##' Plot binned ISD plots similar to MEPS Figure 7 (but with nonoverlapping
+##' bins).
+##'
+##' Also directly called from `plot.size_spectrum_mlebins()` with no
 ##' extra arugments for MLEbins method.
 ##'
 ##' @inheritParams plot.size_spectrum_numeric

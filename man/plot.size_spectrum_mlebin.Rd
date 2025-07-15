@@ -2,7 +2,9 @@
 % Please edit documentation in R/plot.size_spectrum_mlebin.R
 \name{plot.size_spectrum_mlebin}
 \alias{plot.size_spectrum_mlebin}
-\title{Plot a binned ISD plots similar to MEPS Figure 7 (but with nonoverlapping bins)}
+\title{Plot a binned ISD plots similar to MEPS Figure 7 (but with nonoverlapping
+bins). Also directly called from \code{plot.size_spectrum_mlebins()} with no
+extra arugments for MLEbins method.}
 \usage{
 \method{plot}{size_spectrum_mlebin}(
   res_mlebin,
@@ -15,7 +17,7 @@
   legend_label_a = "(a)",
   legend_label_b = "(b)",
   legend_label_single = NULL,
-  legend_text_a = paste0("b=", signif(res_mlebin$b_mle, mle_round)),
+  legend_text_a = paste0("b=", round(res_mlebin$b_mle, mle_round)),
   legend_text_a_n = paste0("n=", round(sum(res_mlebin$data$bin_count))),
   legend_text_b = NULL,
   legend_text_b_n = NULL,
@@ -68,7 +70,9 @@ one- or two-panel plot of the ISD with data in binned form like in
 Fig. 7, 7a or 7b (depending on settings) of MEPS paper, but with nonoverlapping bins; returns nothing.
 }
 \description{
-Plot a binned ISD plots similar to MEPS Figure 7 (but with nonoverlapping bins)
+Plot a binned ISD plots similar to MEPS Figure 7 (but with nonoverlapping
+bins). Also directly called from \code{plot.size_spectrum_mlebins()} with no
+extra arugments for MLEbins method.
 }
 \examples{
 \dontrun{

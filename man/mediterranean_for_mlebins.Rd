@@ -5,14 +5,24 @@
 \title{Extract and format the required Mediterranean data for MLEbins analysis, for
 a given strata and group}
 \usage{
-mediterranean_for_mlebins(dat, group_name, strata_name)
+mediterranean_for_mlebins(
+  dat,
+  group_name = NULL,
+  strata_name = NULL,
+  minimum_length = NULL,
+  maximum_length = NULL
+)
 }
 \arguments{
 \item{dat}{tibble of data already with certain columns TODO}
 
-\item{strata}{strata to analyse}
+\item{group_name}{group to analyse, if not specified then use all}
 
-\item{group}{species group to analyse}
+\item{strata_name}{strata to analyse, if not specified then use all}
+
+\item{minimum_length}{remove fish shorter than this}
+
+\item{maximum_length}{remove fish longer than this  TODO not incorporated yet}
 }
 \value{
 tibble to go into \code{\link[=fit_size_spectrum]{fit_size_spectrum()}}, including the species

@@ -15,7 +15,7 @@ plot_isd_binned(
   y_plb_conf_max,
   plot_conf_ints = TRUE,
   xlab = expression(paste("Values, ", italic(x))),
-  ylab = expression(paste("Number of ", values >= x), sep = ""),
+  ylab = expression(paste("Total ", counts >= x), sep = ""),
   mgp_val = c(1.6, 0.5, 0),
   tcl_small = -0.2,
   inset_label = c(0, 0),
@@ -23,6 +23,7 @@ plot_isd_binned(
   legend_label = NULL,
   legend_text = NULL,
   legend_text_n = NULL,
+  legend_text_second_row_multiplier = 2,
   legend_position = "topright",
   x_big_ticks = NULL,
   x_big_ticks_labels = NULL,
@@ -75,6 +76,9 @@ be modified as required.}
 
 \item{legend_text}{text to put in the corner, defaults to \verb{b = <value>}. Set to
 \code{NA} to have none, and modify default if needed.}
+
+\item{legend_text_second_row_multiplier}{numeric multiplier of the second
+row of legend text to space it out, especially for smaller panel plots.}
 
 \item{legend_position}{where to place legend, gets used as the first
 argument in \code{\link[=legend]{legend()}}.}
