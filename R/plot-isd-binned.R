@@ -4,7 +4,7 @@
 ##' @inheritParams plot.size_spectrum_mlebin
 ##' @param x_plb vector of values to use to plot the fitted PLB curve; if NA then
 ##'   automatically calculated (sometimes need to manually extend it to hit the
-##'   x-axis, but tricky to automate that on a log-scale
+##'   x-axis, but tricky to automate that on a log-scale)
 ##' @param y_plb vector of values corresponding to the MLE fit of the PLB
 ##'   distribution at each value of `x_PLB`
 ##' @param y_plb_conf_min, y_plb_conf_max vector of values corresponding to the fit, using the
@@ -167,12 +167,14 @@ plot_isd_binned <- function(res_mlebin,
   }
 
   lines(x_plb, y_plb, col = fit_col, lwd = fit_lwd)   # Plot line last so can see it
-  lines(x_plb, y_plb_conf_min, col = fit_col, lty = conf_lty)
-  lines(x_plb, y_plb_conf_max, col = fit_col, lty = conf_lty)
+  if(plot_conf_ints){
+    lines(x_plb, y_plb_conf_min, col = fit_col, lty = conf_lty)
+    lines(x_plb, y_plb_conf_max, col = fit_col, lty = conf_lty)
+  }
 
 # TODO fix the legend
 
-  if(!is.null(legend_label)){
+  if(!is.null(legend_label)){   # plot_isd has as.character
     legend("topright",
            legend_label,
            bty = "n",

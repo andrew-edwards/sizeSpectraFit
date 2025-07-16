@@ -1,57 +1,41 @@
-##' Single plot of individual size distribution of values and the MLE fit with
-##' confidence intervals TODO Going to simplify this and call plot_isd(), which
-##' is a copy of this right now. THen maybe this defaults to doing log-log and
-##' lin plot like Fig 7 MEPS default that we also have for MLEbin. And add
+##' Plot individual size distribution of values and the MLE fit with
+##' confidence intervals
+##'
+##' Plots one- or two-panel plot of the ISD and data. Two-panel plot is only for when
+##' the data represent body masses, and gives the normalised biomass on log-log
+##' axes and the individual points on log-log axes, both with the fitted
+##' PLB distribution from the MLE method; this is essentially Fig. 6 of MEE
+##' paper, but with bins in the top panel rather than points.
+##'
+##' For one-panel plot, it is either a linear y-axis or a logarithmic y-axis
+##' (the latter being Fig. 6b of MEE paper, and is the default). Type of plot is
+##' determined by the `log_y_axis` argument.
+##'
+##'
+##' TODO this defaults to doing log-log and
 ##' option for recommended plot from MEE if it's biomass. Can always bin anyway
 ##' and just not normalise.
 ##'
-##' Plot the results from a PLB fit to a vector of values, as in Figure 2h and 6b of
-##' [1](http://onlinelibrary.wiley.com/doi/10.1111/2041-210X.12641/full). Also
-##' shows PLB fits using the values of `b` at the ends of the confidence intervals.
-##' TODO add argument to do all of Figure 6.
-##'
+##' @inheritParams plot_isd
 ##' @param res size_spectrum_numeric object, as output from
 ##'   [fit_size_spectrum.numeric()], which gets called when applying
 ##'   [fit_size_spectrum()] to a numeric vector
-##' @param log Which axes to log, for `plot(..., log = log)`. So "xy" for
-##'   log-log axes, "x" for only x-axis logged.
-##' @param plot_conf_ints logical whether to plot PLB fit for confidence
-##'   intervals or not
-##' @param xlab, ylab x/y labels, explicitly given default values here which can
-##'   be modified as required.
-##' @param mgp_val mgp values to use, as in `plot(..., mgp = mgp_vals)`; see [?par].
-##' @param tcl_small Length of small tickmarks; see [?axis].
-##' @param legend_text text to put in the corner, defaults to `b = <value>`. Set to
-##'   `NA` to have none, and modify default if needed.
-##' @param legend_position where to place legend, gets used as the first
-##'   argument in [legend()].
-##' @param inset Inset distance for legend
-##' @param x_big_ticks, y_big_ticks numeric vector of big tick marks on
-##'   x-axis/y-axis. If NULL then gets done automatically, so if that does not
-##'   look good then define explicitly here, plus `x_big_ticks_labels` and/or `y_big_ticks_labels`.
-##' @param x_big_ticks_labels, y_big_ticks_labels numeric vector of big tick
-##'   marks to label on x-axis/y-axis. If NULL then gets done automatically, so
-##'   if that does not look good then define explicitly here
-##' @param x_small_ticks, y_small_ticks  numeric vector of small tick marks on x-axis/y-axis. If
-##'   NULL then gets done automatically, so if that does not  look good then
-##'   define explicitly here.
-##' @param x_small_ticks_by, y_small_ticks_by  numeric vector of increment to
-##'   use to generate small tick marks on x-axis/y-axis. Will conincide with the
-##'   big tick marks and extend beyond them. Can only define `x_small_ticks` or
-##'   `x_small_ticks_by` (same for `y_...`). Only relevant for linear axes. Set
-##'   to `NA` to force no small unlabelled tickmarks.
-##' @param x_small_ticks_labels, y_small_ticks_labels numeric vector of big tick
-##'   marks to label on x-axis/y-axis. If NULL then gets done automatically, so
-##'   if that does not look good then define explicitly here
-##' @param ... Further arguments for `plot()`
-##' @return Single figure of ISD on log-log plot (or log-linear depending on the
-##'   options given), with values as points and PLB fit (and fits of confidence
-##'   limits) as solid (and dashed) lines; returns nothing.
+##' @param log_y_axis character either `"both"`, do two plots (like Fig. 6 of
+##'   MEE paper, where the top panel is bins of normalized biomss, so only
+##'   suitable when the data are body masses), `"no"` for single plot with
+##'   linear y axis, `"yes"` for single plot with logarithmic y axis (just Fig. 6b
+##'   of MEE paper). Legends are automatically set, but can be tailored with the
+##'   arguments defined below.
+##' @param ... Further arguments for `plot_isd()` and then `plot()`
+##' @return One- or two-panel plot of raw data and PLB distribution (and fits of
+##'   confidence limits) as solid (and dashed) fitted using MLE method; returns
+##'   nothing.
 ##'
 ##' @export
 ##' @author Andrew Edwards
 ##' @examples
 ##' \dontrun{
+##' # TODO
 ##' res_vec <- fit_size_spectrum(sim_vec)
 ##' plot(res_vec)
 ##' plot(res_vec, log = "x")
@@ -60,36 +44,38 @@
 ##'   labels for a particular figure
 ##' }
 plot.size_spectrum_numeric <- function(res,
-                                       log = "xy",
-                                       plot_conf_ints = TRUE,
-                                       xlab = expression(paste("Values, ", italic(x))),
-                                       ylab = expression( paste("Number of ", values >= x), sep=""),
-                                       mgp_val = c(1.6, 0.5, 0),
-                                       tcl_small = -0.2,
-                                       legend_text = expression(paste("b=",
-                                                                      signif(res$b_mle,
-                                                                             3),
-                                                                      sep="")),
-                                       legend_position = "topright",
-                                       inset = c(0, 0),
-                                       x_big_ticks = NULL,
-                                       x_big_ticks_labels = NULL,
-                                       x_small_ticks = NULL,
-                                       x_small_ticks_by = NULL,
-                                       x_small_ticks_labels = NULL,
-                                       y_big_ticks = NULL,
-                                       y_big_ticks_labels = NULL,
-                                       y_small_ticks = NULL,
-                                       y_small_ticks_by = NULL,
-                                       y_small_ticks_labels = NULL,
+                                       log_y_axis = "both",
+                                       xlim = c(min(res$x),
+                                                max(res$x)),
+                                       ylim = NA,
+                                       x_plb = NA,
+                                       y_scaling = 0.75,
+                                       mle_round = 2,
+                                       legend_label_a = "(a)",
+                                       legend_label_b = "(b)",
+                                       legend_label_single = NULL, # for just one
+                                       # panel
+                                       # Use the a ones for single also TODO in help
+                                       legend_text_a = paste0("b=",
+                                                              round(res$b_mle,
+                                                                    mle_round)),
+                                       legend_text_a_n = paste0("n=",
+                                                                round(length(res$x))),
+                                       legend_text_b = NULL,
+                                       legend_text_b_n = NULL,
                                        ...){
 
-  stopifnot("Cannot define both x_small_ticks and x_small_ticks_by" =
-              !(!is.null(x_small_ticks) & !is.null(x_small_ticks_by)))
-  stopifnot("Cannot define both y_small_ticks and y_small_ticks_by" =
-              !(!is.null(y_small_ticks) & !is.null(y_small_ticks_by)))
+  stopifnot("log_y_axis must be both, yes, or no" =
+              log_y_axis %in% c("both", "yes","no"))
+
+  # Work out calculations needed for both types of plot and then pass them on to
+  # plot_isd() (and plot_isd_binned() for `both`).:
 
   x <- res$x
+
+  x_min <- min(x)
+  x_max <- max(x)
+  n <- length(x)
 
   # not sure these are needed; if xlim, ylim don't get specified won't they just
   # end up as these? TODO
@@ -101,84 +87,87 @@ plot.size_spectrum_numeric <- function(res,
   ##   ylim_global = c(1, length(x))
   ##   }
 
-  # To plot rank/frequency style plot:
-  plot(sort(x,
-            decreasing=TRUE),
-       1:length(x),
-       log = log,
-       xlab = xlab,
-       ylab = ylab,
-       mgp = mgp_val,
-       axes = FALSE,
-       ...)
+  # x values to plot PLB if not provided; need high resolution for both plots.
+  if(is.na(x_plb)){
+    x_plb <- exp(seq(log(x_min),
+                     log(x_max),
+                     length = 10000))
 
-  # xlim, ylim will get automatically used above. These might not be needed
-  # explicitly if just calc them in add_ticks():
-#  x_lim = 10^par("usr")[1:2]
-#  y_lim = 10^par("usr")[3:4]
+    #  Need to insert value close to xmax to make log-log curve go down further;
+    #   since log(1 - pplb(xmax, ...)) = log(0) = -Inf   we need to force the asymptopte
+    x_plb_length <- length(x_plb)
+    x_plb <- c(x_plb[-x_plb_length],
+               0.9999999999 * x_plb[x_plb_length],
+               x_plb[x_plb_length])
+  }
 
-  # Add tickmarks and labels
-  add_ticks(#x_lim = x_lim,
-    #y_lim = y_lim,
-    log = log,
-    tcl_small = tcl_small,
-    mgp_val = mgp_val,
-    x_big_ticks = x_big_ticks,
-    x_big_ticks_labels = x_big_ticks_labels,
-    x_small_ticks = x_small_ticks,
-    x_small_ticks_by = x_small_ticks_by,
-    x_small_ticks_labels = x_small_ticks_labels,
-    y_big_ticks = y_big_ticks,
-    y_big_ticks_labels = y_big_ticks_labels,
-    y_small_ticks = y_small_ticks,
-    y_small_ticks_by = y_small_ticks_by,
-    y_small_ticks_labels = y_small_ticks_labels)
-
-  box()
-
-  ## if(log.xy == "x"){
-  ##   mgpVal = c(2, 0.5, 0)
-  ##   logTicks(xLim,
-  ##        yLim = NULL,
-  ##        xLabelSmall = c(5, 50, 500),
-  ##        mgpVal = mgpVal)
-
-  x_plb = seq(min(x),
-              max(x),
-              length=1000)     # x values to plot PLB
   y_plb = (1 - pPLB(x = x_plb,
                     b = res$b_mle,
                     xmin = min(x_plb),
-                    xmax = max(x_plb))) * length(x)
-  lines(x_plb,
-        y_plb,
-        col="red")
+                    xmax = max(x_plb))) * n
+  # To add curves for the limits of the 95% confidence interval of b:
+  y_plb_conf_min = (1 - pPLB(x = x_plb,
+                             b = res$b_conf[1],
+                             xmin = min(x_plb),
+                             xmax = max(x_plb))) * n
+  y_plb_conf_max = (1 - pPLB(x = x_plb,
+                             b = res$b_conf[2],
+                             xmin = min(x_plb),
+                             xmax = max(x_plb))) * n
 
-  if(plot_conf_ints){
-    for(i in 1:length(res$b_conf)){
-      lines(x_plb,
-            (1 - pPLB(x = x_plb,
-                      b = res$b_conf[i],
-                      xmin = min(x_plb),
-                      xmax = max(x_plb))) * length(x), # TODO make more negative
-                                        # I think, see other example
-      col="red",
-      lty=2)
-    }
+  if(is.na(ylim)){
+    ylim <- c(y_scaling,
+              length(x))
+   # TODO in help mention for this one it just scales
+                           # the y-axis since always multiplied by 1, the rank
+                           # of largest value
   }
 
-  if(!is.na(as.character(legend_text))){
-    legend("topright",
-           eval(legend_text),
-           bty = "n",
-           inset = inset)
-  }
+  if(log_y_axis == "both"){
+    par(mfrow = c(2,1))
+    # TODO bin the data with LBN and show fit
 
-    # Original code had this, may need but doubt it
-    # if(panel == "h"){
-    # legJust(c("(h) MLE",
-    #             paste("b=", signif(b, 3), sep="")),
-    #           inset=inset,
-    #           logxy=TRUE)
-    # }
+# HERE - use bin_data()
+    plot_isd_binned(res_mlebin = res_mlebin,
+                    log = "x",
+                    xlim = xlim,
+                    ylim = ylim,
+                    x_plb = x_plb,
+                    y_plb = y_plb,
+                    y_plb_conf_min = y_plb_conf_min,
+                    y_plb_conf_max = y_plb_conf_max,
+                    legend_label = legend_label_a,
+                    legend_text = legend_text_a,
+                    legend_text_n = legend_text_a_n,
+                    ...)  # ADD in more options maybe, see plot_isd_binned; figure out
+                          # useArgs() thing. Copy to next ones
+
+   plot_isd(res = res,
+             log = "xy",
+             xlim = xlim,
+             ylim = ylim,
+             x_plb = x_plb,
+             y_plb = y_plb,
+             y_plb_conf_min = y_plb_conf_min,
+             y_plb_conf_max = y_plb_conf_max,
+             legend_label = legend_label_single,
+             legend_text = legend_text_a,
+             legend_text_n = legend_text_a_n,
+             ...)
+   } else {
+    plot_isd(res = res,
+             log = ifelse(log_y_axis == "yes",
+                          "xy",
+                          "x"),
+             xlim = xlim,
+             ylim = ylim,
+             x_plb = x_plb,
+             y_plb = y_plb,
+             y_plb_conf_min = y_plb_conf_min,
+             y_plb_conf_max = y_plb_conf_max,
+             legend_label = legend_label_single,
+             legend_text = legend_text_a,
+             legend_text_n = legend_text_a_n,
+             ...)
+  }
 }

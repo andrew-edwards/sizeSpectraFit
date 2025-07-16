@@ -95,6 +95,8 @@ plot(res_vec,
      x_small_ticks_labels = c(5, 50, 500))
 ```
 
+HERE - see here in `plot.size_spectrum_numeric()`
+
 TODO After doing MLEbin below , then come back and add extra options for biomass
 LBN type plot for this one (since will first
 create binned figures for MLEbin).

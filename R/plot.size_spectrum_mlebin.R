@@ -1,6 +1,10 @@
 ##' Plot binned ISD plots similar to MEPS Figure 7 (but with nonoverlapping
 ##' bins).
 ##'
+##' Plots one- or two-panel plot of the ISD with data in binned form like in
+##'   Fig. 7, 7a or 7b (depending on settings) of MEPS paper, but with
+##'   nonoverlapping bins. See `log_y_axis` to specify exact plot(s).
+##'
 ##' Also directly called from `plot.size_spectrum_mlebins()` with no
 ##' extra arugments for MLEbins method.
 ##'
@@ -72,7 +76,7 @@ plot.size_spectrum_mlebin <- function(res_mlebin,
   dat <- res_mlebin$data
   n <- sum(dat$bin_count)
 
-  # Cpying from sizeSpectra::ISD_bin_plot()
+  # Copying from sizeSpectra::ISD_bin_plot()
 
   # Think I can just put in arguments as defaults
   #  if(missing(xlim)){
@@ -83,10 +87,10 @@ plot.size_spectrum_mlebin <- function(res_mlebin,
   # TODO don't think want to be able to define these, are they have been by
   # definition when do the mlebin calculation.
   #  if(is.na(xmin)){
-  x_min = min(dat$bin_min)
+  x_min <- min(dat$bin_min)
 
   #if(is.na(xmax)){
-  x_max = max(dat$bin_max)
+  x_max <- max(dat$bin_max)
 
   # x values to plot PLB if not provided; need high resolution for both plots.
   if(is.na(x_plb)){
