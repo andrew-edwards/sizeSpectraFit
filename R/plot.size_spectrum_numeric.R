@@ -125,10 +125,39 @@ plot.size_spectrum_numeric <- function(res,
 
   if(log_y_axis == "both"){
     par(mfrow = c(2,1))
-    # TODO bin the data with LBN and show fit
+    # Going to plot with LBN method, so create an object that looks like output
+    # of `plot.size_spectrum_mlebin()` to be called by
+    # `plot_isd_binned()`. Rest of this comment might be wrong, since we want to
+    # just calculate manually here what we actually need. THere is no
+    # uncertainty in body mass of individuals in each bin, as we do know the
+    # individual body masses.
+    # NOPE: Since also need the `count_gte_bin_min` etc. values,
+    # just fit the data using MLEbin but then change the MLE and conf intervals
+    # and more to match the ones already calculated using MLE. Though some of
+    # the further columns in res_mlebin$data are not relevant, since there is no
+    # uncertainty in the counts in a bin, since we have the raw data.
+    # ACTUALLY, some of that is wrong, we don't actually have vertical
+    # uncertainty, and this already calcs bin_sum_norm which is what we want for
+    # plotting.
 
-# HERE - use bin_data()
-    plot_isd_binned(res_mlebin = res_mlebin,
+HERE    actually, just call it with res and then do the bin_data within the plotting
+    function, so plotting can cope with MLEbin results also
+
+    x_binned <- bin_data(x,
+                         bin_width = "2k")
+    res_mlebin <- fit_size_spectrum.data.frame(x_binned)
+    res_mlebin_for_plot <- res_mlebin
+    # Replace results with those from MLE method, to then facilitate plotting.
+    res_mlebin_for_plot$b_mle <- res$b_mle
+    res_mlebin_for_plot$b_conf <- res$b_conf
+    res_mlebin_for_plot$x_min <- res$x_min
+    res_mlebin_for_plot$x_max <- res$x_max      # So curve might stop before end
+                                        # of last bin, but that's the xmax calculated.
+
+    plot_isd_binned(res_mlebin_for_plot,
+# NEEd argumjent to say do LBN plot
+HERE
+                    LBN_style = TRUE,
                     log = "x",
                     xlim = xlim,
                     ylim = ylim,

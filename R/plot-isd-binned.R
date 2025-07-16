@@ -1,4 +1,6 @@
-##' Plot a single binned ISD plot, as called from `plot.size_spectrum_mlebin()`
+##' Plot a single binned ISD plot, as called from `plot.size_spectrum_mlebin()`,
+##' or used directly from `plot.size_spectrum_numeric()` to make an LBN-style
+##' plot of individual values and MLE plot.
 ##'
 ##' @inheritParams plot.size_spectrum_numeric
 ##' @inheritParams plot.size_spectrum_mlebin
@@ -24,6 +26,9 @@
 ##' @param conf_lty line type to use for confidence intervals
 ##' @param legend_text_second_row_multiplier numeric multiplier of the second
 ##'   row of legend text to space it out, especially for smaller panel plots.
+##' @param LBN_style Whether to plot an LBN style plot (similar to Fig. 6a of MEE
+##'   paper), used directly from `plot.size_spectrum_numeric()` to give the
+##'   recommended Fig. 6 plot for MLE results, provided data are body masses.
 ##' @return single panel plot of the ISD with data in binned form like in
 ##'   Fig. 7a or 7b of MEPS paper, but with nonoverlapping bins; returns nothing.
 ##' @export
@@ -86,7 +91,7 @@ plot_isd_binned <- function(res_mlebin,
                               #        ySmall.tcl = -0.2,
                             #mgp.vals = c(1.6,0.5,0),
                             ){
-  # Not sure if needed, see plot_isd() also.
+  # Not sure if needed, see plot_isd() also and plot_lbn_style.
   stopifnot("Cannot define both x_small_ticks and x_small_ticks_by" =
               !(!is.null(x_small_ticks) & !is.null(x_small_ticks_by)))
   stopifnot("Cannot define both y_small_ticks and y_small_ticks_by" =
@@ -98,7 +103,7 @@ plot_isd_binned <- function(res_mlebin,
 # From ISD_bin_plot to adapt here, this is for linear y-axis, then have to tweak
   # to have the log option also:
 
-  dat <- res_mlebin$dat %>%
+  dat <- res_mlebin$data %>%
     dplyr::arrange(desc(bin_min))
                                    # Should overlay rectangles like in MEPS
                                   # Fig. 7, and not matter for
@@ -206,5 +211,5 @@ plot_isd_binned <- function(res_mlebin,
 
   box()     # to redraw axes over any boxes
 
-  # Prob need to return some things
+  invisible()
 }

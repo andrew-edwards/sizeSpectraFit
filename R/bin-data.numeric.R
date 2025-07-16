@@ -17,6 +17,6 @@ bin_data.numeric <- function(dat = NULL,
   counts_df$x <- as.numeric(levels(counts_df$x))
 
   yy <- bin_data.data.frame(counts_df,
-                           ...)
+                            ...)
   return(yy)
 }

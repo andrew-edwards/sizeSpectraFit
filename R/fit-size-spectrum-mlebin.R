@@ -35,10 +35,6 @@ fit_size_spectrum_mlebin <- function(dat,
   stopifnot("Need x_min < x_max (if not NULL)" =
               x_min < x_max)
 
-  if(x_min <= 0 | x_min >= x_max | d[1] == 0 | d[J] == 0 | min(d) < 0){
-    stop("Parameters out of bounds in fit_size_spectrum.data.frame() for MLEbin method")
-  }
-
 
   # To match equations, especially for internal tricky computations, but stick
   # with bin_min and bin_max for user code. TODO though I replace wmin and wmax
@@ -51,6 +47,9 @@ fit_size_spectrum_mlebin <- function(dat,
   J <- length(d)             # Number of bins
   n <- sum(d)     # TODO check if can be non-integer, think maybe. Check GoF stuff.
 
+  if(x_min <= 0 | x_min >= x_max | d[1] == 0 | d[J] == 0 | min(d) < 0){
+    stop("Parameters out of bounds in fit_size_spectrum.data.frame() for MLEbin method")
+  }
 
   mle_and_conf <- calc_mle_conf(this_neg_ll_fn = neg_ll_mlebin_method,
                                 p = b_start,
