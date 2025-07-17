@@ -97,6 +97,15 @@ plot(res_vec,
 
 HERE -
 
+for LBN plot:
+
+think bin_data.data.frame() needs options to start at min(x) precisely, not just floor(..),
+and also to truncate top bin at the max of the data. Go with: if using x values
+then calc xmin and xmax exactly, use xmin to start the binning, and cut the top
+bin off at xmax not the max of the generated bin. This is being done in plot_lbn_style.
+
+For pre-binned data, just have to stick with the bins we are given.
+
 next:
 p_biomass_bins.size_spectrum_numeric
 to then test:

@@ -9,8 +9,8 @@ bin_data.numeric <- function(dat = NULL,
     if(min(dat) <= 0)stop("dat needs to be >0 in bin_data")
   }
 
-  # Then just make a data.frame of counts for each measurement, and then use
-  #  `bin_data.data.frame()`
+  # Then just make a data.frame of counts for each measurement (no binning yet),
+  #  and then just use `bin_data.data.frame()`
 
   counts_df <- as.data.frame(table(dat))   # This does order them numerically
   names(counts_df) <- c("x", "counts")

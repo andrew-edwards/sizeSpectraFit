@@ -63,6 +63,5 @@ p_biomass_bins.size_spectrum_mlebin <- function(res_mlebin){   # result from mle
                        mle_conf_1_biomass_norm = mle_conf_1_biomass / bin_width,
                        mle_conf_2_biomass_norm = mle_conf_2_biomass / bin_width)
  # TODO think about cases of xmax
-  # TODO if this works then do  for mle conf # intervals also
 return(res)
 }

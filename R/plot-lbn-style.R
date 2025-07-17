@@ -70,10 +70,10 @@
 ##' @
 ##' @}
 plot_lbn_style <- function(res,
+                           x_plb,
                            xlim = NULL,    # xlim for figures and x_lim for
                                         # fitting, should adopt that
                            ylim = NULL,
-                           x_plb,
                            plot_conf_ints = TRUE,
                            plot_binned_fitted = TRUE,  # plot the binned fitted version
                            xlab = expression(paste("Body mass, ", italic(x))),
@@ -120,15 +120,14 @@ plot_lbn_style <- function(res,
   # mgp maybe need - see above commented option
 
   if("size_spectrum_numeric" %in% class(res)){
-    # Need to create bins manually
-    data_manual <- bin_data(res$x,
-                            bin_width = "2k")$bin_vals   # use bin_sum_norm for
+    # TODO use bin_sum_norm for
     # plotting, no uncertainty in y-axis for data
     # create biomass_calcs once done p_biomass_bins.size_spectrum_numeric(). TODO
 
     n <- sum(res$bin_count)
 
-HERE need to edit p_biomass_bins.size_spectrum_numeric
+    dat <- p_biomass_bins(res)
+
   } else {
     dat <- p_biomass_bins(res)
   }
@@ -175,7 +174,8 @@ HERE need to edit p_biomass_bins.size_spectrum_numeric
     y_small_ticks_labels = y_small_ticks_labels)
 
 
-  # won't work for MLE though, so adapt when doing that TODO
+  # won't work for MLE though, so adapt when doing that TODO  or might just do
+  # horizontal automatically which is what we want
   # Data:
   rect(xleft = dat$bin_min,
        ybottom = dat$low_biomass_norm,

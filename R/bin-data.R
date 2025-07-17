@@ -45,6 +45,10 @@
 ##' @param start_integer TRUE or FALSE, whether to start the bin breaks at an integer
 ##'   power of 2 (for method `"2k"`) or an integer. See `bin_width` above.
 ##'   `start_integer` is ignored if `bin_breaks` is specified.
+##' @param truncate_top_bin TRUE of FALSE, whether to truncate the top bin at
+##'   the max of the data, or let it have a maximum value based on the
+##'   bin-generating definition. Usually have it FALSE, but using TRUE for doing
+##'   LBN plot when we have the raw individual data.
 ##' @return list containing:
 ##'   * bin_for_each_x: tibble with a row for each `counts_df$x` value, with columns:
 ##'      + `x`: original `x` or `counts_df$x` values (depending on the input)

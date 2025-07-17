@@ -1,7 +1,7 @@
 ##' @rdname p_biomass_bins
-##' @param ... arguments to pass onto ????
+##' @param ... arguments to pass onto bin_data at least
 ##' @export
-##' TODO numeric version could create a data.frame first like bin_data.numeric does,
+##' TODO dont think this is needed: numeric version could create a data.frame first like bin_data.numeric does,
 ##'   then use p_biomass_bins.data.frame. Something like:
 ##'   ifelse(!is.null(binValsTibble),
 ##'         binTibble <- binValsTibble,
@@ -9,43 +9,61 @@
 ##'         binTibble <- dplyr::tibble(wmin = binBreaks[-length(binBreaks)],
 ##'                                    wmax = binBreaks[-1])
 ##'         )
-p_biomass_bins.size_spectrum_numeric <- function(res,   # result from MLE method
+p_biomass_bins.size_spectrum_numeric <- function(res_mle   # result from MLE method
                                                  ){
 
+  # TODO put some checks in, though given we have the class defined it should be
+  # good
 
-  # TODO put some checks in, though given we have the class defined it should be good
-  data <- res_mlebin$data
+      # Need to create bins manually
+  data <- bin_data(res_mle$x,
+                   bin_width = "2k")$bin_vals
+
   n <- sum(data$bin_count)
-  b <- res_mlebin$b
-  xmin <- res_mlebin$xmin
-  xmax <- res_mlebin$xmax
+  xmin <- res_mle$x_min
+  xmax <- res_mle$x_max
 
-  # for binned data, the range of possible biomass in a bin is the count in bin
-  #  * bin_min to count * bin_max. If individual values are known we also have
-  # low_count and high_count and exact biomass. But I think we wouldn't really
-  # do that (once we bin it we assume that's all we know). TODO clarify that
   res <- dplyr::mutate(data,
                        low_biomass = bin_min * bin_count,
                        high_biomass = bin_max * bin_count,
-                       low_biomass_norm = mle_low_biomass / bin_width,
-                       high_biomass_norm = mle_high_biomass / bin_width,
-                       # TODO test that this is allowed (passing columns as
-                       # arguments to functions; think it should be as things
-                       # like mean() work
+                       low_biomass_norm = low_biomass / bin_width,
+                       high_biomass_norm = high_biomass / bin_width,
                        mle_biomass =
-                         p_biomass(x = bin_max,
-                                   b = res_mlebin$b,
+                         p_biomass(x = data$bin_max,
+                                   b = res_mle$b_mle,
                                    xmin = xmin,
                                    xmax = xmax,
                                    n = n) -
-                         p_biomass(x = bin_min,
-                                   b = res_mlebin$b,
+                         p_biomass(x = data$bin_min,
+                                   b = res_mle$b_mle,
                                    xmin = xmin,
                                    xmax = xmax,
                                    n = n),
-                       mle_biomass_norm = mle_biomass / bin_width)
-  # TODO if this works then do  for mle conf # intervals also
-
-  }
-  return(res)
+                       mle_conf_1_biomass =
+                         p_biomass(x = data$bin_max,
+                                   b = res_mle$b_conf[1],
+                                   xmin = xmin,
+                                   xmax = xmax,
+                                   n = n) -
+                         p_biomass(x = data$bin_min,
+                                   b = res_mle$b_conf[1],
+                                   xmin = xmin,
+                                   xmax = xmax,
+                                   n = n),
+                       mle_conf_2_biomass =
+                         p_biomass(x = data$bin_max,
+                                   b = res_mle$b_conf[2],
+                                   xmin = xmin,
+                                   xmax = xmax,
+                                   n = n) -
+                         p_biomass(x = data$bin_min,
+                                   b = res_mle$b_conf[2],
+                                   xmin = xmin,
+                                   xmax = xmax,
+                                   n = n),
+                       mle_biomass_norm = mle_biomass / bin_width,
+                       mle_conf_1_biomass_norm = mle_conf_1_biomass / bin_width,
+                       mle_conf_2_biomass_norm = mle_conf_2_biomass / bin_width)
+ # TODO think about cases of xmax - think have done, just need to do tests
+return(res)
 }

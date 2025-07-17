@@ -21,7 +21,6 @@
 ##'   giving, for each bin:
 ##'   * median: median of the data
 ##'   * eti_lower: lower end of the ETI
-
 ##'
 ##'
 ##' TODO: somethin like:
@@ -49,7 +48,7 @@ p_biomass_bins <- function(res){
 }
 
 
-can delete this once used for both methods
+##"can delete this once used for both methods
 ##' TODO numeric version could create a data.frame first like bin_data.numeric does,
 ##'   then use p_biomass_bins.data.frame. Something like:
 ##'   ifelse(!is.null(binValsTibble),

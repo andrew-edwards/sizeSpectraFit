@@ -1,4 +1,4 @@
-##' Biomass distribution function from MEE equations A.4 and A.8
+##' Biomass cumulative distribution function from MEE equations A.4 and A.8
 ##'
 ##' Total biomass between `xmin` and `x`, assuming a bounded power-law
 ##' distribution of body masses between `xmin` and `xmax` and a given value of
@@ -7,13 +7,12 @@
 ##' Given by MEE equations A.4 and A.8. Can then be called by [p_biomass_bins()]
 ##' to give total biomass (and normalised biomass) in each bin.
 ##'
-##' ss need to adapt style:
 ##' @param x vector of values for which to calculate the total biomass between
 ##' `xmin` and the value
 ##' @param b estimated exponent of the PLB distribution
 ##' @param xmin minimum bound of the distribution, `xmin > 0`
 ##' @param xmax maximum bound for bounded distribution, `xmax > xmin`
-##' @param n
+##' @param n number of individuals (or total counts)
 ##' @return return vector of total biomass between `xmin` and each value of `x`
 ##' @export
 ##' @author Andrew Edwards
@@ -31,9 +30,12 @@ p_biomass <- function(x,
                       xmax,
                       n){
 
-  if(xmin <= 0 | xmin >= xmax | min(x) < xmin | max(x) > xmax | n <= 0){
+  if(xmin <= 0 | xmin >= xmax | n <= 0){
     stop("Parameters out of bounds in p_biomass")
   }
+
+  # return the biomass distribution at each value, but have to tweak any <x_min
+  #  and > x_max.
 
   if(b != -1){
     C <- (b+1) / ( xmax^(b+1) - xmin^(b+1) )
@@ -43,9 +45,15 @@ p_biomass <- function(x,
 
   if(b != -2){
     biomass <- n * C * (x^(b+2) - xmin^(b+2)) / (b + 2)
+    biomass_for_xmax <- n * C * (xmax^(b+2) - xmin^(b+2)) / (b + 2)  # might not
+                                        # be one of x
   } else {
     biomass <- n * C * (log(x) - log(xmin))
+    biomass_for_xmax <- n * C * (log(xmax) - log(xmin))
   }
+
+  biomass[x < xmin] <- 0         # so have zeros where x < xmin
+  biomass[x > xmax] <- biomass_for_xmax
 
   return(biomass)
 }

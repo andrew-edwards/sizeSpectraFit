@@ -22,7 +22,9 @@
 ##'   [fit_size_spectrum()] to a numeric vector
 ##' @param log_y_axis character either `"both"`, do two plots (like Fig. 6 of
 ##'   MEE paper, where the top panel is bins of normalized biomss, so only
-##'   suitable when the data are body masses), `"no"` for single plot with
+##'   suitable when the data are body masses TODO change that option to
+##'   "biomass", then add a both option to mean linear and logarithmic axis; be
+##'   comsinstent with other plotting functions TODO), `"no"` for single plot with
 ##'   linear y axis, `"yes"` for single plot with logarithmic y axis (just Fig. 6b
 ##'   of MEE paper). Legends are automatically set, but can be tailored with the
 ##'   arguments defined below.
@@ -125,6 +127,14 @@ plot.size_spectrum_numeric <- function(res,
 
   if(log_y_axis == "both"){
     par(mfrow = c(2,1))
+    # TODO this is LBN then log ISD like figure 6 MEE, going to change option to
+    # "biomss" though TODO (see above)
+
+    # HERE think now just want
+    plot_lbn_style(res,
+                   x_plb = x_plb)   # prob want ...
+      # HERE
+
     # Going to plot with LBN method, so create an object that looks like output
     # of `plot.size_spectrum_mlebin()` to be called by
     # `plot_isd_binned()`. Rest of this comment might be wrong, since we want to
@@ -140,37 +150,32 @@ plot.size_spectrum_numeric <- function(res,
     # uncertainty, and this already calcs bin_sum_norm which is what we want for
     # plotting.
 
-HERE    actually, just call it with res and then do the bin_data within the plotting
-    function, so plotting can cope with MLEbin results also
+#HERE    actually, just call it with res and then do the bin_data within the plotting
+#    function, so plotting can cope with MLEbin results also
 
-    x_binned <- bin_data(x,
-                         bin_width = "2k")
-    res_mlebin <- fit_size_spectrum.data.frame(x_binned)
-    res_mlebin_for_plot <- res_mlebin
-    # Replace results with those from MLE method, to then facilitate plotting.
-    res_mlebin_for_plot$b_mle <- res$b_mle
-    res_mlebin_for_plot$b_conf <- res$b_conf
-    res_mlebin_for_plot$x_min <- res$x_min
-    res_mlebin_for_plot$x_max <- res$x_max      # So curve might stop before end
-                                        # of last bin, but that's the xmax calculated.
+    ## # don't want this:
+    ## res_mlebin <- fit_size_spectrum.data.frame(x_binned)
+    ## res_mlebin_for_plot <- res_mlebin
+    ## # Replace results with those from MLE method, to then facilitate plotting.
+    ## res_mlebin_for_plot$b_mle <- res$b_mle
+    ## res_mlebin_for_plot$b_conf <- res$b_conf
+    ## res_mlebin_for_plot$x_min <- res$x_min
+    ## res_mlebin_for_plot$x_max <- res$x_max      # So curve might stop before end
+    ##                                     # of last bin, but that's the xmax calculated.
 
-    now plot_lbn_style I thinmk
-    plot_isd_binned(res_mlebin_for_plot,
-# NEEd argumjent to say do LBN plot
-HERE
-                    LBN_style = TRUE,
-                    log = "x",
-                    xlim = xlim,
-                    ylim = ylim,
-                    x_plb = x_plb,
-                    y_plb = y_plb,
-                    y_plb_conf_min = y_plb_conf_min,
-                    y_plb_conf_max = y_plb_conf_max,
-                    legend_label = legend_label_a,
-                    legend_text = legend_text_a,
-                    legend_text_n = legend_text_a_n,
-                    ...)  # ADD in more options maybe, see plot_isd_binned; figure out
-                          # useArgs() thing. Copy to next ones
+## Now using plot_lbn_style() above, but might want to add some of these in
+##                     log = "x",  # maybe not, since always doing log-log?
+##                     xlim = xlim,
+##                     ylim = ylim,
+##                     x_plb = x_plb,
+##                     y_plb = y_plb,
+##                     y_plb_conf_min = y_plb_conf_min,
+##                     y_plb_conf_max = y_plb_conf_max,
+##                     legend_label = legend_label_a,
+##                     legend_text = legend_text_a,
+##                     legend_text_n = legend_text_a_n,
+##                     ...)  # ADD in more options maybe, see plot_isd_binned; figure out
+##                           # useArgs() thing. Copy to next ones
 
    plot_isd(res = res,
              log = "xy",

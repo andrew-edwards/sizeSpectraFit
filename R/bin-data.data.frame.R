@@ -3,7 +3,8 @@
 bin_data.data.frame <- function(dat,
                                 bin_width = NULL,
                                 bin_breaks = NULL,
-                                start_integer = TRUE){
+                                start_integer = TRUE,
+                                truncate_top_bin = FALSE){
   if(dim(dat)[2] != 2){
     stop("dat needs two cols in bin_data.data.frame()")
   }
@@ -24,8 +25,8 @@ bin_data.data.frame <- function(dat,
   }
 
   x <- dat$x # measured values corresponding to counts
-  min_x <- min(x)  # min(dplyr::pull(dat ,1))
-  max_x <- max(x)  # max(dplyr::pull(dat ,1))
+  min_x <- min(x)
+  max_x <- max(x)
 
   if(!is.null(bin_breaks)){
     if(min_x < min(bin_breaks) | max_x > max(bin_breaks)){
@@ -37,7 +38,8 @@ bin_data.data.frame <- function(dat,
         bin_breaks <- 2^( floor(log2(min_x)) : ceiling(log2(max_x)) )
       } else {
         stop("start_integer needs to be TRUE when
-                   bin_width = 2k")
+                   bin_width = 2k")     # TODO think about, may want min to
+                                        # start at min_x
       }
     } else {    # If not "2k"
       if(!is.numeric(bin_width)){
@@ -51,6 +53,10 @@ bin_data.data.frame <- function(dat,
                         by = bin_width,
                         length = ceiling((max_x - z)/bin_width) + 1)
     }
+  }
+
+  if(truncate_top_bin){
+    bin_breaks[length(bin_breaks)] <- max_x  # instead of the generated max
   }
 
   bin_for_each_x <- tibble::as_tibble(dat)   # data.frame with one row for each x value
