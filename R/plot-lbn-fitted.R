@@ -1,6 +1,6 @@
 ##' Add horizontal bars and shaded rectangles to `plot_lbn_style()`
 ##'
-##' These are to show the estimated normalised biomasses in each bin, based on
+##' TODO check help. These are to show the estimated normalised biomasses in each bin, based on
 ##' the MLE value of `b` and it's confidence limit values.
 ##' Each horizontal bar spans a bin (default colour is red), with it's vertical value indicating the
 ##' expected normalised biomass based on the MLE of `b`. The height of the

@@ -70,7 +70,8 @@
 ##' @
 ##' @}
 plot_lbn_style <- function(res,
-                           xlim = NULL,
+                           xlim = NULL,    # xlim for figures and x_lim for
+                                        # fitting, should adopt that
                            ylim = NULL,
                            x_plb,
                            plot_conf_ints = TRUE,
@@ -127,6 +128,7 @@ plot_lbn_style <- function(res,
 
     n <- sum(res$bin_count)
 
+HERE need to edit p_biomass_bins.size_spectrum_numeric
   } else {
     dat <- p_biomass_bins(res)
   }

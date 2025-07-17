@@ -95,15 +95,26 @@ plot(res_vec,
      x_small_ticks_labels = c(5, 50, 500))
 ```
 
-HERE -  first continue with these (that rely on each other):
+HERE -
 
-This works, need to tweak figure code:
+next:
+p_biomass_bins.size_spectrum_numeric
+to then test:
+
+want to test
+plot_lbn_style(res_vec, x_plb = x_plb)
+
+
+This works, need to tweak figure code, think done.:
 
 x_binned <- bin_data(res_vec$x,
                          bin_width = "2k")
 res_mlebin <- fit_size_spectrum.data.frame(x_binned$bin_vals)
-plot_lbn_style(res_mlebin, x_plb = x_plb)
+plot_lbn_style(res_mlebin, x_plb = x_plb)   # x_plb from
+                         plot.size_spctrum_numeric() right now
 
+
+then continue with these (that rely on each other):
  `p_biomass_bins()`, do data.frame version then copy as template for .numeric
  (see comments at the start of the former), then
  `plot_LBN_style()`
