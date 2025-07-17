@@ -41,7 +41,7 @@ plot_lbn_fitted <- function(dat,
   # Horizontal bars corresponding to MLE values
   segments(x0 = dat$bin_min,
            y0 = dat$mle_biomass_norm,
-           x1 = dat$bin_min,
+           x1 = dat$bin_max,
            y1 = dat$mle_biomass_norm,
            col = bar_col,
            lwd = bar_lwd)

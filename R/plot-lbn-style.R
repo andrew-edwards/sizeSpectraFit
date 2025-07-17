@@ -157,9 +157,8 @@ plot_lbn_style <- function(res,
 
   # Add tickmarks and labels, replacing what was in ISD_bin_plot with this
   # TODO get working:
-  if(FALSE){
   add_ticks(
-    log = log,   # TODO make general, unless making big if switches
+    log = "xy",
     tcl_small = tcl_small,
     mgp_val = mgp_val,
     x_big_ticks = x_big_ticks,
@@ -172,7 +171,6 @@ plot_lbn_style <- function(res,
     y_small_ticks = y_small_ticks,
     y_small_ticks_by = y_small_ticks_by,
     y_small_ticks_labels = y_small_ticks_labels)
-  }
 
 
   # won't work for MLE though, so adapt when doing that TODO
