@@ -41,6 +41,12 @@
 ##'   `bin_max <= x_max`. TODO  Mention species-specific...
 ##'
 ##' @return
+##'
+##' data tibble can have `bin_sum`, `bin_sum_norm`, `low_count`, `high_count`,
+##'   and maybe more from MLEbin method, if the data are individuals and were
+##'   then binned using, say, `x_binned <- bin_data(res_vec$x, bin_width =
+##'   "2k")`. For true binned data we only have some of these.
+
 ##' * If `dat` is numeric then returns a list object of class
 ##'   `size_spectrum_numeric` (such that we can plot it
 ##'   with [plot.size_spectrum_numeric()], with objects.... (adapt below), also

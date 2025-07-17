@@ -96,11 +96,22 @@ plot(res_vec,
 ```
 
 HERE -  first continue with these (that rely on each other):
- `p_biomass_bins()`, then
+
+This works, need to tweak figure code:
+
+x_binned <- bin_data(res_vec$x,
+                         bin_width = "2k")
+res_mlebin <- fit_size_spectrum.data.frame(x_binned$bin_vals)
+plot_lbn_style(res_mlebin, x_plb = x_plb)
+
+ `p_biomass_bins()`, do data.frame version then copy as template for .numeric
+ (see comments at the start of the former), then
  `plot_LBN_style()`
  `plot.size_spectrum.numeric()`
 
-TODO After doing MLEbin below , then come back and add extra options for biomass
+Then add extra exapmles based on that.
+
+...options for biomass
 LBN type plot for this one (since will first
 create binned figures for MLEbin).
 
@@ -111,7 +122,8 @@ the same simulated data as above but assume that we only have it available in
 binned form (e.g. measurements may have been made at a coarse scale to save
 time). The binned data are saved in the package as
 ```{r, MLEbinned}
-sim_vec_binned
+sim_vec_binned    # TODO should strip this down, as I think it includes some
+                  # things that we wouldn't know for true binned data
 ```
 which is a list object (see `?sim_vec_binned` for details), for which we only need the binned values:
 ```{r, MLEbin1}

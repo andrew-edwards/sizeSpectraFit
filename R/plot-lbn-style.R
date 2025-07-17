@@ -70,13 +70,11 @@
 ##' @
 ##' @}
 plot_lbn_style <- function(res,
-                           xlim,
-                           ylim,
+                           xlim = NULL,
+                           ylim = NULL,
                            x_plb,
-                           y_plb,
-                           y_plb_conf_min,
-                           y_plb_conf_max,
                            plot_conf_ints = TRUE,
+                           plot_binned_fitted = TRUE,  # plot the binned fitted version
                            xlab = expression(paste("Body mass, ", italic(x))),
                            ylab = "Normalised biomass",
                            mgp_val = c(1.6, 0.5, 0),
@@ -120,67 +118,34 @@ plot_lbn_style <- function(res,
       cex = par_cex)  # Affects all figures, TODO reset after
   # mgp maybe need - see above commented option
 
-  if(class(res) == "size_spectrum_numeric"){
+  if("size_spectrum_numeric" %in% class(res)){
     # Need to create bins manually
-    data <- bin_data(res$x,
-                     bin_width = "2k")$bin_vals   # use bin_sum_norm for
-    # plotting
+    data_manual <- bin_data(res$x,
+                            bin_width = "2k")$bin_vals   # use bin_sum_norm for
+    # plotting, no uncertainty in y-axis for data
+    # create biomass_calcs once done p_biomass_bins.size_spectrum_numeric(). TODO
+
+    n <- sum(res$bin_count)
 
   } else {
-    data <- res$data
-    # Need a range of normalised biomasses for plotting to account for
-    #  possible ranges of body sizes within each bin:
-    data <- dplyr::mutate(data,
-                          low_biomass = bin_min * bin_count,
-                          high_biomass = bin_max * bin_count,
-                          low_biomass_norm = low_biomass / bin_width)
+    dat <- p_biomass_bins(res)
   }
 
-
-  HERE
-  # Calculate the fitted estimates of biomass in each bin, for b, b.confMin and
-  # b.confMax. Should be able to do the same approach for both types, need to
-  # look at this function and adapt it.
-  binTibble <- pBiomassBinsConfs(binValsTibble = binTibble,
-#                                 xmin = min(binTibble$wmin),
-#                                 xmax = max(binTibble$wmax),
-#                                 n = sum(binTibble$Number),
-                                 b.MLE = b.MLE,
-                                 b.confMin = b.confMin,
-                                 b.confMax = b.confMax)
-
-
-
 # TODO may need to adjust limits, using something like this (to be adapted):
-  ##   if(is.na(xLim)){
-  ##   xLim <- c(min(binTibble$wmin),
-  ##             max(binTibble$wmax))
-  ## }
+  if(is.null(xlim)){
+     xlim <- c(min(dat$bin_min),
+               max(dat$bin_max))
+  }
 
-  ## if(is.na(yLim)){
-  ##   yLim <- c(min(binTibble$lowBiomassNorm),
-  ##             max(binTibble$highBiomassNorm))          # may need pull
-  ## }
+  if(is.null(ylim)){
+    ylim <- c(min(dat$low_biomass_norm),
+              max(dat$high_biomass_norm))          # TODO use the conf intervals also
+  }
 
-
-
-
-copying  and editing from plot_isd_binned():
-
-  dat <- res_mlebin$data
-
-  # Need to calculate the low and high normalised biomasses in each bin, may
-  # want to return this TODO  only for MLEbin I think:
-HERE
-  dat <- dplyr::mutate(dat,
-                       lowBiomass = wmin * Number,
-                       highBiomass = wmax * Number,
-                       binWidth = wmax - wmin,
-                       lowBiomassNorm       = lowBiomass / binWidth,
-                       highBiomassNorm      = highBiomass / binWidth)
+# copying  and editing from plot_isd_binned() (too hard to just generalise that)
 
   plot.default(dat$bin_min,      #    nothing plotted anyway as type = "n"
-               dat$bin_count_norm,
+               dat$high_biomass_norm,
                log = "xy",
                xlab = xlab,
                ylab = ylab,
@@ -189,10 +154,11 @@ HERE
                type = "n",
                axes = FALSE,
                mgp = mgp_val) # TODO
-HERE
+
   # Add tickmarks and labels, replacing what was in ISD_bin_plot with this
-  add_ticks(#x_lim = x_lim,
-    #y_lim = y_lim,
+  # TODO get working:
+  if(FALSE){
+  add_ticks(
     log = log,   # TODO make general, unless making big if switches
     tcl_small = tcl_small,
     mgp_val = mgp_val,
@@ -206,44 +172,60 @@ HERE
     y_small_ticks = y_small_ticks,
     y_small_ticks_by = y_small_ticks_by,
     y_small_ticks_labels = y_small_ticks_labels)
+  }
 
+
+  # won't work for MLE though, so adapt when doing that TODO
+  # Data:
   rect(xleft = dat$bin_min,
-       ybottom = dat$low_count,
+       ybottom = dat$low_biomass_norm,
        xright = dat$bin_max,
-       ytop = dat$high_count,
+       ytop = dat$high_biomass_norm,
        col = rect_col)
-  segments(x0 = dat$bin_min,
-           y0 = dat$count_gte_bin_min,
-           x1 = dat$bin_max,
-           y1 = dat$count_gte_bin_min,
-           col = seg_col)
 
-  if(log == "xy"){    # TODO didn't have for MLEbin plot, think if we need it
-                      # for that, need to test
-    # Need to manually draw the rectangle with low_count = 0 since it doesn't
-    #  get plotted on log-log plot
-    extra_rect <- dplyr::filter(dat,
-                                low_count == 0)
-    # if(nrow(extra.rect) > 1) stop("Check rows of extra rect.")
-    rect(xleft = extra_rect$bin_min,
-         ybottom = rep(0.01 * ylim[1],
-                       nrow(extra_rect)),
-         xright = extra_rect$bin_max,
-         ytop = extra_rect$high_count,
-         col = rect_col)
 
-  segments(x0 = dat$bin_min,
-           y0 = dat$count_gte_bin_min,
-           x1 = dat$bin_max,
-           y1 = dat$count_gte_bin_min,
-           col = seg_col)
+
+  # Option to plot binned version of fitted curve (do first to then overlay the
+  # straight lines of biomass density)
+  if(plot_binned_fitted){
+    plot_lbn_fitted(dat,
+                    ...)
   }
 
-  lines(x_plb, y_plb, col = fit_col, lwd = fit_lwd)   # Plot line last so can see it
-  if(plot_conf_ints){
-    lines(x_plb, y_plb_conf_min, col = fit_col, lty = conf_lty)
-    lines(x_plb, y_plb_conf_max, col = fit_col, lty = conf_lty)
-  }
+  # Biomass density for each value of x, from MEE equation (4), using the MLE for b.
+  # TODO TODO feel like this should be MLE for b plus 1, looking at equation
+  # 4. Ah no, as then normalise I think by x. Leave for now to get it working. Should be straight on this plot?
+  lines(x_plb,
+        dPLB(x_plb,
+             b = res$b_mle,
+             xmin = min(x_plb),
+             xmax = max(x_plb)) * n * x_plb,
+        col="red")   # TODO generalise once working
+
+  # Add lines at limits of the 95% confidence interval of b:
+  lines(x_plb,
+        dPLB(x_plb,
+             b = res$b_conf[1],
+             xmin = min(x_plb),
+             xmax = max(x_plb)) * n * x_plb,
+        col="red",
+        lty=2)
+
+  lines(x_plb,
+        dPLB(x_plb,
+             b = res$b_conf[2],
+             xmin = min(x_plb),
+             xmax = max(x_plb)) * n * x_plb,
+        col="red",
+        lty=2)
+
+
+ # TODO add these in, need to see if already calcualted - no were from ISD plot
+#  lines(x_plb, y_plb, col = fit_col, lwd = fit_lwd)   # Plot line last so can see it
+#  if(plot_conf_ints){
+#    lines(x_plb, y_plb_conf_min, col = fit_col, lty = conf_lty)
+#    lines(x_plb, y_plb_conf_max, col = fit_col, lty = conf_lty)
+#  }
 
 # TODO fix the legend
 
@@ -279,155 +261,13 @@ HERE
 
   box()     # to redraw axes over any boxes
 
-  invisible()
+  # TODO decide if might need something like this
+#  if(is.na(x_plb)){
+#    x_plb <- exp(seq(log(min(binTibble$wmin)),
+#                     log(max(binTibble$wmax)),
+#                     length = 10000))   # values to plot the MLE fit,
+#                                        # encompassing data
+#  }
 
-
-
-
-
-  from sizeSpectra::LBN_bin_plot(), putting above what we need from
-  plot_isd_binned() which has the correct formatting, then go through this for
-  anything else we need:
- - means think we can get rid of but keep for a second for context
-
-
-
-HERE
-
-  plot(binTibble$wmin,         # not plotted, just need something
-       binTibble$highBiomassNorm,
-       log = log.xy,
-       xlab = xLab,
-       ylab = yLab,
-#       mgp = mgpVals,
-       xlim = xLim,
-       ylim = yLim,
-       xaxt = ifelse(log.xy %in% c("x", "xy") , "n", "s"),
-       yaxt = ifelse(log.xy == "xy", "n", "s"),
-       type = "n",            # empty plot
-       ...)
-
-
-
-  box()
-
-  legend(leg.pos,
-         leg.text,
-         bty="n",
-         inset = inset)
-
-#  axis(2, at = yBigTicks,
-#       mgp = mgpVals)
-#  axis(2, at = ySmallTicks,
-#       mgp = mgpVals,
-#       tcl = -0.2,
-#       labels = rep("", length(ySmallTicks)))
-
-  rect(xleft = binTibble$wmin,
-       ybottom = binTibble$lowBiomassNorm,
-       xright = binTibble$wmax,
-       ytop = binTibble$highBiomassNorm,
-       col = rect.col)
-
-  if(is.na(x.PLB)){
-    x.PLB <- exp(seq(log(min(binTibble$wmin)),
-                     log(max(binTibble$wmax)),
-                     length = 10000))   # values to plot the MLE fit,
-                                        # encompassing data
-  }
-
-
-  # Option to plot binned version of fitted curve (do first to then overlay the
-  # straight lines of biomass density)
-  if(plot.binned.fitted){
-    plot_binned_fitted(binTibble,
-                       ...)
-  }
-
-  # Biomass density for each value of x, from MEE equation (4), using the MLE for b.
-  B.PLB <- dPLB(x.PLB,
-                b = b.MLE,
-                xmin=min(x.PLB),
-                xmax=max(x.PLB)) * sum(binTibble$Number) * x.PLB
-
-  lines(x.PLB,
-        B.PLB,
-        col="red")
-
-  # Add lines at limits of the 95% confidence interval of b:
-  lines(x.PLB,
-        dPLB(x.PLB,
-             b = b.confMin,
-             xmin = min(x.PLB),
-             xmax = max(x.PLB)) * sum(binTibble$Number) * x.PLB,
-        col="red",
-        lty=2)
-
-  lines(x.PLB,
-        dPLB(x.PLB,
-             b = b.confMax,
-             xmin = min(x.PLB),
-             xmax = max(x.PLB)) * sum(binTibble$Number) * x.PLB,
-        col="red",
-        lty=2)
-
-  # Go through this and tidy up. Could also do nonlogged version.
-  #   And add red and (uncertainty) pink rectangles for ranges expected by the
-  #   fitted distributions
-  invisible(binTibble)
-}
-
-
-from sizeSpectra:
-
-##' Add horizontal bars and shaded rectangles to `LBN_bin_plot()`
-##'
-##' These are to show the estimated normalised biomasses in each bin, based on
-##' the MLE value of `b` and it's confidence limit values.
-##' Each horizontal bar spans a bin (default colour is red), with it's vertical value indicating the
-##' expected normalised biomass based on the MLE of `b`. The height of the
-##' shaded rectangles (default colour pink) show the range of expected
-##' normalised biomass based on the 95\% confidence interval of `b`.
-##' @param binTibble tibble of values calculated in `LBN_bin_plot()`; this
-##' function adds to that plot
-##' @param bar.col colour for the horizontal bars representing the MLE values of
-##' normalised biomass in each bin
-##' @param bar.lwd thickness of horiztonal bars
-##' @param rect.shading colour for shading of rectangles corresponding to the
-##' normalised biomasses estimated from confidence intervals of `b`
-##' @param shorter fraction shorter to make the rectangles, so can see them
-##' overlapping with grey rectangles; may not work exacly as planned (won't be symmetric) when x-axis
-##' not logged, but that's not going to be a useful plot anyway
-##' @return
-##' @export
-##' @author Andrew Edwards
-##' @examples
-##' @donttest{
-##' @
-##' @}
-plot_binned_fitted <- function(binTibble,
-                               bar.col = "red",
-                               bar.lwd = 3,
-                               rect.shading = "pink",
-                               shorter = 0.05
-                               ){
-
-  # Rectangles corresponding to confidence interval ranges, it doesn't matter
-  # that sometimes we'll have ybottom > ytop (I think it might almost be guaranteed
-  # to happen for at least one bin).m
-  rect(xleft = (1 + shorter) * binTibble$wmin,
-       ybottom = binTibble$estBiomassNormConfMin,
-       xright = (1 - shorter) * binTibble$wmax,
-       ytop = binTibble$estBiomassNormConfMax,
-       col = rect.shading)
-
-  # Horizontal bars corresponding to MLE values
-  segments(x0 = binTibble$wmin,
-           y0 = binTibble$estBiomassNormMLE,
-           x1 = binTibble$wmax,
-           y1 = binTibble$estBiomassNormMLE,
-           col = bar.col,
-           lwd = bar.lwd)
-
-
+  invisible()   # TODO can return something invisibly, might be worth doing
 }

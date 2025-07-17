@@ -73,7 +73,7 @@ plot.size_spectrum_numeric <- function(res,
 
   x <- res$x
 
-  x_min <- min(x)
+  x_min <- min(x)   # or from results??? TODO
   x_max <- max(x)
   n <- length(x)
 
@@ -154,6 +154,7 @@ HERE    actually, just call it with res and then do the bin_data within the plot
     res_mlebin_for_plot$x_max <- res$x_max      # So curve might stop before end
                                         # of last bin, but that's the xmax calculated.
 
+    now plot_lbn_style I thinmk
     plot_isd_binned(res_mlebin_for_plot,
 # NEEd argumjent to say do LBN plot
 HERE

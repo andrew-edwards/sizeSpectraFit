@@ -71,7 +71,8 @@ fit_size_spectrum_mlebin <- function(dat,
   # count_gte_bin_min is, for a given bin, the total counts >= than that bin's minimum.
 
   count_gte_bin_min <- rep(NA, length = J)
-  low_count <- count_gte_bin_min
+  low_count <- count_gte_bin_min    # TODO might want this more descriptive, now
+                                    # adding stuff later
   high_count <- count_gte_bin_min
 
   # yRange = c(min(data_year$lowCount), max(data_year$highCount))
