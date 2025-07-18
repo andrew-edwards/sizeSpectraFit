@@ -107,7 +107,7 @@ plot_isd <- function(res,
        ylab = ylab,
        xlim = xlim,
        ylim = ylim,
-       type = "o",
+       type = "p",
        axes = FALSE,
        mgp = mgp_val, # TODO
        ...)

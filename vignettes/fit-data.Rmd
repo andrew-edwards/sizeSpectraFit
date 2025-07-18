@@ -76,10 +76,45 @@ Now, to plot the PLB fit and the original data, simply do:
 plot(res_vec)
 ```
 
-The style of plot is as recommended in Figure 6b of
+There are four styles available for easy plotting. The default is that
+recommended in Figure 6b of
 our [MEE paper](http://onlinelibrary.wiley.com/doi/10.1111/2041-210X.12641/full), and
 includes the PLB fits using the values of $b$ at the bounds of the confidence
 interval for `b`.
+
+HERE. Check through these, tweak the legends, see `plot.size_spectrum_mlebin()`
+presumably, and tidy up.Good to fix TODO's in each plotting function.
+
+The `style` argument changes the style of plot, for example
+```{r, MLElinearplot}
+plot(res_vec,
+     style = "linear_y_axis")
+```
+gives the same plot but with a linear y-axis.
+
+To show both the above plots together:
+```{r, MLEbothplot}
+plot(res_vec,
+     style = "both")    # add some mgp stuff in there
+```
+which is similar to Fig. 7 of our
+[MEPS paper](https://www.int-res.com/abstracts/meps/v636/p19-33/)
+but for nonbinned data.
+
+The fourth option is only suitable for when the data represent body masses, and
+shows the first plot above plus a plot of normalised biomass within bins,
+similar to what has historically been done (TODO e.g. Platt and Denman probably). The
+bins are set to double in size, such that they appear of equal width on a log
+scale, and the normalised biomass within each one is calcluated. HERE give a
+description of that.
+
+```{r, MLEbiomassplot}
+plot(res_vec,
+     style = "biomass")    # add some mgp stuff in there
+```
+
+
+Code works up to HERE, maybe not when doing as .Rmd
 
 If you want to tweak options beyond the default shown then read this. The plot is as shown because we have written a function
 `plot.size_spectrum_numeric()` which gets automatically used on `res_vec`
@@ -95,45 +130,30 @@ plot(res_vec,
      x_small_ticks_labels = c(5, 50, 500))
 ```
 
-HERE -
-
 for LBN plot:
 
-think bin_data.data.frame() needs options to start at min(x) precisely, not just floor(..),
-and also to truncate top bin at the max of the data. Go with: if using x values
+Go with: if using x values
 then calc xmin and xmax exactly, use xmin to start the binning, and cut the top
-bin off at xmax not the max of the generated bin. This is being done in plot_lbn_style.
+bin off at xmax not the max of the generated bin. This is being done in
+plot_lbn_style. TODO will require tweaking of bin_data.data.frame() needs
+options to start at min(x) precisely, not just floor(..), see TODO in bin_data.data.frame().
 
 For pre-binned data, just have to stick with the bins we are given.
 
-next:
-p_biomass_bins.size_spectrum_numeric
-to then test:
+This works, need to tweak figure code, think done, want to try it and maybe add
+more options, maybe all fine now:
 
-want to test
-plot_lbn_style(res_vec, x_plb = x_plb)
-
-
-This works, need to tweak figure code, think done.:
-
+```{r, eval = FALSE}
 x_binned <- bin_data(res_vec$x,
                          bin_width = "2k")
 res_mlebin <- fit_size_spectrum.data.frame(x_binned$bin_vals)
 plot_lbn_style(res_mlebin, x_plb = x_plb)   # x_plb from
-                         plot.size_spctrum_numeric() right now
-
+#                          plot.size_spctrum_numeric() right now
+}
 
 then continue with these (that rely on each other):
- `p_biomass_bins()`, do data.frame version then copy as template for .numeric
- (see comments at the start of the former), then
- `plot_LBN_style()`
- `plot.size_spectrum.numeric()`
 
-Then add extra exapmles based on that.
-
-...options for biomass
-LBN type plot for this one (since will first
-create binned figures for MLEbin).
+TODO examples and tests for all.
 
 ### Binned data of counts in bins
 
@@ -143,7 +163,8 @@ binned form (e.g. measurements may have been made at a coarse scale to save
 time). The binned data are saved in the package as
 ```{r, MLEbinned}
 sim_vec_binned    # TODO should strip this down, as I think it includes some
-                  # things that we wouldn't know for true binned data
+                  # things that we wouldn't know for true binned data, also
+simplify it probably
 ```
 which is a list object (see `?sim_vec_binned` for details), for which we only need the binned values:
 ```{r, MLEbin1}
@@ -166,6 +187,9 @@ this case the same as `sim_vec_binned$bin_vals`).
 We have a built-in plotting function to generate a plot in the style of Figure 7
 in our MEPS paper (but a bit simpler because here we do not have overlapping
 bins), which is accessed by simply doing:
+
+TODO probably get rid of green lines in MLEbin plot since not needed (are for
+MLEbins though).
 
 ```{r, MLEbinplot, fig.height = 10}
 plot(res_binned)

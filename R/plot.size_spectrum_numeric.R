@@ -1,37 +1,39 @@
 ##' Plot individual size distribution of values and the MLE fit with
 ##' confidence intervals
 ##'
-##' Plots one- or two-panel plot of the ISD and data. Two-panel plot is only for when
-##' the data represent body masses, and gives the normalised biomass on log-log
-##' axes and the individual points on log-log axes, both with the fitted
-##' PLB distribution from the MLE method; this is essentially Fig. 6 of MEE
-##' paper, but with bins in the top panel rather than points.
+##' Plots one- or two-panel plot of the ISD and data, with maximum likelihood
+##' fits shown, as calcualted using the MLE method.. Two-panel plot is either
+##' the ISD style (individual points and fitted distribution) with (a) linear
+##' y-axis and (b) logarithimc y-axis (so like Fig 7 of MEPS paper but for
+##' unbinned data), or, only for when
+##' the data represent body masses, (a) the normalised biomass on log-log
+##' axes with fitted estimates and (b) same as (b) above, essentially the
+##' recommended Fig. 6 of the MEE paper, but improved by showing bins in the top
+##' panel rather than points.
+##' Single plots are either the ISD style with logarithmic or linear y-axis. See
+##' the `style` argument.
 ##'
-##' For one-panel plot, it is either a linear y-axis or a logarithmic y-axis
-##' (the latter being Fig. 6b of MEE paper, and is the default). Type of plot is
-##' determined by the `log_y_axis` argument.
-##'
-##'
-##' TODO this defaults to doing log-log and
-##' option for recommended plot from MEE if it's biomass. Can always bin anyway
-##' and just not normalise.
+##' Legends are automatically set, but can be tailored with the
+##'   arguments defined below.
 ##'
 ##' @inheritParams plot_isd
 ##' @param res size_spectrum_numeric object, as output from
 ##'   [fit_size_spectrum.numeric()], which gets called when applying
 ##'   [fit_size_spectrum()] to a numeric vector
-##' @param log_y_axis character either `"both"`, do two plots (like Fig. 6 of
-##'   MEE paper, where the top panel is bins of normalized biomss, so only
-##'   suitable when the data are body masses TODO change that option to
-##'   "biomass", then add a both option to mean linear and logarithmic axis; be
-##'   comsinstent with other plotting functions TODO), `"no"` for single plot with
-##'   linear y axis, `"yes"` for single plot with logarithmic y axis (just Fig. 6b
-##'   of MEE paper). Legends are automatically set, but can be tailored with the
-##'   arguments defined below.
-##' @param ... Further arguments for `plot_isd()` and then `plot()`
+##' @param style character either:
+##'   * `"log_y_axis"` - single ISD plot with logarithmic y axis (Fig. 6b of MEE paper)
+##'   * `"linear_y_axis"` - for single ISD plot with linear y axis
+##'   * `"both"` - both the above plots as a two-panel plot
+##'   * `"biomass"` - to use only if the data represent body masses. Does two-panel
+##'   plot, essentially the recommended Fig. 6 of MEE paper where the top panel
+##'   is bins of normalized biomass (but improved here by showing bins in the top
+##'   panel rather than points) and the `"log_y_axis"` plot described above.
+##' TODO prob have to make that consistent in other plotting function
+##'
+##' @param ... Further arguments for `plot_isd()` and then `plot()` TODO check
 ##' @return One- or two-panel plot of raw data and PLB distribution (and fits of
 ##'   confidence limits) as solid (and dashed) fitted using MLE method; returns
-##'   nothing.
+##'   nothing. TODO could return invisible biomass calcs
 ##'
 ##' @export
 ##' @author Andrew Edwards
@@ -46,7 +48,7 @@
 ##'   labels for a particular figure
 ##' }
 plot.size_spectrum_numeric <- function(res,
-                                       log_y_axis = "both",
+                                       style = "log_y_axis",
                                        xlim = c(min(res$x),
                                                 max(res$x)),
                                        ylim = NA,
@@ -67,8 +69,8 @@ plot.size_spectrum_numeric <- function(res,
                                        legend_text_b_n = NULL,
                                        ...){
 
-  stopifnot("log_y_axis must be both, yes, or no" =
-              log_y_axis %in% c("both", "yes","no"))
+  stopifnot("style must be log_y_axis, linear_y_axis, both, or biomass" =
+              style %in% c("log_y_axis", "linear_y_axis", "both", "biomass"))
 
   # Work out calculations needed for both types of plot and then pass them on to
   # plot_isd() (and plot_isd_binned() for `both`).:
@@ -125,44 +127,42 @@ plot.size_spectrum_numeric <- function(res,
                            # of largest value
   }
 
-  if(log_y_axis == "both"){
-    par(mfrow = c(2,1))
-    # TODO this is LBN then log ISD like figure 6 MEE, going to change option to
-    # "biomss" though TODO (see above)
+  if(style == "both"){
 
-    # HERE think now just want
+    par(mfrow = c(2,1))
+
+    plot_isd(res = res,
+             log = "x",
+             xlim = xlim,
+             ylim = ylim,
+             x_plb = x_plb,
+             y_plb = y_plb,
+             y_plb_conf_min = y_plb_conf_min,
+             y_plb_conf_max = y_plb_conf_max,
+             legend_label = legend_label_single,
+             legend_text = legend_text_a,
+             legend_text_n = legend_text_a_n,
+             ...)
+
+    plot_isd(res = res,
+             log = "xy",
+             xlim = xlim,
+             ylim = ylim,
+             x_plb = x_plb,
+             y_plb = y_plb,
+             y_plb_conf_min = y_plb_conf_min,
+             y_plb_conf_max = y_plb_conf_max,
+             legend_label = legend_label_single,
+             legend_text = legend_text_b,
+             legend_text_n = legend_text_b_n,
+             ...)
+
+  }
+
+  if(style == "biomass"){
+    par(mfrow = c(2,1))
     plot_lbn_style(res,
                    x_plb = x_plb)   # prob want ...
-      # HERE
-
-    # Going to plot with LBN method, so create an object that looks like output
-    # of `plot.size_spectrum_mlebin()` to be called by
-    # `plot_isd_binned()`. Rest of this comment might be wrong, since we want to
-    # just calculate manually here what we actually need. THere is no
-    # uncertainty in body mass of individuals in each bin, as we do know the
-    # individual body masses.
-    # NOPE: Since also need the `count_gte_bin_min` etc. values,
-    # just fit the data using MLEbin but then change the MLE and conf intervals
-    # and more to match the ones already calculated using MLE. Though some of
-    # the further columns in res_mlebin$data are not relevant, since there is no
-    # uncertainty in the counts in a bin, since we have the raw data.
-    # ACTUALLY, some of that is wrong, we don't actually have vertical
-    # uncertainty, and this already calcs bin_sum_norm which is what we want for
-    # plotting.
-
-#HERE    actually, just call it with res and then do the bin_data within the plotting
-#    function, so plotting can cope with MLEbin results also
-
-    ## # don't want this:
-    ## res_mlebin <- fit_size_spectrum.data.frame(x_binned)
-    ## res_mlebin_for_plot <- res_mlebin
-    ## # Replace results with those from MLE method, to then facilitate plotting.
-    ## res_mlebin_for_plot$b_mle <- res$b_mle
-    ## res_mlebin_for_plot$b_conf <- res$b_conf
-    ## res_mlebin_for_plot$x_min <- res$x_min
-    ## res_mlebin_for_plot$x_max <- res$x_max      # So curve might stop before end
-    ##                                     # of last bin, but that's the xmax calculated.
-
 ## Now using plot_lbn_style() above, but might want to add some of these in
 ##                     log = "x",  # maybe not, since always doing log-log?
 ##                     xlim = xlim,
@@ -186,14 +186,18 @@ plot.size_spectrum_numeric <- function(res,
              y_plb_conf_min = y_plb_conf_min,
              y_plb_conf_max = y_plb_conf_max,
              legend_label = legend_label_single,
-             legend_text = legend_text_a,
+             legend_text = legend_text_b,
              legend_text_n = legend_text_a_n,
              ...)
-   } else {
+  }
+
+  if(style %in% c("linear_y_axis", "log_y_axis")){
+    log_axes <- ifelse(style == "log_y_axis",
+                       "xy",
+                       "x")    # TODO test this
+
     plot_isd(res = res,
-             log = ifelse(log_y_axis == "yes",
-                          "xy",
-                          "x"),
+             log = log_axes,
              xlim = xlim,
              ylim = ylim,
              x_plb = x_plb,
