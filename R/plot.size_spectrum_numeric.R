@@ -55,6 +55,7 @@ plot.size_spectrum_numeric <- function(res,
                                        x_plb = NA,
                                        y_scaling = 0.75,
                                        mle_round = 2,
+                                       inset_label = c(0, -0.02),
                                        legend_label_a = "(a)",
                                        legend_label_b = "(b)",
                                        legend_label_single = NULL, # for just one
@@ -67,6 +68,9 @@ plot.size_spectrum_numeric <- function(res,
                                                                 round(length(res$x))),
                                        legend_text_b = NULL,
                                        legend_text_b_n = NULL,
+                                       par_mai = c(0.4, 0.5, 0.05, 0.3),
+                                       par_cex = 0.7,   # only for two panel
+                                         # plots, use par() as usual for single plots
                                        ...){
 
   stopifnot("style must be log_y_axis, linear_y_axis, both, or biomass" =
@@ -129,7 +133,9 @@ plot.size_spectrum_numeric <- function(res,
 
   if(style == "both"){
 
-    par(mfrow = c(2,1))
+    par(mfrow = c(2,1),
+        mai = par_mai,
+        cex = par_cex)
 
     plot_isd(res = res,
              log = "x",
@@ -139,7 +145,8 @@ plot.size_spectrum_numeric <- function(res,
              y_plb = y_plb,
              y_plb_conf_min = y_plb_conf_min,
              y_plb_conf_max = y_plb_conf_max,
-             legend_label = legend_label_single,
+             inset_label = inset_label,
+             legend_label = legend_label_a,
              legend_text = legend_text_a,
              legend_text_n = legend_text_a_n,
              ...)
@@ -152,7 +159,8 @@ plot.size_spectrum_numeric <- function(res,
              y_plb = y_plb,
              y_plb_conf_min = y_plb_conf_min,
              y_plb_conf_max = y_plb_conf_max,
-             legend_label = legend_label_single,
+             inset_label = inset_label,
+             legend_label = legend_label_b,
              legend_text = legend_text_b,
              legend_text_n = legend_text_b_n,
              ...)
@@ -160,22 +168,26 @@ plot.size_spectrum_numeric <- function(res,
   }
 
   if(style == "biomass"){
-    par(mfrow = c(2,1))
+    par(mfrow = c(2,1),
+        mai = par_mai,
+        cex = par_cex)
+
     plot_lbn_style(res,
-                   x_plb = x_plb)   # prob want ...
+                   # xlim = xlim,   # since get worked out automatically
+                   # ylim = ylim,
+                   x_plb = x_plb,
+                   # y_plb = y_plb,
+                   # y_plb_conf_min = y_plb_conf_min,
+                   # y_plb_conf_max = y_plb_conf_max,
+                   inset_label = inset_label,
+                   legend_label = legend_label_a,
+                   legend_text = legend_text_a,
+                   legend_text_n = legend_text_a_n,
+                   ...)
+
 ## Now using plot_lbn_style() above, but might want to add some of these in
 ##                     log = "x",  # maybe not, since always doing log-log?
-##                     xlim = xlim,
-##                     ylim = ylim,
-##                     x_plb = x_plb,
-##                     y_plb = y_plb,
-##                     y_plb_conf_min = y_plb_conf_min,
-##                     y_plb_conf_max = y_plb_conf_max,
-##                     legend_label = legend_label_a,
-##                     legend_text = legend_text_a,
-##                     legend_text_n = legend_text_a_n,
 ##                     ...)  # ADD in more options maybe, see plot_isd_binned; figure out
-##                           # useArgs() thing. Copy to next ones
 
    plot_isd(res = res,
              log = "xy",
@@ -185,6 +197,7 @@ plot.size_spectrum_numeric <- function(res,
              y_plb = y_plb,
              y_plb_conf_min = y_plb_conf_min,
              y_plb_conf_max = y_plb_conf_max,
+             inset_label = inset_label,
              legend_label = legend_label_single,
              legend_text = legend_text_b,
              legend_text_n = legend_text_a_n,

@@ -1,7 +1,8 @@
 ##' Single plot of individual size distribution of values and the MLE fit with
 ##' confidence intervals.
 ##'
-##' Is called from `plot.size_spectrum_numeric()` with logarithmic of linear y-axis.
+##' Is called from `plot.size_spectrum_numeric()` with logarithmic or linear
+##' y-axis TODO.
 ##'
 ##' @inheritParams plot.size_spectrum_numeric
 ##' @param log Which axes to log, for `plot(..., log = log)`. So "xy" for
@@ -67,11 +68,11 @@ plot_isd <- function(res,
                      mgp_val = c(1.6, 0.5, 0),
                      tcl_small = -0.2,
                      inset_label = c(0, 0),
-                     inset_text = c(0, 0.04),
+                     inset_text = c(0, 0.02),
                      legend_label = NULL,
                      legend_text = NULL,
                      legend_text_n = NULL,
-                     legend_text_second_row_multiplier = 2,
+                     legend_text_second_row_multiplier = 3,
                      legend_position = "topright",
                      x_big_ticks = NULL,
                      x_big_ticks_labels = NULL,
@@ -84,8 +85,6 @@ plot_isd <- function(res,
                      y_small_ticks_by = NULL,
                      y_small_ticks_labels = NULL,
                      y_scaling = 0.75,
-                     par_mai = c(0.4, 0.5, 0.05, 0.3),
-                     par_cex = 0.7,
                      fit_col = "red",
                      fit_lwd = 2,
                      conf_lty = 2,
@@ -149,7 +148,7 @@ plot_isd <- function(res,
     legend("topright",
            eval(legend_label),
            bty = "n",
-           inset = inset)
+           inset = inset_label)
   }
 
     # Original code had this, may need but doubt it. Maybe.
@@ -160,8 +159,15 @@ plot_isd <- function(res,
     #           logxy=TRUE)
 # }
 
+  if(!is.null(legend_text)){
+    legend(legend_position,
+           legend = legend_text,
+           bty = "n",
+           inset = inset_text)
+  }
+
   if(!is.null(legend_text_n)){
-    legend("topright",
+    legend(legend_position,
            legend = legend_text_n,
            bty = "n",
            inset = legend_text_second_row_multiplier * inset_text)

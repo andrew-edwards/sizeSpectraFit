@@ -183,8 +183,6 @@ plot_lbn_style <- function(res,
        ytop = dat$high_biomass_norm,
        col = rect_col)
 
-
-
   # Option to plot binned version of fitted curve (do first to then overlay the
   # straight lines of biomass density)
   if(plot_binned_fitted){
@@ -197,28 +195,29 @@ plot_lbn_style <- function(res,
   # 4. Ah no, as then normalise I think by x. Leave for now to get it working. Should be straight on this plot?
   lines(x_plb,
         dPLB(x_plb,
-             b = res$b_mle,
+             b = res$b_mle,    # HERE
              xmin = min(x_plb),
              xmax = max(x_plb)) * n * x_plb,
         col="red")   # TODO generalise once working
 
-  # Add lines at limits of the 95% confidence interval of b:
-  lines(x_plb,
-        dPLB(x_plb,
-             b = res$b_conf[1],
-             xmin = min(x_plb),
-             xmax = max(x_plb)) * n * x_plb,
-        col="red",
-        lty=2)
+  if(plot_conf_ints){
+    # Add lines at limits of the 95% confidence interval of b:
+    lines(x_plb,
+          dPLB(x_plb,
+               b = res$b_conf[1],
+               xmin = min(x_plb),
+               xmax = max(x_plb)) * n * x_plb,
+          col="red",
+          lty=2)
 
-  lines(x_plb,
-        dPLB(x_plb,
-             b = res$b_conf[2],
-             xmin = min(x_plb),
-             xmax = max(x_plb)) * n * x_plb,
-        col="red",
-        lty=2)
-
+    lines(x_plb,
+          dPLB(x_plb,
+               b = res$b_conf[2],
+               xmin = min(x_plb),
+               xmax = max(x_plb)) * n * x_plb,
+          col="red",
+          lty=2)
+  }
 
  # TODO add these in, need to see if already calcualted - no were from ISD plot
 #  lines(x_plb, y_plb, col = fit_col, lwd = fit_lwd)   # Plot line last so can see it

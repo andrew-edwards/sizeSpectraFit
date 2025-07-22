@@ -1,7 +1,8 @@
 ---
 title: "Fit data and plot results - MLE and MLEbin methods"
 author: "Andrew Edwards"
-output: rmarkdown::html_vignette
+output:
+  rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{Fit data and plot results - MLE and MLEbin methods}
   %\VignetteEngine{knitr::rmarkdown}
@@ -71,19 +72,23 @@ first 10 values of the original data. You can check that all 1000 values are in
 length(res_vec$x)
 ```
 
-Now, to plot the PLB fit and the original data, simply do:
-```{r, MLE4}
+Now, to plot the PLB fit and the original data as an Individual Size
+Distribution (ISD), simply do:
+```{r, MLE4, fig.cap = "hello"}
 plot(res_vec)
 ```
+Each individual body mass is shown as a point (note the log scales), the solid
+red line is the maximum likelihood estimate (MLE) of the size-spectrum exponent
+$b$, and the dashed lines are the fits from using the low and high values of the
+95% confidence interval of $b$. The MLE for $b$ and the sample size $n$ are
+also explicitly given.
 
-There are four styles available for easy plotting. The default is that
+There are four styles available for easy plotting. The default is the figure
+above, as
 recommended in Figure 6b of
-our [MEE paper](http://onlinelibrary.wiley.com/doi/10.1111/2041-210X.12641/full), and
-includes the PLB fits using the values of $b$ at the bounds of the confidence
-interval for `b`.
-
-HERE. Check through these, tweak the legends, see `plot.size_spectrum_mlebin()`
-presumably, and tidy up.Good to fix TODO's in each plotting function.
+our [MEE paper](http://onlinelibrary.wiley.com/doi/10.1111/2041-210X.12641/full)
+(the figure above reproduces that figure, because we used the same simulated
+data here).
 
 The `style` argument changes the style of plot, for example
 ```{r, MLElinearplot}
@@ -92,10 +97,17 @@ plot(res_vec,
 ```
 gives the same plot but with a linear y-axis.
 
-To show both the above plots together:
+
+HERE - biomass plot, can't get lines on. See HERE in plot-lbn-style.R
+
+HERE carry on checking through these (move this forward each time), tweak the legends, see `plot.size_spectrum_mlebin()`
+presumably, and tidy up.Good to fix TODO's in each plotting function.
+
+To show both the above plots together, with panels automatically labelled as (a)
+and (b):
 ```{r, MLEbothplot}
 plot(res_vec,
-     style = "both")    # add some mgp stuff in there
+     style = "both")
 ```
 which is similar to Fig. 7 of our
 [MEPS paper](https://www.int-res.com/abstracts/meps/v636/p19-33/)
@@ -110,7 +122,7 @@ description of that.
 
 ```{r, MLEbiomassplot}
 plot(res_vec,
-     style = "biomass")    # add some mgp stuff in there
+     style = "biomass")
 ```
 
 
@@ -164,7 +176,7 @@ time). The binned data are saved in the package as
 ```{r, MLEbinned}
 sim_vec_binned    # TODO should strip this down, as I think it includes some
                   # things that we wouldn't know for true binned data, also
-simplify it probably
+                  # simplify it probably
 ```
 which is a list object (see `?sim_vec_binned` for details), for which we only need the binned values:
 ```{r, MLEbin1}
@@ -178,6 +190,8 @@ res_binned <- fit_size_spectrum(sim_vec_binned$bin_vals)
 
 res_binned
 ```
+
+`r knitr::knit_exit()`
 
 So `res_binned` is a list object that contains objects `b_mle`, the
 maximum likelihood estimate of the exponent $b$, `b_conf` which gives the 95%

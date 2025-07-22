@@ -70,8 +70,6 @@ plot_isd_binned <- function(res_mlebin,
                             y_small_ticks_by = NULL,
                             y_small_ticks_labels = NULL,
                             y_scaling = 0.75,
-                            par_mai = c(0.4, 0.5, 0.05, 0.3),
-                            par_cex = 0.7,
                             seg_col = "green",   # want these parsed along if
                                         # they're changed by users in original
                                         # call - useArgs or something? TODO
@@ -97,8 +95,6 @@ plot_isd_binned <- function(res_mlebin,
   stopifnot("Cannot define both y_small_ticks and y_small_ticks_by" =
               !(!is.null(y_small_ticks) & !is.null(y_small_ticks_by)))
 
-  par(mai = par_mai,
-      cex = par_cex)  # Affects all figures, TODO reset after
 # mgp maybe need - see above commented option
 # From ISD_bin_plot to adapt here, this is for linear y-axis, then have to tweak
   # to have the log option also:
