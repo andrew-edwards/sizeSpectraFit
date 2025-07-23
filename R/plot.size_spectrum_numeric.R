@@ -173,12 +173,7 @@ plot.size_spectrum_numeric <- function(res,
         cex = par_cex)
 
     plot_lbn_style(res,
-                   # xlim = xlim,   # since get worked out automatically
-                   # ylim = ylim,
                    x_plb = x_plb,
-                   # y_plb = y_plb,
-                   # y_plb_conf_min = y_plb_conf_min,
-                   # y_plb_conf_max = y_plb_conf_max,
                    inset_label = inset_label,
                    legend_label = legend_label_a,
                    legend_text = legend_text_a,
@@ -189,7 +184,7 @@ plot.size_spectrum_numeric <- function(res,
 ##                     log = "x",  # maybe not, since always doing log-log?
 ##                     ...)  # ADD in more options maybe, see plot_isd_binned; figure out
 
-   plot_isd(res = res,
+    plot_isd(res = res,
              log = "xy",
              xlim = xlim,
              ylim = ylim,
@@ -198,9 +193,9 @@ plot.size_spectrum_numeric <- function(res,
              y_plb_conf_min = y_plb_conf_min,
              y_plb_conf_max = y_plb_conf_max,
              inset_label = inset_label,
-             legend_label = legend_label_single,
+             legend_label = legend_label_b,
              legend_text = legend_text_b,
-             legend_text_n = legend_text_a_n,
+             legend_text_n = legend_text_b_n,
              ...)
   }
 

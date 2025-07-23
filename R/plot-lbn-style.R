@@ -119,18 +119,23 @@ plot_lbn_style <- function(res,
       cex = par_cex)  # Affects all figures, TODO reset after
   # mgp maybe need - see above commented option
 
+      # TODO might not need the if statement as have class-specific ones
   if("size_spectrum_numeric" %in% class(res)){
     # TODO use bin_sum_norm for
     # plotting, no uncertainty in y-axis for data
     # create biomass_calcs once done p_biomass_bins.size_spectrum_numeric(). TODO
 
-    n <- sum(res$bin_count)
-
     dat <- p_biomass_bins(res)
+
+    n <- sum(dat$bin_count)
 
   } else {
-    dat <- p_biomass_bins(res)
+    dat <- p_biomass_bins(res)   # might not need n calc as above as maybe
+                                 # already saved in res, need to tease out here
   }
+
+
+
 
 # TODO may need to adjust limits, using something like this (to be adapted):
   if(is.null(xlim)){
@@ -218,13 +223,6 @@ plot_lbn_style <- function(res,
           col="red",
           lty=2)
   }
-
- # TODO add these in, need to see if already calcualted - no were from ISD plot
-#  lines(x_plb, y_plb, col = fit_col, lwd = fit_lwd)   # Plot line last so can see it
-#  if(plot_conf_ints){
-#    lines(x_plb, y_plb_conf_min, col = fit_col, lty = conf_lty)
-#    lines(x_plb, y_plb_conf_max, col = fit_col, lty = conf_lty)
-#  }
 
 # TODO fix the legend
 
