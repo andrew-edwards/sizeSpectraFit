@@ -27,16 +27,19 @@ plot_lbn_fitted <- function(dat,
                             bar_col = "red",
                             bar_lwd = 3,
                             rect_shading = "pink",
+                            rect_border = "pink",
                             shorter = 0.05
                             ){
   # Rectangles corresponding to confidence interval ranges, it doesn't matter
   # that sometimes we'll have ybottom > ytop (I think it might almost be guaranteed
-  # to happen for at least one bin).m
+  # to happen for at least one bin, yes, think they must switch). So can't say
+  # top corresponds to max or min of conf interval of b, I think. TODO tidy up
   rect(xleft = (1 + shorter) * dat$bin_min,
        ybottom = dat$mle_conf_1_biomass_norm,
        xright = (1 - shorter) * dat$bin_max,
        ytop = dat$mle_conf_2_biomass_norm,
-       col = rect_shading)
+       col = rect_shading,
+       border = rect_border)
 
   # Horizontal bars corresponding to MLE values
   segments(x0 = dat$bin_min,

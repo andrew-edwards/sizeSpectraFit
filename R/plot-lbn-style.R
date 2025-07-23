@@ -121,17 +121,25 @@ plot_lbn_style <- function(res,
 
       # TODO might not need the if statement as have class-specific ones
   if("size_spectrum_numeric" %in% class(res)){
-    # TODO use bin_sum_norm for
-    # plotting, no uncertainty in y-axis for data
-    # create biomass_calcs once done p_biomass_bins.size_spectrum_numeric(). TODO
+    # using bin_sum_norm for
+    # plotting, no uncertainty in y-axis for data, by setting the
+    # low_biomass_norm etc. to be same as bin_sum_norm in
+    #  p_biomass_bins.size_spectrum_numeric()
 
     dat <- p_biomass_bins(res)
 
     n <- sum(dat$bin_count)
 
+    plot_data_boxes_first = FALSE   # plot the data boxes last, since only
+                                    # horizontal lines representing data
+                                    # (which are actually drawn as rectangles).
+
   } else {
     dat <- p_biomass_bins(res)   # might not need n calc as above as maybe
                                  # already saved in res, need to tease out here
+    plot_data_boxes_first = TRUE   # Will have uncertainty in data, so plot
+                                      # data first as fitted boxes won't
+                                      # completely cover them up
   }
 
 
@@ -179,14 +187,17 @@ plot_lbn_style <- function(res,
     y_small_ticks_labels = y_small_ticks_labels)
 
 
-  # won't work for MLE though, so adapt when doing that TODO  or might just do
-  # horizontal automatically which is what we want
   # Data:
-  rect(xleft = dat$bin_min,
-       ybottom = dat$low_biomass_norm,
-       xright = dat$bin_max,
-       ytop = dat$high_biomass_norm,
-       col = rect_col)
+  if(plot_data_boxes_first){
+    rect(xleft = dat$bin_min,
+         ybottom = dat$low_biomass_norm,
+         xright = dat$bin_max,
+         ytop = dat$high_biomass_norm,
+         col = rect_col,
+         lwd = 1)     # TODO generalise, but want thick for .numeric below since no
+    # uncertainty; this might be fine
+  }
+
 
   # Option to plot binned version of fitted curve (do first to then overlay the
   # straight lines of biomass density)
@@ -195,12 +206,21 @@ plot_lbn_style <- function(res,
                     ...)
   }
 
+  if(!plot_data_boxes_first){
+    rect(xleft = dat$bin_min,
+         ybottom = dat$low_biomass_norm,
+         xright = dat$bin_max,
+         ytop = dat$high_biomass_norm,
+         col = rect_col,
+         lwd = 2)     # TODO generalise, but want thick for .numeric below since no
+    # uncertainty; this might be fine
+  }
+
+
   # Biomass density for each value of x, from MEE equation (4), using the MLE for b.
-  # TODO TODO feel like this should be MLE for b plus 1, looking at equation
-  # 4. Ah no, as then normalise I think by x. Leave for now to get it working. Should be straight on this plot?
   lines(x_plb,
         dPLB(x_plb,
-             b = res$b_mle,    # HERE
+             b = res$b_mle,
              xmin = min(x_plb),
              xmax = max(x_plb)) * n * x_plb,
         col="red")   # TODO generalise once working

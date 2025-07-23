@@ -36,7 +36,7 @@ the fitting and plotting functions, without extra explanation. This will show
 the simplicity, and refer to vignette for more details. Can use the MLEbins
 vignette maybe (when it's done).
 
-### Vector of individual measurements
+## Measurements of individual body sizes -- MLE method
 
 The simplest data is just a vector of measurements, such as body masses or
 body lengths. We fit the size spectrum by calculating the maximum likelihood estimate
@@ -82,7 +82,7 @@ red line is the maximum likelihood estimate (MLE) of the size-spectrum exponent
 $b$, and the dashed lines are the fits from using the low and high values of the
 95% confidence interval of $b$. The MLE for $b$ and the sample size $n$ are
 also explicitly given. The default x-axis label assumes the body masses are in
-g, but this can easily be changed (described below).
+g, but this can easily be changed (see later).
 
 There are four styles available for easy plotting. The default is the figure
 above, as
@@ -109,98 +109,79 @@ which is similar to Fig. 7 of our
 [MEPS paper](https://www.int-res.com/abstracts/meps/v636/p19-33/)
 but for nonbinned data.
 
-The fourth option is only suitable for when the data represent body masses. It
+The fourth option is only suitable when the data represent body masses. It
 shows the normalised biomass in the top panel followed by the ISD plot shown above:
 ```{r, MLEbiomassplot}
 plot(res_vec,
      style = "biomass")
 ```
 
-In (a), , and HERE
-shows the first plot above plus a plot of normalised biomass within bins,
-similar to what has historically been done (TODO e.g. Platt and Denman probably). The
-bins are set to double in size, such that they appear of equal width on a log
-scale, and the normalised biomass within each one is calcluated. HERE give a
-description of that.
+In (a), the black horizontal lines indicate the normalised biomass within each
+bin. We use bars, rather than the usual points (e.g. Figure 2(f) of our MEE
+paper) to emphasise that the actual values of body size in each bin span a
+range; the points somewhat imply that the midpoint of the bin is more
+relevant.
 
-TODO change default x-axis label to body mass, x, g and mention that above.
+Successive bins double in size, such that they appear of equal width on the log
+scale (e.g. Platt and Denman probably TODO). The normalised biomass within each
+one is calcluated as the sum of the biomass in the bin divided by the bin width;
+there is no uncertainty in this calculation here because we know the individual
+body sizes (this is not so if the data are already binned, see later). The
+horizontal red lines show the estimated normalised biomass in each bin based on
+the MLE of the exponent $b$, and the pink boxes span the normalised biomass
+estimated for all values within the 95% confidence interval of $b$. The straight
+lines are also shown for the MLE of $b$ (solid line) and the 95% confidency
+interval estimates (dashed lines). Note that the straight lines fit the PLB
+distribution, who's definition includes the $x_{min}$ and $x_{max}$ bounds (see
+MEE paper equation 1), but the top bin here goes beyond $x_{max}$, even though
+there are no data there.
 
-HERE carry on checking through these (move this forward each time), tweak the legends, see `plot.size_spectrum_mlebin()`
-presumably, and tidy up.Good to fix TODO's in each plotting function.
+The fit here is clearly very good, but remember this is expected as the data are
+simulated from a known PLB distribution and are not noisy, unlike real data.
 
 
+TODO add in GoF once done.
 
-Code works up to HERE, maybe not when doing as .Rmd
+## Measurements that are already binned -- MLEbin method
 
-If you want to tweak options beyond the default shown then read this. The plot is as shown because we have written a function
-`plot.size_spectrum_numeric()` which gets automatically used on `res_vec`
-because `res_vec` has class `size_spectrum_numeric`. That was assigned
-automatically in the function `fit_size_spectrum()` used above to
-create `res_vec`. This all happens behind the scenes but it is useful for users
-to know about this. In particular, to see the help you need to do
-`?plot.size_spectrum_numeric()`. There you can see lots of customisable options
-by setting arguments; for example to add the extra labels on the x-axis (to
-*exactly* match the Figure 6b):
-```{r, MLE5}
-plot(res_vec,
-     x_small_ticks_labels = c(5, 50, 500))
+Often, data are only available in binned form, motivating our MLEbin and MLEbins
+methods (see our MEPS paper for details).
+
+Saved in sizeSpectra2 is a binned version of the simulated data set used above:
+```{r}
+sim_vec_binned
+```
+which has information on counts within each body-mass bin, rather than values of
+individual
+body masses. For example, the first row represent the first bin, which ranges
+from 1-2 g (`bin_min` to `bin_max`), and body masses in
+this range were observed for 528 individuals (`bin_count`). The bins here progressively double
+in width.
+
+To fit the PLB distribution, we again just use the `fit_size_spectrum()` function:
+```{r}
+res_mlebin <- fit_size_spectrum(sim_vec_binned)
+res_mlebin
 ```
 
-for LBN plot:
+So `res_mlebin` is a list object that contains objects `b_mle`, the
+MLE of the exponent $b$ as calculated using the MLEbin method, `b_conf` which gives the 95%
+confidence interval of $b$, `data` which gives the data used for the fit plus
+some extra calculations (TODO explain somewwhere else), `x_min` and `x_max`
+which are the MLEs of $x_{min}$ and $x_{max}$, which are simply the minimum of
+the lowest bin and maximum of the maximum bin. Also, `method` tells us that the
+MLEbin method was used, and the `attr(,"class")` at the end adds attributes to
+the list that help our automated plotting functions.
 
-Go with: if using x values
-then calc xmin and xmax exactly, use xmin to start the binning, and cut the top
-bin off at xmax not the max of the generated bin. This is being done in
-plot_lbn_style. TODO will require tweaking of bin_data.data.frame() needs
-options to start at min(x) precisely, not just floor(..), see TODO in bin_data.data.frame().
-
-For pre-binned data, just have to stick with the bins we are given.
-
-This works, need to tweak figure code, think done, want to try it and maybe add
-more options, maybe all fine now:
-
-```{r, eval = FALSE}
-x_binned <- bin_data(res_vec$x,
-                         bin_width = "2k")
-res_mlebin <- fit_size_spectrum.data.frame(x_binned$bin_vals)
-plot_lbn_style(res_mlebin, x_plb = x_plb)   # x_plb from
-#                          plot.size_spctrum_numeric() right now
-}
-
-then continue with these (that rely on each other):
-
-TODO examples and tests for all.
-
-### Binned data of counts in bins
-
-Now we demonstrate the MLEbin method, which is for binned data. Let's just take
-the same simulated data as above but assume that we only have it available in
-binned form (e.g. measurements may have been made at a coarse scale to save
-time). The binned data are saved in the package as
-```{r, MLEbinned}
-sim_vec_binned    # TODO should strip this down, as I think it includes some
-                  # things that we wouldn't know for true binned data, also
-                  # simplify it probably
+Our default plot for results from the MLEbin method is
+```{r, MLEbinplot, fig.height = 10}
+plot(res_binned)
 ```
-which is a list object (see `?sim_vec_binned` for details), for which we only need the binned values:
-```{r, MLEbin1}
-sim_vec_binned$bin_vals
-```
+This is similar to the "both" style shown above for invidual body masses, but
+here we only have binned data available. in the style of
 
-We fit these again using the generic `fit_size_spectrum()` function, which will
-automatically pick the MLEbin method:
-```{r MLEbin1a}
-res_binned <- fit_size_spectrum(sim_vec_binned$bin_vals)
-
-res_binned
-```
-
-`r knitr::knit_exit()`
-
-So `res_binned` is a list object that contains objects `b_mle`, the
-maximum likelihood estimate of the exponent $b$, `b_conf` which gives the 95%
-confidence interval of $b$, and `data` which gives the data used for the fit (in
-this case the same as `sim_vec_binned$bin_vals`).
+HERE need to decide on default, probaly the above, and then add in the biomass
+etc. options like for MLE results.
 
 We have a built-in plotting function to generate a plot in the style of Figure 7
 in our MEPS paper (but a bit simpler because here we do not have overlapping
@@ -209,9 +190,6 @@ bins), which is accessed by simply doing:
 TODO probably get rid of green lines in MLEbin plot since not needed (are for
 MLEbins though).
 
-```{r, MLEbinplot, fig.height = 10}
-plot(res_binned)
-```
 
 The y-axis is (a) linear and (b) logarithmic, and the grey rectangles indicate
 the uncertainty in numbers of values due to the binning. For each bin, the horizontal green
@@ -339,6 +317,39 @@ our [MEE paper](http://onlinelibrary.wiley.com/doi/10.1111/2041-210X.12641/full)
 
 our [MEPS paper](https://www.int-res.com/abstracts/meps/v636/p19-33/)
 
+
+# Tweaking options for plots
+
+Fix TODO's in each plotting function.
+
+Many aspects of the plots can be adapted by changing arguments to the plotting
+functions.
+
+See the relevant helpfiles.
+
+If you want to tweak options beyond the default shown then read this. The plot is as shown because we have written a function
+`plot.size_spectrum_numeric()` which gets automatically used on `res_vec`
+because `res_vec` has class `size_spectrum_numeric`. That was assigned
+automatically in the function `fit_size_spectrum()` used above to
+create `res_vec`. This all happens behind the scenes but it is useful for users
+to know about this. In particular, to see the help you need to do
+`?plot.size_spectrum_numeric()`. There you can see lots of customisable options
+by setting arguments; for example to add the extra labels on the x-axis (to
+*exactly* match the Figure 6b):
+```{r, MLE5}
+plot(res_vec,
+     x_small_ticks_labels = c(5, 50, 500))
+```
+
+for LBN plot:
+
+
+
+## Session information
+
+```{r sessioninfo}
+sessionInfo()
+```
 
 
 `r knitr::knit_exit()`
@@ -684,10 +695,4 @@ plot(res_all_years_spawning$res_all[[which(res_all_years_spawning$intervals_all$
      y_arrow = 0.57,
      xlab = "Female spawning biomass in 2024 (millions of tonnes)",
      type = "hdi")
-```
-
-## Session information
-
-```{r sessioninfo}
-sessionInfo()
 ```

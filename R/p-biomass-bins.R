@@ -1,6 +1,11 @@
 ##' Total and normalised biomass in each bin for a fitted distribution and given
 ##' bin breaks
 ##'
+##'
+##' For size_spectrum_numeric we know all the individual body sizes, so there is
+##' no uncertainty in the biomass within each bin. So setting high and low
+##' biomasses to be the same.
+##'
 ##' HERE HERE
 ##' TODO TODO - actually, input the results list (since we have b and conf ints
 ##' and data all in there), and then do two different methods dependent upon the

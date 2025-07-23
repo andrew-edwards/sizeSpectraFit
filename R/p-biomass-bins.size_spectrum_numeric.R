@@ -23,11 +23,13 @@ p_biomass_bins.size_spectrum_numeric <- function(res_mle   # result from MLE met
   xmin <- res_mle$x_min
   xmax <- res_mle$x_max
 
+  # There is no uncertainty in the biomass in each bin, because we know the
+  # individual body masses. So setting low_biomass and high_biomass to be the
   res <- dplyr::mutate(data,
-                       low_biomass = bin_min * bin_count,
-                       high_biomass = bin_max * bin_count,
-                       low_biomass_norm = low_biomass / bin_width,
-                       high_biomass_norm = high_biomass / bin_width,
+                       low_biomass = bin_sum,
+                       high_biomass = bin_sum,
+                       low_biomass_norm = bin_sum_norm,
+                       high_biomass_norm = bin_sum_norm,
                        mle_biomass =
                          p_biomass(x = data$bin_max,
                                    b = res_mle$b_mle,
