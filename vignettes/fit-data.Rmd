@@ -81,7 +81,8 @@ Each individual body mass is shown as a point (note the log scales), the solid
 red line is the maximum likelihood estimate (MLE) of the size-spectrum exponent
 $b$, and the dashed lines are the fits from using the low and high values of the
 95% confidence interval of $b$. The MLE for $b$ and the sample size $n$ are
-also explicitly given.
+also explicitly given. The default x-axis label assumes the body masses are in
+g, but this can easily be changed (described below).
 
 There are four styles available for easy plotting. The default is the figure
 above, as
@@ -98,11 +99,6 @@ plot(res_vec,
 gives the same plot but with a linear y-axis.
 
 
-HERE - biomass plot, can't get lines on. See HERE in plot-lbn-style.R
-
-HERE carry on checking through these (move this forward each time), tweak the legends, see `plot.size_spectrum_mlebin()`
-presumably, and tidy up.Good to fix TODO's in each plotting function.
-
 To show both the above plots together, with panels automatically labelled as (a)
 and (b):
 ```{r, MLEbothplot}
@@ -113,17 +109,25 @@ which is similar to Fig. 7 of our
 [MEPS paper](https://www.int-res.com/abstracts/meps/v636/p19-33/)
 but for nonbinned data.
 
-The fourth option is only suitable for when the data represent body masses, and
+The fourth option is only suitable for when the data represent body masses. It
+shows the normalised biomass in the top panel followed by the ISD plot shown above:
+```{r, MLEbiomassplot}
+plot(res_vec,
+     style = "biomass")
+```
+
+In (a), , and HERE
 shows the first plot above plus a plot of normalised biomass within bins,
 similar to what has historically been done (TODO e.g. Platt and Denman probably). The
 bins are set to double in size, such that they appear of equal width on a log
 scale, and the normalised biomass within each one is calcluated. HERE give a
 description of that.
 
-```{r, MLEbiomassplot}
-plot(res_vec,
-     style = "biomass")
-```
+TODO change default x-axis label to body mass, x, g and mention that above.
+
+HERE carry on checking through these (move this forward each time), tweak the legends, see `plot.size_spectrum_mlebin()`
+presumably, and tidy up.Good to fix TODO's in each plotting function.
+
 
 
 Code works up to HERE, maybe not when doing as .Rmd

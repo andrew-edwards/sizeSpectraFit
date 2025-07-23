@@ -76,7 +76,7 @@ plot_lbn_style <- function(res,
                            ylim = NULL,
                            plot_conf_ints = TRUE,
                            plot_binned_fitted = TRUE,  # plot the binned fitted version
-                           xlab = expression(paste("Body mass, ", italic(x))),
+                           xlab = NULL,
                            ylab = "Normalised biomass",
                            mgp_val = c(1.6, 0.5, 0),
                            tcl_small = -0.2,

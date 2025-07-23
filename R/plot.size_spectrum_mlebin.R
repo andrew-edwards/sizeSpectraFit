@@ -1,6 +1,8 @@
 ##' Plot binned ISD plots similar to MEPS Figure 7 (but with nonoverlapping
 ##' bins).
 ##'
+##' TODO need xlab here and called functions
+##'
 ##' Plots one- or two-panel plot of the ISD with data in binned form like in
 ##'   Fig. 7, 7a or 7b (depending on settings) of MEPS paper, but with
 ##'   nonoverlapping bins. See `log_y_axis` to specify exact plot(s).

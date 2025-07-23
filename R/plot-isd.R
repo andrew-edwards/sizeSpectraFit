@@ -61,7 +61,7 @@ plot_isd <- function(res,
                      y_plb_conf_min,
                      y_plb_conf_max,
                      plot_conf_ints = TRUE,
-                     xlab = expression(paste("Values, ", italic(x))),
+                     xlab = NULL,
                      ylab = expression(paste("Total ", counts >= x),
                                        sep=""),  # Figure out how to do
                      # it as optional but feed through.
