@@ -84,7 +84,7 @@ $b$, and the dashed lines are the fits from using the low and high values of the
 also explicitly given. The default x-axis label assumes the body masses are in
 g, but this can easily be changed (see later).
 
-There are four styles available for easy plotting. The default is the figure
+There are several styles available for easy plotting. The default is the figure
 above, as
 recommended in Figure 6b of
 our [MEE paper](http://onlinelibrary.wiley.com/doi/10.1111/2041-210X.12641/full)
@@ -98,12 +98,11 @@ plot(res_vec,
 ```
 gives the same plot but with a linear y-axis.
 
-
 To show both the above plots together, with panels automatically labelled as (a)
 and (b):
 ```{r, MLEbothplot}
 plot(res_vec,
-     style = "both")
+     style = "both_y_axes")
 ```
 which is similar to Fig. 7 of our
 [MEPS paper](https://www.int-res.com/abstracts/meps/v636/p19-33/)
@@ -139,6 +138,11 @@ there are no data there.
 The fit here is clearly very good, but remember this is expected as the data are
 simulated from a known PLB distribution and are not noisy, unlike real data.
 
+To show the biomass plot and the ISD plot:
+```{r, MLEbiomassisdplot}
+plot(res_vec,
+     style = "biomass_and_isd")
+```
 
 TODO add in GoF once done.
 
@@ -174,7 +178,7 @@ MLEbin method was used, and the `attr(,"class")` at the end adds attributes to
 the list that help our automated plotting functions.
 
 Our default plot for results from the MLEbin method is
-```{r, MLEbinplot, fig.height = 10}
+```{r, MLEbinplot}
 plot(res_mlebin)
 ```
 
@@ -192,7 +196,7 @@ gives the same plot but with a linear y-axis.
 To show both the above plots together:
 ```{r, MLEbinbothplot}
 plot(res_mlebin,
-     style = "both")
+     style = "both_y_axes")
 ```
 which is similar to Fig. 7 of our
 [MEPS paper](https://www.int-res.com/abstracts/meps/v636/p19-33/)
@@ -205,7 +209,16 @@ plot(res_binned,
      style = "biomass")
 ```
 
+And to show this plot and the first one as two panels:
+```{r, MLEbinbiomassandlogplot}
+plot(res_binned,
+     style = "biomass_and_log")
+```
+The y-axes happen to have the same numbers (though they mean different things) for this simulated data set, though
+this will not generally be the case.
 
+
+--
 
 This is similar to the "both" style shown above for invidual body masses, but
 here we only have binned data available. in the style of
@@ -257,13 +270,13 @@ plot(res_mlebin,
 ```
 and also just plot one or other of the panels:
 ```{r, MLEbinplot3}
-plot(res_mlebin,
-     log_y_axis = "yes")
+#plot(res_mlebin,
+#     log_y_axis = "yes")
 ```
 
 ```{r, MLEbinplot4}
-plot(res_mlebin,
-     log_y_axis = "no")
+#plot(res_mlebin,
+#     log_y_axis = "no")
 ```
 
 For more options, see `?plot.size_spectrum_mlebin` TODO check that links with `?plot_isd_binned`.

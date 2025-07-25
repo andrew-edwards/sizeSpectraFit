@@ -16,7 +16,7 @@
 ##'   `fit_size_spectrum()` on binned data (such that the function
 ##'   `fit_size_spectrum_mlebin()` is used; see vignette TODO). # TODO link help
 ##'   to plot.size_spectrum_numeric - may want to put them all together
-##' @param log_y_axis character either `"both"`, do two plots (like Fig. 7 of
+##' @param log_y_axis TODO delete a bunch of these params.....character either `"both"`, do two plots (like Fig. 7 of
 ##'   MEPS paper), `"no"` for single plot with linear y axis (like Fig. 7a of
 ##'   MEPS paper), `"yes"` for single plot with logarithmic y axis (like Fig. 7b
 ##'   of MEPS paper). Legends are automatically set, but can be tailored with the
@@ -78,8 +78,9 @@ plot.size_spectrum_mlebin <- function(res_mlebin,
                                       ){   # TODO decide if want ... yes, just
                                         # make sure help files link to all functions
 
-  stopifnot("style must be log_y_axis, linear_y_axis, both, or biomass" =
-              style %in% c("log_y_axis", "linear_y_axis", "both", "biomass"))
+  stopifnot("style must be log_y_axis, linear_y_axis, both_y_axes, biomass, or biomass_and_log" =
+              style %in% c("log_y_axis", "linear_y_axis", "both_y_axes",
+                           "biomass", "biomass_and_log"))
 
   # Work out calculations needed for both types of plot and then pass them on to
   # plot_isd_binned():
@@ -137,7 +138,7 @@ plot.size_spectrum_mlebin <- function(res_mlebin,
               max(dat$high_count))
   }
 
-  if(style == "both"){
+  if(style == "both_y_axes"){
     par(mfrow = c(2,1),
         mai = par_mai,
         cex = par_cex)
@@ -208,5 +209,37 @@ plot.size_spectrum_mlebin <- function(res_mlebin,
                     legend_text_n = legend_text_a_n,
                     seg_col = seg_col,
                     ...)
+  }
+
+
+  if(style == "biomass_and_log"){
+    par(mfrow = c(2,1),
+        mai = par_mai,
+        cex = par_cex)
+
+    plot_lbn_style(res_mlebin,
+                   x_plb = x_plb,
+                   xlab = xlab,
+                   inset_label = inset_label,
+                   legend_label = legend_label_a,
+                   legend_text = legend_text_a,
+                   legend_text_n = legend_text_a_n,
+                   ...)
+
+    plot_isd_binned(res_mlebin = res_mlebin,
+                    log = "xy",
+                    xlim = xlim,
+                    ylim = ylim,
+                    x_plb = x_plb,
+                    y_plb = y_plb,
+                    y_plb_conf_min = y_plb_conf_min,
+                    y_plb_conf_max = y_plb_conf_max,
+                    xlab = xlab,
+                    legend_label = legend_label_b,
+                    legend_text = legend_text_b,
+                    legend_text_n = legend_text_b_n,
+                    seg_col = seg_col,
+                    ...)  # ADD in more options maybe, see plot_isd_binned; figure out
+                          # useArgs() thing. Copy to next ones TODO
   }
 }

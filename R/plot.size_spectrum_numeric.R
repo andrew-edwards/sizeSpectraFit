@@ -23,8 +23,8 @@
 ##' @param style character either:
 ##'   * `"log_y_axis"` - single ISD plot with logarithmic y axis (Fig. 6b of MEE paper)
 ##'   * `"linear_y_axis"` - for single ISD plot with linear y axis
-##'   * `"both"` - both the above plots as a two-panel plot
-##'   * `"biomass"` - to use only if the data represent body masses. Does two-panel
+##'   * `"both_y_axes"` - both the above plots as a two-panel plot
+##'   * `"biomass_and_isd"` - to use only if the data represent body masses. Does two-panel
 ##'   plot, essentially the recommended Fig. 6 of MEE paper where the top panel
 ##'   is bins of normalized biomass (but improved here by showing bins in the top
 ##'   panel rather than points) and the `"log_y_axis"` plot described above.
@@ -75,8 +75,9 @@ plot.size_spectrum_numeric <- function(res,
                                          # plots, use par() as usual for single plots
                                        ...){
 
-  stopifnot("style must be log_y_axis, linear_y_axis, both, or biomass" =
-              style %in% c("log_y_axis", "linear_y_axis", "both", "biomass"))
+  stopifnot("style must be log_y_axis, linear_y_axis, both_y_axes, biomass, or biomass_and_isd" =
+              style %in% c("log_y_axis", "linear_y_axis", "both_y_axes",
+                           "biomass", "biomass_and_isd"))
 
   # Work out calculations needed for both types of plot and then pass them on to
   # plot_isd() (and plot_isd_binned() for `both`).:
@@ -133,7 +134,7 @@ plot.size_spectrum_numeric <- function(res,
                            # of largest value
   }
 
-  if(style == "both"){
+  if(style == "both_y_axes"){
 
     par(mfrow = c(2,1),
         mai = par_mai,
@@ -172,6 +173,18 @@ plot.size_spectrum_numeric <- function(res,
   }
 
   if(style == "biomass"){
+
+    plot_lbn_style(res,
+                   x_plb = x_plb,
+                   xlab = xlab,
+                   inset_label = inset_label,
+                   legend_label = legend_label_single,
+                   legend_text = legend_text_a,
+                   legend_text_n = legend_text_a_n,
+                   ...)
+  }
+
+  if(style == "biomass_and_isd"){
     par(mfrow = c(2,1),
         mai = par_mai,
         cex = par_cex)
