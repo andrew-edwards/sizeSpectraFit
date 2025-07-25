@@ -33,7 +33,7 @@ plot_lbn_fitted <- function(dat,
   # Rectangles corresponding to confidence interval ranges, it doesn't matter
   # that sometimes we'll have ybottom > ytop (I think it might almost be guaranteed
   # to happen for at least one bin, yes, think they must switch). So can't say
-  # top corresponds to max or min of conf interval of b, I think. TODO tidy up
+  # top corresponds to max or min of conf interval of b, I think. TODO tidy up.
   rect(xleft = (1 + shorter) * dat$bin_min,
        ybottom = dat$mle_conf_1_biomass_norm,
        xright = (1 - shorter) * dat$bin_max,

@@ -46,11 +46,15 @@
 plot.size_spectrum_mlebin <- function(res_mlebin,
                                      # from plot.size_spectrum_numeric(), best
                                       # to use these for consistency
-                                      log_y_axis = "both",
+                                      style = "log_y_axis",
                                       xlim = c(min(res_mlebin$data$bin_min),
                                                max(res_mlebin$data$bin_max)),
                                       ylim = NA,
                                       x_plb = NA,
+                                      inset_label = c(0, -0.02),
+                                      xlab = expression(paste("Body mass, ",
+                                                               italic(x), "(g)")),
+
                                       y_scaling = 0.75,
                                       mle_round = 2,
                                       legend_label_a = "(a)",
@@ -65,12 +69,17 @@ plot.size_spectrum_mlebin <- function(res_mlebin,
                                                                round(sum(res_mlebin$data$bin_count))),
                                       legend_text_b = NULL,
                                       legend_text_b_n = NULL,
+                                      seg_col = "black",
+                                      par_mai = c(0.4, 0.5, 0.05, 0.3),
+                                      par_cex = 0.7,   # only for two panel
+                                         # plots, use par() as usual for single plots
+
                                       ...
                                       ){   # TODO decide if want ... yes, just
                                         # make sure help files link to all functions
 
-  stopifnot("log_y_axis must be both, yes, or no" =
-              log_y_axis %in% c("both", "yes","no"))
+  stopifnot("style must be log_y_axis, linear_y_axis, both, or biomass" =
+              style %in% c("log_y_axis", "linear_y_axis", "both", "biomass"))
 
   # Work out calculations needed for both types of plot and then pass them on to
   # plot_isd_binned():
@@ -128,8 +137,10 @@ plot.size_spectrum_mlebin <- function(res_mlebin,
               max(dat$high_count))
   }
 
-  if(log_y_axis == "both"){
-    par(mfrow = c(2,1))
+  if(style == "both"){
+    par(mfrow = c(2,1),
+        mai = par_mai,
+        cex = par_cex)
     plot_isd_binned(res_mlebin = res_mlebin,
                     log = "x",
                     xlim = xlim,
@@ -138,9 +149,11 @@ plot.size_spectrum_mlebin <- function(res_mlebin,
                     y_plb = y_plb,
                     y_plb_conf_min = y_plb_conf_min,
                     y_plb_conf_max = y_plb_conf_max,
+                    xlab = xlab,
                     legend_label = legend_label_a,
                     legend_text = legend_text_a,
                     legend_text_n = legend_text_a_n,
+                    seg_col = seg_col,
                     ...)  # ADD in more options maybe, see plot_isd_binned; figure out
                           # useArgs() thing. Copy to next ones
 
@@ -152,24 +165,48 @@ plot.size_spectrum_mlebin <- function(res_mlebin,
                     y_plb = y_plb,
                     y_plb_conf_min = y_plb_conf_min,
                     y_plb_conf_max = y_plb_conf_max,
+                    xlab = xlab,
                     legend_label = legend_label_b,
                     legend_text = legend_text_b,
                     legend_text_n = legend_text_b_n,
+                    seg_col = seg_col,
                     ...)
-  } else {
+  }
+
+  if(style == "biomass"){
+    # Think this should just be the one plot
+    plot_lbn_style(res_mlebin,
+                   x_plb = x_plb,
+                   xlab = xlab,
+                   inset_label = inset_label,
+                   legend_label = legend_label_single,
+                   legend_text = legend_text_a,
+                   legend_text_n = legend_text_a_n,
+                   ...)
+
+
+    # plot_lbn_style presumably, compare with .numeric
+  }
+
+
+  if(style %in% c("linear_y_axis", "log_y_axis")){
+    log_axes <- ifelse(style == "log_y_axis",
+                       "xy",
+                       "x")    # TODO test this
+
     plot_isd_binned(res_mlebin = res_mlebin,
-                    log = ifelse(log_y_axis == "yes",
-                                 "xy",
-                                 "x"),
+                    log = log_axes,
                     xlim = xlim,
                     ylim = ylim,
                     x_plb = x_plb,
                     y_plb = y_plb,
                     y_plb_conf_min = y_plb_conf_min,
                     y_plb_conf_max = y_plb_conf_max,
+                    xlab = xlab,
                     legend_label = legend_label_single,
                     legend_text = legend_text_a,
                     legend_text_n = legend_text_a_n,
+                    seg_col = seg_col,
                     ...)
   }
 }

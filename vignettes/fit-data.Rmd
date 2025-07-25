@@ -175,21 +175,44 @@ the list that help our automated plotting functions.
 
 Our default plot for results from the MLEbin method is
 ```{r, MLEbinplot, fig.height = 10}
-plot(res_binned)
+plot(res_mlebin)
 ```
+
+HERE - use the text from here to END, to streamline this. Decide how repetitive
+need to be from the above. And whether biomass should have two plots. Maybe in
+above we should have biomass and biomass_ISD styles? Cover all the options.
+
+As for the MLE results above, the `style` argument changes the style of plot:
+```{r, MLEbinlinearplot}
+plot(res_mlebin,
+     style = "linear_y_axis")
+```
+gives the same plot but with a linear y-axis.
+
+To show both the above plots together:
+```{r, MLEbinbothplot}
+plot(res_mlebin,
+     style = "both")
+```
+which is similar to Fig. 7 of our
+[MEPS paper](https://www.int-res.com/abstracts/meps/v636/p19-33/)
+but for nonbinned data. TODO check
+
+The fourth option is only suitable when the data represent body masses. It
+shows the normalised biomass in the top panel followed by the ISD plot shown above:
+```{r, MLEbinbiomassplot}
+plot(res_binned,
+     style = "biomass")
+```
+
+
+
 This is similar to the "both" style shown above for invidual body masses, but
 here we only have binned data available. in the style of
-
-HERE need to decide on default, probaly the above, and then add in the biomass
-etc. options like for MLE results.
 
 We have a built-in plotting function to generate a plot in the style of Figure 7
 in our MEPS paper (but a bit simpler because here we do not have overlapping
 bins), which is accessed by simply doing:
-
-TODO probably get rid of green lines in MLEbin plot since not needed (are for
-MLEbins though).
-
 
 The y-axis is (a) linear and (b) logarithmic, and the grey rectangles indicate
 the uncertainty in numbers of values due to the binning. For each bin, the horizontal green
@@ -208,9 +231,9 @@ green line for the next bin. This plotting method allows us to properly represen
 discrete binned data on a continuous scale. For example, for a body mass of 1.5
 g we can see that the number (on the y-axis) of possible individual individuals with
 body mass $\geq$ 1.5 g is between
-`r sum(res_binned$data$bin_count) - res_binned$data$bin_count[1]`
+`r sum(res_mlebin$data$bin_count) - res_mlebin$data$bin_count[1]`
 (all individuals could conceivably be 1.7 g and therefore all are $\geq$ 1.5 g)
-and `r sum(res_binned$data$bin_count)` (all individuals in the first bin are
+and `r sum(res_mlebin$data$bin_count)` (all individuals in the first bin are
 actually $<$ 1.5 g).
 
 The text
@@ -225,19 +248,21 @@ be a good fit, but these figures show the benefit of the plotting approach
 structure).
 
 
+END
+
 We can easily add options:
 ```{r, MLEbinplot2, fig.height = 10}
-plot(res_binned,
+plot(res_mlebin,
      x_small_ticks_labels = c(5, 50, 500))
 ```
 and also just plot one or other of the panels:
 ```{r, MLEbinplot3}
-plot(res_binned,
+plot(res_mlebin,
      log_y_axis = "yes")
 ```
 
 ```{r, MLEbinplot4}
-plot(res_binned,
+plot(res_mlebin,
      log_y_axis = "no")
 ```
 

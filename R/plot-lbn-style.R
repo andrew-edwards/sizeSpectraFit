@@ -136,7 +136,9 @@ plot_lbn_style <- function(res,
 
   } else {
     dat <- p_biomass_bins(res)   # might not need n calc as above as maybe
-                                 # already saved in res, need to tease out here
+    # already saved in res, need to tease out here TODO, next line should work:
+    n <- sum(res$data$bin_count)
+
     plot_data_boxes_first = TRUE   # Will have uncertainty in data, so plot
                                       # data first as fitted boxes won't
                                       # completely cover them up
