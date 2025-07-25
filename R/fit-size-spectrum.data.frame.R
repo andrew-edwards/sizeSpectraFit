@@ -7,7 +7,7 @@ fit_size_spectrum.data.frame <- function(dat,
 #                                         x_max = NULL,
 #                                         b_vec = NULL,
 #                                         b_vec_inc = 0.00001){
-
+  # TODO, make fit_size_spectrum_strata  which then loops round the existing ones
   # TODO May need to get people to specify method, bit
   # TODO hard to fully automate, and no guarantee what other column names people have.
   # TODO could check if bin_min is in column names, in which case treat as

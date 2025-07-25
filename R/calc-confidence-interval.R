@@ -1,10 +1,10 @@
 ##' Calculate confidence interval
 ##'
-##' Gets called from [fit_size_spectrum.numeric()]. TODO may need to be explicit
+##' Gets called from [calc_mle_conf(). TODO may need to be explicit
 ##' about the help. Might be simpler as fitting function gets more complex.
 ##'
-##' @param min_ll list output from [nlm()].
-##' @inheritParams fit_size_spectrum
+##' @param min_neg_ll_value the minimum negative log likelihood value at the MLE.
+##' @inheritParams calc_mle_conf
 ##' @export
 ##' @author Andrew Edwards
 ##' @examples
@@ -45,6 +45,7 @@ calc_confidence_interval <- function(this_neg_ll_fn,
 
   values_in_95 <- vec[neg_ll_vals < crit_val] # b values in 95% confidence interval
   conf = c(min(values_in_95),
-             max(values_in_95))
+           max(values_in_95))
+
   return(conf)
 }

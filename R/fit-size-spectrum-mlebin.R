@@ -3,8 +3,7 @@
 fit_size_spectrum_mlebin <- function(dat,
                                      x_min = NULL,
                                      x_max = NULL,
-                                     b_start = -1.9,   # Starting estimate for
-                                        # b, since no analytical value
+                                     b_start = -1.9,
                                      b_vec = NULL,
                                      b_vec_inc = 0.00001){
 

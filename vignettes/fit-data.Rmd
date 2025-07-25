@@ -207,7 +207,7 @@ because here we do not have species-specific overlapping body-mass bins.
 The fourth option is only suitable when the data represent body masses. It
 shows the normalised biomass:
 ```{r, MLEbinbiomassplot}
-plot(res_binned,
+plot(res_mlebin,
      style = "biomass")
 ```
 and is interpreted the same way as the earlier plot for the MLE method (but here
@@ -215,7 +215,7 @@ the bins are already predefined, because that is how the data are provided).
 
 And to show this plot and the first one as two panels:
 ```{r, MLEbinbiomassandlogplot}
-plot(res_binned,
+plot(res_mlebin,
      style = "biomass_and_log")
 ```
 The y-axes happen to have the same numbers (though they mean different things) for this simulated data set, though
@@ -240,11 +240,10 @@ TODO and _MLEbin? Don't expect so help should  link them.
 
 HERE
 
-Might still need to:
-
  D make a general `calc_mle_conf` function based on previous `calcLike` (see
    `fit-size-spectrum.numeric.R` also, and move some ideas from that into
    `calc_mle_conf()`, plus replace that code with `calc_mle_conf()`.). Need to make `prof_like()`.
+
  D use that in `fit-size-spectrum.numeric.R` instead of current
 
  - back to `fit-size-spectrum.data.frame.R` to carry on. See HERE.
