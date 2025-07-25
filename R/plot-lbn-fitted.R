@@ -16,13 +16,13 @@
 ##' @param shorter fraction shorter to make the rectangles, so can see them
 ##' overlapping with grey rectangles; may not work exacly as planned (won't be symmetric) when x-axis
 ##' not logged, but that's not going to be a useful plot anyway
-##' @return
+##' @return  TODO
 ##' @export
 ##' @author Andrew Edwards
 ##' @examples
-##' @donttest{
-##' @
-##' @}
+##' \dontrun{
+##' 3+3
+##' }
 plot_lbn_fitted <- function(dat,
                             bar_col = "red",
                             bar_lwd = 3,

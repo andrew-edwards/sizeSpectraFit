@@ -48,8 +48,11 @@ plot_lbn_style(
 ignore I think: TODO but if called
 from \code{plot.size_spectrum_numeric()} then the results are from the MLE
 method and do not have all the columns that would have from MLEbin method.
-
 TODO onwards:}
+
+\item{inset_label}{inset distance vector for legend}
+
+\item{legend_text}{text for legend TODO}
 
 \item{...}{further arguments to be passed to \code{plot()} and
 \code{plot_binned_fitted()}}
@@ -76,18 +79,9 @@ biomass in each bin for the MLE of \emph{b} and it's confidence limits}
 \item{log.xy}{Which axes to log, for \code{plot(..., log = log.xy)}. So "xy" for
 log-log axes, "x" for only x-axis logged, "" for both axes unlogged.}
 
-\item{x.PLB}{vector of values to use to plot the fitted PLB curve; if NA then
-automatically calculated}
-
-\item{legend}{if TRUE then add legend}
-
 \item{leg.pos}{position of legend, from "bottomright"', '"bottom"',
 '"bottomleft"', '"left"', '"topleft"', '"top"', '"topright"', '"right"'
 and '"center"'.}
-
-\item{inset}{inset distance vector for legend}
-
-\item{leg.text}{text for legend}
 }
 \value{
 TODO should return a tibble of results
@@ -111,9 +105,11 @@ vertical direction on the plot. Only appropriate for nonoverlapping bins.
 
 Adapting from \code{sizeSpectra::LBN_bin_plot()} and \code{plot_isd_binned()} (wanting
 it consistent with the latter, but seemed better to make a new function).
+}
+\examples{
+\donttest{
 
-TODO use sizeSpectra vignette
-\code{MLEbin_recommend.Rmd} for new vignette.
+}
 }
 \author{
 Andrew Edwards

@@ -16,7 +16,7 @@
 ##' @param x vector of values to compute the density and distribution functions.
 ##' @param n number of random numbers to be generated (if `length(n) > 1` then
 ##' generate `length(n)` values)
-##' @param b exponent of the distribution (must be <-1 for [PL()])
+##' @param b exponent of the distribution (must be <-1 for [dPL()] and related functions)
 ##' @param p vector of probabilities for `qPLB()`
 ##' @param xmin minimum bound of the distribution, `xmin > 0`
 ##' @param xmax maximum bound for bounded distribution, `xmax > xmin`

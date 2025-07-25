@@ -1,14 +1,6 @@
 ##' @rdname p_biomass_bins
 ##' @param ... arguments to pass onto ????
 ##' @export
-##' TODO numeric version could create a data.frame first like bin_data.numeric does,
-##'   then use p_biomass_bins.data.frame. Something like:
-##'   ifelse(!is.null(binValsTibble),
-##'         binTibble <- binValsTibble,
-##'      # Create tibble from the vector binBreaks:
-##'         binTibble <- dplyr::tibble(wmin = binBreaks[-length(binBreaks)],
-##'                                    wmax = binBreaks[-1])
-##'         )
 p_biomass_bins.size_spectrum_mlebin <- function(res_mlebin){   # result from mlebin
 
   # TODO put some checks in, though given we have the class defined it should be good

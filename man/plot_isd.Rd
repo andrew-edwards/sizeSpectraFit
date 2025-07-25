@@ -57,9 +57,9 @@ intervals or not}
 \item{xlab, }{ylab x/y labels, explicitly given default values here which can
 be modified as required.}
 
-\item{mgp_val}{mgp values to use, as in \code{plot(..., mgp = mgp_vals)}; see \link{?par}.}
+\item{mgp_val}{mgp values to use, as in \code{plot(..., mgp = mgp_vals)}; see \code{\link[graphics:par]{graphics::par()}}.}
 
-\item{tcl_small}{Length of small tickmarks; see \link{?axis}.}
+\item{tcl_small}{Length of small tickmarks; see \code{\link[graphics:axis]{graphics::axis()}}.}
 
 \item{legend_text}{text to put in the corner, defaults to \verb{b = <value>}. Set to
 \code{NA} to have none, and modify default if needed.}

@@ -29,6 +29,9 @@ normalised biomasses estimated from confidence intervals of \code{b}}
 overlapping with grey rectangles; may not work exacly as planned (won't be symmetric) when x-axis
 not logged, but that's not going to be a useful plot anyway}
 }
+\value{
+TODO
+}
 \description{
 TODO check help. These are to show the estimated normalised biomasses in each bin, based on
 the MLE value of \code{b} and it's confidence limit values.
@@ -36,6 +39,11 @@ Each horizontal bar spans a bin (default colour is red), with it's vertical valu
 expected normalised biomass based on the MLE of \code{b}. The height of the
 shaded rectangles (default colour pink) show the range of expected
 normalised biomass based on the 95\\% confidence interval of \code{b}.
+}
+\examples{
+\dontrun{
+3+3
+}
 }
 \author{
 Andrew Edwards

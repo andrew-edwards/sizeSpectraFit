@@ -29,7 +29,7 @@ qPLB(p = 0.1, b = -2, xmin = 1, xmax = 100)
 \arguments{
 \item{x}{vector of values to compute the density and distribution functions.}
 
-\item{b}{exponent of the distribution (must be <-1 for \code{\link[=PL]{PL()}})}
+\item{b}{exponent of the distribution (must be <-1 for \code{\link[=dPL]{dPL()}} and related functions)}
 
 \item{xmin}{minimum bound of the distribution, \code{xmin > 0}}
 

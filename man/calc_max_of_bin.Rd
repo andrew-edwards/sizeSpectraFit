@@ -13,12 +13,15 @@ calc_max_of_bin(vec, bin_widths = 1, vec_represents_bin_mid = TRUE)
 \item{bin_widths}{numeric of length 1 to specify all bins having same widths, or
 vector of two different allowed bin widths TODO think if need more, or
 generalise. Or tell people to do manually if not simply two options.}
+
+\item{vec_represents_bin_mid}{logical, if \code{TRUE} then \code{vec} represents the
+midpoints of bins, if \code{FALSE} then represents the minima of bins.}
 }
 \value{
 tibble of bin_min, bin_max
 }
 \description{
-Given a vector of values representing either the midpoing or the minimum of
+Given a vector of values representing either the midpoint or the minimum of
 each bin, calculate the correponding maximum value of each bin. The defined
 bin widths can be specified (currently either all identical or some are 0.01
 and some 1).

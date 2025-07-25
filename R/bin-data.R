@@ -17,8 +17,8 @@
 ##' `x` in the interval satisfy `w_j <= x < w_{j+1}`, i.e. closed on the left
 ##' and open on the right.  The exception being for
 ##' the highest bin `[w_{J-1}, w_J]` which includes both bin breaks; see p11 of
-##' Appendix of MEE paper [1] for more details. Functions are adapted from
-##' [sizeSpectra::binData()].
+##' Appendix of MEE paper for more details. Functions are adapted from
+##' `sizeSpectra::binData()`.
 ##'
 ##' @param dat numeric vector of individual values (e.g. body masses) OR a
 ##'   data.frame with first column `x` being the measured values

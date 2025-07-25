@@ -105,8 +105,8 @@ Bins are defined intervals \verb{[w_j, w_\{j+1\})}, which means values
 \code{x} in the interval satisfy \verb{w_j <= x < w_\{j+1\}}, i.e. closed on the left
 and open on the right.  The exception being for
 the highest bin \verb{[w_\{J-1\}, w_J]} which includes both bin breaks; see p11 of
-Appendix of MEE paper \link{1} for more details. Functions are adapted from
-\code{\link[sizeSpectra:binData]{sizeSpectra::binData()}}.
+Appendix of MEE paper for more details. Functions are adapted from
+\code{sizeSpectra::binData()}.
 }
 \examples{
 \dontrun{

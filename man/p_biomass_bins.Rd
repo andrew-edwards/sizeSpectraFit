@@ -57,6 +57,19 @@ TODO TODO - actually, input the results list (since we have b and conf ints
 and data all in there), and then do two different methods dependent upon the
 class of the results.
 }
+\examples{
+\dontrun{
+# TODO
+binBreaks = c(1, 10, 20, 50, 100)
+pBiomassBins(binBreaks = binBreaks) # uses default pBiomass() values
+
+# Same data as a tibble:
+testTibble <- dplyr::tibble(binMin = binBreaks[-length(binBreaks)],
+                            binMax = binBreaks[-1])
+pBiomassBins(binValsTibble = testTibble)
+}
+
+}
 \author{
 Andrew Edwards
 }

@@ -37,7 +37,7 @@
 ##' @export
 ##' @author Andrew Edwards
 ##' @examples
-##' @donttest{
+##' \dontrun{
 ##' # TODO
 ##' binBreaks = c(1, 10, 20, 50, 100)
 ##' pBiomassBins(binBreaks = binBreaks) # uses default pBiomass() values
@@ -46,7 +46,7 @@
 ##' testTibble <- dplyr::tibble(binMin = binBreaks[-length(binBreaks)],
 ##'                             binMax = binBreaks[-1])
 ##' pBiomassBins(binValsTibble = testTibble)
-##' @}
+##' }
 ##'
 p_biomass_bins <- function(res){
   UseMethod("p_biomass_bins")

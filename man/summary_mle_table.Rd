@@ -4,18 +4,18 @@
 \name{summary_mle_table}
 \alias{summary_mle_table}
 \alias{summary_mle_table.determine_xmin_and_fit}
-\title{TODO Print a Markdown summary table of main results from \code{\link[=create_intervals]{create_intervals()}}}
+\title{TODO Print a Markdown summary table of main results from...  adapting from HDIanalysis}
 \usage{
 summary_mle_table(obj, ...)
 
 \method{summary_mle_table}{determine_xmin_and_fit}(res, dig = 2)
 }
 \arguments{
-\item{obj}{result from \code{\link[=create_intervals]{create_intervals()}}, either with class
-\code{intervals_density} if \code{\link[=create_intervals]{create_intervals()}} was applied to a vector, or of
-class \code{intervals_density_list} if \code{\link[=create_intervals]{create_intervals()}} was applied to a data
-frame; the respective function \code{\link[=summary_table.intervals_density]{summary_table.intervals_density()}} or
-\code{\link[=summary_table.intervals_density_list]{summary_table.intervals_density_list()}} gets automatically used.}
+\item{obj}{result from ..., either with class
+\code{intervals_density} if  was applied to a vector, or of
+class \code{intervals_density_list} if ...  was applied to a data
+frame; the respective function ...  or
+gets automatically used.}
 
 \item{dig}{number of decimal places to show}
 }
@@ -23,13 +23,13 @@ frame; the respective function \code{\link[=summary_table.intervals_density]{sum
 Markdown code (for automatic use straight in an R Markdown document, for instance)
 }
 \description{
-TODO Works on \code{\link[=create_intervals]{create_intervals()}} output applied to either a vector or a data
+TODO Works on MLE/MLEbin output applied to either a vector or a data
 frame, creating an appropriate table that renders in an R Markdown
 document. See the vignettes.
 }
 \examples{
 \dontrun{
-# And see vignettes
+# TODO And see vignettes
 res <- create_intervals(rec_2021)
 summary_table(res)
 

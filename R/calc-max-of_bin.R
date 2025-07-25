@@ -1,7 +1,7 @@
 ##' Calculate the maximum value of each bin
 ##'  minimum or midpoint)
 ##'
-##' Given a vector of values representing either the midpoing or the minimum of
+##' Given a vector of values representing either the midpoint or the minimum of
 ##' each bin, calculate the correponding maximum value of each bin. The defined
 ##' bin widths can be specified (currently either all identical or some are 0.01
 ##' and some 1).
@@ -10,7 +10,8 @@
 ##' @param bin_widths numeric of length 1 to specify all bins having same widths, or
 ##'   vector of two different allowed bin widths TODO think if need more, or
 ##'   generalise. Or tell people to do manually if not simply two options.
-##' @param vec_represents_bin_mid
+##' @param vec_represents_bin_mid logical, if `TRUE` then `vec` represents the
+##'   midpoints of bins, if `FALSE` then represents the minima of bins.
 ##' @return tibble of bin_min, bin_max
 ##' @export
 ##' @author Andrew Edwards

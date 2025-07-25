@@ -245,10 +245,9 @@ HERE
    `calc_mle_conf()`, plus replace that code with `calc_mle_conf()`.). Need to make `prof_like()`.
 
  D use that in `fit-size-spectrum.numeric.R` instead of current
-
+ - carry on tidying up help; getting there
  - back to `fit-size-spectrum.data.frame.R` to carry on. See HERE.
  - Add/fix tests
- - add help for each
  - Change any negll -> neg_ll.
  - Check results with paper.
  - Fix TODO's in each plotting function.

@@ -42,7 +42,6 @@
 ##'   used as the `vec_inc` argument of `calc_mle_conf()`
 ##' @param b_start for the MLEbin method, the starting estimate for numerical
 ##'   search for the MLE, since there is no analytical value.
-##' @param
 ##' @return
 ##'
 ##' data tibble can have `bin_sum`, `bin_sum_norm`, `low_count`, `high_count`,

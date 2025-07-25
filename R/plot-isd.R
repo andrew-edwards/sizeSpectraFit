@@ -11,8 +11,8 @@
 ##'   intervals or not
 ##' @param xlab, ylab x/y labels, explicitly given default values here which can
 ##'   be modified as required.
-##' @param mgp_val mgp values to use, as in `plot(..., mgp = mgp_vals)`; see [?par].
-##' @param tcl_small Length of small tickmarks; see [?axis].
+##' @param mgp_val mgp values to use, as in `plot(..., mgp = mgp_vals)`; see [graphics::par()].
+##' @param tcl_small Length of small tickmarks; see [graphics::axis()].
 ##' @param legend_text text to put in the corner, defaults to `b = <value>`. Set to
 ##'   `NA` to have none, and modify default if needed.
 ##' @param legend_position where to place legend, gets used as the first
