@@ -138,6 +138,27 @@ plot.size_spectrum_mlebin <- function(res_mlebin,
               max(dat$high_count))
   }
 
+    if(style %in% c("linear_y_axis", "log_y_axis")){
+    log_axes <- ifelse(style == "log_y_axis",
+                       "xy",
+                       "x")    # TODO test this
+
+    plot_isd_binned(res_mlebin = res_mlebin,
+                    log = log_axes,
+                    xlim = xlim,
+                    ylim = ylim,
+                    x_plb = x_plb,
+                    y_plb = y_plb,
+                    y_plb_conf_min = y_plb_conf_min,
+                    y_plb_conf_max = y_plb_conf_max,
+                    xlab = xlab,
+                    legend_label = legend_label_single,
+                    legend_text = legend_text_a,
+                    legend_text_n = legend_text_a_n,
+                    seg_col = seg_col,
+                    ...)
+  }
+
   if(style == "both_y_axes"){
     par(mfrow = c(2,1),
         mai = par_mai,
@@ -188,29 +209,6 @@ plot.size_spectrum_mlebin <- function(res_mlebin,
 
     # plot_lbn_style presumably, compare with .numeric
   }
-
-
-  if(style %in% c("linear_y_axis", "log_y_axis")){
-    log_axes <- ifelse(style == "log_y_axis",
-                       "xy",
-                       "x")    # TODO test this
-
-    plot_isd_binned(res_mlebin = res_mlebin,
-                    log = log_axes,
-                    xlim = xlim,
-                    ylim = ylim,
-                    x_plb = x_plb,
-                    y_plb = y_plb,
-                    y_plb_conf_min = y_plb_conf_min,
-                    y_plb_conf_max = y_plb_conf_max,
-                    xlab = xlab,
-                    legend_label = legend_label_single,
-                    legend_text = legend_text_a,
-                    legend_text_n = legend_text_a_n,
-                    seg_col = seg_col,
-                    ...)
-  }
-
 
   if(style == "biomass_and_log"){
     par(mfrow = c(2,1),

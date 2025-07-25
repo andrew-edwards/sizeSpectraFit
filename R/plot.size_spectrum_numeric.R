@@ -134,6 +134,26 @@ plot.size_spectrum_numeric <- function(res,
                            # of largest value
   }
 
+  if(style %in% c("linear_y_axis", "log_y_axis")){
+    log_axes <- ifelse(style == "log_y_axis",
+                       "xy",
+                       "x")    # TODO test this
+
+    plot_isd(res = res,
+             log = log_axes,
+             xlim = xlim,
+             ylim = ylim,
+             x_plb = x_plb,
+             y_plb = y_plb,
+             y_plb_conf_min = y_plb_conf_min,
+             y_plb_conf_max = y_plb_conf_max,
+             xlab = xlab,
+             legend_label = legend_label_single,
+             legend_text = legend_text_a,
+             legend_text_n = legend_text_a_n,
+             ...)
+  }
+
   if(style == "both_y_axes"){
 
     par(mfrow = c(2,1),
@@ -218,23 +238,4 @@ plot.size_spectrum_numeric <- function(res,
              ...)
   }
 
-  if(style %in% c("linear_y_axis", "log_y_axis")){
-    log_axes <- ifelse(style == "log_y_axis",
-                       "xy",
-                       "x")    # TODO test this
-
-    plot_isd(res = res,
-             log = log_axes,
-             xlim = xlim,
-             ylim = ylim,
-             x_plb = x_plb,
-             y_plb = y_plb,
-             y_plb_conf_min = y_plb_conf_min,
-             y_plb_conf_max = y_plb_conf_max,
-             xlab = xlab,
-             legend_label = legend_label_single,
-             legend_text = legend_text_a,
-             legend_text_n = legend_text_a_n,
-             ...)
-  }
 }
