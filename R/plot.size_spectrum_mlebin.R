@@ -81,6 +81,7 @@ plot.size_spectrum_mlebin <- function(res_mlebin,
   stopifnot("style must be log_y_axis, linear_y_axis, both_y_axes, biomass, or biomass_and_log" =
               style %in% c("log_y_axis", "linear_y_axis", "both_y_axes",
                            "biomass", "biomass_and_log"))
+  par_orig <- par(no.readonly = TRUE)
 
   # Work out calculations needed for both types of plot and then pass them on to
   # plot_isd_binned():
@@ -240,4 +241,7 @@ plot.size_spectrum_mlebin <- function(res_mlebin,
                     ...)  # ADD in more options maybe, see plot_isd_binned; figure out
                           # useArgs() thing. Copy to next ones TODO
   }
+  par(par_orig)      # Leave as was found
+
+  invisible()
 }

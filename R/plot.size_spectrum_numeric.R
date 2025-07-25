@@ -79,6 +79,8 @@ plot.size_spectrum_numeric <- function(res,
               style %in% c("log_y_axis", "linear_y_axis", "both_y_axes",
                            "biomass", "biomass_and_isd"))
 
+  par_orig <- par(no.readonly = TRUE)
+
   # Work out calculations needed for both types of plot and then pass them on to
   # plot_isd() (and plot_isd_binned() for `both`).:
 
@@ -238,4 +240,7 @@ plot.size_spectrum_numeric <- function(res,
              ...)
   }
 
+  par(par_orig)      # Leave as was found
+
+  invisible()
 }

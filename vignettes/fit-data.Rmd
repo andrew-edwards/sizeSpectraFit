@@ -10,17 +10,17 @@ vignette: >
 date: "Last rendered on `r format(Sys.time(), '%d %B, %Y')`"
 ---
 
-```{r, echo = FALSE, eval = FALSE}
+```{r, instr, echo = FALSE, eval = FALSE}
 # To build either run this line or click knit button in RStudio
 rmarkdown::render("fit-data.Rmd")
 ```
 
-```{r, include = FALSE}
+```{r, load, include = FALSE}
 load_all()   # TODO replace with library(sizeSpectra2)
 
 knitr::opts_chunk$set(
   collapse = TRUE,
-  comment = "#>",
+  comment = " ",
   fig.width = 7,
   fig.height = 6
 )
@@ -46,37 +46,43 @@ As an example we use the simulated data from a bounded power-law distribution as
 our [MEE
 paper](http://onlinelibrary.wiley.com/doi/10.1111/2041-210X.12641/full). The
 values are included in sizeSpectra2 as the data object `sim_vec` (which stands
-for simulated vector). Note that the fit will be great
+for simulated vector), and we assume they are individual body masses measured in
+grammes. Note that the fit will be great
 because the data are sampled from the expected power-law distribution.
 
-So let's print the first 15 values, check
-the length is 1000, and do a quick histogram to show the long tail:
+First, verify that there are 1000 values and print the first 20 values to take a
+look:
 ```{r, MLE1}
-sim_vec[1:15]
 length(sim_vec)
-hist(sim_vec, breaks = 100)
+sim_vec[1:20]
 ```
 
-To fit the data using the MLE method, simply use `fit_size_spectrum()`
+The main fitting function is `fit_size_spectrum()`, which will automatically use
+the MLE method here because the data are a vector of individual values:
 ```{r, MLE2}
-res_vec <- fit_size_spectrum(sim_vec)
-res_vec
+res <- fit_size_spectrum(sim_vec)
+res
 ```
+The resulting `res` is a list that contains:
 
-So `res_vec` is a list that contains the MLE and confidence intervals for $b$,
-as components `b_mle` and `b_conf`, respectively,
-plus also the original data as component `x`. When printing I have set it up to just show the
-first 10 values of the original data. You can check that all 1000 values are in
-`res_vec$x` with simply:
-```{r, MLE3}
-length(res_vec$x)
-```
+- `b_mle`: the MLE of the exponent $b$,
+- `b_conf`: the 95% confidence interval of $b$,
+- `x`: the original data (the printing here is set up to only show the
+ first 10 values),
+- `x_min` and `x_max`: the MLEs of $x_{min}$ and $x_{max}$, which are simply the minimum and
+ maximum of the data,
+- `method`: tells us that the MLE method was used.
 
-Now, to plot the PLB fit and the original data as an Individual Size
-Distribution (ISD), simply do:
-```{r, MLE4, fig.cap = "hello"}
-plot(res_vec)
+The list `res` also has class `size_spectrum_numeric` which helps with our
+plotting and printing functions.
+
+To plot the PLB fit and the original data as an Individual Size
+Distribution (ISD):
+```{r, MLE4}
+plot(res)
 ```
+as recommended in Figure 6b of
+our [MEE paper](http://onlinelibrary.wiley.com/doi/10.1111/2041-210X.12641/full).
 Each individual body mass is shown as a point (note the log scales), the solid
 red line is the maximum likelihood estimate (MLE) of the size-spectrum exponent
 $b$, and the dashed lines are the fits from using the low and high values of the
@@ -84,16 +90,9 @@ $b$, and the dashed lines are the fits from using the low and high values of the
 also explicitly given. The default x-axis label assumes the body masses are in
 g, but this can easily be changed (see later).
 
-There are several styles available for easy plotting. The default is the figure
-above, as
-recommended in Figure 6b of
-our [MEE paper](http://onlinelibrary.wiley.com/doi/10.1111/2041-210X.12641/full)
-(the figure above reproduces that figure, because we used the same simulated
-data here).
-
-The `style` argument changes the style of plot, for example
+The `style` argument gives other styles of plotting, for example:
 ```{r, MLElinearplot}
-plot(res_vec,
+plot(res,
      style = "linear_y_axis")
 ```
 gives the same plot but with a linear y-axis.
@@ -101,22 +100,23 @@ gives the same plot but with a linear y-axis.
 To show both the above plots together, with panels automatically labelled as (a)
 and (b):
 ```{r, MLEbothplot}
-plot(res_vec,
+plot(res,
      style = "both_y_axes")
 ```
-which is similar to Fig. 7 of our
+which is similar to Figure 7 of our
 [MEPS paper](https://www.int-res.com/abstracts/meps/v636/p19-33/)
 but for nonbinned data.
 
 The fourth option is only suitable when the data represent body masses. It
-shows the normalised biomass in the top panel followed by the ISD plot shown above:
+shows the normalised biomass:
 ```{r, MLEbiomassplot}
-plot(res_vec,
+plot(res,
      style = "biomass")
 ```
 
-In (a), the black horizontal lines indicate the normalised biomass within each
-bin. We use bars, rather than the usual points (e.g. Figure 2(f) of our MEE
+The black horizontal lines indicate the normalised biomass within each
+bin on the y-axis, and the span on the x-axis shows the range of the bin. We use
+bars, rather than the usual points (e.g. Figure 6(f) of our MEE
 paper) to emphasise that the actual values of body size in each bin span a
 range; the points somewhat imply that the midpoint of the bin is more
 relevant.
@@ -131,16 +131,17 @@ the MLE of the exponent $b$, and the pink boxes span the normalised biomass
 estimated for all values within the 95% confidence interval of $b$. The straight
 lines are also shown for the MLE of $b$ (solid line) and the 95% confidency
 interval estimates (dashed lines). Note that the straight lines fit the PLB
-distribution, who's definition includes the $x_{min}$ and $x_{max}$ bounds (see
-MEE paper equation 1), but the top bin here goes beyond $x_{max}$, even though
-there are no data there.
+distribution, whose definition includes the $x_{min}$ and $x_{max}$ bounds (see
+MEE paper equation 1) so the lines are bounded, but the top bin here goes beyond $x_{max}$, even though
+there are no actual body masses there (the bin happens to extend out further).
 
 The fit here is clearly very good, but remember this is expected as the data are
 simulated from a known PLB distribution and are not noisy, unlike real data.
 
-To show the biomass plot and the ISD plot:
+To show the biomass plot and the ISD plot, which is an improved version of the
+suggested plot in Figure 6 of our MEE paper:
 ```{r, MLEbiomassisdplot}
-plot(res_vec,
+plot(res,
      style = "biomass_and_isd")
 ```
 
@@ -162,29 +163,30 @@ from 1-2 g (`bin_min` to `bin_max`), and body masses in
 this range were observed for 528 individuals (`bin_count`). The bins here progressively double
 in width.
 
-To fit the PLB distribution, we again just use the `fit_size_spectrum()` function:
+To fit the PLB distribution, we again just use the `fit_size_spectrum()`
+function (which automatically detects that we want to use the MLEbin method
+because our data are a data frame rather than a simple vector of individual body
+masses):
 ```{r}
 res_mlebin <- fit_size_spectrum(sim_vec_binned)
 res_mlebin
 ```
 
-So `res_mlebin` is a list object that contains objects `b_mle`, the
-MLE of the exponent $b$ as calculated using the MLEbin method, `b_conf` which gives the 95%
-confidence interval of $b$, `data` which gives the data used for the fit plus
-some extra calculations (TODO explain somewwhere else), `x_min` and `x_max`
-which are the MLEs of $x_{min}$ and $x_{max}$, which are simply the minimum of
-the lowest bin and maximum of the maximum bin. Also, `method` tells us that the
-MLEbin method was used, and the `attr(,"class")` at the end adds attributes to
-the list that help our automated plotting functions.
+So `res_mlebin` is a list object that contains objects:
+- `b_mle`: the MLE of the exponent $b$ as calculated using the MLEbin method,
+- `b_conf`: the 95% confidence interval of $b$,
+- `data`: the original data as used for the fit, plus some extra calculations
+ (TODO define somewhere)
+- `x_min` and `x_max`: the MLEs of $x_{min}$ and $x_{max}$, which are simply the
+minimum of the lowest bin and maximum of the maximum bin,
+- `method`: tells us that the MLEbin method was used.
+- `attr(,"class")` tells us the list is also of class `size_spectrum_mlebin`,
+which helps with our automated plotting and printing functions.
 
-Our default plot for results from the MLEbin method is
+Our default plot for results from the MLEbin method is simply:
 ```{r, MLEbinplot}
 plot(res_mlebin)
 ```
-
-HERE - use the text from here to END, to streamline this. Decide how repetitive
-need to be from the above. And whether biomass should have two plots. Maybe in
-above we should have biomass and biomass_ISD styles? Cover all the options.
 
 As for the MLE results above, the `style` argument changes the style of plot:
 ```{r, MLEbinlinearplot}
@@ -198,16 +200,18 @@ To show both the above plots together:
 plot(res_mlebin,
      style = "both_y_axes")
 ```
-which is similar to Fig. 7 of our
+which is similar to, but simpler than, Figure 7 of our
 [MEPS paper](https://www.int-res.com/abstracts/meps/v636/p19-33/)
-but for nonbinned data. TODO check
+because here we do not have species-specific overlapping body-mass bins.
 
 The fourth option is only suitable when the data represent body masses. It
-shows the normalised biomass in the top panel followed by the ISD plot shown above:
+shows the normalised biomass:
 ```{r, MLEbinbiomassplot}
 plot(res_binned,
      style = "biomass")
 ```
+and is interpreted the same way as the earlier plot for the MLE method (but here
+the bins are already predefined, because that is how the data are provided).
 
 And to show this plot and the first one as two panels:
 ```{r, MLEbinbiomassandlogplot}
@@ -217,134 +221,38 @@ plot(res_binned,
 The y-axes happen to have the same numbers (though they mean different things) for this simulated data set, though
 this will not generally be the case.
 
-
---
-
-This is similar to the "both" style shown above for invidual body masses, but
-here we only have binned data available. in the style of
-
-We have a built-in plotting function to generate a plot in the style of Figure 7
-in our MEPS paper (but a bit simpler because here we do not have overlapping
-bins), which is accessed by simply doing:
-
-The y-axis is (a) linear and (b) logarithmic, and the grey rectangles indicate
-the uncertainty in numbers of values due to the binning. For each bin, the horizontal green
-line shows the range of body masses of that bin, with its value
-on the y-axis corresponding to the total number of individuals in bins whose
-minima are $\geq$ the bin's minimum. By definition, this includes all individuals
-in that bin. For example, all $n = 1000$ individuals are $\geq$ the minimum of
-the first (left-most) bin, so that bin is at $1000$ on the y-axis. The vertical
-span of each grey rectangle shows the possible numbers of
-individuals with body mass $\geq$ the
-body mass of individuals in that bin (horizontal
-span is the same as for the green lines). The maximum number of such individuals
-is the same as the green line, and the minimum number (bottom of grey rectangle)
-is the total number of individuals $\geq$ the bin's maximum. By definition, this is then the
-green line for the next bin. This plotting method allows us to properly represent the
-discrete binned data on a continuous scale. For example, for a body mass of 1.5
-g we can see that the number (on the y-axis) of possible individual individuals with
-body mass $\geq$ 1.5 g is between
-`r sum(res_mlebin$data$bin_count) - res_mlebin$data$bin_count[1]`
-(all individuals could conceivably be 1.7 g and therefore all are $\geq$ 1.5 g)
-and `r sum(res_mlebin$data$bin_count)` (all individuals in the first bin are
-actually $<$ 1.5 g).
-
-The text
-in (a) gives the MLE for the size-spectrum exponent
-$b$, and the sample size $n$.
-
 Both figures show that the PLB distribution is an excellent fit for these data
 the red curves go through the top-left and bottom-right corners of the grey
 boxes. Of course, the data are simulated from a PLB distribution and so should
 be a good fit, but these figures show the benefit of the plotting approach
-(which may not have been so obvious in MEPS Fig. 7 for data with a complex bin
+(which may not have been so obvious in our MEPS Figure 7 for data with a complex bin
 structure).
 
-
-END
-
-We can easily add options:
-```{r, MLEbinplot2, fig.height = 10}
+All the plots are customisable, for example to add extra tick labels to pretty
+up a final plot:
+```{r, MLEbinplot2)
 plot(res_mlebin,
      x_small_ticks_labels = c(5, 50, 500))
 ```
-and also just plot one or other of the panels:
-```{r, MLEbinplot3}
-#plot(res_mlebin,
-#     log_y_axis = "yes")
-```
-
-```{r, MLEbinplot4}
-#plot(res_mlebin,
-#     log_y_axis = "no")
-```
-
-For more options, see `?plot.size_spectrum_mlebin` TODO check that links with `?plot_isd_binned`.
+See `?plot.size_spectrum_numeric` for details.
+TODO and _MLEbin? Don't expect so help should  link them.
 
 
-
-
-TODO output might be different, have to check if do end up removing 0's in end
-bins. Maybe do an example.
-
-
-TODO To get your data into
-the required format use `bin_data()` or whatever - see data-raw/. maybe take
-some of what's below
-
-
-## LBN plot if data are body-masses
-
-TODO can take some text from `MLEbin_recommend` vignette.
-
-HERE -- maybe use some of this and uput it above.
-
-
-The `bin_width = "2k"` argument says to assign bin widths that double in width.
-The function returns a list of two tibbles, the first (`$bin_for_each_x` above) shows each
-original value of `sim_vec`, the counts of that value (just 1 here because in
-`sim_vec` we have individual values at a high level of resolution), and the bin that that value
-is assigned to. The bins are defined by their midpoint, minimum, and maximum
-values, given as `bin_mid`, `bin_min`, and `bin_max`, respectively. Given there
-are many values close to 1 the above values are not overly instructive. To see
-the higheest values:
-```{r, MLEbin2}
-tail(sim_vec_binned$bin_for_each_x)
-```
-to see the bins that the rare large values get assigned to.
-
-The second component of the output of `bin_data()` is the tibble `bin_vals`, as
-seen above. This just gives the counts in the bins (`bin_count`), along with
-various useful the bin count divided by the bin width (`bin_count_norm`). See
-`?bin_data` for full details of outputs. For your own binned data that might be
-in a different format, we have some helper functions to get the data into the
-desired format (see TODO below).
-
-We will only used the binned data now (`$bin_vals`) without knowledge of the raw
-measurements, to replicate what we might have for real data where measurements
-are assigned to bins (in this case ones that double in size; real data would
-more likely have linear bins based on the measurement accuracy of the
-instruments).
-
-TODO actually, just include a simple example data set of binned values. Move the
-above to later.
-
-TODO: create a function to make into bin_data formatthat if we have a vector of
-counts and binbreaks. - check if `bin_data.data.frame()` works, check when wrote it.
-
-NEXT: make `bin_data()` not sort the `bin_for_each_x`, just the `bin_vals`
-
+HERE
 
 Might still need to:
 
  D make a general `calc_mle_conf` function based on previous `calcLike` (see
    `fit-size-spectrum.numeric.R` also, and move some ideas from that into
    `calc_mle_conf()`, plus replace that code with `calc_mle_conf()`.). Need to make `prof_like()`.
- - use that in `fit-size-spectrum.numeric.R` instead of current
+ D use that in `fit-size-spectrum.numeric.R` instead of current
+
  - back to `fit-size-spectrum.data.frame.R` to carry on. See HERE.
-Think that's all mostly done, need to set up tests. NEXT fix tests, may have to
-tidy up what I just did, though writing tests will help; change any negll ->
-neg_ll. Check results with paper.
+ - Add/fix tests
+ - add help for each
+ - Change any negll -> neg_ll.
+ - Check results with paper.
+ - Fix TODO's in each plotting function.
 
 And then also consider that we want to also allow for a tibble that has year or
 another heading (maybe allow it to be called strata, or let user add that as an
@@ -356,381 +264,8 @@ our [MEE paper](http://onlinelibrary.wiley.com/doi/10.1111/2041-210X.12641/full)
 our [MEPS paper](https://www.int-res.com/abstracts/meps/v636/p19-33/)
 
 
-# Tweaking options for plots
-
-Fix TODO's in each plotting function.
-
-Many aspects of the plots can be adapted by changing arguments to the plotting
-functions.
-
-See the relevant helpfiles.
-
-If you want to tweak options beyond the default shown then read this. The plot is as shown because we have written a function
-`plot.size_spectrum_numeric()` which gets automatically used on `res_vec`
-because `res_vec` has class `size_spectrum_numeric`. That was assigned
-automatically in the function `fit_size_spectrum()` used above to
-create `res_vec`. This all happens behind the scenes but it is useful for users
-to know about this. In particular, to see the help you need to do
-`?plot.size_spectrum_numeric()`. There you can see lots of customisable options
-by setting arguments; for example to add the extra labels on the x-axis (to
-*exactly* match the Figure 6b):
-```{r, MLE5}
-plot(res_vec,
-     x_small_ticks_labels = c(5, 50, 500))
-```
-
-for LBN plot:
-
-
-
 ## Session information
 
 ```{r sessioninfo}
 sessionInfo()
-```
-
-
-`r knitr::knit_exit()`
-
-This vignette reproduces the main results in the manuscript, and can easily be
-used as a template for users to apply to their own data or model outputs. The longer
-`results-extra` vignette gives more details of outputs and further examples of
-plotting features.
-
-Set up:
-```{r setup}
-library(hdiAnalysis)
-library(dplyr)
-```
-
-## Analyse a single vector of values
-
-Our first 'data' set is the hake Markov chain Monte Carlo (MCMC) recruitment
-values for 2021, which is saved as a data object in the package as
-`rec_2021`. It is a simple vector of the 8,000 MCMC values, and we will use it
-to create Figure 1 and associated numbers. To run this code on your own
-data you just need to have your values in a vector, and replace `rec_2021` with the
-name of your vector.
-
-```{r vector}
-vec <- rec_2021
-summary(vec)
-length(vec)
-```
-
-We use the `create_intervals` function to do the main calculations. We call the
-results here `res_vec` for results on a vector, so that the subsequent code will not need changing by users for their own analyses:
-
-```{r vectorres}
-res_vec <- create_intervals(vec)
-res_vec
-```
-As seen above, `res_vec` is a list, with first element `$intervals` containing
-results such as the median, lower and upper bounds for the equal-tailed interval
-(ETI) and for the highest density interval (HDI) , widths of the
-ETI and HDI, and more. See `?create_intervals` for full details of what is returned.
-We will show a summary table of the key values after plotting the
-figures.
-
-The second element of `res_vec` is `$density` (seen above), which is a
-kernel density estimate of the distribution represented by the samples in
-`vec`. It is useful for plotting and calculating approximate intervals.
-
-The HDI is calculated by `create_intervals()` using the `HDInterval::hdi()`
-function, and we explore other choices in the `results-extra` vignette.
-
-## Plot the distribution showing the ETI and HDI -- Figure 1
-
-Plotting the resulting density function and intervals is simply done using our
-custom plotting functions, with options for automatically adding intervals and
-lines. The ETI plot (Figure 1A) is:
-```{r plot, fig.height = 4}
-plot(res_vec,
-     type = "eti",
-     xlim = c(0, 40),
-     ylim = c(0, 0.11),
-     interval_arrows = TRUE,
-     xlab = "Recruitment (billions of age-0 fish)",
-     arrowhead_gap = 0.1)
-```
-and the HDI plot (Figure 1B) is
-```{r plot2, fig.height = 4}
-plot(res_vec,
-     type = "hdi",
-     xlim = c(0, 40),
-     ylim = c(0, 0.11),
-     interval_arrows = TRUE,
-     xlab = "Recruitment (billions of age-0 fish)",
-     arrowhead_gap = 0.1)
-```
-The `plot()` command automatically uses our custom plotting function
-`plot.intervals_density()`, because the `res_vec` object has our class
-`intervals_density`. See `?plot.intervals_density()` for details and full
-options. Our complete Figure 1
-is reproduced with the command `figure_1()`, which can be adapted by users if
-desired for their own data, or just adapt the above code as necessary
-(e.g., change the limits and labels).
-
-The main values of interest are simplified in our customised `summary_table()` function:
-```{r tab, results = "asis"}
-summary_table(res_vec)
-```
-
-The full results are
-```{r fullres}
-res_vec$intervals %>% a()       # a() is our shorthand function for as.data.frame()
-```
-for which definitions are given in the help file `?create_intervals`.
-
-
-## MCMC samples for multiple years -- recruitment for Figure 2A
-
-We now present calculations for multiple data sets, in our case multiple years
-of MCMC samples of hake recruitment.
-
-The values are saved in the package as the tibble `hake_recruitment_mcmc`, with each
-column corresponding to a year
-(with the first column representing the Virgin unfished equilibrium biomass) and
-each of the 8,000 rows representing an MCMC sample:
-```{r hake_mcmc}
-hake_recruitment_mcmc
-```
-
-For your own data, wrangle it into the same kind of tibble, with rows
-representing the MCMC samples.
-
-To create ETIs and HDIs for estimates of recruitment for each year, we can simply use
-`create_intervals()` which, because `hake_recruitment_mcmc` has class
-`data.frame`, uses our function `create_intervals.data.frame()` to automatically
-calculate intervals for each column (year in this case, and we will exclude the
-Virgin column) of samples.
-```{r hake_mcmc2}
-res_all_years <- create_intervals(dplyr::select(hake_recruitment_mcmc,
-                                                -"Virgin"))
-```
-This gives a list object, with element `res_all[[i]]` corresponding to column `i`
-of the data. Each `res_all[[i]]` element is itself a list, giving the same
-results as above for a single vector (and also with the `$name`
-element corresponding the column of the input, a year in this example). So the
-2021 results from above are:
-```{r hake_mcmc3}
-res_all_years$res_all[[56]]
-```
-
-For convenience, the intervals for all years are saved in a single tibble:
-```{r hake_mcmc4}
-res_all_years$intervals_all
-```
-The first column is called `quantity` for generalisability so the code can be
-applied to different types of data; in this example it represents the years
-
-To see the main values of interest, namely the ETIs and HDIs and the difference
-between their widths:
-```{r hake_mcmc5}
-summary_table(res_all_years)
-```
-
-The sum of the differences over all years between the width of the ETI and width
-of the HDI, (but excluding 2023 and 2024 as these are not informed by data for
-our hake recruitment values), is
-```{r hake_mcmc6}
-res_all_years$intervals_all %>%
-  dplyr::filter(!quantity %in% c(2023, 2024)) %>%
-  dplyr::pull(width_diff) %>%
-  sum()
-```
-which is the source of the ``>30 billion fish`` statement reported in the main text.
-
-To plot the time series shown in Fig. 2A, we have a custom plotting function
-`plot.intervals_density_list()`, that gets called because `res_all_years` is
-defined to have class `intervals_density_list`, so we can just use:
-```{r hake_mcmc7}
-plot(res_all_years,
-     xlab = "Year",
-     ylab = "Recruitment (billions of fish)")
-```
-
-<!-- The ETIs match those shown in Table 24 of the 2024 hake assessment (values
-manually checked, code is below but not run or printed in vignette): -->
-```{r hake_mcmc8, eval = FALSE, echo = FALSE}
-res_all_years$intervals_all %>%
-  dplyr::select(eti_lower, eti_upper) %>%
-  a() %>%
-  round(3) * 1000
-```
-
-## MCMC samples for multiple years -- relative spawning biomass for Figure 2B
-
-We now use the same approach for the relative spawning biomass calculations
-shown in Figure 2B.
-
-The female spawning biomass is the estimated total biomass of all females in the
-population that are mature (for context, roughly half of age-2 females are considered
-mature). The relative spawning biomass is the females spawning biomass divided
-by that for the unfished equilibrium state (the calculation is already done for
-each MCMC sample and then the ratios saved).
-
-The values are saved in the package
-as a tibble `hake_relative_biomass_mcmc` with years as column headings, and also
-includes forecasts made assuming constant catches in 2024, 2025,
-and 2026 of 350,000 t, which is close to the average coastwide catch from 2014-2023.
-Values correspond to the relative spawning biomass at the start of the
-corresponding year (before any fishing).
-
-We can use similar code to above (since the values are in a tibble):
-```{r allyears}
-res_all_years_2 <- create_intervals(hake_relative_biomass_mcmc)
-
-res_all_years_2$intervals_all
-
-res_all_years_2$intervals_all %>% tail()
-```
-
-<!-- To confirm that the ETIs match those in Table b of the 2024 hake assessment -->
-<!-- (which does not have 2025 onwards); keeping the code for reference -->
-
-```{r allyearsmatch, echo = FALSE, eval = FALSE}
-res_all_years_2$intervals_all %>%
-  filter(quantity >= 2015) %>%
-  mutate(`Year` = quantity,
-         `Rel. SB 2.5th percentile` = eti_lower * 100,
-         `Rel. SB median` = median * 100,
-         `Rel. SB 97.5th percentile` = eti_upper * 100) %>%
-  select(`Year`:`Rel. SB 97.5th percentile`) %>%
-  filter(`Year` <= 2024) %>%
-  knitr::kable(digits = 1)
-```
-
-To create Figure 2B, which includes the forecasts:
-```{r biomassseries}
-plot(res_all_years_2,
-     xlim = c(2010, 2027),
-     ylim = c(0, 2.6),
-     add_line_at_0.4 = TRUE,
-     inc = 0.05,
-     leg_loc = "topleft",
-     xlab = "Year",
-     ylab = "Relative spawning biomass")
-```
-
-Whether the relative spawning biomass is above or below the management reference point
-of 0.4 is key in forming stakeholders' perception of the health of the hake
-stock. As seen in the figure, in 2024 and 2025 the ETI does not dip below 0.4 but
-the HDI does. Thus, the perception of current and future stock status can depend upon the
-definition of credible intervals (ETI versus HDI). The specific years across the
-whole time series for which this happens are:
-
-```{r whichyears}
-dplyr::filter(res_all_years_2$intervals_all,
-              eti_lower > 0.4,
-              hdi_lower < 0.4)
-```
-
-Also, on the plot the years 2016 and 2020 look like they are also exhibiting this
-behaviour, but in fact the HDI is very slightly above 0.4:
-```{r whichyearsclose}
-dplyr::filter(res_all_years_2$intervals_all,
-              quantity %in% c(2016, 2020))
-```
-
-To see all the values of interest:
-```{r summarytab2}
-summary_table(res_all_years_2)
-```
-
-To plot results for a single year, for example 2024, extract the results
-from the list and use our plotting function, and tailor the figure as necessary
-by setting the arguments (see `?plot.intervals_density`):
-```{r plotoneyear, fig.height = 10}
-index_for_2024 <- which(res_all_years_2$intervals_all$quantity == 2024)
-par(mfrow = c(2,1))
-plot(res_all_years_2[["res_all"]][[index_for_2024]],
-     type = "eti",
-     xlim = c(0, 3.5),
-     ylim = c(0, 1.2),
-     interval_arrows = TRUE,
-     xlab = "Relative spawning biomass in 2024",
-     y_arrow = 1.07,
-     arrowhead_gap = 0.01,
-     x_minor_ticks_by = 0.25,
-     y_minor_ticks_by = 0.05)
-
-plot(res_all_years_2[["res_all"]][[index_for_2024]],
-     type = "hdi",
-     xlim = c(0, 3.5),
-     ylim = c(0, 1.2),
-     interval_arrows = TRUE,
-     xlab = "Relative spawning biomass in 2024",
-     y_arrow = 1.07,
-     arrowhead_gap = 0.01,
-     x_minor_ticks_by = 0.25,
-     y_minor_ticks_by = 0.05)
-```
-
-## Absolute female spawning biomass
-
-The above was for relative female spawning biomass. We now briefly look at
-absolute female spawning biomass, in units of millions of tonnes. This is also
-saved as a data object in the package (`hake_spawning_biomass_mcmc`). We focus
-on the values
-for 2023 and 2024 which are given prominence in a bullet in the one-page summary of the hake assessment:
-
-"The median estimate of female spawning biomass at the start of 2024 is 1,884,950 t
-(with 95% credible interval from 853,207 to 4,828,382 t). This is an upward shift
-from this assessment’s estimate for the 2023 female spawning biomass of 1,335,485 t
-(with 95% credible interval from 652,495 to 3,224,819 t)."
-
-So those credible intervals are ETIs. How would HDIs compare? The results are
-(in millions of tonnes):
-```{r sb1}
-res_all_years_spawning <-
-  create_intervals(dplyr::select(hake_spawning_biomass_mcmc,
-                                 `2023`,
-                                 `2024`))
-
-summary_table(res_all_years_spawning)
-```
-The above quote, using HDIs instead of ETIs, becomes:
-
-"The median estimate of female spawning biomass at the start of 2024 is 1,884,950 t
-(with 95% credible interval from
-`r f(dplyr::filter(res_all_years_spawning$intervals_all, quantity ==
-                                                       2024)$hdi_lower * 1e06)` to
-`r f(dplyr::filter(res_all_years_spawning$intervals_all, quantity ==
-                                                       2024)$hdi_upper * 1e06)` t).
-This is an upward shift
-from this assessment’s estimate for the 2023 female spawning biomass of 1,335,485 t
-(with 95% credible interval from
-`r f(dplyr::filter(res_all_years_spawning$intervals_all, quantity ==
-                                                       2023)$hdi_lower * 1e06)` to
-`r f(dplyr::filter(res_all_years_spawning$intervals_all, quantity ==
-                                                       2023)$hdi_upper * 1e06)` t)."
-
-The reduction in uncertainty for 2024 from switching from the ETI to the HDI is
-`r f(dplyr::filter(res_all_years_spawning$intervals_all, quantity ==
-                                                       2024)$width_diff * 1e06)` t.
-This is larger than the average catch from 2014-2023 of 338,606 t, of which less
-than half would be considered as spawning biomass (mature females; catch is
-males plus females). Thus, the reduction in uncertainty is certainly not trivial.
-Again, intervals are shifted downwards, implying the stock biomass is lower than implied
-when using the original ETIs.
-
-The ETI and HDI plots are
-```{r,  sb2, fig.height = 10}
-par(mfrow = c(2, 1))
-plot(res_all_years_spawning$res_all[[which(res_all_years_spawning$intervals_all$quantity == 2024)]],
-     xlim = c(0, 8),
-     ylim = c(0, 0.6),
-     interval_arrows = TRUE,
-     y_arrow = 0.57,
-     xlab = "Female spawning biomass in 2024 (millions of tonnes)",
-     type = "eti")
-
-plot(res_all_years_spawning$res_all[[which(res_all_years_spawning$intervals_all$quantity == 2024)]],
-     xlim = c(0, 8),
-     ylim = c(0, 0.6),
-     interval_arrows = TRUE,
-     y_arrow = 0.57,
-     xlab = "Female spawning biomass in 2024 (millions of tonnes)",
-     type = "hdi")
 ```

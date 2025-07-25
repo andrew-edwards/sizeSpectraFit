@@ -98,8 +98,6 @@ plot_lbn_style <- function(res,
                            y_small_ticks_by = NULL,
                            y_small_ticks_labels = NULL,
                            y_scaling = 0.75,
-                           par_mai = c(0.4, 0.5, 0.05, 0.3),
-                           par_cex = 0.7,
                            seg_col = "green",   # want these parsed along if
                            # they're changed by users in original
                            # call - useArgs or something? TODO
@@ -114,10 +112,6 @@ plot_lbn_style <- function(res,
               !(!is.null(x_small_ticks) & !is.null(x_small_ticks_by)))
   stopifnot("Cannot define both y_small_ticks and y_small_ticks_by" =
               !(!is.null(y_small_ticks) & !is.null(y_small_ticks_by)))
-
-  par(mai = par_mai,
-      cex = par_cex)  # Affects all figures, TODO reset after
-  # mgp maybe need - see above commented option
 
       # TODO might not need the if statement as have class-specific ones
   if("size_spectrum_numeric" %in% class(res)){
