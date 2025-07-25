@@ -22,36 +22,6 @@ add_ticks(
   y_small_ticks_labels = NULL
 )
 }
-\arguments{
-\item{log}{Which axes to log, for \code{plot(..., log = log)}. So "xy" for
-log-log axes, "x" for only x-axis logged.}
-
-\item{tcl_small}{Length of small tickmarks; see \link{?axis}.}
-
-\item{mgp_val}{mgp values to use, as in \code{plot(..., mgp = mgp_vals)}; see \link{?par}.}
-
-\item{x_big_ticks}{y_big_ticks numeric vector of big tick marks on
-x-axis/y-axis. If NULL then gets done automatically, so if that does not
-look good then define explicitly here, plus \code{x_big_ticks_labels} and/or \code{y_big_ticks_labels}.}
-
-\item{x_big_ticks_labels}{y_big_ticks_labels numeric vector of big tick
-marks to label on x-axis/y-axis. If NULL then gets done automatically, so
-if that does not look good then define explicitly here}
-
-\item{x_small_ticks}{y_small_ticks  numeric vector of small tick marks on x-axis/y-axis. If
-NULL then gets done automatically, so if that does not  look good then
-define explicitly here.}
-
-\item{x_small_ticks_by}{y_small_ticks_by  numeric vector of increment to
-use to generate small tick marks on x-axis/y-axis. Will conincide with the
-big tick marks and extend beyond them. Can only define \code{x_small_ticks} or
-\code{x_small_ticks_by} (same for \code{y_...}). Only relevant for linear axes. Set
-to \code{NA} to force no small unlabelled tickmarks.}
-
-\item{x_small_ticks_labels}{y_small_ticks_labels numeric vector of big tick
-marks to label on x-axis/y-axis. If NULL then gets done automatically, so
-if that does not look good then define explicitly here}
-}
 \value{
 Adds axes and big and small tick marks to the plot. Returns invisible.
 }
@@ -59,6 +29,10 @@ Adds axes and big and small tick marks to the plot. Returns invisible.
 Useful because you can then interpret the unlogged values, e.g. Figures 2(h)
 and 6(b) of MEE paper and Figure 7 of MEPS paper. \code{log} argument needs to
 match the original \code{\link[=plot]{plot()}} call (this is not checked).
+}
+\details{
+Legends are automatically set, but can be tailored with the
+arguments defined below.
 }
 \examples{
 \dontrun{

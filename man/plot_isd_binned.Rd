@@ -2,7 +2,9 @@
 % Please edit documentation in R/plot-isd-binned.R
 \name{plot_isd_binned}
 \alias{plot_isd_binned}
-\title{Plot a single binned ISD plot, as called from \code{plot.size_spectrum_mlebin()}}
+\title{Plot a single binned ISD plot, as called from \code{plot.size_spectrum_mlebin()},
+or used directly from \code{plot.size_spectrum_numeric()} to make an LBN-style
+plot of individual values and MLE plot.}
 \usage{
 plot_isd_binned(
   res_mlebin,
@@ -36,8 +38,6 @@ plot_isd_binned(
   y_small_ticks_by = NULL,
   y_small_ticks_labels = NULL,
   y_scaling = 0.75,
-  par_mai = c(0.4, 0.5, 0.05, 0.3),
-  par_cex = 0.7,
   seg_col = "green",
   rect_col = "grey",
   fit_col = "red",
@@ -51,12 +51,9 @@ plot_isd_binned(
 \code{fit_size_spectrum_mlebin()} is used; see vignette TODO). # TODO link help
 to plot.size_spectrum_numeric - may want to put them all together}
 
-\item{log}{Which axes to log, for \code{plot(..., log = log)}. So "xy" for
-log-log axes, "x" for only x-axis logged.}
-
 \item{x_plb}{vector of values to use to plot the fitted PLB curve; if NA then
 automatically calculated (sometimes need to manually extend it to hit the
-x-axis, but tricky to automate that on a log-scale}
+x-axis, but tricky to automate that on a log-scale)}
 
 \item{y_plb}{vector of values corresponding to the MLE fit of the PLB
 distribution at each value of \code{x_PLB}}
@@ -70,49 +67,13 @@ distribution at each value of \code{x_PLB}}
 \item{xlab}{ylab x/y labels, explicitly given default values here which can
 be modified as required.}
 
-\item{mgp_val}{mgp values to use, as in \code{plot(..., mgp = mgp_vals)}; see \link{?par}.}
-
-\item{tcl_small}{Length of small tickmarks; see \link{?axis}.}
-
-\item{legend_text}{text to put in the corner, defaults to \verb{b = <value>}. Set to
-\code{NA} to have none, and modify default if needed.}
-
 \item{legend_text_second_row_multiplier}{numeric multiplier of the second
 row of legend text to space it out, especially for smaller panel plots.}
-
-\item{legend_position}{where to place legend, gets used as the first
-argument in \code{\link[=legend]{legend()}}.}
-
-\item{x_big_ticks}{y_big_ticks numeric vector of big tick marks on
-x-axis/y-axis. If NULL then gets done automatically, so if that does not
-look good then define explicitly here, plus \code{x_big_ticks_labels} and/or \code{y_big_ticks_labels}.}
-
-\item{x_big_ticks_labels}{y_big_ticks_labels numeric vector of big tick
-marks to label on x-axis/y-axis. If NULL then gets done automatically, so
-if that does not look good then define explicitly here}
-
-\item{x_small_ticks}{y_small_ticks  numeric vector of small tick marks on x-axis/y-axis. If
-NULL then gets done automatically, so if that does not  look good then
-define explicitly here.}
-
-\item{x_small_ticks_by}{y_small_ticks_by  numeric vector of increment to
-use to generate small tick marks on x-axis/y-axis. Will conincide with the
-big tick marks and extend beyond them. Can only define \code{x_small_ticks} or
-\code{x_small_ticks_by} (same for \code{y_...}). Only relevant for linear axes. Set
-to \code{NA} to force no small unlabelled tickmarks.}
-
-\item{x_small_ticks_labels}{y_small_ticks_labels numeric vector of big tick
-marks to label on x-axis/y-axis. If NULL then gets done automatically, so
-if that does not look good then define explicitly here}
 
 \item{y_scaling}{numeric scaling of y-minimum of y-axis. Axis can't go to zero on
 log-log plot, but goes to the proportion \code{y_scaling} (<1)
 of the minimum value of counts greater than the highest \code{bin_min} value. Do
 such that can see the right-most bin in all plots.}
-
-\item{par_mai}{vector of values to use for \code{par(mai)}}
-
-\item{par_cex}{numeric value to use for \code{par(cex)} (font size)}
 
 \item{seg_col}{colour to use for the segments (green in Fig. 7 of
 MEPS paper).}
@@ -122,13 +83,23 @@ MEPS paper).}
 \item{fit_lwd}{line thickness to use for fitted curves}
 
 \item{conf_lty}{line type to use for confidence intervals}
+
+\item{par_mai}{vector of values to use for \code{par(mai)}}
+
+\item{par_cex}{numeric value to use for \code{par(cex)} (font size)}
+
+\item{LBN_style}{Whether to plot an LBN style plot (similar to Fig. 6a of MEE
+paper), used directly from \code{plot.size_spectrum_numeric()} to give the
+recommended Fig. 6 plot for MLE results, provided data are body masses.}
 }
 \value{
 single panel plot of the ISD with data in binned form like in
 Fig. 7a or 7b of MEPS paper, but with nonoverlapping bins; returns nothing.
 }
 \description{
-Plot a single binned ISD plot, as called from \code{plot.size_spectrum_mlebin()}
+Plot a single binned ISD plot, as called from \code{plot.size_spectrum_mlebin()},
+or used directly from \code{plot.size_spectrum_numeric()} to make an LBN-style
+plot of individual values and MLE plot.
 }
 \examples{
 \dontrun{

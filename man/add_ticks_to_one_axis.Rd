@@ -22,10 +22,6 @@ add_ticks_to_one_axis(
 \item{x_or_y}{character, either "x" or "y" to specify which axis the tick
 marks and labels are being added to}
 
-\item{tcl_small}{Length of small tickmarks; see \link{?axis}.}
-
-\item{mgp_val}{mgp values to use, as in \code{plot(..., mgp = mgp_vals)}; see \link{?par}.}
-
 \item{big_ticks, }{big_ticks_labels, small_ticks, small_ticks_by,
 small_ticks_labels See corresponding \code{x_...} definitions in
 \code{\link[=plot.size_spectrum_numeric]{plot.size_spectrum_numeric()}}.}
@@ -36,8 +32,13 @@ adds tickmarks to one axis of a plot. Returns invisible.
 \description{
 Called from \code{\link[=add_ticks]{add_ticks()}} which is called from \code{\link[=plot.size_spectrum_numeric]{plot.size_spectrum_numeric()}}.
 }
+\details{
+Legends are automatically set, but can be tailored with the
+arguments defined below.
+}
 \examples{
 \dontrun{
+# TODO
 res_vec <- fit_size_spectrum(sim_vec)
 plot(res_vec)
 plot(res_vec, log = "x")

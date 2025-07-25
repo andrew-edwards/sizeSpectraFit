@@ -7,10 +7,24 @@
 calc_confidence_interval(this_neg_ll_fn, min_neg_ll_value, vec, ...)
 }
 \arguments{
-\item{min_ll}{list output from \code{\link[=nlm]{nlm()}}.}
+\item{this_neg_ll_fn}{negative log-likelihood function that take arguments
+(parameters and data) in ... and returns a negative
+log-likelihood value.}
+
+\item{min_neg_ll_value}{the minimum negative log likelihood value at the MLE.}
+
+\item{vec}{vector of values over which to test the negative log-likelihood
+to construct the confidence interval. If \code{NULL} (users will probably just
+want to stick with this default) then it will get
+automatically created, based on \code{vec_diff} and \code{vec_inc}. If the resulting
+confidence interval bounds including one of the endpoints of \code{vec}, then
+\code{vec} is automatically expanded until it encompasses the confidence
+interval (regardless of whether it was manually specified or \code{NULL}).}
+
+\item{...}{further arguments (including parameters and data) to \code{negll_fn()}}
 }
 \description{
-Gets called from \code{\link[=fit_size_spectrum.numeric]{fit_size_spectrum.numeric()}}. TODO may need to be explicit
+Gets called from [calc_mle_conf(). TODO may need to be explicit
 about the help. Might be simpler as fitting function gets more complex.
 }
 \examples{

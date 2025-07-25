@@ -2,16 +2,17 @@
 % Please edit documentation in R/plot.size_spectrum_mlebin.R
 \name{plot.size_spectrum_mlebin}
 \alias{plot.size_spectrum_mlebin}
-\title{Plot a binned ISD plots similar to MEPS Figure 7 (but with nonoverlapping
-bins). Also directly called from \code{plot.size_spectrum_mlebins()} with no
-extra arugments for MLEbins method.}
+\title{Plot binned ISD plots similar to MEPS Figure 7 (but with nonoverlapping
+bins).}
 \usage{
 \method{plot}{size_spectrum_mlebin}(
   res_mlebin,
-  log_y_axis = "both",
+  style = "log_y_axis",
   xlim = c(min(res_mlebin$data$bin_min), max(res_mlebin$data$bin_max)),
   ylim = NA,
   x_plb = NA,
+  inset_label = c(0, -0.02),
+  xlab = expression(paste("Body mass, ", italic(x), "(g)")),
   y_scaling = 0.75,
   mle_round = 2,
   legend_label_a = "(a)",
@@ -21,6 +22,9 @@ extra arugments for MLEbins method.}
   legend_text_a_n = paste0("n=", round(sum(res_mlebin$data$bin_count))),
   legend_text_b = NULL,
   legend_text_b_n = NULL,
+  seg_col = "black",
+  par_mai = c(0.4, 0.5, 0.05, 0.3),
+  par_cex = 0.7,
   ...
 )
 }
@@ -30,15 +34,24 @@ extra arugments for MLEbins method.}
 \code{fit_size_spectrum_mlebin()} is used; see vignette TODO). # TODO link help
 to plot.size_spectrum_numeric - may want to put them all together}
 
-\item{log_y_axis}{character either \code{"both"}, do two plots (like Fig. 7 of
-MEPS paper), \code{"no"} for single plot with linear y axis (like Fig. 7a of
-MEPS paper), \code{"yes"} for single plot with logarithmic y axis (like Fig. 7b
-of MEPS paper). Legends are automatically set, but can be tailored with the
-arguments defined below.}
+\item{style}{character either:
+\itemize{
+\item \code{"log_y_axis"} - single ISD plot with logarithmic y axis (Fig. 6b of MEE paper)
+\item \code{"linear_y_axis"} - for single ISD plot with linear y axis
+\item \code{"both_y_axes"} - both the above plots as a two-panel plot
+\item \code{"biomass_and_isd"} - to use only if the data represent body masses. Does two-panel
+plot, essentially the recommended Fig. 6 of MEE paper where the top panel
+is bins of normalized biomass (but improved here by showing bins in the top
+panel rather than points) and the \code{"log_y_axis"} plot described above.
+TODO prob have to make that consistent in other plotting function
+}}
 
 \item{x_plb}{vector of values to use to plot the fitted PLB curve; if NA then
 automatically calculated (sometimes need to manually extend it to hit the
-x-axis, but tricky to automate that on a log-scale}
+x-axis, but tricky to automate that on a log-scale)}
+
+\item{xlab}{ylab x/y labels, explicitly given default values here which can
+be modified as required.}
 
 \item{y_scaling}{numeric scaling of y-minimum of y-axis. Axis can't go to zero on
 log-log plot, but goes to the proportion \code{y_scaling} (<1)
@@ -63,15 +76,34 @@ of MEPS paper, or the only panel for a one-panel plot (\code{log_y_axis = "yes"}
 \item{legend_text_b}{text to include in the legend for panel
 b for two-panel plot (\code{log_y_axis = "both"}); ignored for one-panel plot}
 
-\item{...}{Further arguments for \code{plot()}}
+\item{seg_col}{colour to use for the segments (green in Fig. 7 of
+MEPS paper).}
+
+\item{par_mai}{vector of values to use for \code{par(mai)}}
+
+\item{par_cex}{numeric value to use for \code{par(cex)} (font size)}
+
+\item{...}{Further arguments for \code{plot_isd()} and then \code{plot()} TODO check}
+
+\item{log_y_axis}{TODO delete a bunch of these params.....character either \code{"both"}, do two plots (like Fig. 7 of
+MEPS paper), \code{"no"} for single plot with linear y axis (like Fig. 7a of
+MEPS paper), \code{"yes"} for single plot with logarithmic y axis (like Fig. 7b
+of MEPS paper). Legends are automatically set, but can be tailored with the
+arguments defined below.}
 }
 \value{
 one- or two-panel plot of the ISD with data in binned form like in
 Fig. 7, 7a or 7b (depending on settings) of MEPS paper, but with nonoverlapping bins; returns nothing.
 }
 \description{
-Plot a binned ISD plots similar to MEPS Figure 7 (but with nonoverlapping
-bins). Also directly called from \code{plot.size_spectrum_mlebins()} with no
+TODO need xlab here and called functions
+}
+\details{
+Plots one- or two-panel plot of the ISD with data in binned form like in
+Fig. 7, 7a or 7b (depending on settings) of MEPS paper, but with
+nonoverlapping bins. See \code{log_y_axis} to specify exact plot(s).
+
+Also directly called from \code{plot.size_spectrum_mlebins()} with no
 extra arugments for MLEbins method.
 }
 \examples{

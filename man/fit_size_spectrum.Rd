@@ -37,7 +37,8 @@ fit_size_spectrum(dat, ...)
   x_min = NULL,
   x_max = NULL,
   b_vec = NULL,
-  b_vec_inc = 1e-05
+  b_vec_inc = 1e-05,
+  b_start = NULL
 )
 }
 \arguments{
@@ -45,46 +46,56 @@ fit_size_spectrum(dat, ...)
 \itemize{
 \item \code{numeric} vector of values (such as individual body masses or lengths), which uses
 the MLE method (via the function \code{\link[=fit_size_spectrum.numeric]{fit_size_spectrum.numeric()}};
-\item \code{data.frame} that can be either
+\item \code{data.frame} that can be either:
 \itemize{
-\item individual measurements for a strata (such as a year), for which column
-names are given by \code{strata} (user has to specify TODO or make it year and
-check other columns ) and \code{x} for the measurements. More column
-names can be in the data.frame but will not be used. In this case the MLE
-method \code{fit_size_spectrum.numeric()} will be applied separately to each
-year. TODO - need the functions OR
 \item count data for MLEbin method. At a minimum this has to include the columns:
 \itemize{
 \item \code{bin_min}
 \item \code{bin_max}
 \item \code{bin_count}.
-If \code{species} is in \code{names(dat)} then uses the MLEbins method, else uses
+}
+\item individual measurements for a strata (such as a year) TODO and might change, for which column
+names are given by \code{strata} (user has to specify TODO or make it year and
+check other columns ) and \code{x} for the measurements. More column
+names can be in the data.frame but will not be used. In this case the MLE
+method \code{fit_size_spectrum.numeric()} will be applied separately to each
+year. TODO - need the functions OR
+If \code{species} is in \code{names(dat)} then uses the MLEbins method, RISKY THOUGH
+and need length-weight coefficients also, so do something different. else uses
 MLEbin for which we do not care about the species. TODO
 \code{bin_min} and \code{bin_max} in a row correspond to \code{w_sj} for that species and
 bin in MEPS supp infor -- see other help that spells it out.
 }
-}
-}
-
-TODO}
+}}
 
 \item{x_min}{minimum value of data to fit the PLB distribution to. If \code{NULL}
 (the default) then it is set to the minimum value of the data (if \code{dat} is
-\code{numeric}), else to the minimum bin break of the lowest bin or ??TODO any
-other options? If not NULL then the fitting is restricted to value above
+\code{numeric}), else to the minimum bin break of the lowest bin. If not \code{NULL}
+then the fitting is restricted to values greater than or equal to
 \code{x_min}; for the MLEbin method this is the first full bin equal to or above \code{x_min}
 (i.e. first bin with \code{bin_min >= x_min}). Similarly for \code{x_max} (fitting
-is restricted to including the largest bin for which \code{bin_max <= x_max}).
-TODO check the MLEbinfunction when finished. TODO Mention species-specific}
+is restricted to including the largest bin for which \code{bin_max <= x_max}).}
 
 \item{x_max}{maximum value of data to fit the PLB distribution to. If \code{NULL}
 (the default) then it is set to the maximum value of the data (if \code{dat} is
-\code{numeric}), else to the maximum bin break of the highest bin or ??TODOany
-other options? If not NULL then the fitting is restricted to value below
-\code{x_max}; for the MLEbin method this includes the largest bin for which
-\code{bin_max <= x_max}. TODO  Mention species-specific...}
+\code{numeric}), else to the maximum bin break of the highest bin
+If not \code{NULL} then the fitting is restricted to values below or equal to
+\code{x_max}; for the MLEbin method this includes the highest bin for which
+\code{bin_max <= x_max}.}
+
+\item{b_start}{for the MLEbin method, the starting estimate for numerical
+search for the MLE, since there is no analytical value.}
+
+\item{b_vec}{vector of values for the confidence interval calculation, to be
+used as the \code{vec} argument of \code{calc_mle_conf()}}
+
+\item{b_vec_inc}{increment value for the confidence interval calculation, to be
+used as the \code{vec_inc} argument of \code{calc_mle_conf()}}
 }
 \value{
+data tibble can have \code{bin_sum}, \code{bin_sum_norm}, \code{low_count}, \code{high_count},
+and maybe more from MLEbin method, if the data are individuals and were
+then binned using, say, \code{x_binned <- bin_data(res_vec$x, bin_width = "2k")}. For true binned data we only have some of these.
 \itemize{
 \item If \code{dat} is numeric then returns a list object of class
 \code{size_spectrum_numeric} (such that we can plot it

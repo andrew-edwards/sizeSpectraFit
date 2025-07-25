@@ -7,7 +7,7 @@
 \method{plot}{size_spectrum_mlebins}(res_mlebins, ...)
 }
 \arguments{
-\item{...}{Further arguments for \code{plot()}}
+\item{...}{Further arguments for \code{plot_isd()} and then \code{plot()} TODO check}
 }
 \value{
 one- or two-panel plot of the ISD with data in binned form like in

@@ -10,7 +10,13 @@ the data}
 \usage{
 bin_data(dat, ...)
 
-\method{bin_data}{data.frame}(dat, bin_width = NULL, bin_breaks = NULL, start_integer = TRUE)
+\method{bin_data}{data.frame}(
+  dat,
+  bin_width = NULL,
+  bin_breaks = NULL,
+  start_integer = TRUE,
+  truncate_top_bin = FALSE
+)
 
 \method{bin_data}{numeric}(dat = NULL, ...)
 }
@@ -51,6 +57,11 @@ or \code{bin_breaks} must be specified.}
 \item{start_integer}{TRUE or FALSE, whether to start the bin breaks at an integer
 power of 2 (for method \code{"2k"}) or an integer. See \code{bin_width} above.
 \code{start_integer} is ignored if \code{bin_breaks} is specified.}
+
+\item{truncate_top_bin}{TRUE of FALSE, whether to truncate the top bin at
+the max of the data, or let it have a maximum value based on the
+bin-generating definition. Usually have it FALSE, but using TRUE for doing
+LBN plot when we have the raw individual data.}
 }
 \value{
 list containing:

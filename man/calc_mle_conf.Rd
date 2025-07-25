@@ -16,20 +16,37 @@ calc_mle_conf(
 )
 }
 \arguments{
+\item{this_neg_ll_fn}{negative log-likelihood function that take arguments
+(parameters and data) in ... and returns a negative
+log-likelihood value.}
+
 \item{p}{starting point to calculate the maximum likelihood estimate}
 
-\item{vec_diff}{the range over which to test the negative log-likelihood
+\item{vec}{vector of values over which to test the negative log-likelihood
+to construct the confidence interval. If \code{NULL} (users will probably just
+want to stick with this default) then it will get
+automatically created, based on \code{vec_diff} and \code{vec_inc}. If the resulting
+confidence interval bounds including one of the endpoints of \code{vec}, then
+\code{vec} is automatically expanded until it encompasses the confidence
+interval (regardless of whether it was manually specified or \code{NULL}).}
+
+\item{vec_diff}{if \code{vec} is \code{NULL}, the range over which to calculate the
+negative log-likelihood
 to construct the confidence interval. Default is 0.5 and a symmetric
 range is tested for fitting size spectra, since for movement data
 sets in Table 2 of Edwards (2011; 92(6):1247-1257) the intervals were
 symmetric, so symmetric seems a good start. TODO may need updating}
 
-\item{vec_inc}{TODO increments to try, the accuracy of the resulting bounds
+\item{vec_inc}{if \code{vec} is \code{NULL}, the increments of the vector to calculate
+the negative log-likelihood to construct the confidence interval. The
+accuracy of the resulting bounds
 will depend on this. Note that a resulting interval of, say,
 (-2.123, -1.987) means that that interval is contained within the
 true 95\\% interval, which is itself contained within (-2.124, -1.986).
 The true bounds lie between the stated lower bounds and between
-the stated upper bounds. So reduce \code{vecInc} if further accuracy is needed.}
+the stated upper bounds. So reduce \code{vec_inc} if further accuracy is
+needed. Also used even if \code{vec} is specified by the user but then needs to
+be expanded (see \code{vec}).}
 
 \item{suppress_warnings}{TODO decide. If TRUE then suppress warnings from the \code{nlm()}
 calculations; for the \code{MEPS_IBTS_MLEbins} vignette these occur a lot, and
@@ -39,10 +56,6 @@ situations also. It is due to the likelihood function blowing up,
 presumably when searching some very very very unlikely region of paramater space.}
 
 \item{...}{further arguments (including parameters and data) to \code{negll_fn()}}
-
-\item{neg_ll_fn}{negative log-likelihood function that take arguments
-(parameters and data) in ... and returns a negative
-log-likelihood value.}
 }
 \value{
 \if{html}{\out{<div class="sourceCode">}}\preformatted{  list containing:
