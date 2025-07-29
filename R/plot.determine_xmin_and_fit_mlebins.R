@@ -31,7 +31,7 @@ plot.determine_xmin_and_fit_mlebins <- function(res,
   mai_orig <- par("mai")
   par(mfrow = c(3,1))
 
-  par(mai = mai_orig)     # TODO (from sizeSpectraHake): think about Since gets reset by ISD_bin_plot(). Should clean
+  # par(mai = mai_orig)     # TODO (from sizeSpectraHake): think about Since gets reset by ISD_bin_plot(). Should clean
                           # up that function in sizeSpectra.
 
   # Don't think needed now, this was specific for hake:
@@ -68,12 +68,12 @@ plot.determine_xmin_and_fit_mlebins <- function(res,
  }
 
   plot(res$mlebins_fit,
-       log_y_axis = "no")
+       style = "linear_y_axis")
 
   plot(res$mlebins_fit,
-       log_y_axis = "yes")
+       style = "log_y_axis")
   # plot(res$mle_fit)  # TODO this changes for mlebins, could functionalise the
   # hist plot above since needed for all data types
 
-  par(mfrow = c(1,1))  # TODO
+  # par(mfrow = c(1,1))  # TODO
 }

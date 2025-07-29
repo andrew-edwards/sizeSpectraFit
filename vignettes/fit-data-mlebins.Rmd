@@ -1,10 +1,10 @@
 ---
-title: "Fit data and plot results - MLE and MLEbin methods"
+title: "Fitting length data with species-specific body-mass relationships - MLEbins method"
 author: "Andrew Edwards"
 output:
   rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Fit data and plot results - MLE and MLEbin methods}
+  %\VignetteIndexEntry{Fitting length data with species-specific body-mass relationships - MLEbins method}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 date: "Last rendered on `r format(Sys.time(), '%d %B, %Y')`"
@@ -12,7 +12,7 @@ date: "Last rendered on `r format(Sys.time(), '%d %B, %Y')`"
 
 ```{r, instr, echo = FALSE, eval = FALSE}
 # To build either run this line or click knit button in RStudio
-rmarkdown::render("fit-data.Rmd")
+rmarkdown::render("fit-data-mlebins.Rmd")
 ```
 
 ```{r, load, include = FALSE}
@@ -25,6 +25,206 @@ knitr::opts_chunk$set(
   fig.height = 6
 )
 ```
+
+
+Did all this but didn't run it in one go. Have changed some functions since
+doing Zabala analysis, so prob best to make sure Zabala can run first.
+
+
+In our [MEPS paper](https://www.int-res.com/abstracts/meps/v636/p19-33/) we
+introduced the MLEbins method. This calculates the maximum likelihood estimate
+of the size-spectrum exponent, $b$, when the data are collected as lengths and
+we have species-specific length-weight coefficients. So individual body-masses
+are not available; if they were we could use the MLE or MLEbin method in the
+`fit-data.Rmd` vignette.
+
+The lengths may already be binned, for example a length bin could be 10-11
+cm. And even when measured more accurately, the resolution of the measurements
+essentially add uncertainty to a length. For example, a fish of length 15 cm
+measured to the nearest cm has a true length in the range 14.5-15.5 cm, which
+then gets converted into a body-mass range using that species specific
+length-weight coefficients. See the MEPS paper for further explanation (rather
+than it being repeated here, where we focus on applying the method).
+
+We use real data of measured lengths from experimental trawl surveys conducted in
+the Northwestern Mediterranean Sea (as part of the research projects RESNEP and
+BITER by the Instituto de Ciencias del Mar (ICM-CSIC), Spain). The full data are
+available in sizeSpectra2 as simply
+```{r meddata}
+mediterranean_data
+```
+and are being analysed using sizeSpectra2 as part of a separate manuscript
+(see `?mediterranean_data` for more details).
+
+## Wrangling the data
+
+We first wrangle the data into the format required for using the MLEbins
+method. Similar wrangling would need to be done for users' data to get the
+required inputs for the likelihood calculations.
+
+We will fit the size spectrum for
+just one species group (crustacea) and for one strata, the fishing grounds that
+are close to a no-take marine reserve. So first filter to obtain just those values:
+```{r fgcrustacea}
+dat <- dplyr::filter(mediterranean_data,
+                     strata == "fg",
+                     group == "Crustacea")
+dat
+summary(dat)
+```
+The `number` column is the number of individuals of species `species` that were
+measured as length `length`. Values of `number` can be non-integer because they
+are standardised by dividing by trawling time TODO check; the MLEbins method can
+deal with this.
+
+The
+lengths are in mm, with integer values measured to nearest mm using standard
+lab metric tape, and values
+with decimals are assumed to be measured to 0.01 mm (measured using vernier
+calipers). We convert these length values to minima and maxima of bins, with the
+measured lengths representing the midpoints. This keeps track of the uncertainty
+in the 'true' length of individuals (which obviously is small for the 0.01 mm
+bins, but is needed for the MLEbins method), and progresses the uncertainties
+through to the likelihood calculations.
+
+The bin breaks are calculated as:
+```{r binbreaks}
+dat_bin_breaks <- calc_max_of_bin(dat$length,
+                                  bin_widths = c(0.01, 1))
+dat_bin_breaks
+
+dat_all <- cbind(dat,
+                 dat_bin_breaks) %>%
+  tibble::as_tibble() %>%
+  dplyr::rename(length_bin_min = bin_min,
+                length_bin_max = bin_max)
+dat_all
+```
+using our `calc_max_of_bin()` function, where the argument `bin_widths`
+specifies the possible widths of bins (see its help file for details). Assuming
+all integer lenghts were measured to the nearest mm will mis-specify about 1% of
+measurements (those that were measured to 0.01 mm accuracy but turned out to be
+integers), a minor amount.
+So we now have minima and maxima of the length bins for each row, defined as
+`length_bin_min` and `length_bin_max`, respectively.
+
+In the package we also provide the species-specific length-weight coefficients:
+```{r lwcoeffs}
+mediterranean_length_weight_coefficients
+```
+which assume units of cm (not mm) and grammes.
+
+We now use these for each species, to generate body-mass bins:
+```{r onestratagroup}
+dat_joined <- dplyr::left_join(dat_all,
+                               mediterranean_length_weight_coefficients,
+                               by = "species") %>%
+
+  # Lengths to weights, note the 10 needed here to convert mm lengths into
+  # weights based on length-weight coefficients that assume lengths are in cm:
+  dplyr::mutate(weight_bin_min = alpha * (length_bin_min/10)^beta,
+                weight_bin_max = alpha * (length_bin_max/10)^beta) %>%
+
+  # Remove species with no length-weight coefficients:
+  dplyr::filter(!is.na(alpha))
+
+dat_joined[1:5, ] %>% a()      # a() is our helper shortcut for as.data.frame()
+
+summary(dat_joined)
+```
+
+The data may have rows that have the same species and bins - maybe take care of
+in the fitting??? TODO - yes, probably worth doing. Also sort by `weight_bin_min`:
+From mediterranean_for_mlebins:
+```{r duplicates}
+dat_joined_2 <- dplyr::summarise(dplyr::group_by(dat_joined,
+                                          species,
+                                          weight_bin_min,
+                                          weight_bin_max),    # need to retain, not needed
+                                                       # for grouping
+                          bin_count = sum(number)) %>%
+  dplyr::ungroup() %>%
+  dplyr::arrange(weight_bin_min)
+
+# This could go into fitting:
+#res <- dplyr::summarise(dplyr::group_by(temp,
+#                                          species,
+#                                          bin_min,
+#                                          bin_max),    # need to retain, not needed
+#                                                       # for grouping
+#                         bin_count = sum(bin_count)) %>%
+#    dplyr::ungroup()
+```
+
+
+
+It is useful for users to retain see all the columns above, but here we just
+simplify it down (and rename two columns) to what is needed for the fitting,
+namely `number`, `bin_min` and `bin_max` (assumed to represent body masses);
+users should do the same for their own data.
+looking like:
+```{r, select}
+dat_use <- dplyr::select(dat_joined,
+                         bin_count = number,
+                         bin_min = weight_bin_min,
+                         bin_max = weight_bin_max)
+dat_use %>% tail()
+
+dat_use_2 <- dplyr::select(dat_joined_2,
+                         bin_count,
+                         bin_min = weight_bin_min,
+                         bin_max = weight_bin_max)
+dat_use_2
+dat_use_2 %>% tail()
+
+
+```
+
+
+
+
+## Fit using MLEbins
+
+Now fit the data using the MLEbins method
+
+Those steps have been combined into a single function:
+```{r, mlebins}
+res <- determine_xmin_and_fit_mlebins(dat_use)
+dim(dat_use)
+
+res_2 <- determine_xmin_and_fit_mlebins(dat_use_2)
+dim(dat_use_2)   # ran way quicker. So TODO absorbe into the fitting.
+
+```
+
+TODO not working:
+```{r, fig}
+plot(res_2)
+```
+
+```{r, figlinear}
+# class(res_2)
+# [1] "determine_xmin_and_fit_mlebins" "list"
+plot(res_2$mlebins_fit,
+       style = "linear_y_axis")
+```
+
+```{r, figlog}
+plot(res_2$mlebins_fit,
+       style = "log_y_axis")
+```
+
+
+
+TODO put check of column names in `determine_xmin_and_fit_mlebins` or similar;
+need those in the `select` chunk above.
+
+```{r, exit}
+knitr::knit_exit()
+```
+
+
+MLE and MLEbin vignette:
 
 Fitting a size spectrum to a data set using likelihood is done using the
 function `fit_size_spectrum()`. The function automatically selects the
@@ -246,12 +446,10 @@ HERE
 
  D use that in `fit-size-spectrum.numeric.R` instead of current
 
-HERE- see mlebins vignette now. Need to ensure zabala stuff running, make sure
-it still works; think it needs a bit of tweaking.
- - Add/fix tests
+
  - back to `fit-size-spectrum.data.frame.R` to carry on. See HERE. Doing an
    MLEbins vignette now, since already done code and functions in report/.
-
+ - Add/fix tests
  - carry on tidying up help; getting there
  - Change any negll -> neg_ll.
  - see `summary_mle_table()`
