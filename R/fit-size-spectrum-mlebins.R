@@ -10,14 +10,16 @@ fit_size_spectrum_mlebins <- function(dat,
 
 
   # TODO in help note that bin_count can be non-integer. And need species column
-  # since species-specific bins
+  # since species-specific bins, though don't need to know what these are now,
+  # and don't actually need them, so not a requirement.
 
   # Fitting MLEbins method. Need dat
-  stopifnot("dat needs to include columns species, bin_min, bin_max, and bin_count to use the MLEbins method" = c("species", "bin_min", "bin_max", "bin_count") %in% names(dat))
+  stopifnot("dat needs to include columns bin_min, bin_max, and bin_count to use the MLEbins method" = c("bin_min", "bin_max", "bin_count") %in% names(dat))
 
   df <- tibble::as_tibble(dat)     # df is tibble to be fitted, can get
                                    # restricted in next lines
 
+  # TODO here combine repeated ones and arrange; do in mlebin function also.
 
   df <- dplyr::arrange(df,
                        bin_min)

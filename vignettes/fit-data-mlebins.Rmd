@@ -138,11 +138,11 @@ in the fitting??? TODO - yes, probably worth doing. Also sort by `weight_bin_min
 From mediterranean_for_mlebins:
 ```{r duplicates}
 dat_joined_2 <- dplyr::summarise(dplyr::group_by(dat_joined,
-                                          species,
-                                          weight_bin_min,
-                                          weight_bin_max),    # need to retain, not needed
-                                                       # for grouping
-                          bin_count = sum(number)) %>%
+                                                 species,
+                                                 weight_bin_min,
+                                                 weight_bin_max),    # need to retain, not needed
+                                 # for grouping
+                                 bin_count = sum(number)) %>%
   dplyr::ungroup() %>%
   dplyr::arrange(weight_bin_min)
 
@@ -193,13 +193,13 @@ res <- determine_xmin_and_fit_mlebins(dat_use)
 dim(dat_use)
 
 res_2 <- determine_xmin_and_fit_mlebins(dat_use_2)
-dim(dat_use_2)   # ran way quicker. So TODO absorbe into the fitting.
+dim(dat_use_2)   # ran way quicker. So TODO absorb the grouping of same bins,
+                 # and arranging, into the fitting. HERE next
 
 ```
 
-TODO not working:
 ```{r, fig}
-plot(res_2)
+plot(res_2)    # still not working though HERE, unlike example from med analysis
 ```
 
 ```{r, figlinear}

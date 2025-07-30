@@ -14,6 +14,7 @@ fit_size_spectrum_mlebin <- function(dat,
                                    # restricted in next lines
   df <- dplyr::arrange(df,
                        bin_min)
+ # TODO also combine repeated bins like doing for MLEbins
 
   # TODO might have to take out 0 counts in end bins. Check here or reduce the
   # bins. And add to help.

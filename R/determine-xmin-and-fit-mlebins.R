@@ -42,9 +42,9 @@ determine_xmin_and_fit_mlebins <- function(dat_for_mlebins,
   # Not determining x_max separately here so no need to mention it, it gets
   #  passed on in ...
 
-  mlebins_fit <- fit_size_spectrum(dat_for_mlebins,
-                                   x_min = x_min,
-                                   ...)
+  mlebins_fit <- fit_size_spectrum_mlebins(dat_for_mlebins,
+                                           x_min = x_min,
+                                           ...)
 
   res <- list(mlebins_fit = mlebins_fit,
               h = hh)
