@@ -21,6 +21,7 @@ fit_size_spectrum_mlebins <- function(dat,
 
   # TODO here combine repeated ones and arrange; do in mlebin function also.
 
+
   df <- dplyr::arrange(df,
                        bin_min)
                        # species,    # don't want to do that as it messes up
@@ -29,7 +30,8 @@ fit_size_spectrum_mlebins <- function(dat,
 
 
   # TODO might have to take out 0 counts in end bins. Check here or reduce the
-  # bins. And add to help. SEe also mlebin
+  # bins. And add to help. SEe also mlebin. Though don't think will have any 0
+  # counts
 
   if(!is.null(x_min)){
     df <- dplyr::filter(df,

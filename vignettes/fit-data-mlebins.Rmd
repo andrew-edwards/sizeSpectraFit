@@ -89,6 +89,7 @@ through to the likelihood calculations.
 
 The bin breaks are calculated as:
 ```{r binbreaks}
+# TODO convert this all into calc_max_of_bin():
 dat_bin_breaks <- calc_max_of_bin(dat$length,
                                   bin_widths = c(0.01, 1))
 dat_bin_breaks
@@ -96,7 +97,8 @@ dat_bin_breaks
 dat_all <- cbind(dat,
                  dat_bin_breaks) %>%
   tibble::as_tibble() %>%
-  dplyr::rename(length_bin_min = bin_min,
+  dplyr::rename(bin_count = number,
+                length_bin_min = bin_min,
                 length_bin_max = bin_max)
 dat_all
 ```
@@ -114,8 +116,26 @@ mediterranean_length_weight_coefficients
 ```
 which assume units of cm (not mm) and grammes.
 
+
+### New function that should replace proceeding chunks
+
+New function:
+- check results agree, then change name to dat_joined
+```{r convert}
+dat_joined_3 <- length_bins_to_body_mass_bins(dat_all,
+                                              mediterranean_length_weight_coefficients,
+                                              length_data_unit = "mm")
+
+expect_equal(dat_joined_3,
+             dplyr::select(dat_joined_2,
+                           -"species"))   # from below; passes!
+```
+
+
 We now use these for each species, to generate body-mass bins:
 ```{r onestratagroup}
+
+# TODO should functionalise this; check it agrees with function
 dat_joined <- dplyr::left_join(dat_all,
                                mediterranean_length_weight_coefficients,
                                by = "species") %>%
@@ -133,7 +153,7 @@ dat_joined[1:5, ] %>% a()      # a() is our helper shortcut for as.data.frame()
 summary(dat_joined)
 ```
 
-The data may have rows that have the same species and bins - maybe take care of
+Doing these in length_bins_to_body_mass_bins: The data may have rows that have the same species and bins - maybe take care of
 in the fitting??? TODO - yes, probably worth doing. Also sort by `weight_bin_min`:
 From mediterranean_for_mlebins:
 ```{r duplicates}
@@ -155,6 +175,9 @@ dat_joined_2 <- dplyr::summarise(dplyr::group_by(dat_joined,
 #                         bin_count = sum(bin_count)) %>%
 #    dplyr::ungroup()
 ```
+
+
+
 
 
 
