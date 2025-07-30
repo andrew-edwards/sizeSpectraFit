@@ -13,11 +13,13 @@
 ##'
 ##' }
 plot.size_spectrum_mlebins <- function(res_mlebins,
+                                       seg_col = "green",
                                        ...
                                        ){   # TODO decide if want ... yes, just
                                         # make sure help files link to all
                                         # functions; check it all works.
   plot.size_spectrum_mlebin(res_mlebin = res_mlebins,
+                            seg_col = seg_col,
                             ...)    # want to have mlebins in class, hence need
   # this separate function.
 }

@@ -241,7 +241,7 @@ plot.size_spectrum_mlebin <- function(res_mlebin,
                     ...)  # ADD in more options maybe, see plot_isd_binned; figure out
                           # useArgs() thing. Copy to next ones TODO
   }
-  par(par_orig)      # Leave as was found
+  # par(par_orig)      # Leave as was found  commenting as think messes up plot.determine_xmin_and_fit_mlebins.R
 
   invisible()
 }

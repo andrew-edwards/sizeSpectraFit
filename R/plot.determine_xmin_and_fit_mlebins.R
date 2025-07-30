@@ -20,6 +20,9 @@
 ##' }
 plot.determine_xmin_and_fit_mlebins <- function(res,
                                                 xlim_hist = NULL,
+                                                par_mai = c(0.4, 0.5, 0.05, 0.3),
+                                                par_cex = 0.7,   # these two are
+                                                  # only for isd plots TODO
                                                 ...){
 
   # Global xlim, might want to add functionality at some point
@@ -67,11 +70,14 @@ plot.determine_xmin_and_fit_mlebins <- function(res,
          ...)
  }
 
+  par(mai = par_mai,
+      cex = par_cex)
   plot(res$mlebins_fit,
-       style = "linear_y_axis")
+       style = "linear_y_axis")    # TODO prob want ..., e.g. for seg_col
 
   plot(res$mlebins_fit,
        style = "log_y_axis")
+
   # plot(res$mle_fit)  # TODO this changes for mlebins, could functionalise the
   # hist plot above since needed for all data types
 

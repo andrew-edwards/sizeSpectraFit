@@ -28,7 +28,7 @@ knitr::opts_chunk$set(
 
 
 Did all this but didn't run it in one go. Have changed some functions since
-doing Zabala analysis, so prob best to make sure Zabala can run first.
+doing Zabala analysis, so prob best to make sure Zabala can run first. HERE
 
 
 In our [MEPS paper](https://www.int-res.com/abstracts/meps/v636/p19-33/) we
