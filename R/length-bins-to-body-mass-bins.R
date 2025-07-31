@@ -10,7 +10,7 @@
 ##' and we use the species-specific coefficients to convert the length bins to
 ##' body mass bins (see the MEPS paper for more details). Body-mass bins that
 ##' are repeated (likely from the same species being measured in the same length
-##' bin, though could also occur coincendtally for different species) are
+##' bin, though could also occur coincidentally for different species) are
 ##' aggregated to give total counts for such bins, so that there are no
 ##' duplicated bins in the output. The resulting data.frame is also sorted in
 ##' order of `bin_min`, starting with the lowest.
@@ -36,6 +36,14 @@
 ##' @param length_data_unit character giving the units of the length data, must
 ##'   be mm or cm (the default).
 ##' @return data.frame with each row representing a body-mass bins, and columns:
+##'  * `species` - unique species corresponding to `bin_min` and `bin_max` in
+##'   the corresponding row. If any resulting bin definitions are the same for
+##'   two or more distinct species, then this column is omitted. This could
+##'   occur if the same length-weight relationship is used for different species
+##'   (e.g. same relationship used for multiple rockfish species), or just by
+##'   chance. The `species` is not needed for the subsequent MLEbins method, but
+##'   it can be helpul for users to still keep track of species if they body-mass
+##'   bins each correspond to just one species.
 ##'  * `bin_min` - minimum of the body-mass bin (g)
 ##'  * `bin_max` - maximum of the body-mass bin (g)
 ##'  * `bin_count` - total count of individuals within that body-mass bin; can
@@ -45,16 +53,13 @@
 ##' @examples
 ##' \dontrun{
 ##'  # Example using the first 1000 lines of the Mediterranean data in the
-##'   package:
+##'   package, copy from vignette:
 ##' med_subset <- mediterranean_data[1:1000, ]
 ##' # TODO need to functionalise the conversion of lengths to length bins
 ##'  mediterranean_example <-
 ##'   length_bins_to_body_mass_bins(med_subset,
 ##'                                 mediterranean_length_weight_coefficients,
-##' TODO)
-##'
-##'
-##'HERE
+##' TODO, ...)
 ##' }
 length_bins_to_body_mass_bins <- function(dat,
                                           coefficients,
@@ -99,21 +104,44 @@ length_bins_to_body_mass_bins <- function(dat,
   dat_joined <- dplyr::left_join(dat,
                                  coefficients,
                                  by = "species") %>%
-    dplyr::mutate(weight_bin_min = alpha * (length_bin_min)^beta,
-                  weight_bin_max = alpha * (length_bin_max)^beta) %>%
+    dplyr::mutate(bin_min = alpha * (length_bin_min)^beta,
+                  bin_max = alpha * (length_bin_max)^beta) %>%
     # Remove species with no length-weight coefficients:
     dplyr::filter(!is.na(alpha))
 
 
   # Now aggregate duplicate bins (not keeping species in case duplicate bins are
   #  for different species, which can happen if they share length-weight
-  #  coefficients), and then arrange by weight_bin_min
-  dat_joined_2 <- dplyr::summarise(dplyr::group_by(dat_joined,
-                                                   weight_bin_min,
-                                                   weight_bin_max),
-                                 bin_count = sum(bin_count)) %>%
-    dplyr::ungroup() %>%
-    dplyr::arrange(weight_bin_min)
+  #  coefficients), and then arrange by weight_bin_min, but first check if we
+  #  can keep species in there also.
+
+
+  check_unique_species <- dplyr::summarise(dplyr::group_by(dat_joined,
+                                                           bin_min,
+                                                           bin_max,),
+                                           number_species =
+                                             length(unique(species))) %>%
+    dplyr::ungroup()
+
+  if(max(check_unique_species$number_species) > 1){
+    # Cannot include species name
+    dat_joined_2 <- dplyr::summarise(dplyr::group_by(dat_joined,
+                                                     bin_min,
+                                                     bin_max),
+                                     bin_count = sum(bin_count)) %>%
+      dplyr::ungroup() %>%
+      dplyr::arrange(bin_min)
+  } else {
+    # Can include species name
+    dat_joined_2 <- dplyr::summarise(dplyr::group_by(dat_joined,
+                                                     bin_min,
+                                                     bin_max),
+                                     bin_count = sum(bin_count),
+                                     species = unique(species)) %>%
+      dplyr::ungroup() %>%
+      dplyr::arrange(bin_min) %>%
+      dplyr::relocate(species)
+  }
 
   dat_joined_2
 }

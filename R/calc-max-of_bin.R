@@ -1,5 +1,4 @@
-##' Calculate the maximum value of each bin
-##'  minimum or midpoint)
+##' Calculate the maximum value of each bin minimum or midpoint)
 ##'
 ##' Given a vector of values representing either the midpoint or the minimum of
 ##' each bin, calculate the correponding maximum value of each bin. The defined

@@ -1,10 +1,10 @@
 ---
-title: "Fitting length data with species-specific body-mass relationships - MLEbins method"
+title: "Fitting length data and related species-specific body-mass relationships -- MLEbins method"
 author: "Andrew Edwards"
 output:
   rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Fitting length data with species-specific body-mass relationships - MLEbins method}
+  %\VignetteIndexEntry{Fitting length data and related species-specific body-mass relationships -- MLEbins method}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 date: "Last rendered on `r format(Sys.time(), '%d %B, %Y')`"
@@ -26,11 +26,6 @@ knitr::opts_chunk$set(
 )
 ```
 
-
-Did all this but didn't run it in one go. Have changed some functions since
-doing Zabala analysis, so prob best to make sure Zabala can run first. HERE
-
-
 In our [MEPS paper](https://www.int-res.com/abstracts/meps/v636/p19-33/) we
 introduced the MLEbins method. This calculates the maximum likelihood estimate
 of the size-spectrum exponent, $b$, when the data are collected as lengths and
@@ -40,21 +35,26 @@ are not available; if they were we could use the MLE or MLEbin method in the
 
 The lengths may already be binned, for example a length bin could be 10-11
 cm. And even when measured more accurately, the resolution of the measurements
-essentially add uncertainty to a length. For example, a fish of length 15 cm
+essentially adds uncertainty to a length. For example, a fish of length 15 cm
 measured to the nearest cm has a true length in the range 14.5-15.5 cm, which
-then gets converted into a body-mass range using that species specific
-length-weight coefficients. See the MEPS paper for further explanation (rather
-than it being repeated here, where we focus on applying the method).
+then gets converted into a body-mass bin using that species specific
+length-weight coefficients. The resulting body-mass bins can overlap each other
+(unlike for the MLEbin method), because the length bins of differently shaped
+species get converted to different body-mass bins. See the MEPS paper for
+further explanation (rather than it being repeated here, where we focus on
+applying the method).
 
 We use real data of measured lengths from experimental trawl surveys conducted in
-the Northwestern Mediterranean Sea (as part of the research projects RESNEP and
-BITER by the Instituto de Ciencias del Mar (ICM-CSIC), Spain). The full data are
+the Northwestern Mediterranean Sea, as part of the research projects RESNEP and
+BITER by the Instituto de Ciencias del Mar (ICM-CSIC), Spain; data courtesy of
+Juliana Quevedo, Joan B. Company, Nixon Bahamon, and Jordi Ribera Altimir. The full data are
 available in sizeSpectra2 as simply
 ```{r meddata}
 mediterranean_data
 ```
 and are being analysed using sizeSpectra2 as part of a separate manuscript
-(see `?mediterranean_data` for more details).
+(see `?mediterranean_data` for more details). Here we demonstrate the code on a
+subset of the data.
 
 ## Wrangling the data
 
@@ -64,7 +64,7 @@ required inputs for the likelihood calculations.
 
 We will fit the size spectrum for
 just one species group (crustacea) and for one strata, the fishing grounds that
-are close to a no-take marine reserve. So first filter to obtain just those values:
+are close to a no-take marine reserve. So we first filter to obtain just those values:
 ```{r fgcrustacea}
 dat <- dplyr::filter(mediterranean_data,
                      strata == "fg",
@@ -72,9 +72,10 @@ dat <- dplyr::filter(mediterranean_data,
 dat
 summary(dat)
 ```
-The `number` column is the number of individuals of species `species` that were
+Thus, `dat` contains data for just one `strata` and one `group`, but multiple
+`species`. The `number` column is the number of individuals of species `species` that were
 measured as length `length`. Values of `number` can be non-integer because they
-are standardised by dividing by trawling time TODO check; the MLEbins method can
+are standardised by the area trawled in each tow; the MLEbins method can explicitly
 deal with this.
 
 The
@@ -91,7 +92,8 @@ The bin breaks are calculated as:
 ```{r binbreaks}
 # TODO convert this all into calc_max_of_bin():
 dat_bin_breaks <- calc_max_of_bin(dat$length,
-                                  bin_widths = c(0.01, 1))
+                                  bin_widths = 0.1)
+
 dat_bin_breaks
 
 dat_all <- cbind(dat,
@@ -102,6 +104,7 @@ dat_all <- cbind(dat,
                 length_bin_max = bin_max)
 dat_all
 ```
+
 using our `calc_max_of_bin()` function, where the argument `bin_widths`
 specifies the possible widths of bins (see its help file for details). Assuming
 all integer lenghts were measured to the nearest mm will mis-specify about 1% of
@@ -116,131 +119,266 @@ mediterranean_length_weight_coefficients
 ```
 which assume units of cm (not mm) and grammes.
 
-
-### New function that should replace proceeding chunks
+We now use these for each species, to generate body-mass bins:
 
 New function:
-- check results agree, then change name to dat_joined
+D check results agree
+TODO: change name to dat_joined
 ```{r convert}
 dat_joined_3 <- length_bins_to_body_mass_bins(dat_all,
                                               mediterranean_length_weight_coefficients,
                                               length_data_unit = "mm")
-
-expect_equal(dat_joined_3,
-             dplyr::select(dat_joined_2,
-                           -"species"))   # from below; passes!
+dat_joined_3
+summary(dat_joined_3)
 ```
 
-
-We now use these for each species, to generate body-mass bins:
-```{r onestratagroup}
-
-# TODO should functionalise this; check it agrees with function
-dat_joined <- dplyr::left_join(dat_all,
-                               mediterranean_length_weight_coefficients,
-                               by = "species") %>%
-
-  # Lengths to weights, note the 10 needed here to convert mm lengths into
-  # weights based on length-weight coefficients that assume lengths are in cm:
-  dplyr::mutate(weight_bin_min = alpha * (length_bin_min/10)^beta,
-                weight_bin_max = alpha * (length_bin_max/10)^beta) %>%
-
-  # Remove species with no length-weight coefficients:
-  dplyr::filter(!is.na(alpha))
-
-dat_joined[1:5, ] %>% a()      # a() is our helper shortcut for as.data.frame()
-
-summary(dat_joined)
-```
-
-Doing these in length_bins_to_body_mass_bins: The data may have rows that have the same species and bins - maybe take care of
-in the fitting??? TODO - yes, probably worth doing. Also sort by `weight_bin_min`:
-From mediterranean_for_mlebins:
-```{r duplicates}
-dat_joined_2 <- dplyr::summarise(dplyr::group_by(dat_joined,
-                                                 species,
-                                                 weight_bin_min,
-                                                 weight_bin_max),    # need to retain, not needed
-                                 # for grouping
-                                 bin_count = sum(number)) %>%
-  dplyr::ungroup() %>%
-  dplyr::arrange(weight_bin_min)
-
-# This could go into fitting:
-#res <- dplyr::summarise(dplyr::group_by(temp,
-#                                          species,
-#                                          bin_min,
-#                                          bin_max),    # need to retain, not needed
-#                                                       # for grouping
-#                         bin_count = sum(bin_count)) %>%
-#    dplyr::ungroup()
-```
-
-
-
-
-
-
-It is useful for users to retain see all the columns above, but here we just
+TODO revise: It is useful for users to retain see all the columns above, but here we just
 simplify it down (and rename two columns) to what is needed for the fitting,
-namely `number`, `bin_min` and `bin_max` (assumed to represent body masses);
+namely `bin_count`, `bin_min` and `bin_max` (assumed to represent body masses);
 users should do the same for their own data.
 looking like:
-```{r, select}
-dat_use <- dplyr::select(dat_joined,
-                         bin_count = number,
-                         bin_min = weight_bin_min,
-                         bin_max = weight_bin_max)
-dat_use %>% tail()
-
-dat_use_2 <- dplyr::select(dat_joined_2,
-                         bin_count,
-                         bin_min = weight_bin_min,
-                         bin_max = weight_bin_max)
-dat_use_2
-dat_use_2 %>% tail()
-
-
-```
-
-
 
 
 ## Fit using MLEbins
 
-Now fit the data using the MLEbins method
+Now fit the data using the MLEbins method. First need to determine $x_{min}$....
+
+maybe just do the next and explain what is done.
 
 Those steps have been combined into a single function:
 ```{r, mlebins}
-res <- determine_xmin_and_fit_mlebins(dat_use)
-dim(dat_use)
-
-res_2 <- determine_xmin_and_fit_mlebins(dat_use_2)
-dim(dat_use_2)   # ran way quicker. So TODO absorb the grouping of same bins,
-                 # and arranging, into the fitting. HERE next
+res_3 <- determine_xmin_and_fit_mlebins(dat_joined_3)
+res_3
 
 ```
+
+Results when used the 0.01 and 1 bins, compare before deleting
+```{r oldres, eval = FALSE
+#dat_bin_breaks <- calc_max_of_bin(dat$length,
+#                                  bin_widths = c(0.01, 1))
+
+$mlebins_fit
+ $b_mle
+ [1] -1.92739
+
+$b_conf
+ [1] -1.93558 -1.91921
+
+$x_min
+[1] 2.00599
+
+$x_max
+[1] 63.67162
+
+```
+
+
+TODO explain
+
+
 
 ```{r, fig}
-plot(res_2)    # still not working though HERE, unlike example from med analysis
+plot(res_3)
 ```
+
+
+
+these might work:
 
 ```{r, figlinear}
 # class(res_2)
 # [1] "determine_xmin_and_fit_mlebins" "list"
-plot(res_2$mlebins_fit,
+plot(res_3$mlebins_fit,
        style = "linear_y_axis")
 ```
 
 ```{r, figlog}
-plot(res_2$mlebins_fit,
+plot(res_3$mlebins_fit,
        style = "log_y_axis")
 ```
 
 
+With the 0.1 mm bins (instead of 0.01 and 1) we now get lots and lots of tiny
+bins.
+
+So prob better off picking another data set that was non crustacea, for which
+all bins are 1 mm.
+
+Acti baseline maybe?  HERE Maybe redo the zabala results with correct length
+resolutions, and then use one as an example. Quick attempt here on Thurs pm:
+
+Quick try, then do big zabala results file: TODO had not taken out big
+organisms, so go back to Zabala pdf, tidy that up (simplify function as
+described above), then come back here and use just one example. Looks too fine
+to use as an example. HERE
+
+```{r actibaseline}
+dat_acti <- dplyr::filter(mediterranean_data,
+                          strata == "baseline",
+                          group == "Actinopterygii")
+dat_acti
+summary(dat_acti)
+
+dat_acti_bin_breaks <- calc_max_of_bin(dat_acti$length,
+                                       bin_widths = 1)
+
+dat_acti_bin_breaks   # looks funny because of rounding
+
+dat_acti_all <- cbind(dat_acti,
+                 dat_acti_bin_breaks) %>%
+  tibble::as_tibble() %>%
+  dplyr::rename(bin_count = number,
+                length_bin_min = bin_min,
+                length_bin_max = bin_max)
+dat_acti_all
+
+dat_acti_joined_3 <- length_bins_to_body_mass_bins(dat_acti_all,
+                                              mediterranean_length_weight_coefficients,
+                                              length_data_unit = "mm")
+dat_acti_joined_3
+summary(dat_acti_joined_3)
+
+res_acti <- determine_xmin_and_fit_mlebins(dat_acti_joined_3)
+res_acti
+
+plot(res_acti)
+
+```
+
+
+
+
 
 TODO put check of column names in `determine_xmin_and_fit_mlebins` or similar;
-need those in the `select` chunk above.
+need those in the `select` chunk above. Think this might be okay now.
+
+
+## Checking lengths -- move to elsewhere, presumably the report.
+
+Had thought that Crustacea are the only ones measured to 0.01 mm, rest are 1 mm.
+
+**All non-crustacea are measured to nearest 1 mm (except one measurement that
+doesn't matter), as verified below.**
+
+Looks like crustacea are not all measured to 0.01 mm though, so look at each strata
+separately (below).
+
+**Conclusion is that
+crustacea in fishing grounds and NTR were measured to nearest 0.1 mm (with a
+very few minor exceptions), while those for baseline were to nearest 0.01 mm.**
+
+[should reorder into usual order when putting into report]
+
+### Crustacea Fishing grounds:
+```{r fgcrustacea2}
+table(dat$length)[1:10]   # crustacea FG, looks like nearest 0.1 mm
+lengths <- as.numeric(names(table(dat$length)))
+to_0.01 <- lengths[which((10 * lengths) %% 1 != 0)]
+dplyr::filter(dat,
+              length %in% to_0.01)
+dplyr::filter(dat,
+              length %in% to_0.01)$length
+```
+So only 5 measurements to 0.01 mm, for one species. Overall, there are:
+```{r onesp}
+nrow(dplyr::filter(dat, species == "Parapenaeus longirostris"))
+```
+measurements for that species. So let's simply just assume all crustacea FG were
+to 0.1 mm (very minor approximation introduced for 5 measurements).
+
+### Crustacea baseline
+```{r crustaceabaseline}
+crust_baseline <- dplyr::filter(mediterranean_data,
+                                strata == "baseline",
+                                group == "Crustacea")
+crust_baseline
+
+table(crust_baseline$length)[1:100]   # looks like nearest 0.01 mm
+lengths <- as.numeric(names(table(crust_baseline$length)))
+to_0.01 <- lengths[which((10 * lengths) %% 1 != 0)]
+dplyr::filter(crust_baseline,
+              length %in% to_0.01)
+dplyr::filter(crust_baseline,
+              length %in% to_0.01) %>% summary()
+sp_to_0.01 <- dplyr::filter(crust_baseline,
+                            length %in% to_0.01)$species %>% unique()
+
+# Not to_0.01:
+dplyr::filter(crust_baseline,
+              !(length %in% to_0.01)) %>% summary()
+sp_not_to_0.01 <- dplyr::filter(crust_baseline,
+                                !(length %in% to_0.01))$species %>% unique()
+
+intersect(sp_to_0.01, sp_not_to_0.01)
+setdiff(sp_to_0.01, sp_not_to_0.01)
+setdiff(sp_not_to_0.01, sp_to_0.01)
+dplyr::filter(crust_baseline,
+              species %in% setdiff(sp_not_to_0.01, sp_to_0.01))
+
+```
+So lots of measurements to 0.01 mm, looks like a mixture of species, and the
+ones that are only not to 0.01 (final tibble) is only 21 rows.
+
+So just assume all measurements are to 0.01 mm, as only a few that seem to be
+possibly to 0.1mm, and only 21 measurements then.
+
+
+### Crustacea ntr
+```{r crustaceantr}
+crust_ntr <- dplyr::filter(mediterranean_data,
+                                strata == "ntr",
+                                group == "Crustacea")
+crust_ntr
+
+table(crust_ntr$length)[1:100]   # looks like nearest 0.1 mm
+lengths <- as.numeric(names(table(crust_ntr$length)))
+to_0.01 <- lengths[which((10 * lengths) %% 1 != 0)]
+dplyr::filter(crust_ntr,
+              length %in% to_0.01)
+sp_to_0.01 <- dplyr::filter(crust_ntr,
+                            length %in% to_0.01)$species %>% unique()
+sp_to_0.01
+# Not to_0.01:
+dplyr::filter(crust_ntr,
+              !(length %in% to_0.01)) %>% summary()
+sp_not_to_0.01 <- dplyr::filter(crust_ntr,
+                                !(length %in% to_0.01))$species %>% unique()
+
+intersect(sp_to_0.01, sp_not_to_0.01)
+
+dplyr::filter(crust_ntr,
+              length %in% to_0.01)
+dplyr::filter(crust_ntr,
+              length %in% to_0.01)$length
+```
+So only two species that seem to be to 0.01, but are also measured to 0.1 it
+seems.
+
+So let's simply just assume all crustacea ntr were
+to 0.1 mm (very minor approximation introduced for 3 measurements).
+
+### Non-crustacea
+
+```{r noncrustacea}
+non_crust <- dplyr::filter(mediterranean_data,
+                           group != "Crustacea")
+non_crust
+
+table(non_crust$length)[1:100]   # looks like nearest 1 mm, except first one
+lengths <- as.numeric(names(table(non_crust$length)))
+to_0.01 <- lengths[which((10 * lengths) %% 1 != 0)]
+to_0.01   # none
+to_0.1 <- lengths[which(lengths %% 1 != 0)]
+to_0.1
+
+dplyr::filter(non_crust,
+              length %in% to_0.1)
+```
+So only one non-crustacean measurement to 0.1 mm, and it's the smalles, and so
+will get removed anyway most likely. So just assume all non-crustacea were
+indeed measured to nearest 1 mm.
+
+
 
 ```{r, exit}
 knitr::knit_exit()
@@ -460,8 +598,6 @@ plot(res_mlebin,
 See `?plot.size_spectrum_numeric` for details.
 TODO and _MLEbin? Don't expect so as help should  link them.
 
-
-HERE
 
  D make a general `calc_mle_conf` function based on previous `calcLike` (see
    `fit-size-spectrum.numeric.R` also, and move some ideas from that into
