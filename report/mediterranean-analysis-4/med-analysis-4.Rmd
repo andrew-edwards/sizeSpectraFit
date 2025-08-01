@@ -11,8 +11,8 @@ knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "",
   cache = TRUE,
-  cache_path = "med-analysis-cache/",
-  fig.path = "med-analysis-figs-cache/",
+  cache_path = "med-analysis-4-cache/",
+  fig.path = "med-analysis-4-figs-cache/",
   fig.width = 7,
   fig.height = 9
 )
@@ -21,7 +21,7 @@ knitr::opts_chunk$set(
 
 ```{r, build, echo = FALSE, eval = FALSE}
 # To build either run this line or click knit button in RStudio:
-rmarkdown::render("med-analysis.Rmd")
+rmarkdown::render("med-analysis-4.Rmd")
 ```
 
 ```{r, packages, echo = FALSE, cache = FALSE}
@@ -30,7 +30,10 @@ load_all()
 #library(sizeSpectra2)    # Need latest version
 ```
 
-This is after setting xmin to be the min `bin_min` value above the histogram
+When doing the MLEbins vignette realised that had not properly considered the
+length resolutions. Did some analysis (copied to here), so need to rerun all these.
+
+For analysis-3, this is after setting xmin to be the min `bin_min` value above the histogram
 determined minimum. Now removing the big fish. For Actin, big fish are very
 rare, not really sampling for them. Bit random to catch
 them, so suggest removing. We agreed a cut off of 1500 g because of the gaps
@@ -68,13 +71,17 @@ combination. The data can have repeated measurements for the same
 strata-group-length combination. We will aggregate such examples at the analysis
 stage.
 
-Second piece is the definition of lengths. They are in mm, with integers measured to nearest mm and ones
+Second piece is the definition of lengths. They are in mm. I had originally
+misintepreted as integers measured to nearest mm and ones
 with decimals assumed to be measured to 0.01 mm (assuming this will mis-specify, presumably
 1%, a few mm ones,
-but that's okay). And the lengths assumed to be midpoints (e.g. 10 mm represents
+but that's okay). But it's group-specific, as investigated below.
+
+Lengths are assumed to be midpoints (e.g. 10 mm represents
 9.5-10.5 mm).
 
-Juliana: The lengths with 0.01mm accuracy are all measured crustaceans, as
+Juliana: The lengths with 0.01mm accuracy are all measured crustaceans [Andy:
+but it turns out that not all crustaceans are measured to 0.01 mm, see below], as
 they're typically small and its the standard to measure them with a vernier
 caliper. All other species were measured to the 1mm accuracy, as we used a
 standard lab metric tape. So if we have 27 its correct to say it is 27.00. With
@@ -91,6 +98,135 @@ Thirdly, we have species-specific length-weight coefficients.
 mediterranean_length_weight_coefficients
 ```
 which assume units of cm (not mm) and grammes.
+
+
+## Investigate resolutions of length measurements
+
+## Checking lengths -- move to elsewhere, presumably the report.
+
+Had thought that Crustacea are the only ones measured to 0.01 mm, rest are 1 mm.
+
+**All non-crustacea are measured to nearest 1 mm (except one measurement that
+doesn't matter), as verified below.**
+
+Looks like crustacea are not all measured to 0.01 mm though, so look at each strata
+separately (below).
+
+**Conclusion is that
+crustacea in fishing grounds and NTR were measured to nearest 0.1 mm (with a
+very few minor exceptions), while those for baseline were to nearest 0.01 mm.**
+
+[should reorder into usual order when putting into report]
+
+### Crustacea Fishing grounds:
+```{r fgcrustacea2}
+table(dat$length)[1:10]   # crustacea FG, looks like nearest 0.1 mm
+lengths <- as.numeric(names(table(dat$length)))
+to_0.01 <- lengths[which((10 * lengths) %% 1 != 0)]
+dplyr::filter(dat,
+              length %in% to_0.01)
+dplyr::filter(dat,
+              length %in% to_0.01)$length
+```
+So only 5 measurements to 0.01 mm, for one species. Overall, there are:
+```{r onesp}
+nrow(dplyr::filter(dat, species == "Parapenaeus longirostris"))
+```
+measurements for that species. So let's simply just assume all crustacea FG were
+to 0.1 mm (very minor approximation introduced for 5 measurements).
+
+### Crustacea baseline
+```{r crustaceabaseline}
+crust_baseline <- dplyr::filter(mediterranean_data,
+                                strata == "baseline",
+                                group == "Crustacea")
+crust_baseline
+
+table(crust_baseline$length)[1:100]   # looks like nearest 0.01 mm
+lengths <- as.numeric(names(table(crust_baseline$length)))
+to_0.01 <- lengths[which((10 * lengths) %% 1 != 0)]
+dplyr::filter(crust_baseline,
+              length %in% to_0.01)
+dplyr::filter(crust_baseline,
+              length %in% to_0.01) %>% summary()
+sp_to_0.01 <- dplyr::filter(crust_baseline,
+                            length %in% to_0.01)$species %>% unique()
+
+# Not to_0.01:
+dplyr::filter(crust_baseline,
+              !(length %in% to_0.01)) %>% summary()
+sp_not_to_0.01 <- dplyr::filter(crust_baseline,
+                                !(length %in% to_0.01))$species %>% unique()
+
+intersect(sp_to_0.01, sp_not_to_0.01)
+setdiff(sp_to_0.01, sp_not_to_0.01)
+setdiff(sp_not_to_0.01, sp_to_0.01)
+dplyr::filter(crust_baseline,
+              species %in% setdiff(sp_not_to_0.01, sp_to_0.01))
+
+```
+So lots of measurements to 0.01 mm, looks like a mixture of species, and the
+ones that are only not to 0.01 (final tibble) is only 21 rows.
+
+So just assume all measurements are to 0.01 mm, as only a few that seem to be
+possibly to 0.1mm, and only 21 measurements then.
+
+
+### Crustacea ntr
+```{r crustaceantr}
+crust_ntr <- dplyr::filter(mediterranean_data,
+                                strata == "ntr",
+                                group == "Crustacea")
+crust_ntr
+
+table(crust_ntr$length)[1:100]   # looks like nearest 0.1 mm
+lengths <- as.numeric(names(table(crust_ntr$length)))
+to_0.01 <- lengths[which((10 * lengths) %% 1 != 0)]
+dplyr::filter(crust_ntr,
+              length %in% to_0.01)
+sp_to_0.01 <- dplyr::filter(crust_ntr,
+                            length %in% to_0.01)$species %>% unique()
+sp_to_0.01
+# Not to_0.01:
+dplyr::filter(crust_ntr,
+              !(length %in% to_0.01)) %>% summary()
+sp_not_to_0.01 <- dplyr::filter(crust_ntr,
+                                !(length %in% to_0.01))$species %>% unique()
+
+intersect(sp_to_0.01, sp_not_to_0.01)
+
+dplyr::filter(crust_ntr,
+              length %in% to_0.01)
+dplyr::filter(crust_ntr,
+              length %in% to_0.01)$length
+```
+So only two species that seem to be to 0.01, but are also measured to 0.1 it
+seems.
+
+So let's simply just assume all crustacea ntr were
+to 0.1 mm (very minor approximation introduced for 3 measurements).
+
+### Non-crustacea
+
+```{r noncrustacea}
+non_crust <- dplyr::filter(mediterranean_data,
+                           group != "Crustacea")
+non_crust
+
+table(non_crust$length)[1:100]   # looks like nearest 1 mm, except first one
+lengths <- as.numeric(names(table(non_crust$length)))
+to_0.01 <- lengths[which((10 * lengths) %% 1 != 0)]
+to_0.01   # none
+to_0.1 <- lengths[which(lengths %% 1 != 0)]
+to_0.1
+
+dplyr::filter(non_crust,
+              length %in% to_0.1)
+```
+So only one non-crustacean measurement to 0.1 mm, and it's the smalles, and so
+will get removed anyway most likely. So just assume all non-crustacea were
+indeed measured to nearest 1 mm.
+
 
 
 ## Combine data
