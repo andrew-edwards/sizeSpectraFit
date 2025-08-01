@@ -1,4 +1,9 @@
-##' Calculate the maximum value of each bin minimum or midpoint)
+##' Calculate the maximum value of each bin minimum or midpoint
+##'
+##' Likely deprecated, see [calc_bin_breaks()]. TODO decide if want to keep
+##' this, keep the 0.01/1 code somewhere in case want to incorporate it, though
+##' splitting up like I'm doing for Med data seems best. Actually, might need it
+##' for that, just need to change name maybe.
 ##'
 ##' Given a vector of values representing either the midpoint or the minimum of
 ##' each bin, calculate the correponding maximum value of each bin. The defined
