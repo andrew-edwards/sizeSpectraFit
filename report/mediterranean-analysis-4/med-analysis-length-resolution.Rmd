@@ -1,5 +1,5 @@
 ---
-title: "Analysing Mediterranean data using MLEbins"
+title: "Determining length resolutions for Mediterranean data"
 author: "Andrew Edwards and Juliana Zabala"
 output: pdf_document
 fontsize: 12pt
@@ -10,9 +10,9 @@ date: "Last compiled on `r format(Sys.time(), '%d %B, %Y')`"
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "",
-  cache = TRUE,
-  cache_path = "med-analysis-4-cache/",
-  fig.path = "med-analysis-4-figs-cache/",
+  cache = FALSE,
+  cache_path = "med-analysis-length-resolution-cache/",
+  fig.path = "med-analysis-length-resolution-figs-cache/",
   fig.width = 7,
   fig.height = 9
 )
@@ -21,7 +21,7 @@ knitr::opts_chunk$set(
 
 ```{r, build, echo = FALSE, eval = FALSE}
 # To build either run this line or click knit button in RStudio:
-rmarkdown::render("med-analysis-4.Rmd")
+rmarkdown::render("med-analysis-length-resolution.Rmd")
 ```
 
 ```{r, packages, echo = FALSE, cache = FALSE}
@@ -30,49 +30,31 @@ load_all()
 #library(sizeSpectra2)    # Need latest version
 ```
 
-When doing the MLEbins vignette realised that had not properly considered the
-length resolutions. Did some analysis (copied to here), so need to rerun all these.
+When doing the MLEbins vignette Andy realised that he had not properly considered the
+length resolutions. Doing the analysis here.
 
-For analysis-3, this is after setting xmin to be the min `bin_min` value above the histogram
-determined minimum. Now removing the big fish. For Actin, big fish are very
-rare, not really sampling for them. Bit random to catch
-them, so suggest removing. We agreed a cut off of 1500 g because of the gaps
-in the sizes. Nothing between 1335 and 2396, clear gap. Can see details below.
+Summary (from the analyses below):
 
-Data are saved in the package. Doing MLEbins on full community and then each
-species group in turn. Not worth fully functionalising as have to manually check
-some things.
+**Crustacea for baseline were to nearest 0.01 mm, while crustacea for FG and NTR
+were measured to nearest 0.1 mm (with a very few minor exceptions).**
 
-In earlier analysis we had looked at determining a global xmin and xmax within
-each strata, but this ends up throwing out a lot of data (lots of small fish),
-so going to stick with determining xmin using the modal approach independently
-for each strata within a group. This is what we did for the North Sea data in
-the MEPS paper.
+**All non-crustacea are measured to nearest 1 mm (except one measurement that
+doesn't matter), as verified below.**
 
-Copy and pasting analysis for a particular species group, then just find and
-replacing the group name and the short name. Need to examine results and so
-can't just make one giant function. The later groups are probably best to use as
-templates as the analyses and code got refined along the way.
 
 ## Data
 
-We have data and the length-weight coefficients saved in a standard form in the
-package, and also knowledge of the accuracty of the measurements. We need to
-combine these to get the inputs required for MLEbins, namely counts in each
-species-specific weight bin.
-
-So we have three pieces of information. First is the measurements:
+Raw data of measurement are saved in the package as:
 ```{r medcalcs}
+options(pillar.sigfig = 7)   # show 7 sig figs when printing tibbles
 mediterranean_data
 summary(mediterranean_data)
 ```
 which we want to fit the size spectrum for each strata-group
-combination. The data can have repeated measurements for the same
-strata-group-length combination. We will aggregate such examples at the analysis
-stage.
+combination.
 
-Second piece is the definition of lengths. They are in mm. I had originally
-misintepreted as integers measured to nearest mm and ones
+Lengths are in mm. I had originally
+misintepreted values as integer lengths assumed to be measured to nearest mm and lengths
 with decimals assumed to be measured to 0.01 mm (assuming this will mis-specify, presumably
 1%, a few mm ones,
 but that's okay). But it's group-specific, as investigated below.
@@ -80,38 +62,21 @@ but that's okay). But it's group-specific, as investigated below.
 Lengths are assumed to be midpoints (e.g. 10 mm represents
 9.5-10.5 mm).
 
-Juliana: The lengths with 0.01mm accuracy are all measured crustaceans [Andy:
+Juliana had said: The lengths with 0.01mm accuracy are all measured crustaceans [Andy:
 but it turns out that not all crustaceans are measured to 0.01 mm, see below], as
 they're typically small and its the standard to measure them with a vernier
 caliper. All other species were measured to the 1mm accuracy, as we used a
 standard lab metric tape. So if we have 27 its correct to say it is 27.00. With
 this in mind, I would define b) 26.5 - 27.5 mm as the bin value for 27.00.
 
-And for the 0.01 mm accuracy it really isn't going to make much difference
+For the 0.01 mm accuracy it really isn't going to make much difference
 exactly how
 we define the bin, so say 26.13 is 26.125-26.135 for consistency. (Have to
-assume this for `calc_max_of_bin()` and need a weight range for each length).
-
-
-Thirdly, we have species-specific length-weight coefficients.
-```{r lwcoeffs}
-mediterranean_length_weight_coefficients
-```
-which assume units of cm (not mm) and grammes.
-
+assume this for `calc_max_of_bin()` and need a weight range for each length for MLEbins).
 
 ## Investigate resolutions of length measurements
 
-Summary (from the analyses below):
-
-**All non-crustacea are measured to nearest 1 mm (except one measurement that
-doesn't matter), as verified below.**
-
-**Crustacea in fishing grounds and NTR were measured to nearest 0.1 mm (with a
-very few minor exceptions), while those for baseline were to nearest 0.01 mm.**
-
-
-[should reorder into usual order when putting into report]
+Need to investigate each strata of crustacea, and then everything else.
 
 ### Crustacea baseline
 
@@ -121,7 +86,18 @@ crust_baseline <- dplyr::filter(mediterranean_data,
                                 group == "Crustacea")
 crust_baseline
 
-table(crust_baseline$length)[1:100]   # looks like nearest 0.01 mm
+table(crust_baseline$length)[1:100]      # looks like nearest 0.01 mm, though
+                                         # quite a few 0.1 mm
+
+table(crust_baseline$length)[998:1097]   # looks like nearest 0.01 mm
+```
+
+That first table looks like quite a few 0.1 mm, but turns out only for a few
+species and not loads of measurements (see below).
+
+Species measured to 0.01:
+
+```{r, crustaceabasline2}
 lengths <- as.numeric(names(table(crust_baseline$length)))
 to_0.01 <- lengths[which((10 * lengths) %% 1 != 0)]
 dplyr::filter(crust_baseline,
@@ -130,25 +106,52 @@ dplyr::filter(crust_baseline,
               length %in% to_0.01) %>% summary()
 sp_to_0.01 <- dplyr::filter(crust_baseline,
                             length %in% to_0.01)$species %>% unique()
+sp_to_0.01
+```
 
-# Not to_0.01:
+Species not measured to 0.01:
+```{r, crustaceabaseline3}
+dplyr::filter(crust_baseline,
+              !(length %in% to_0.01))
+
 dplyr::filter(crust_baseline,
               !(length %in% to_0.01)) %>% summary()
+```
+
+So quite a few rows of measurements, about half of the number for 0.01
+resolution.
+
+```{r, crustaceabaseline4}
 sp_not_to_0.01 <- dplyr::filter(crust_baseline,
                                 !(length %in% to_0.01))$species %>% unique()
+sp_not_to_0.01
 
 intersect(sp_to_0.01, sp_not_to_0.01)
-setdiff(sp_to_0.01, sp_not_to_0.01)
-setdiff(sp_not_to_0.01, sp_to_0.01)
+
+setdiff(sp_to_0.01, sp_not_to_0.01)   # sp in first but not in second vector; so sp
+                                      # measured to 0.01 but never seem to be
+                                      # measured to 0.1 (bit surprising this is
+                                      # empty, since 1 in 100 of the first would
+                                      # look like it's measured to 0.1)
+
+setdiff(sp_not_to_0.01, sp_to_0.01)   # sp measured to 0.1 that don't seem to
+                                      # get measured to 0.01
+
 dplyr::filter(crust_baseline,
-              species %in% setdiff(sp_not_to_0.01, sp_to_0.01))
+              species %in% setdiff(sp_not_to_0.01, sp_to_0.01)) %>%
+  dplyr::arrange(species) %>%
+  a()
 
 ```
 So lots of measurements to 0.01 mm, looks like a mixture of species, and the
-ones that are only not to 0.01 (final tibble) is only 21 rows.
+ones that are always to 0.1 (final tibble) is only 21 rows of measurements.
 
 So just assume all measurements are to 0.01 mm, as only a few that seem to be
 possibly to 0.1mm, and only 21 measurements then.
+
+Seems conceivable that there might be some species that were measured sometimes to 0.01 and
+sometimes to 0.1, but would have to examine by trawl which we don't have.
+
 
 ### Crustacea fishing grounds
 
@@ -157,7 +160,7 @@ crust_fg <- dplyr::filter(mediterranean_data,
                           strata == "fg",
                           group == "Crustacea")
 
-table(crust_fg$length)[1:10]   # crustacea FG, looks like nearest 0.1 mm
+table(crust_fg$length)[1:100]   # crustacea FG, looks like nearest 0.1 mm
 lengths <- as.numeric(names(table(crust_fg$length)))
 to_0.01 <- lengths[which((10 * lengths) %% 1 != 0)]
 dplyr::filter(crust_fg,
@@ -172,6 +175,7 @@ nrow(dplyr::filter(crust_fg, species == "Parapenaeus longirostris"))
 ```
 measurements for that species. So let's simply just assume all crustacea FG were
 to 0.1 mm (very minor approximation introduced for 5 measurements).
+
 
 ### Crustacea ntr
 
@@ -188,25 +192,15 @@ dplyr::filter(crust_ntr,
               length %in% to_0.01)
 sp_to_0.01 <- dplyr::filter(crust_ntr,
                             length %in% to_0.01)$species %>% unique()
-sp_to_0.01
-# Not to_0.01:
-dplyr::filter(crust_ntr,
-              !(length %in% to_0.01)) %>% summary()
-sp_not_to_0.01 <- dplyr::filter(crust_ntr,
-                                !(length %in% to_0.01))$species %>% unique()
-
-intersect(sp_to_0.01, sp_not_to_0.01)
-
-dplyr::filter(crust_ntr,
-              length %in% to_0.01)
-dplyr::filter(crust_ntr,
-              length %in% to_0.01)$length
 ```
-So only two species that seem to be to 0.01, but are also measured to 0.1 it
-seems (i.e. not consistent).
-
-So let's simply just assume all crustacea ntr were
-to 0.1 mm (very minor approximation introduced for 3 measurements).
+So only 3 measurements to 0.01 mm, for two different species. Overall, there are:
+```{r twosp}
+nrow(dplyr::filter(crust_fg, species == sp_to_0.01[1]))
+nrow(dplyr::filter(crust_fg, species == sp_to_0.01[2]))
+```
+total measurement for those two species. So as for crustacea FG, simply assume
+all crustacea NTR were to 0.1 mm
+(very minor approximation introduced for 3 measurements).
 
 ### Non-crustacea
 
@@ -226,775 +220,7 @@ dplyr::filter(non_crust,
               length %in% to_0.1)
 ```
 So only one non-crustacean measurement to 0.1 mm, and it's the smallest, and so
-will get removed anyway most likely. So just assume all non-crustacea were
-indeed measured to nearest 1 mm.
+will get removed anyway (it has in the analysis where I had the length
+resolutions not quite right, so will again).
 
-
-```{r, exit, cache = FALSE}
-knitr::knit_exit()
-```
-
-
-
-## Combine data - need to do this for each data set in turn given different bin widths
-
-Could functionalise this, but worth doing in steps since other data sets will
-have subtleties specific to them.
-
-Note the 10 needed to convert mm lengths into weights based on length-weight
-coefficients that assume cm.
-
-TODO rewrite function also (see vignette comment)
-
-```{r onestratagroup}
-dat_bin_breaks <- calc_max_of_bin(mediterranean_data$length,
-                                  bin_widths = c(0.01, 1))
-dat_bin_breaks
-
-dat_all <- cbind(mediterranean_data,
-                 dat_bin_breaks) %>%
-  tibble::as_tibble() %>%
-  dplyr::rename(length_bin_min = bin_min,
-                length_bin_max = bin_max)
-
-dat_joined <- dplyr::left_join(dat_all,
-                               mediterranean_length_weight_coefficients,
-                               by = "species") %>%
-  dplyr::mutate(weight_bin_min = alpha * (length_bin_min/10)^beta,
-                weight_bin_max = alpha * (length_bin_max/10)^beta) %>%
-  # remove species with no length-weight coefficients:
-  dplyr::filter(!is.na(alpha))
-
-dat_joined[1:5, ] %>% a()
-```
-
-Useful for users to see all the values, even though only some of it is
-needed for the likelihood fitting.
-
-There are very few large individuals, and these are all fish:
-```{r, largefish}
-dplyr::arrange(dat_joined, weight_bin_min) %>%
-  dplyr::select(-c("length", "length_bin_min", "length_bin_max", "alpha",
-                   "beta", "weight_bin_max")) %>%
-    tail(n=25) %>%
-    a()
-```
-
-Can see a gradual increase in weights, but then a clear jump between 1334
-and 2395. The largest 12 measurements are all occasional rare individual fish,
-which are going to be sporadically caught. Given that, and the big jump, we
-determined that removing fish $>1500$~g is a sensible thing to do. Do it here in
-the data processing stage so it's done throughout.
-
-```{r, largefish2}
-dat_joined <- dplyr::filter(dat_joined,
-                            weight_bin_min <= 1500)
-```
-That will get used in all the analyses.
-
-\clearpage
-
-
-# Full community
-
-Doing full community of values, which is okay because the sampling protocol
-(trawl fishing) is the same
-for each species group and the counts are standardised to be numbers per
-km$^2$. For species groups, copying and pasting the analyses and then just
-changing the group names (need to see everything and not worth it to functionalise
-it all).
-
-## Full Community baseline
-
-```{r, fullbaseline}
-# This function extracts the required data and returns what is needed for
-# MLEbins; keeps species column for understanding even though not strictly
-# needed for MLEbins.
-data_full_baseline <- mediterranean_for_mlebins(dat_joined,
-                                                strata_name = "baseline")
-
-res_full_baseline <- determine_xmin_and_fit_mlebins(data_full_baseline)
-
-res_full_baseline$mlebins_fit      # full list includes histogram values which
-                                   # are not a tibble (am printing them all for
-                                   # some later species groups).
-```
-
-```{r, fullbaselineplot}
-plot(res_full_baseline,
-     xlim_hist = c(0, 60),
-     main = "Full Community baseline")
-```
-
-## Full Community fg
-
-```{r, fullfg}
-data_full_fg <- mediterranean_for_mlebins(dat_joined,
-                                                strata_name = "fg")
-
-res_full_fg <- determine_xmin_and_fit_mlebins(data_full_fg)
-
-res_full_fg$mlebins_fit      # full list includes histogram values which
-                                   # are not a tibble (am printing them all for
-                                   # some later species groups).
-```
-
-```{r, fullfgplot}
-plot(res_full_fg,
-     xlim_hist = c(0, 60),
-     main = "Full Community FG")
-```
-
-## Full Community ntr
-
-```{r, fullntr}
-data_full_ntr <- mediterranean_for_mlebins(dat_joined,
-                                                strata_name = "ntr")
-
-res_full_ntr <- determine_xmin_and_fit_mlebins(data_full_ntr)
-
-res_full_ntr$mlebins_fit      # full list includes histogram values which
-                                   # are not a tibble (am printing them all for
-                                   # some later species groups).
-```
-
-```{r, fullntrplot}
-plot(res_full_ntr,
-     xlim_hist = c(0, 60),
-     main = "Full Community NTR")
-```
-
-Now to compare the three strata for full community.
-
-TODO move to a function
-```{r, fullsumm}
-add_row_to_summary_table <- function(summary, res, group, strata){
-  rbind(summary,
-        dplyr::tibble("Group" = group,
-                      "Strata" = strata,
-                      "x_min" = res$mlebins_fit$x_min,
-                      "x_max" = res$mlebins_fit$x_max,
-                      "Low b" = res$mlebins_fit$b_conf[1],
-                      "MLE b" = res$mlebins_fit$b_mle,
-                      "High b" = res$mlebins_fit$b_conf[2]))
-}
-
-res_table_full <- dplyr::tibble()
-res_table_full <- add_row_to_summary_table(res_table_full,
-                                      res_full_baseline,
-                                      "Full community",
-                                      "Baseline")
-
-res_table_full <- add_row_to_summary_table(res_table_full,
-                                      res_full_fg,
-                                      "Full community",
-                                      "fg")
-res_table_full <- add_row_to_summary_table(res_table_full,
-                                      res_full_ntr,
-                                      "Full community",
-                                      "ntr")
-```
-
-Results combined are:
-
-```{r, resfulltable}
-knitr::kable(res_table_full, digits = 2)
-```
-
-
-TODO edit and summarise: Also, the results show clear distinct ranges of data.
-
-
-\clearpage
-
-# Crustacea
-
-## Crustacea baseline
-
-```{r, crustbaseline}
-data_crust_baseline <- mediterranean_for_mlebins(dat_joined,
-                                                 group_name = "Crustacea",
-                                                 strata_name = "baseline")
-
-res_crust_baseline <- determine_xmin_and_fit_mlebins(data_crust_baseline)
-
-res_crust_baseline$mlebins_fit
-```
-
-```{r, crustbaselineplot}
-plot(res_crust_baseline,
-     xlim_hist = c(0, 60),
-     main = "Crustacea baseline")
-```
-
-## Crustacea FG
-
-```{r, crustfg}
-data_crust_fg <- mediterranean_for_mlebins(dat_joined,
-                                           group_name = "Crustacea",
-                                           strata_name = "fg")
-
-res_crust_fg <- determine_xmin_and_fit_mlebins(data_crust_fg)
-
-res_crust_fg$mlebins_fit
-```
-
-```{r, crustfgplot}
-plot(res_crust_fg,
-     xlim_hist = c(0, 60),
-     main = "Crustacea FG")
-```
-
-## Crustacea NTR
-
-```{r, crustntr}
-data_crust_ntr <- mediterranean_for_mlebins(dat_joined,
-                                            group_name = "Crustacea",
-                                            strata_name = "ntr")
-
-res_crust_ntr <- determine_xmin_and_fit_mlebins(data_crust_ntr)
-
-res_crust_ntr$mlebins_fit
-```
-
-```{r, crustntrplot}
-plot(res_crust_ntr,
-     xlim_hist = c(0, 60),
-     main = "Crustacea NTR")
-```
-
-Now to compare the three strata for Crustacea.
-
-```{r, crustsumm}
-res_table_crust <- dplyr::tibble()
-res_table_crust <- add_row_to_summary_table(res_table_crust,
-                                      res_crust_baseline,
-                                      "Crustacea",
-                                      "Baseline")
-
-res_table_crust <- add_row_to_summary_table(res_table_crust,
-                                      res_crust_fg,
-                                      "Crustacea",
-                                      "fg")
-res_table_crust <- add_row_to_summary_table(res_table_crust,
-                                      res_crust_ntr,
-                                      "Crustacea",
-                                      "ntr")
-```
-
-Results combined are:
-
-```{r, rescrusttable}
-knitr::kable(res_table_crust, digits = 2)
-```
-
-# Actinopterygii
-
-## Actinopterygii baseline
-
-```{r, actinbaseline}
-data_actin_baseline <- mediterranean_for_mlebins(dat_joined,
-                                                 group_name = "Actinopterygii",
-                                                 strata_name = "baseline")
-
-res_actin_baseline <- determine_xmin_and_fit_mlebins(data_actin_baseline)
-
-res_actin_baseline$mlebins_fit
-```
-
-```{r, actinbaselineplot}
-plot(res_actin_baseline,
-     xlim_hist = c(0, 60),
-     main = "Actinopterygii baseline")
-```
-
-## Actinopterygii FG
-
-```{r, actinfg}
-data_actin_fg <- mediterranean_for_mlebins(dat_joined,
-                                           group_name = "Actinopterygii",
-                                           strata_name = "fg")
-
-res_actin_fg <- determine_xmin_and_fit_mlebins(data_actin_fg)
-
-res_actin_fg$mlebins_fit
-```
-
-```{r, actinfgplot}
-plot(res_actin_fg,
-     xlim_hist = c(0, 60),
-     main = "Actinopterygii FG")
-```
-
-## Actinopterygii NTR
-
-```{r, actinntr}
-data_actin_ntr <- mediterranean_for_mlebins(dat_joined,
-                                            group_name = "Actinopterygii",
-                                            strata_name = "ntr")
-
-res_actin_ntr <- determine_xmin_and_fit_mlebins(data_actin_ntr)
-
-res_actin_ntr$mlebins_fit
-```
-
-```{r, actinntrplot}
-plot(res_actin_ntr,
-     xlim_hist = c(0, 60),
-     main = "Actinopterygii NTR")
-```
-
-Now to compare the three strata for Actinopterygii.
-
-```{r, actinsumm}
-res_table_actin <- dplyr::tibble()
-res_table_actin <- add_row_to_summary_table(res_table_actin,
-                                      res_actin_baseline,
-                                      "Actinopterygii",
-                                      "Baseline")
-
-res_table_actin <- add_row_to_summary_table(res_table_actin,
-                                      res_actin_fg,
-                                      "Actinopterygii",
-                                      "fg")
-res_table_actin <- add_row_to_summary_table(res_table_actin,
-                                      res_actin_ntr,
-                                      "Actinopterygii",
-                                      "ntr")
-```
-
-Results combined are:
-```{r, resactintable}
-knitr::kable(res_table_actin, digits = 2)
-```
-
-\clearpage
-
-# Chondrichthyes
-
-## Chondrichthyes baseline
-
-```{r, chondrbaseline}
-data_chondr_baseline <- mediterranean_for_mlebins(dat_joined,
-                                                 group_name = "Chondrichthyes",
-                                                 strata_name = "baseline")
-
-res_chondr_baseline <- determine_xmin_and_fit_mlebins(data_chondr_baseline)
-
-res_chondr_baseline$mlebins_fit
-```
-
-```{r, chondrbaselineplot}
-plot(res_chondr_baseline,
-     xlim_hist = c(0, 300),
-     main = "Chondrichthyes baseline")
-```
-
-## Chondrichthyes FG
-
-```{r, chondrfg}
-data_chondr_fg <- mediterranean_for_mlebins(dat_joined,
-                                           group_name = "Chondrichthyes",
-                                           strata_name = "fg")
-
-res_chondr_fg <- determine_xmin_and_fit_mlebins(data_chondr_fg)
-
-res_chondr_fg$mlebins_fit
-```
-
-```{r, chondrfgplot}
-plot(res_chondr_fg,
-     xlim_hist = c(0, 300),
-     main = "Chondrichthyes FG")
-```
-
-## Chondrichthyes NTR
-
-```{r, chondrntr}
-data_chondr_ntr <- mediterranean_for_mlebins(dat_joined,
-                                            group_name = "Chondrichthyes",
-                                            strata_name = "ntr")
-
-res_chondr_ntr <- determine_xmin_and_fit_mlebins(data_chondr_ntr)
-
-res_chondr_ntr$mlebins_fit
-```
-
-```{r, chondrntrplot}
-plot(res_chondr_ntr,
-     xlim_hist = c(0, 300),
-     main = "Chondrichthyes NTR")
-```
-
-Now to compare the three strata for Chondrichthyes.
-
-```{r, chondrsumm}
-res_table_chondr <- dplyr::tibble()
-res_table_chondr <- add_row_to_summary_table(res_table_chondr,
-                                      res_chondr_baseline,
-                                      "Chondrichthyes",
-                                      "Baseline")
-res_table_chondr <- add_row_to_summary_table(res_table_chondr,
-                                      res_chondr_fg,
-                                      "Chondrichthyes",
-                                      "fg")
-res_table_chondr <- add_row_to_summary_table(res_table_chondr,
-                                      res_chondr_ntr,
-                                      "Chondrichthyes",
-                                      "ntr")
-```
-
-Results combined are:
-```{r, reschondrtable}
-knitr::kable(res_table_chondr, digits = 2)
-```
-
-
-# Cephalopoda (all)
-
-Analyse the full Cephalopoda data in one go first, but this will show up the
-clear distinction with a gap with very very few individuals. This is due to the
-small and large being different species. Then work out how to split into small
-and large.
-
-## Cephalopoda (all) baseline
-
-```{r, cephallbaseline}
-data_cephall_baseline <- mediterranean_for_mlebins(dat_joined,
-                                                   group_name = "Cephalopoda",
-                                                   strata_name = "baseline")
-
-res_cephall_baseline <- determine_xmin_and_fit_mlebins(data_cephall_baseline)
-
-res_cephall_baseline$mlebins_fit
-```
-
-```{r, cephallbaselineplot}
-plot(res_cephall_baseline,
-     xlim_hist = c(0, 60),
-     main = "Cephalopoda (all) baseline")
-```
-
-## Cephalopoda (all) FG
-
-```{r, cephallfg}
-data_cephall_fg <- mediterranean_for_mlebins(dat_joined,
-                                             group_name = "Cephalopoda",
-                                             strata_name = "fg")
-
-res_cephall_fg <- determine_xmin_and_fit_mlebins(data_cephall_fg)
-
-res_cephall_fg$mlebins_fit
-```
-
-```{r, cephallfgplot}
-plot(res_cephall_fg,
-     xlim_hist = c(0, 60),
-     main = "Cephalopoda (all) FG")
-```
-
-## Cephalopoda (all) NTR
-
-```{r, cephallntr}
-data_cephall_ntr <- mediterranean_for_mlebins(dat_joined,
-                                            group_name = "Cephalopoda",
-                                            strata_name = "ntr")
-
-res_cephall_ntr <- determine_xmin_and_fit_mlebins(data_cephall_ntr)
-
-res_cephall_ntr$mlebins_fit
-```
-
-```{r, cephallntrplot}
-plot(res_cephall_ntr,
-     xlim_hist = c(0, 60),
-     main = "Cephalopoda (all) NTR")
-```
-
-Now to compare the three strata for Cephalopoda (all).
-
-```{r, cephallsumm}
-res_table_cephall <- dplyr::tibble()
-res_table_cephall <- add_row_to_summary_table(res_table_cephall,
-                                      res_cephall_baseline,
-                                      "Cephalopoda all",
-                                      "Baseline")
-
-res_table_cephall <- add_row_to_summary_table(res_table_cephall,
-                                      res_cephall_fg,
-                                      "Cephalopoda all",
-                                      "fg")
-res_table_cephall <- add_row_to_summary_table(res_table_cephall,
-                                      res_cephall_ntr,
-                                      "Cephalopoda all",
-                                      "ntr")
-```
-
-Results combined are:
-
-```{r, rescephalltable}
-knitr::kable(res_table_cephall, digits = 2)
-```
-
-## Determine cephalopod small/large cutoff
-
-Now repeat the above for small and large separately, since the
-first baseline plot clearly suggests a natural break. Explicitly this is at
-20.89, with fg and ntr saying maybe something similar. 24 might be a sensible
-consistent way of breaking up the data, but 20.89 seems more
-obvious and occurs for all (so makes sense to use it for xmin).
-Specifically 20.892555.... And doing $\geq$ that value for large.
-
-Here are all the data:
-```{r, cephallbaselinebreak}
-dplyr::arrange(data_cephall_baseline, bin_min) %>% a()
-
-dplyr::arrange(data_cephall_fg, bin_min) %>% a()
-
-dplyr::arrange(data_cephall_ntr, bin_min) %>% a()
-
-# And the rows in each for that xmin suggestion are:
-ceph_small_large_delineation <- dplyr::filter(data_cephall_baseline,
-                                              species == "Illex coindetii",
-                                              bin_min > 20,
-                                              bin_min < 21)$bin_min  # to get
-                                              # the exact value
-
-ceph_small_large_delineation
-
-dplyr::filter(data_cephall_baseline,
-              species == "Illex coindetii",
-              bin_min == ceph_small_large_delineation)
-dplyr::filter(data_cephall_fg,
-              species == "Illex coindetii",
-              bin_min == ceph_small_large_delineation)
-dplyr::filter(data_cephall_ntr,
-              species == "Illex coindetii",
-              bin_min == ceph_small_large_delineation)
-```
-
-Okay, use that for delineating small/big organisms. Use that to define the data
-to be analysed, still determine xmin and xmax in the usual way.
-
-## Cephalopoda (small) baseline
-
-```{r, cephsmallbaseline}
-data_cephsmall_baseline <- dplyr::filter(data_cephall_baseline,
-                                         bin_min < ceph_small_large_delineation)
-
-# check:  TODO put this back in, well run first. Don't want to crash without
-# checking first.
-# max(data_cephsmall_baseline$weight_bin_min)
-
-res_cephsmall_baseline <-
-  determine_xmin_and_fit_mlebins(data_cephsmall_baseline)
-```
-
-```{r, cephsmallbaselineplot}
-plot(res_cephsmall_baseline,
-     xlim_hist = c(0, 21),
-     main = "Cephalopoda (small) baseline")
-```
-
-## Cephalopoda (small) FG with fixed xmin and
-
-```{r, cephsmallfg}
-data_cephsmall_fg <- dplyr::filter(data_cephall_fg,
-                                   bin_min < ceph_small_large_delineation)
-
-res_cephsmall_fg <- determine_xmin_and_fit_mlebins(data_cephsmall_fg)
-```
-
-```{r, cephsmallfgplot}
-plot(res_cephsmall_fg,
-     xlim_hist = c(0, 21),
-     main = "Cephalopoda (small) FG")
-```
-
-## Cephalopoda (small) NTR with fixed xmin and
-
-```{r, cephsmallbaeline}
-data_cephsmall_ntr <- dplyr::filter(data_cephall_ntr,
-                                    bin_min < ceph_small_large_delineation)
-
-res_cephsmall_ntr <- determine_xmin_and_fit_mlebins(data_cephsmall_ntr)
-```
-
-```{r, cephsmallntrplot}
-plot(res_cephsmall_ntr,
-     xlim_hist = c(0, 21),
-     main = "Cephalopoda (small) NTR")
-```
-
-Now to compare the three strata for Cephalopoda (small):
-
-```{r, cephsmallsumm}
-res_table_cephsmall <- dplyr::tibble()
-res_table_cephsmall <- add_row_to_summary_table(res_table_cephsmall,
-                                      res_cephsmall_baseline,
-                                      "Cephalopoda small",
-                                      "Baseline")
-
-res_table_cephsmall <- add_row_to_summary_table(res_table_cephsmall,
-                                      res_cephsmall_fg,
-                                      "Cephalopoda small",
-                                      "fg")
-res_table_cephsmall <- add_row_to_summary_table(res_table_cephsmall,
-                                      res_cephsmall_ntr,
-                                      "Cephalopoda small",
-                                      "ntr")
-```
-
-Results combined are:
-
-```{r, rescephsmalltable}
-knitr::kable(res_table_cephsmall, digits = 2)
-```
-
-## Global xmin and  for Cephalopoda (large)
-
-
-## Cephalopoda (large) baseline with fixed xmin and
-
-```{r, cephlargebaseline}
-data_cephlarge_baseline <- dplyr::filter(data_cephall_baseline,
-                                         bin_min >= ceph_small_large_delineation)
-# TODO check the smallest ones are in; should be
-
-res_cephlarge_baseline <-
-  determine_xmin_and_fit_mlebins(data_cephlarge_baseline)
-```
-
-
-```{r, cephlargebaselineplot}
-plot(res_cephlarge_baseline,
-     xlim_hist = c(0, 100),
-     main = "Cephalopoda (large) baseline")
-```
-
-## Cephalopoda (large) FG with fixed xmin and
-
-```{r, cephlargefg}
-data_cephlarge_fg <- dplyr::filter(data_cephall_fg,
-                                   bin_min >= ceph_small_large_delineation)
-
-res_cephlarge_fg <- determine_xmin_and_fit_mlebins(data_cephlarge_fg)
-```
-
-```{r, cephlargefgplot}
-plot(res_cephlarge_fg,
-     xlim_hist = c(0, 100),
-     main = "Cephalopoda (large) FG")
-```
-
-## Cephalopoda (large) NTR with fixed xmin and
-
-```{r, cephlargebaeline}
-data_cephlarge_ntr <- dplyr::filter(data_cephall_ntr,
-                                    bin_min >= ceph_small_large_delineation)
-
-res_cephlarge_ntr <- determine_xmin_and_fit_mlebins(data_cephlarge_ntr)
-```
-
-```{r, cephlargentrplot}
-plot(res_cephlarge_ntr,
-     xlim_hist = c(0, 100),
-     main = "Cephalopoda (large) NTR")
-```
-
-Now to compare the three strata for Cephalopoda (large):
-
-```{r, cephlargesummfix}
-res_table_cephlarge <- dplyr::tibble()
-res_table_cephlarge <- add_row_to_summary_table(res_table_cephlarge,
-                                      res_cephlarge_baseline,
-                                      "Cephalopoda large",
-                                      "Baseline")
-
-res_table_cephlarge <- add_row_to_summary_table(res_table_cephlarge,
-                                      res_cephlarge_fg,
-                                      "Cephalopoda large",
-                                      "fg")
-res_table_cephlarge <- add_row_to_summary_table(res_table_cephlarge,
-                                      res_cephlarge_ntr,
-                                      "Cephalopoda large",
-                                      "ntr")
-```
-
-Results combined are:
-
-```{r, rescephlargetable}
-knitr::kable(res_table_cephlarge, digits = 2)
-```
-
-# Combining results
-
-For each of baseline, FG, and NTR, can we produce an aggregated plot. Based on
-what I figured out in 'Aggregating size spectra' document. Here just focus on
-developing the code, based somewhat on that and code developed then.
-
-First, let's create a table of the main results from above that we want to move
-forward with. Just from the `res_table_***` objects. Then we'll need the raw
-data from each in turn. Could then functionalise this maybe, but probably best
-to keep explicit and tailored for different applications. Aggregated plots done
-in `med-analysis.Rmd`.
-
-```{r, aggregatetable}
-res_table_agg <- rbind(res_table_full,
-                       res_table_crust,
-                       res_table_actin,
-                       res_table_chondr,
-                       res_table_cephsmall,
-                       res_table_cephlarge)
-
-
-knitr::kable(res_table_agg,
-             digits = 2)
-```
-
-
-## Aggregated fit to data
-
-```{r, aggregatefit}
-baseline_agg <- aggregate_mlebins(list(full = res_full_baseline,
-                                       crust = res_crust_baseline,
-                                       actin = res_actin_baseline,
-                                       chondr = res_chondr_baseline,
-                                       cephsmall = res_cephsmall_baseline,
-                                       cephlarge = res_cephlarge_baseline),
-                                  res_table_agg,
-                                  strata = "Baseline")
-
-fg_agg <- aggregate_mlebins(list(full = res_full_fg,
-                                 crust = res_crust_fg,
-                                 actin = res_actin_fg,
-                                 chondr = res_chondr_fg,
-                                 cephsmall = res_cephsmall_fg,
-                                 cephlarge = res_cephlarge_fg),
-                            res_table_agg,
-                            strata = "fg")
-
-ntr_agg <- aggregate_mlebins(list(full = res_full_ntr,
-                                  crust = res_crust_ntr,
-                                  actin = res_actin_ntr,
-                                  chondr = res_chondr_ntr,
-                                  cephsmall = res_cephsmall_ntr,
-                                  cephlarge = res_cephlarge_ntr),
-                             res_table_agg,
-                             strata = "ntr")
-```
-
-Each one is saved as a `mlebins_list object` to then create plotting function.
-
-## Saving what is needed for plots and tables, and doing in med-summary.Rmd
-
-```{r, saving}
-saveRDS(baseline_agg,
-        "baseline_agg.rds")
-saveRDS(fg_agg,
-        "fg_agg.rds")
-saveRDS(ntr_agg,
-        "ntr_agg.rds")
-saveRDS(res_table_agg,
-        "res_table_agg.rds")
-```
+So just assume all non-crustacea were indeed measured to nearest 1 mm.
