@@ -4,6 +4,7 @@
 *.xlsx
 *cache*
 *.Rproj
+*.rds
 
 .Rproj.user
 
@@ -12,7 +13,13 @@ R-sizeSpectra/
 R-sizeSpectraHake/
 tests/testthat-hdiAnalysis/
 
+data/dataBinForLike.rda
+
 data-raw/hake-2024/*
 
+data-raw/mediterranean-data/north-sea-data.Rmd
 data-raw/zabala-data/using-sizeSpectra2.Rmd
 report/using-sizeSpectra2.Rmd
+
+report/mediterranean-analysis-1/
+report/mediterranean-analysis-2/

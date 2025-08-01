@@ -30,3 +30,10 @@ mediterranean-analysis-3/
    histogram determined version. Should note that when describing histograms.
    NOT COMPARED wiht previous yet, copying over and running the no-large-fish
    fun.
+
+mediterranean-analysis-4/
+ Rerunning with corrected length resolutions (0.01, 0.1, 1 mm), as explained at
+ the start of med-analysis.Rmd. Originally figured out in MLEbins vignette but now doing
+ here first.
+ med-analysis.Rmd - not renaming, just copying into this folder and adapting.
+ med-summary.Rmd from - not renaming.
