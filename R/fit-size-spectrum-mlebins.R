@@ -8,6 +8,7 @@ fit_size_spectrum_mlebins <- function(dat,
                                       b_vec = NULL,
                                       b_vec_inc = 0.00001){
 
+  # Need to amalgamate; see TODO in determine_smin_and_fit_mlebins.
 
   # TODO in help note that bin_count can be non-integer. And need species column
   # since species-specific bins, though don't need to know what these are now,

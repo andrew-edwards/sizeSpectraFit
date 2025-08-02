@@ -6,14 +6,16 @@
 ##' where $w$ is the estimated body mass (g) of an individual, $l$ is the known
 ##' body length (cm), and $alpha_s$ and $\beta_s$ are species-specific
 ##' parameters; this is equation (1) in our [MEPS paper](https://www.int-res.com/abstracts/meps/v636/p19-33/).
+##'
 ##' Each count corresponds to numbers of a given species in a given length bin,
 ##' and we use the species-specific coefficients to convert the length bins to
 ##' body mass bins (see the MEPS paper for more details). Body-mass bins that
 ##' are repeated (likely from the same species being measured in the same length
 ##' bin, though could also occur coincidentally for different species) are
 ##' aggregated to give total counts for such bins, so that there are no
-##' duplicated bins in the output. The resulting data.frame is also sorted in
-##' order of `bin_min`, starting with the lowest.
+##' duplicated bins in the output. The resulting tibble is also sorted in
+##' order of `bin_min`, starting with the lowest. Any species that do not have
+##' length-weight coefficients get omitted from the resulting tibble.
 ##'
 ##' The resulting species-specific body-mass bins can then be used for the
 ##' MLEbins method.
@@ -104,44 +106,51 @@ length_bins_to_body_mass_bins <- function(dat,
   dat_joined <- dplyr::left_join(dat,
                                  coefficients,
                                  by = "species") %>%
-    dplyr::mutate(bin_min = alpha * (length_bin_min)^beta,
-                  bin_max = alpha * (length_bin_max)^beta) %>%
+    dplyr::mutate(weight_bin_min = alpha * (length_bin_min)^beta,
+                  weight_bin_max = alpha * (length_bin_max)^beta) %>%
     # Remove species with no length-weight coefficients:
     dplyr::filter(!is.na(alpha))
 
+  # NOT DOING THIS NOW as need to return the original tibble (to not lose strata
+  # etc.), and this only summarises by species. TODO decide on this, may be best to just remove it and tell people to
+  # aggregate repeated measurements (by strata) at the start, like I'm doing for
+  # med analysis. Too fiddly to keep this more general and allow for all strata
+  # to be retained.
 
-  # Now aggregate duplicate bins (not keeping species in case duplicate bins are
-  #  for different species, which can happen if they share length-weight
-  #  coefficients), and then arrange by weight_bin_min, but first check if we
-  #  can keep species in there also.
+  if(FALSE){
+    # Now aggregate duplicate bins (not keeping species in case duplicate bins are
+    #  for different species, which can happen if they share length-weight
+    #  coefficients), and then arrange by weight_bin_min, but first check if we
+    #  can keep species in there also.  bin_min etc. here need to be
+    #  weight_bin_min if keeping
+    check_unique_species <- dplyr::summarise(dplyr::group_by(dat_joined,
+                                                             bin_min,
+                                                             bin_max,),
+                                             number_species =
+                                               length(unique(species))) %>%
+      dplyr::ungroup()
 
+    if(max(check_unique_species$number_species) > 1){
+      # Cannot include species name
+      dat_joined_2 <- dplyr::summarise(dplyr::group_by(dat_joined,
+                                                       bin_min,
+                                                       bin_max),
+                                       bin_count = sum(bin_count)) %>%
+        dplyr::ungroup() %>%
+        dplyr::arrange(bin_min)
+    } else {
+      # Can include species name
+      dat_joined_2 <- dplyr::summarise(dplyr::group_by(dat_joined,
+                                                       bin_min,
+                                                       bin_max),
+                                       bin_count = sum(bin_count),
+                                       species = unique(species)) %>%
+        dplyr::ungroup() %>%
+        dplyr::arrange(bin_min) %>%
+        dplyr::relocate(species)
+    }
 
-  check_unique_species <- dplyr::summarise(dplyr::group_by(dat_joined,
-                                                           bin_min,
-                                                           bin_max,),
-                                           number_species =
-                                             length(unique(species))) %>%
-    dplyr::ungroup()
-
-  if(max(check_unique_species$number_species) > 1){
-    # Cannot include species name
-    dat_joined_2 <- dplyr::summarise(dplyr::group_by(dat_joined,
-                                                     bin_min,
-                                                     bin_max),
-                                     bin_count = sum(bin_count)) %>%
-      dplyr::ungroup() %>%
-      dplyr::arrange(bin_min)
-  } else {
-    # Can include species name
-    dat_joined_2 <- dplyr::summarise(dplyr::group_by(dat_joined,
-                                                     bin_min,
-                                                     bin_max),
-                                     bin_count = sum(bin_count),
-                                     species = unique(species)) %>%
-      dplyr::ungroup() %>%
-      dplyr::arrange(bin_min) %>%
-      dplyr::relocate(species)
   }
 
-  dat_joined_2
+  dat_joined
 }

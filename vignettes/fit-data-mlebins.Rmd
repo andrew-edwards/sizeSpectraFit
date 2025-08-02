@@ -210,7 +210,8 @@ resolutions, and then use one as an example. Quick attempt here on Thurs pm:
 Quick try, then do big zabala results file: TODO had not taken out big
 organisms, so go back to Zabala pdf, tidy that up (simplify function as
 described above), then come back here and use just one example. Looks too fine
-to use as an example. HERE. Doing that in desktop 3.
+to use as an example. HERE. Doing that in desktop 3. Need to carry on with them,
+the full community ones took quite a while. THen copy an example to here.
 
 ```{r actibaseline}
 dat_acti <- dplyr::filter(mediterranean_data,

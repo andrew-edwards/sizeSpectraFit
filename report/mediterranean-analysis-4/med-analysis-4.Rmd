@@ -10,7 +10,7 @@ date: "Last compiled on `r format(Sys.time(), '%d %B, %Y')`"
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "",
-  cache = FALSE,   # TODO will want at some point
+  cache = TRUE,
   cache_path = "med-analysis-4-cache/",
   fig.path = "med-analysis-4-figs-cache/",
   fig.width = 7,
@@ -30,6 +30,10 @@ load_all()
 #library(sizeSpectra2)    # Need latest version
 ```
 
+HERE - read through this when back. Fix some TODOs, including figure
+scaling. Maybe change some variable names to things more sensible. Carry on with
+other species groups and compare previous one for understanding.
+
 When doing the MLEbins vignette realised that had not properly considered the
 length resolutions. Did some analysis in mediterranean-analysis-4/med-analysis-length-resolution.Rmd concluding that:
 
@@ -39,9 +43,11 @@ length resolutions. Did some analysis in mediterranean-analysis-4/med-analysis-l
 
 **All non-crustacea are measured to nearest 1 mm (except one measurement that
 doesn't matter)**
+
 So here updating the analysis from mediterranean-analysis-3. Now need to do the
 calculation of length bin min and max separately for each type of data (could do
-once up front but a bit fiddly). Also going to rewrite `calc_max_of_bin()` to
+once up front but a bit fiddly). Also rewrote `calc_max_of_bin()` as new
+function to
 return a tibble, so user doesn't have to join things up.
 
 For analysis-3, this is after setting xmin to be the min `bin_min` value above the histogram
@@ -112,12 +118,6 @@ dat_amalgamate <- dplyr::summarise(group_by(mediterranean_data,
 dat_amalgamate   # TODO verify, and check why the message only mentions three summaries
 ```
 
-
-
-```{r, exit, cache = FALSE}
-knitr::knit_exit()
-```
-
 ## Convert length measurements into length bins and then body-mass bins
 
 Had thought might want to leave the length bins min and max calculations to the
@@ -186,54 +186,53 @@ expect_equal(summary(mediterranean_data),
                                       "length_bin_max"))))
 ```
 
-Now use the length-weight coefficients to construct the body mass bins. First
+### Now to construct body-mass bins
+
+Now use the length-weight coefficients to construct the body-mass bins. First
 need to rename the `number` column to be `bin_count` (required by `length_bins_to_body_mass_bins()`):
 ```{r bodymassbins}
 dat_with_breaks <- dplyr::rename(dat_with_breaks,
                                  bin_count = number)
-dat_joined_new <-
+dat_joined <-
   length_bins_to_body_mass_bins(dat_with_breaks,
                                 mediterranean_length_weight_coefficients,
                                 length_data_unit = "mm")
-dat_joined_new
-
-```
-
-HERE - carry on, can remove some of the upcoming. Results will change slightly,
-so best just to plough on here I think and then compare overall results and
-figures with version 3. HERE.
-
-Note the 10 needed to convert mm lengths into weights based on length-weight
-coefficients that assume cm.
-
-TODO rewrite function also (see vignette comment)
-
-```{r onestratagroup}
-dat_bin_breaks <- calc_max_of_bin(mediterranean_data$length,
-                                  bin_widths = c(0.01, 1))
-dat_bin_breaks
-
-dat_all <- cbind(mediterranean_data,
-                 dat_bin_breaks) %>%
-  tibble::as_tibble() %>%
-  dplyr::rename(length_bin_min = bin_min,
-                length_bin_max = bin_max)
-
-
-# wrote a function for this:
-dat_joined <- dplyr::left_join(dat_all,
-                               mediterranean_length_weight_coefficients,
-                               by = "species") %>%
-  dplyr::mutate(weight_bin_min = alpha * (length_bin_min/10)^beta,
-                weight_bin_max = alpha * (length_bin_max/10)^beta) %>%
-  # remove species with no length-weight coefficients:
-  dplyr::filter(!is.na(alpha))
+dat_joined
 
 dat_joined[1:5, ] %>% a()
 ```
 
 Useful for users to see all the values, even though only some of it is
-needed for the likelihood fitting.
+needed for the likelihood fitting. There are less rows than the original data;
+presumably these are only due to species that do not have length-weight
+coefficients (such rows of data get excluded in
+`length_bins_to_body_mass_bins()`. Just check that:
+
+```{r, checkspecies}
+dat_with_breaks_sp <- unique(dat_with_breaks$species)
+dat_joined_sp <- unique(dat_joined$species)
+
+sp_excluded <- setdiff(dat_with_breaks_sp,
+                       dat_joined_sp)
+
+dat_sp_excluded <- dplyr::filter(dat_with_breaks,
+                                 species %in% sp_excluded)
+dat_sp_excluded
+
+# This has difference of 6
+#expect_equal(nrow(dat_with_breaks),
+#             nrow(dat_joined) + nrow(dat_sp_excluded))
+
+sp_excluded_but_with_length_weight <- intersect(sp_excluded,
+                                                mediterranean_length_weight_coefficients$species)
+
+dplyr::filter(dat_with_breaks,
+              species %in% sp_excluded_but_with_length_weight)
+dplyr::filter(mediterranean_length_weight_coefficients,
+              species %in% sp_excluded_but_with_length_weight)
+```
+
+TODO - just figure out where those 6 numbers went. Carry on as won't be hugely consequential.
 
 There are very few large individuals, and these are all fish:
 ```{r, largefish}
@@ -258,7 +257,6 @@ That will get used in all the analyses.
 
 \clearpage
 
-
 # Full community
 
 Doing full community of values, which is okay because the sampling protocol
@@ -268,7 +266,7 @@ km$^2$. For species groups, copying and pasting the analyses and then just
 changing the group names (need to see everything and not worth it to functionalise
 it all).
 
-## Full Community baseline
+## Full Community baseline (takes a while TODO - check results, and fix figure)
 
 ```{r, fullbaseline}
 # This function extracts the required data and returns what is needed for
@@ -287,14 +285,15 @@ res_full_baseline$mlebins_fit      # full list includes histogram values which
 ```{r, fullbaselineplot}
 plot(res_full_baseline,
      xlim_hist = c(0, 60),
-     main = "Full Community baseline")
+     main = "Full Community baseline",
+     seg_col = "black")  # TODO didn't get passed on, check ... in functions
 ```
 
 ## Full Community fg
 
 ```{r, fullfg}
 data_full_fg <- mediterranean_for_mlebins(dat_joined,
-                                                strata_name = "fg")
+                                          strata_name = "fg")
 
 res_full_fg <- determine_xmin_and_fit_mlebins(data_full_fg)
 
@@ -313,7 +312,7 @@ plot(res_full_fg,
 
 ```{r, fullntr}
 data_full_ntr <- mediterranean_for_mlebins(dat_joined,
-                                                strata_name = "ntr")
+                                           strata_name = "ntr")
 
 res_full_ntr <- determine_xmin_and_fit_mlebins(data_full_ntr)
 
@@ -365,8 +364,9 @@ Results combined are:
 knitr::kable(res_table_full, digits = 2)
 ```
 
-
-TODO edit and summarise: Also, the results show clear distinct ranges of data.
+```{r, exit, cache = FALSE}
+knitr::knit_exit()
+```
 
 
 \clearpage

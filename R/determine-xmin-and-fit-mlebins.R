@@ -17,6 +17,13 @@ determine_xmin_and_fit_mlebins <- function(dat_for_mlebins,
                                            bin_start = 0,
                                            x_min = NULL,
                                            ...){
+
+  # TODO need to amalgamate repeated combinations of bin_min, bin_max, and then
+  # sum the bin_counts. Have done this somewhere maybe a vignette, so need to check where and
+  # ensure it gets done for all fitting, and recommend to do early in the
+  # analyses (would save a little computation time, but more important
+  # here). Prob best to do in fit_size_spectrum_mlebins() than here.
+
   # Need to be pragmatic, since have overlapping bins. Since assuming a power
   # law, kind of expect counts to be shifted to the low end of the bin. Use this
   # though to just create simple histograms of counts based on bin_min values.

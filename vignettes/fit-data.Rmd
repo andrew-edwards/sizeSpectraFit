@@ -246,7 +246,8 @@ HERE
 
  D use that in `fit-size-spectrum.numeric.R` instead of current
 
-HERE- see mlebins vignette now. Need to ensure zabala stuff running, make sure
+HERE- see mlebins vignette now, and actually the zabala-4 analsysis first.
+Need to ensure zabala stuff running, make sure
 it still works; think it needs a bit of tweaking.
  - Add/fix tests
  - back to `fit-size-spectrum.data.frame.R` to carry on. See HERE. Doing an

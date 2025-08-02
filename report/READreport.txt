@@ -35,5 +35,6 @@ mediterranean-analysis-4/
  Rerunning with corrected length resolutions (0.01, 0.1, 1 mm), as explained at
  the start of med-analysis.Rmd. Originally figured out in MLEbins vignette but now doing
  here first.
- med-analysis.Rmd - not renaming, just copying into this folder and adapting.
- med-summary.Rmd from - not renaming.
+ med-analysis-length-resolution.Rmd - explains all that.
+ med-analysis-4.Rmd - redoing the analysis.
+ med-summary-4.Rmd - not started yet.

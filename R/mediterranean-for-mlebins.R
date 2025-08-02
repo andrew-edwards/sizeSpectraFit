@@ -42,7 +42,7 @@ mediterranean_for_mlebins <- function(dat,
 
   temp <- dplyr::select(temp,
                         species,
-                        bin_count = number,
+                        bin_count,
                         bin_min = weight_bin_min,
                         bin_max = weight_bin_max)
 
