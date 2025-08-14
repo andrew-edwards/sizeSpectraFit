@@ -1,16 +1,16 @@
 ##' Plot results from determining xmin by mode method and then fitting use
-##' MLEbins method # TODO function is actually the same as
-##' plot.determine_xmin_and fit, since plot is already assigned correctly. So
-##' might not need this one, or just call the other one. TODO TODO NOT quite,
-##' two lines changed.
+##' MLEbins method
 ##'
 ##' @param res list of class `determine_xmin_for_mlebins_and_fit` as output from `determine_xmin_for_mlebins_and_fit()`
 ##' @param xlim_hist numeric vector of two values representing `xlim` for histogram plot; default is the full range
 ##'   of breaks (which might be too large for a clear figure, especially given
-##'   the linear axis). TODO could maybe add in log-x axis, but not option in
-##'   `plot.hist()` so would have to make it up here.
-##' @param ... arguments to passed onto [hist()] for now, but probably want
-##'   more. TODO `sizeSpectra::ISD_bin_plot_nonoverlapping()`
+##'   the linear axis).
+##' @param ... arguments to passed onto [hist()] or [plot.size_spectrum_mlebins()]
+##' @inheritParams plot.size_spectrum_mlebin
+##' # @inheritParams plot.size_spectrum_numeric   might need these two if not
+##'   everything captured (i.e. if help doesn't flow through from these) TODO
+##' # @inheritParams plot_isd_binned
+##'
 ##' @return figure in current device
 ##' @export
 ##' @author Andrew Edwards
@@ -21,8 +21,8 @@
 plot.determine_xmin_and_fit_mlebins <- function(res,
                                                 xlim_hist = NULL,
                                                 par_mai = c(0.4, 0.5, 0.05, 0.3),
-                                                par_cex = 0.7,   # these two are
-                                                  # only for isd plots TODO
+                                                par_cex = 0.7,
+                                                seg_col = "green",
                                                 ...){
 
   # Global xlim, might want to add functionality at some point
@@ -45,7 +45,7 @@ plot.determine_xmin_and_fit_mlebins <- function(res,
 
 
 
-  col_hist <- ifelse(res$h$mids < res$mlebins_fit$x_min,  # TODO changed also
+  col_hist <- ifelse(res$h$mids < res$mlebins_fit$x_min,
                      "grey",
                      "red")
 
@@ -56,30 +56,58 @@ plot.determine_xmin_and_fit_mlebins <- function(res,
   #  border_col = col_hist
   #}
 
+  # arguments <- list(...)
+
+  # if (!"seg_col" %in% names(arguments)) {
+  #  seg_col <- "green"    # the default in plot.size_spectrum_mlebins(); just
+                          # can't use that automatically, see below.
+  #}
+
   if(is.null(xlim_hist)){
-    plot(res$h,
-         # xlim = xlim_global,
-         col = col_hist,
-         border = border_col,
-         ...)} else {
-    plot(res$h,
-         # xlim = xlim_global,
-         col = col_hist,
-         border = border_col,
-         xlim = xlim_hist,
-         ...)
- }
+    dots_parser(graphics:::plot.histogram,
+                x = res$h,
+                # xlim = xlim_global,
+                col = col_hist,
+                border = border_col,
+                ...)} else {
+    dots_parser(graphics:::plot.histogram,
+                x = res$h,
+                # xlim = xlim_global,
+                col = col_hist,
+                border = border_col,
+                xlim = xlim_hist,
+                ...)
+  }
 
   par(mai = par_mai,
       cex = par_cex)
-  plot(res$mlebins_fit,
-       style = "linear_y_axis")    # TODO prob want ..., e.g. for seg_col
 
-  plot(res$mlebins_fit,
-       style = "log_y_axis")
+  dots_parser(plot.size_spectrum_mlebin,
+              # This should be
+              # plot.size_spectrum_mlebins but the
+              # dots_parser doesn't pass on style (TODO had thought seg_col was
+              # the issue)
+              # because formals(FUN) I think does not
+              # detect the arguments for the
+              # subsequent function plot...mlebin(), and hence ignores the
+              #  style = "linear_y_axis" argument given here (and things like xlab).
+              # Option 1. since plot..mlebins() basically calls
+              # plot...mlebin() with seg_col = "green", can circumvent the
+              # ...mlebins() call here and add seg_col as an explicit
+              # option. TODO check if that works for other options though; don't
+              # think it will. Don't see what's special about seg_col now - yes,
+              # want it to switch the default to green as for mlebins plots,
+              # since now calling plot...mlebin.
+              res_mlebin = res$mlebins_fit,
+              style = "linear_y_axis",
+              seg_col = seg_col,
+              ...)
 
-  # plot(res$mle_fit)  # TODO this changes for mlebins, could functionalise the
-  # hist plot above since needed for all data types
+  dots_parser(plot.size_spectrum_mlebin,
+              res_mlebin = res$mlebins_fit,
+              style = "log_y_axis",
+              seg_col = seg_col,
+              ...)
 
   # par(mfrow = c(1,1))  # TODO
 }

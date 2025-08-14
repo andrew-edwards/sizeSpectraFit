@@ -30,7 +30,7 @@ load_all()
 #library(sizeSpectra2)    # Need latest version
 ```
 
-HERE - read through this when back. Fix some TODOs, including figure
+HERE - Fix some TODOs, including figure
 scaling. Maybe change some variable names to things more sensible. Carry on with
 other species groups and compare previous one for understanding.
 
@@ -101,11 +101,12 @@ mediterranean_length_weight_coefficients
 ```
 which assume units of cm (not mm) and grammes.
 
-TODO amalgamate the data early, for duplicated strata-group-species-length
+Could amalgamate the data early, for duplicated strata-group-species-length
 combinations, just sum the numbers. Does get done in MLEbins but makes sense to
 do straight away before doing lots of calculations. Want to check results first.
-Though this does move things out of order, so might be good to avoid.
-Something like NOT RUNNING:
+Though this does move things out of order, so might be good to avoid, and keep
+the data close to how it is originally saved.
+Something like this but NOT RUNNING:
 
 ```{r, amalgamate, eval = FALSE}
 dat_amalgamate <- dplyr::summarise(group_by(mediterranean_data,
@@ -115,7 +116,7 @@ dat_amalgamate <- dplyr::summarise(group_by(mediterranean_data,
                                             length),
                                    number = sum(number)) %>%
   ungroup()
-dat_amalgamate   # TODO verify, and check why the message only mentions three summaries
+dat_amalgamate   # would need to verify, and check why the message only mentions three summaries
 ```
 
 ## Convert length measurements into length bins and then body-mass bins
@@ -286,7 +287,7 @@ res_full_baseline$mlebins_fit      # full list includes histogram values which
 plot(res_full_baseline,
      xlim_hist = c(0, 60),
      main = "Full Community baseline",
-     seg_col = "black")  # TODO didn't get passed on, check ... in functions
+     seg_col = "black")
 ```
 
 ## Full Community fg
@@ -305,7 +306,8 @@ res_full_fg$mlebins_fit      # full list includes histogram values which
 ```{r, fullfgplot}
 plot(res_full_fg,
      xlim_hist = c(0, 60),
-     main = "Full Community FG")
+     main = "Full Community FG",
+     seg_col = "black")
 ```
 
 ## Full Community ntr
@@ -321,10 +323,13 @@ res_full_ntr$mlebins_fit      # full list includes histogram values which
                                    # some later species groups).
 ```
 
+TODO not sure what's happening here with y-axis:
+
 ```{r, fullntrplot}
 plot(res_full_ntr,
      xlim_hist = c(0, 60),
-     main = "Full Community NTR")
+     main = "Full Community NTR",
+     seg_col = "black")
 ```
 
 Now to compare the three strata for full community.

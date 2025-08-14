@@ -18,5 +18,8 @@
 dots_parser <- function(FUN, ...) {
   argnames <- names(formals(FUN))
   dots <- list(...)
+
   return(do.call(FUN, dots[names(dots) %in% argnames]))
+
+
 }
