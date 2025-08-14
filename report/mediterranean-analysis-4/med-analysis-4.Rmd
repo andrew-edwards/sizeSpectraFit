@@ -310,7 +310,7 @@ plot(res_full_fg,
      seg_col = "black")
 ```
 
-## Full Community ntr
+## Full Community ntr all data (suggests removing the smallest, so doing that next)
 
 ```{r, fullntr}
 data_full_ntr <- mediterranean_for_mlebins(dat_joined,
@@ -323,14 +323,53 @@ res_full_ntr$mlebins_fit      # full list includes histogram values which
                                    # some later species groups).
 ```
 
-TODO not sure what's happening here with y-axis:
-
 ```{r, fullntrplot}
 plot(res_full_ntr,
      xlim_hist = c(0, 60),
      main = "Full Community NTR",
      seg_col = "black")
 ```
+
+This figure looks strange, in the data do not show the usual spanning all the
+way down to the lowest value ($x_{min}$). The plotting code is working
+correctly. It's just that the first bins are very small:
+```{r, fullntrdetails}
+res_full_ntr$mlebins_fit$data %>% filter(bin_min < 0.5)
+```
+The first bin gets overplotted by the red line, and the second bin is in fact
+the lowest one that can be seen around 0.4 on the x-axis.
+Can see a bit more clearly in these figures
+
+```{r, fullntrplot2}
+plot.size_spectrum_mlebin(res_full_ntr$mlebins_fit,
+                          xlim = c(0.1, 0.5))  # note plot..._mlebin
+```
+
+
+```{r, fullntrplote}
+plot.size_spectrum_mlebin(res_full_ntr$mlebins_fit,
+                          xlim = c(0.1, 0.5))  # note plot..._mlebin
+ind <- 1
+rect(xleft = res_full_ntr$mlebins_fit$data[ind, "bin_min"],
+       #exaggerate bin:
+     ybottom = res_full_ntr$mlebins_fit$data[ind, "low_count"] * 0.01,
+     xright = res_full_ntr$mlebins_fit$data[ind, "bin_max"],
+     ytop = res_full_ntr$mlebins_fit$data[ind, "high_count"],
+     col = "green")
+ind <- 2
+rect(xleft = res_full_ntr$mlebins_fit$data[ind, "bin_min"],
+     ybottom = res_full_ntr$mlebins_fit$data[ind, "low_count"] * 0.01,
+     xright = res_full_ntr$mlebins_fit$data[ind, "bin_max"],
+     ytop = res_full_ntr$mlebins_fit$data[ind, "high_count"],
+     col = "pink")
+```
+
+Given the gap between the first two bins, suggests removing the lowest bin and
+refitting. Does not make sense to fit to such an outlier (hard to automate that
+though).
+
+
+## Compare strata for full community
 
 Now to compare the three strata for full community.
 

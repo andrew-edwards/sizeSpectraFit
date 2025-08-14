@@ -89,21 +89,9 @@ plot.size_spectrum_mlebin <- function(res_mlebin,
   dat <- res_mlebin$data
   n <- sum(dat$bin_count)
 
-  # Copying from sizeSpectra::ISD_bin_plot()
+  x_min <- res_mlebin$x_min
 
-  # Think I can just put in arguments as defaults
-  #  if(missing(xlim)){
-  #    xlim = c(min(dat$bin_min),
-  #             max(dat$bin_max))
-  #  }
-
-  # TODO don't think want to be able to define these, are they have been by
-  # definition when do the mlebin calculation.
-  #  if(is.na(xmin)){
-  x_min <- min(dat$bin_min)
-
-  #if(is.na(xmax)){
-  x_max <- max(dat$bin_max)
+  x_max <- res_mlebin$x_max
 
   # x values to plot PLB if not provided; need high resolution for both plots.
   if(is.na(x_plb)){
