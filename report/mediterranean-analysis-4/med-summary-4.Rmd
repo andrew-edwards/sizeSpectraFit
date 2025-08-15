@@ -1,0 +1,171 @@
+---
+title: "Summarising the ananlyses of Juliana Zabala's data having wrangled it"
+author: "Andrew Edwards and Juliana Zabala"
+output: pdf_document
+fontsize: 12pt
+date: "Last compiled on `r format(Sys.time(), '%d %B, %Y')`"
+---
+
+```{r, setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "",
+  cache = TRUE,
+  cache_path = "zabala-summary-cache/",
+  fig.path = "zabala-summary-figs-cache/",
+  fig.width = 7,
+  fig.height = 9
+)
+  # comment = "#>",
+```
+
+```{r, build, echo = FALSE, eval = FALSE}
+# To build either run this line or click knit button in RStudio:
+rmarkdown::render("zabala-summary.Rmd")
+```
+
+```{r, packages, echo = FALSE, cache = FALSE}
+library(dplyr)
+load_all()
+#library(sizeSpectra2)    # Need latest version
+```
+
+Copying from `mediterranean-analysis-2/zabala-summary.Rmd`, which I hadn't
+updated for `mediterranean-analysis-3/`. Committing before changing anything
+further.
+
+Need to have already run `zabala-data-analysis.Rmd` which takes a while to run
+and saves three `.rds`
+files in the same directory. Or just have the three files. The files contain the
+results after some exploration and iterative calculations.
+
+## Results
+
+```{r, loadresults}
+baseline_agg <- readRDS("baseline_agg.rds")
+fg_agg <- readRDS("fg_agg.rds")
+ntr_agg <- readRDS("ntr_agg.rds")
+res_table_agg <- readRDS("res_table_agg.rds")
+```
+
+Each of the first three is a list for that strata, with: results for each of the five species groups; the
+data all aggregated together for a master plot; and a summary table of results
+that contains the values needed.
+
+`res_table_agg` is all results regarding $b$ in
+one table for simplicity (the same values are parsed out in each strata).
+
+\clearpage
+
+```{r, aggregatetable}
+knitr::kable(res_table_agg,
+             digits = 2)
+```
+
+First, need a global range for the body sizes:
+```{r, globalx}
+x_min_global <- min(res_table_agg$x_min)
+x_max_global <- max(res_table_agg$x_max)
+groups <- unique(res_table_agg$Group)    # Assume we're keeping everything in
+                                        # the same order, no reason not to
+```
+
+
+TODO Plot all the data (should be the same way as MLEbins plot. So lots of boxes.
+ Could plot the five PLB fits like I did for MLE example.
+ Plot the aggregated fit.
+
+TODO Need to summarise those results in a plot of $b$ with confidence
+intervals.
+
+## Figures -- one figure with 12 panels
+
+Could also plot each one in turn with linear y-axis also will probably want in
+an Appendix. Do panel plot first.
+
+```{r, panelplot}
+par(mfrow = c(5, 3),    # group in each row, strata in each column
+    oma = c(0, 3, 3, 0))
+
+for(i in 1:length(groups)){
+  plot(baseline_agg[[i]],
+       xlim = c(x_min_global,
+                x_max_global),
+       log_y_axis = "yes",
+       legend_text_second_row_multiplier = 4)
+
+  mtext(groups[i],
+        side = 2,
+        line = 3)
+
+  if(i ==1){
+    mtext("Baseline",
+          side = 3,
+          line = 1)
+  }
+
+  plot(fg_agg[[i]],
+       xlim = c(x_min_global,
+                x_max_global),
+       log_y_axis = "yes",
+       legend_text_second_row_multiplier = 4)
+
+  if(i ==1){
+    mtext("Fishing Grounds",
+          side = 3,
+          line = 1)
+  }
+
+  plot(ntr_agg[[i]],
+       xlim = c(x_min_global,
+                x_max_global),
+       log_y_axis = "yes",
+       legend_text_second_row_multiplier = 4)
+
+  if(i ==1){
+    mtext("No-take Reserve",
+          side = 3,
+          line = 1)
+  }
+}
+```
+
+## Conclusions from these results
+
+From theory we would expect a steepening of the size spectrum ($b$ becoming more
+negative) under fishing
+pressure, because larger organisms get fished out, releasing some predation pressure on
+smaller organisms. For a No-take Reserve we would conversely expect a shallowing
+of the size spectrum ($b$ become less negative).
+
+Presumably the baseline ecosystem was already experiencing fishing pressure, so
+the ideal theoretical results would be the FG staying the same as the baseline
+(or maybe shallowing as the area is adjacent to the NTR), and the NTR shallowing.
+
+The table and figure show the following:
+
+Crustacea: From the baseline, FG steepens quite a bit and NTR less so. So NTR
+indeed shallower than FG, but it did steepen a little from baseline.
+
+Actinopterygii: From the baseline, FG steepened and NTR got shallower.
+
+Chondrichthyes: From the baseline, FG got shallower, and NTR got even
+shallower.
+
+Cephalopoda small: Cephalopoda were tricky to fit, in terms of specifying xmin
+and xmax. Strangely, from the baseline the FG got shallower (by quite a bit) and the NTR
+steepened, opposite to what we would theoretically expect.
+
+Cephalopoda large: From the baseline, the FG shallowed slightly, while NTR
+steepened.
+
+So the first three groups all find the resulting NTR to have a shallower size
+spectrum than for the FG, in agreement with the ideal theoretically expected
+directions. For both Cephalopoda, the results were opposite to what was
+expected, but the data had to be divided into small and large, which could maybe
+be done differently.
+
+## Aggregating onto one plot
+
+I think this can be done, with the size spectra 'added' together to give a
+community one. Bit of work still to do that.

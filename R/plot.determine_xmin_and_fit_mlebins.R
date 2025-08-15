@@ -44,8 +44,10 @@ plot.determine_xmin_and_fit_mlebins <- function(res,
 #                                bin_width = res[[i]]$bin_width)
 
 
-
-  col_hist <- ifelse(res$h$mids < res$mlebins_fit$x_min,
+  # Want it red for the bin with x_min in it (though not all values in the bin
+  # will get fitted) and all those above. So for all bins with max bin break > x_min
+  col_hist <- ifelse(res$h$breaks[-1] < res$mlebins_fit$x_min,  # take out first
+                                        # breakpoint
                      "grey",
                      "red")
 
