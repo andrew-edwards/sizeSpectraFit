@@ -1,0 +1,50 @@
+% \documentclass[12pt, hidelinks]{article}
+\textheight 213mm
+\topmargin -10mm
+\addtolength{\textwidth}{1.0in}
+\addtolength{\oddsidemargin}{-0.5in}
+
+% \usepackage{lineno}
+\usepackage{amsmath}         % for \text for x_min, for \dfrac
+\usepackage{natbib}
+% \usepackage{array}         % for fixed width tables
+% \usepackage{epsfig}
+% \usepackage{graphicx}      % to try and embed .gif
+%\usepackage{rotating}        % for sidewaysfigure
+%\usepackage{pdflscape}       % for animateinline attempt
+%\usepackage{animate}[2017/01/09]        % for animated figures
+\usepackage{setspace}        % for \begin{singlespace} for captions
+\PassOptionsToPackage{hyphens}{url}\usepackage{hyperref}
+%\usepackage{float}
+%\usepackage{placeins}
+%\usepackage{listings}
+%\usepackage{tabularx}
+%\usepackage{soul}
+\usepackage{booktabs}
+%\usepackage{setspace}
+
+\bibliographystyle{natbibfull}
+
+% \linenumbers
+
+% From
+% https://tex.stackexchange.com/questions/25784/why-doesnt-lineno-number-a-paragraph-when-it-is-followed-by-an-indented-equatio:
+
+%\let\oldequation\equation
+%\let\oldendequation\endequation
+
+%\renewenvironment{equation}
+%  {\linenomathNonumbers\oldequation}
+%  {\oldendequation\endlinenomath}
+
+% \newcommand{\eb}{\begin{eqnarray}}
+% \newcommand{\ee}{\end{eqnarray}}
+
+\newcommand{\logten}{\log_{\mathrm{10}}}
+%\newcommand{\Cet}{C_{E, t^*}}
+
+\renewcommand{\baselinestretch}{1.2}  % use 1.8 for submission; 1.6 seems small;
+                                % change further down also after tables
+
+% http://ctan.math.ca/tex-archive/info/Free_Math_Font_Survey/en/survey.pdf
+\usepackage{mathptmx}    % Should have Times plus math fonts, as used for hake.

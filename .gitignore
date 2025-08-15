@@ -11,6 +11,8 @@
 R-hdiAnalysis/
 R-sizeSpectra/
 R-sizeSpectraHake/
+R-aggregating/
+
 tests/testthat-hdiAnalysis/
 
 data/dataBinForLike.rda

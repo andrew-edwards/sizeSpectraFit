@@ -37,4 +37,5 @@ mediterranean-analysis-4/
  here first.
  med-analysis-length-resolution.Rmd - explains all that.
  med-analysis-4.Rmd - redoing the analysis.
- med-summary-4.Rmd - not started yet.
+ med-summary-4.Rmd - summarising results and doing aggregate plots, found some
+ code from May 2025.

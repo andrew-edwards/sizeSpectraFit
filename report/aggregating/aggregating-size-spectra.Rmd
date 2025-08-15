@@ -1,0 +1,449 @@
+---
+title: "Aggregating size spectra"
+author: "Andrew Edwards"
+output:
+  pdf_document:
+    includes:
+      in_header: preamble.tex
+fontsize: 12pt
+date: "Last compiled on `r format(Sys.time(), '%d %B, %Y')`"
+---
+
+<!-- rmarkdown::render("aggregating-size-spectra.Rmd") -->
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = ">",
+  fig.width = 10,
+  fig.height = 8
+)
+```
+
+Juliana -- these are my working notes that helped me figure out the new plotting
+approach. See the "For Juliana" section at the end for instructions for your
+analyses -- don't worry if some of this does not make too much sense, it was me
+figuring things out. You need the "aggregating-functions.R" file in the same
+directory as when running this .Rmd file. You should be able to run this fine,
+as it uses simulated data.
+
+I have some simulated data with settings to help see the figures clearly, and
+some based on eyeballing the ranges and using your fitted $b$ values from your
+2019 data (that you sent me).
+
+TODO these are working notes, can then change to be an Appendix for Juliana's manuscript.
+
+```{r setup, results = FALSE}
+load_all()
+library(dplyr)
+```
+
+# Motivation
+
+From discussing Juliana's work. She has four different types of species that are
+sampled using different methods. She could fit PLB distributions separately to
+each, and a global fit of a single PLB distribution to the full community. The
+latter isn't so appropriate though because
+of the different sampling approaches (and sample sizes). Here are some
+calculations for working out the aggregated distribution, which may have further
+application regarding size spectra domes (though my figures don't end up looking
+dome-shaped, so maybe not). The aggregated distribution is shown as yellow in
+the plots.
+
+# Analytical calculations
+
+Sample 1 has sample size $n_1$, with data ranging from $x_{\mathrm{min}, 1}$ to $x_{\mathrm{max}, 1}$, with fitted PLB exponent of $b_1$.
+
+Similarly, sample 2 has sample size $n_2$, with data ranging from $x_{\mathrm{min}, 2}$
+to $x_{\mathrm{max}, 2}$, with fitted PLB exponent of $b_2$.
+
+The abundance density function (equation 3 of MEE paper) for sample 1 is
+therefore
+\begin{eqnarray}
+N_1(x) = n_1 C_1 x^{b_1}, ~~~x_{\mathrm{min}, 1} \leq x \leq x_{\mathrm{max}, 1}
+\end{eqnarray}
+and for sample 2 is
+\begin{eqnarray}
+N_2(x) = n_2 C_2 x^{b_2},~~~x_{\mathrm{min}, 2} \leq x \leq x_{\mathrm{max}, 2}
+\end{eqnarray}
+where $C_1$ and $C_2$ are the respective normalisation constants given by
+equation 2 of MEE paper. $N_1(x)$ and $N_2(x)$ are 0 outside of the prescribed
+ranges, which needs to be kept track of
+and so we define the indicator function:
+\begin{eqnarray}
+\mathrm{I}_s(x) = \left\{ \begin{array}{ll}
+ 1, & x_{\mathrm{min}, s} \leq x \leq x_{\mathrm{max}, s} \\
+ 0, & \mathrm{otherwise.}
+  \end{array}
+  \right.
+\end{eqnarray}
+
+## Calculating the aggregated abundance density function, probability density function, and cumulative distribution function
+
+The abundance density function, $N_T(x)$, for the total community, i.e. all individuals in
+sample 1 and sample 2 combined, is then just
+\begin{eqnarray}
+N_T(x) & = & N_1(x) \mathrm{I}_1(x) + N_2(x) \mathrm{I}_2(x)\\
+ & = & n_1 C_1 x^{b_1} \mathrm{I}_1(x) + n_2 C_2 x^{b_2} \mathrm{I}_2(x).
+\end{eqnarray}
+
+The resulting probability density function, $f_T(x)$, for the total community is calculated
+by simply normalising this by the total sample size $n_1 + n_2$:
+\begin{eqnarray}
+f_T(x) = \dfrac{1}{n_1 + n_2} \left(n_1 C_1 x^{b_1} \mathrm{I}_1(x) + n_2 C_2
+x^{b_2} \mathrm{I}_2(x)
+\right).
+\end{eqnarray}
+
+This generalises in the obvious way to $s = 1, 2, ..., S$ samples as:
+\begin{eqnarray}
+f_T(x) = \dfrac{1}{n} \sum_{s=1}^S n_s C_s x^{b_s} \mathrm{I}_s(x)
+\label{agg}
+\end{eqnarray}
+where $n = \sum_{s=1}^S n_s$.
+
+Denoting the $S$ original probability density functions as $f_s(x)$, equation
+(1) of MEE paper, and since
+\begin{eqnarray}
+f_s(x) = 0, ~~~x < x_{\mathrm{min}, s}~\mathrm{or}~x > x_{\mathrm{max}, s},
+\end{eqnarray}
+then we can just write
+\begin{eqnarray}
+f_s(x) = C_s x^{b_s} \mathrm{I}_s(x),
+\end{eqnarray}
+and so
+\begin{eqnarray}
+f_T(x) = \dfrac{1}{n} \sum_{s=1}^S n_s f_s(x).
+\end{eqnarray}
+
+Then to work out the cumulative distribution function for the total community,
+given the cumulative distribution functions $F_s(x)$ for each sample,
+we can just do (following Supp Page 4 of MEE paper, though keeping in terms of
+$F_s(x)$):
+
+\begin{eqnarray}
+F_T(x) & = & \mathrm{P}(X \leq x) \\
+ & = & \int_{x_{\mathrm{min}}}^x f_T(x) \mathrm{d}x \\
+ & = & \dfrac{1}{n} \int_{x_{\mathrm{min}}}^x \sum_s n_s f_s(x) \mathrm{d}x \\
+ & = & \dfrac{1}{n} \sum_s n_s \int_{x_{\mathrm{min}}}^x f_s(x) \mathrm{d}x \\
+ & = & \dfrac{1}{n} \sum_s n_s F_s(x).
+\end{eqnarray}
+
+This makes writing an R function for $F_T(x)$ somewhat easier than spelling out
+all the maths in detail, as we can just essentially sum the existing functions
+(provided the values outside of the bounds are treated properly).
+
+# Generate simulated data and fit it to check things work well
+
+Simulate $S$ different samples, each with different sample sizes, exponents, and
+ranges of body sizes, prescribed as vectors:
+
+```{r simulations}
+set.seed(42)
+
+S = 4
+
+# Make up some values to check plotting in particular is working
+col_vec <- c("lightblue", "orange", "green", "magenta")
+n_vec <- c(6000, 6000, 1600, 2000)
+b_vec_known <- c(-1.09, -2, -3, -4)
+xmin_known <- c(0.3, 10, 100, 500)
+xmax_known <- c(80, 800, 1000, 1500)
+
+expect_equal(c(length(n_vec), length(b_vec_known), length(xmin_known),
+               length(xmax_known)),
+             rep(S, 4))
+
+x <- list()                             # To get filled with list of vectors of
+                                        # simulated data, one vector for each sample.
+# To save results
+b_mle <- numeric(S)
+b_conf_min <- numeric(S)
+b_conf_max <- numeric(S)
+xmin_from_data <- numeric(S)            # xmin value based on the simulated data
+xmax_from_data <- numeric(S)            #  (not the known value)
+x_lim_global <- c(NA, NA)               # Global max and min for consistent
+                                        #  plotting axes
+x_full <- NULL    # anumeric(sum(n_vec))
+
+for(s in 1:S){
+  x[[s]] <- rPLB(n_vec[s],
+                 b = b_vec_known[s],
+                 xmin = xmin_known[s],
+                 xmax = xmax_known[s])
+
+  # Save having to keep calculating these when iterating - TODO functionalise
+  xmin <- min(x[[s]])
+  xmax <- max(x[[s]])
+  sum_log_x <- sum(log(x[[s]]))
+  PL_bMLE <- 1/(log(min(x[[s]])) - sum(log(x[[s]])/length(x[[s]]))) - 1
+
+  MLE_res <- calcLike(negLL.fn = negLL.PLB,
+                      p = PL_bMLE,
+                      x = x[[s]],
+                      n = n_vec[s],
+                      xmin = xmin,
+                      xmax = xmax,
+                      sumlogx = sum_log_x)
+  b_mle[s] <- MLE_res$MLE
+  b_conf_min[s] <- MLE_res$conf[1]
+  b_conf_max[s] <- MLE_res$conf[2]
+
+  xmin_from_data[s] <- min(x[[s]])
+  xmax_from_data[s] <- max(x[[s]])
+
+  x_full <- c(x_full,
+              x[[s]])             # concatenate all values
+}
+
+x_lim_global <- range(x_full)     # for plotting on same axes
+```
+
+# Plot data and results
+
+```{r plotting, fig.cap = "Four simulated data sets, each fit separately with a PLB (fits are good as data were simulated from a PLB)."}
+par(mfrow = c(min(S, 4), 1),
+    mai = c(0.6, 0.5, 0.05, 0.3))  # ISD_bin_plot default was 0.4, 0.5 0.05, 0.3
+
+for(s in 1:S){
+#  MLE.plot(x[[s]],
+#           b = b_mle[s],
+#           log.xy = "x",
+#           xlim_global = x_lim_global)
+
+  MLE.plot(x[[s]],
+           b = b_mle[s],
+           xlim_global = x_lim_global)
+  legJust(textVec = paste0("b=",
+                           round(b_mle[s], 2)),
+          logxy = TRUE)              # TODO add arguement for just logx
+
+}
+```
+
+# Aggregating distributions
+
+So we have `r S` fitted distributions that we want to aggregate.
+
+```{r plotagg, fig.cap = "Full data set (black circles), the four fitted PLB's using same colour coding as Juliana's plots. The thick yellow curve is the aggregated PLB distribution, the distribution obtained from aggregating the four fitted PLB's together. Fits are very good because the data are simulated from PLB's, and likelihood used to estimated the $b$ exponents. This figure demonstrates the code seems to be working well."}
+# Adapting from MLE.plot to get working, then make into new function
+plot(sort(x_full, decreasing = TRUE),
+     1:length(x_full),
+     log = "xy",
+     xlab = expression(paste("Values, ", italic(x))),
+     ylab = expression( paste("Number of ", values >= x), sep=""),
+     xlim = x_lim_global,
+     ylim = c(1, length(x_full)))
+
+# Add aggregated distriution first so that the right-most distribution shows up okay as
+# it overlays the aggregated one (and is thinner line).
+
+# Doing evenly on a log scale since range is quite large for aggregated, and
+# x-axis is always logged (so I really should have always done this)
+x.PLB_agg = 10^seq(log10(x_lim_global[1]),
+                   log10(x_lim_global[2]),
+                   length=1000)     # x values to plot PLB
+
+#  Need to insert value close to xmax to make log-log curve go down further;
+#   since log(1 - pPLB(xmax, ...)) = log(0) = -Inf   we need to force the asymptopte
+x.PLB_agg_length = length(x.PLB_agg)
+x.PLB_agg = c(x.PLB_agg[-x.PLB_agg_length],
+              0.9999999999 * x.PLB_agg[x.PLB_agg_length],
+              x.PLB_agg[x.PLB_agg_length])
+
+y.PLB_agg = (1 - pPLB_agg(x = x.PLB_agg,
+                          b_vec = b_vec_known,
+                          n_vec = n_vec,
+                          xmin = xmin_from_data,
+                          xmax = xmax_from_data)) * length(x_full)
+
+lines(x.PLB_agg,
+      y.PLB_agg,
+      col = "yellow",
+      lwd = 4)
+
+# Now plot each individually fitted sample, based on the range of the data.
+for(s in 1:S){
+  x.PLB = seq(min(x[[s]]),
+              max(x[[s]]),
+              length=1000)     # x values to plot PLB.  These are s-specific, as
+                               # just covering the correct range.
+
+  #  Need to insert value close to xmax to make log-log curve go down further;
+  #   since log(1 - pPLB(xmax, ...)) = log(0) = -Inf   we need to force the asymptopte
+  x.PLB.length = length(x.PLB)
+  x.PLB = c(x.PLB[-x.PLB.length],
+            0.9999999999 * x.PLB[x.PLB.length],
+            x.PLB[x.PLB.length])
+
+  y.PLB = (1 - pPLB(x = x.PLB,
+                    b = b_mle[s],
+                    xmin = min(x.PLB),
+                    xmax = max(x.PLB))) * length(x[[s]])
+
+  lines(x.PLB,
+        y.PLB,
+        col = col_vec[s],
+        lwd = 3)
+}
+
+```
+
+Did these to work out why the figure wasn't originally correct. Helps
+understanding so leaving here.
+```{r testing}
+head(y.PLB_agg)
+
+s <- 1
+y.s1 <- (1 - pPLB(x.PLB_agg, b_vec_known[s], xmin_from_data[s], xmax_from_data[s])) * length(x_full)
+
+# head should be the same as one above, since s=2 to 4 (below) are all 0:
+head(y.s1)
+
+# expect_different(head(y.PLB_agg), head(y.s1))   # fails as expected because x.PLB and
+#  x.PLB_agg are different (both 1001 spanning their range)
+expect_equal(min(x[[1]]), min(x.PLB_agg))
+
+s <- 2
+y.s2 <- (1 - pPLB(x.PLB_agg, b_vec_known[s], xmin_from_data[s], xmax_from_data[s])) * length(x_full)
+head(y.s2)
+
+s <- 3
+y.s3 <- (1 - pPLB(x.PLB_agg, b_vec_known[s], xmin_from_data[s], xmax_from_data[s])) * length(x_full)
+head(y.s3)
+
+s <- 4
+y.s4 <- (1 - pPLB(x.PLB_agg, b_vec_known[s], xmin_from_data[s], xmax_from_data[s])) * length(x_full)
+head(y.s4)
+
+
+# These aren't quite the same, as expected, because you never sample fully up
+# to the bounds (particularly xmax):
+range(c(xmin_known, xmax_known))
+c(min(xmin_from_data), max(xmax_from_data))
+x_lim_global   # is the same as preceding, by definition.
+```
+
+# Taking the above plotting code and functionalising it
+
+```{r functionalise, fig.cap="Same as previous figure but using functionalised code, and including tick marks."}
+MLE.plot_agg(x = x_full,
+             b_vec = b_vec_known,
+             n_vec = n_vec,
+             xmin_vec = xmin_from_data,
+             xmax_vec = xmax_from_data)
+```
+
+# For Juliana
+
+So you already have values for your four fitted samples of body sizes. So all
+you need is to run the following function (which is the same as above), with the arguments as described here by my comments:
+```{r forjuliana, fig.cap="Same as previous figure, with code annotated with instructions."}
+MLE.plot_agg(x = x_full,                 # vector containing all your body weights
+             b_vec = b_vec_known,        # vector, one element for each sample
+                                         # (Crustacea, etc.) representing your
+                                         # MLE for b for that sample
+             n_vec = n_vec,              # vector, one element for size of each sample
+             xmin_vec = xmin_from_data,  # vector, minimum body size for each sample
+             xmax_vec = xmax_from_data) # vector, minimum body size for each sample
+```
+
+## Simulate data again, but with values based on 2019 results
+
+```{r simulate2019}
+# Eyeballing these numbers from Juliana's results for 2019, using her colours
+#  to give realistic numbers
+n_vec <- c(6000, 6000, 1600, 2000)
+# b_vec_known <- c(-1.09, -1.33, -1.17, -1.19)
+b_vec_known <- c(-2, -2, -2, -2)  # Try this to see if aggregated looks like
+                                  # just one size spectrum. TODO then try
+                                  # fitting b to the full spectrum, see what
+                                  # happens! Also need full fit for Juliana's anyway.
+xmin_known <- c(0.3, 1, 5, 3)
+xmax_known <- c(80, 800, 500, 550)
+
+# Copying some of the earlier code to do simulations - Juliana, you won't need
+# to do this as you have real data, just replace the above values with your
+# exact values.
+
+x_full <- NULL    # anumeric(sum(n_vec))
+
+for(s in 1:S){
+  x[[s]] <- rPLB(n_vec[s],
+                 b = b_vec_known[s],
+                 xmin = xmin_known[s],
+                 xmax = xmax_known[s])
+
+  # Save having to keep calculating these when iterating - TODO functionalise
+  xmin <- min(x[[s]])
+  xmax <- max(x[[s]])
+  sum_log_x <- sum(log(x[[s]]))
+  PL_bMLE <- 1/(log(min(x[[s]])) - sum(log(x[[s]])/length(x[[s]]))) - 1
+
+  MLE_res <- calcLike(negLL.fn = negLL.PLB,
+                      p = PL_bMLE,
+                      x = x[[s]],
+                      n = n_vec[s],
+                      xmin = xmin,
+                      xmax = xmax,
+                      sumlogx = sum_log_x)
+  b_mle[s] <- MLE_res$MLE
+  b_conf_min[s] <- MLE_res$conf[1]
+  b_conf_max[s] <- MLE_res$conf[2]
+
+  xmin_from_data[s] <- min(x[[s]])
+  xmax_from_data[s] <- max(x[[s]])
+
+  x_full <- c(x_full,
+              x[[s]])             # concatenate all values
+}
+
+x_lim_global <- range(x_full)     # for plotting on same axes
+```
+
+```{r plotsimulatedjuliana, fig.cap = "Resulting plot of roughly 2019 values, with aggregated PLB shown in yellow. Data are simulated from the four fitted distributions and then aggregated (i.e. not real raw data), based on sample size and b based on 2019 results."}
+MLE.plot_agg(x = x_full,                 # vector containing all your body weights
+             b_vec = b_vec_known,        # vector, one element for each sample
+                                         # (Crustacea, etc.) representing your
+                                         # MLE for b for that sample
+             n_vec = n_vec,              # vector, one element for size of each sample
+             xmin_vec = xmin_from_data,  # vector, minimum body size for each sample
+             xmax_vec = xmax_from_data) # vector, minimum body size for each sample
+```
+
+# Now use all data in list form, to show the data on the figure (to better match Juliana's)
+
+```{r plotlist, fig.cap = "Now using new function to show all the data."}
+MLE.plot_agg_list(x_list = x,                 # Data as a list object, one
+                                              #  vector for each sample
+                  b_vec = b_vec_known,        # vector, one element for each sample
+                                              #  (Crustacea, etc.) representing your
+                                              #  MLE for b for that sample
+                  n_vec = n_vec,              # vector, one element for size of each sample
+                  xmin_vec = xmin_from_data,  # vector, minimum body size for each sample
+                  xmax_vec = xmax_from_data)  # vector, minimum body size for each sample
+
+# This didn't quite work within my function for some reason, but it does here - I'll try it when I
+# get back TODO.
+for(s in 1:S){
+  points(sort(x[[s]],
+              decreasing = TRUE),
+         1:length(x[[s]]),
+         col = col_vec[s])
+}
+```
+
+Juliana - the code you probably want, if you just want to add the extra yellow
+curve to your plots, is L191 in aggregating-functions.R. It uses the pPLB
+function that you can just source from that same file. I can tidy some of this
+up and help out when I'm back from vacation in a few weeks.
+
+Hope this helps! I can certainly help writing any of it up if you want to use
+it. I think this is a neat new idea.
+
+
+# Further ideas
+
+ - Also may want to add the red curve like Juliana has - the fit of the full
+community data set to a single PLB, to illustrate it.
+ - think about incorporating conf intervals

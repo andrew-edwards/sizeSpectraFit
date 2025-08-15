@@ -73,9 +73,7 @@ groups <- unique(res_table_agg$Group)    # Assume we're keeping everything in
 ```
 
 
-TODO Plot all the data (should be the same way as MLEbins plot. So lots of boxes.
- Could plot the five PLB fits like I did for MLE example.
- Plot the aggregated fit.
+TODO Plot the aggregated fit.
 
 TODO Need to summarise those results in a plot of $b$ with confidence
 intervals.
@@ -161,7 +159,6 @@ for(i in 2:length(groups)){    # Start from 2 to exclude full community
 }
 ```
 
-
 ## Conclusions from these results
 
 TODO
@@ -201,5 +198,42 @@ be done differently.
 
 ## Aggregating onto one plot
 
-I think this can be done, with the size spectra 'added' together to give a
-community one. Bit of work still to do that.
+`aggregate_mlebins()` is used in analysis to combine.
+
+Think I just need to write the plotting function. It should work on
+`baseline_agg` etc. which have class `mlebins_list`.
+
+on 7/5/25. Found
+some .Rmd code (originally in data-raw/zabala-data/zabala-data-analysis.Rmd but
+that is now deleted, copying from GitHub; was the same commit as the new function).
+
+And also `aggregating-functions.R` that contains several functions that are
+needed for plotting. Was consistent with sizeSpectra, so just need to update
+those for sizeSpectra2. HERE. Copied into `R-aggregating/`, including .Rmd and
+.pdf.
+
+Maybe update the pdf first as a new report, as it counts for new methods also
+(likely needed as an appendix for the manuscript).
+
+
+
+
+
+```{r, aggregatefit, eval = FALSE}
+x_min_global <- min(res_table_agg$x_min)
+x_max_global <- max(res_table_agg$x_max)
+
+# Had this back in May, but saving has changed.
+
+
+# Already in res_table_agg: b_vec, n_vec, x_min_vec,
+
+# x_max_vec, for simplicity in plotting.
+# Save as a mlebins_list object, then create plotting function for that.
+
+# Plot all the data (should be the same way as MLEbins plot. So lots of boxes.
+# Could plot the five PLB fits like I did for MLE example.
+# Plot the aggregated fit.
+
+
+```
