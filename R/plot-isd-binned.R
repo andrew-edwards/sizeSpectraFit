@@ -29,6 +29,9 @@
 ##' @param LBN_style Whether to plot an LBN style plot (similar to Fig. 6a of MEE
 ##'   paper), used directly from `plot.size_spectrum_numeric()` to give the
 ##'   recommended Fig. 6 plot for MLE results, provided data are body masses.
+##' @param show_fit_on_top logical, whether to plot the fitted PLB curve on top of the
+##'   data or underneath. Usually on top (the default) is fine, but sometimes
+##'   having it underneath is better.
 ##' @return single panel plot of the ISD with data in binned form like in
 ##'   Fig. 7a or 7b of MEPS paper, but with nonoverlapping bins; returns nothing.
 ##' @export
@@ -76,7 +79,8 @@ plot_isd_binned <- function(res_mlebin,
                             rect_col = "grey",
                             fit_col = "red",
                             fit_lwd = 2,
-                            conf_lty = 2
+                            conf_lty = 2,
+                            show_fit_on_top = TRUE
                             # decide if want to have , ...)
                             # From sizeSpectra::ISD_bin_plot, may want some
                               #        xlim = NA,
@@ -135,6 +139,16 @@ plot_isd_binned <- function(res_mlebin,
     y_small_ticks_by = y_small_ticks_by,
     y_small_ticks_labels = y_small_ticks_labels)
 
+
+  if(!show_fit_on_top){                              # Plot fit first, under data
+    lines(x_plb, y_plb, col = fit_col, lwd = fit_lwd)
+    if(plot_conf_ints){
+      lines(x_plb, y_plb_conf_min, col = fit_col, lty = conf_lty)
+      lines(x_plb, y_plb_conf_max, col = fit_col, lty = conf_lty)
+    }
+  }
+
+
   rect(xleft = dat$bin_min,
        ybottom = dat$low_count,
        xright = dat$bin_max,
@@ -167,10 +181,12 @@ plot_isd_binned <- function(res_mlebin,
            col = seg_col)
   }
 
-  lines(x_plb, y_plb, col = fit_col, lwd = fit_lwd)   # Plot line last so can see it
-  if(plot_conf_ints){
-    lines(x_plb, y_plb_conf_min, col = fit_col, lty = conf_lty)
-    lines(x_plb, y_plb_conf_max, col = fit_col, lty = conf_lty)
+  if(show_fit_on_top){
+    lines(x_plb, y_plb, col = fit_col, lwd = fit_lwd)   # Plot line last so can see it
+    if(plot_conf_ints){
+      lines(x_plb, y_plb_conf_min, col = fit_col, lty = conf_lty)
+      lines(x_plb, y_plb_conf_max, col = fit_col, lty = conf_lty)
+    }
   }
 
 # TODO fix the legend

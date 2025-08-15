@@ -122,7 +122,7 @@ plot.size_spectrum_mlebin <- function(res_mlebin,
                              xmax = max(x_plb))) * n
 
 
-  if(is.na(ylim)){
+  if(all(is.na(ylim))){
     ylim <- c(y_scaling * min(dat$count_gte_bin_min),
               max(dat$high_count))
   }

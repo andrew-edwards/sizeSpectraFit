@@ -1,5 +1,5 @@
 ---
-title: "Summarising the ananlyses of Juliana Zabala's data having wrangled it"
+title: "Summarising the analysis of Mediterranean data using MLEbins"
 author: "Andrew Edwards and Juliana Zabala"
 output: pdf_document
 fontsize: 12pt
@@ -10,18 +10,18 @@ date: "Last compiled on `r format(Sys.time(), '%d %B, %Y')`"
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "",
-  cache = TRUE,
-  cache_path = "zabala-summary-cache/",
-  fig.path = "zabala-summary-figs-cache/",
-  fig.width = 7,
-  fig.height = 9
+  cache = FALSE,
+  # cache_path = "med-summary-4-cache/",
+  # fig.path = "med-summary-4-figs-cache/",
+  fig.width = 8,
+  fig.height = 10
 )
   # comment = "#>",
 ```
 
 ```{r, build, echo = FALSE, eval = FALSE}
 # To build either run this line or click knit button in RStudio:
-rmarkdown::render("zabala-summary.Rmd")
+rmarkdown::render("med-summary-4.Rmd")
 ```
 
 ```{r, packages, echo = FALSE, cache = FALSE}
@@ -34,7 +34,7 @@ Copying from `mediterranean-analysis-2/zabala-summary.Rmd`, which I hadn't
 updated for `mediterranean-analysis-3/`. Committing before changing anything
 further.
 
-Need to have already run `zabala-data-analysis.Rmd` which takes a while to run
+Need to have already run `med-analysis-4.Rmd` which takes a while to run
 and saves three `.rds`
 files in the same directory. Or just have the three files. The files contain the
 results after some exploration and iterative calculations.
@@ -48,9 +48,11 @@ ntr_agg <- readRDS("ntr_agg.rds")
 res_table_agg <- readRDS("res_table_agg.rds")
 ```
 
-Each of the first three is a list for that strata, with: results for each of the five species groups; the
+Each of the first three is a list for that strata, with: results for each of the
+full community and then the five species groups; the
 data all aggregated together for a master plot; and a summary table of results
-that contains the values needed.
+that contains the values needed. Probably don't want the full community, so
+exclude it from plots.
 
 `res_table_agg` is all results regarding $b$ in
 one table for simplicity (the same values are parsed out in each strata).
@@ -67,7 +69,7 @@ First, need a global range for the body sizes:
 x_min_global <- min(res_table_agg$x_min)
 x_max_global <- max(res_table_agg$x_max)
 groups <- unique(res_table_agg$Group)    # Assume we're keeping everything in
-                                        # the same order, no reason not to
+                                         # the same order, no reason not to
 ```
 
 
@@ -83,22 +85,43 @@ intervals.
 Could also plot each one in turn with linear y-axis also will probably want in
 an Appendix. Do panel plot first.
 
-```{r, panelplot}
-par(mfrow = c(5, 3),    # group in each row, strata in each column
-    oma = c(0, 3, 3, 0))
+HERE try cowplot
 
-for(i in 1:length(groups)){
+```{r, panelplot, fig.cap = "Summary plot of all groups (rows) and strata(columns), with a consistent x-axis range throughout, and a consistent y-axis range for each group. Data are shown as rectangles representing the range of possible values within each body-mass bin, but due to the small bins these mostly show up as lines."}
+par(mfrow = c(5, 3),    # group in each row, strata in each column
+    oma = c(0, 3, 3, 0),
+    mar = c(3, 3, 1, 0.2))
+
+seg_col = "black"      # bins are so small the default green does not really
+                       # help
+
+for(i in 2:length(groups)){    # Start from 2 to exclude full community
+  # Based on calculation in plot.size_spectrum_mlebin():
+  y_min_group <- 0.75 * min(c(baseline_agg[[i]]$data$count_gte_bin_min,
+                              fg_agg[[i]]$data$count_gte_bin_min,
+                              ntr_agg[[i]]$data$count_gte_bin_min))
+
+  y_max_group <- max(c(baseline_agg[[i]]$data$high_count,
+                       fg_agg[[i]]$data$high_count,
+                       ntr_agg[[i]]$data$high_count))
+
+  y_lim_group = c(y_min_group,
+                  y_max_group)
+
   plot(baseline_agg[[i]],
        xlim = c(x_min_global,
                 x_max_global),
-       log_y_axis = "yes",
-       legend_text_second_row_multiplier = 4)
+       ylim = y_lim_group,
+       style = "log_y_axis",
+       legend_text_second_row_multiplier = 4,
+       seg_col = seg_col,
+       show_fit_on_top = FALSE)
 
   mtext(groups[i],
         side = 2,
         line = 3)
 
-  if(i ==1){
+  if(i ==2){
     mtext("Baseline",
           side = 3,
           line = 1)
@@ -107,10 +130,14 @@ for(i in 1:length(groups)){
   plot(fg_agg[[i]],
        xlim = c(x_min_global,
                 x_max_global),
-       log_y_axis = "yes",
-       legend_text_second_row_multiplier = 4)
+       ylim = y_lim_group,
+       style = "log_y_axis",
+       legend_text_second_row_multiplier = 4,
+       seg_col = seg_col,
+       ylab = "",
+       show_fit_on_top = FALSE)
 
-  if(i ==1){
+  if(i ==2){
     mtext("Fishing Grounds",
           side = 3,
           line = 1)
@@ -119,10 +146,14 @@ for(i in 1:length(groups)){
   plot(ntr_agg[[i]],
        xlim = c(x_min_global,
                 x_max_global),
-       log_y_axis = "yes",
-       legend_text_second_row_multiplier = 4)
+       ylim = y_lim_group,
+       style = "log_y_axis",
+       legend_text_second_row_multiplier = 4,
+       seg_col = seg_col,
+       ylab = "",
+       show_fit_on_top = FALSE)
 
-  if(i ==1){
+  if(i ==2){
     mtext("No-take Reserve",
           side = 3,
           line = 1)
@@ -130,7 +161,10 @@ for(i in 1:length(groups)){
 }
 ```
 
+
 ## Conclusions from these results
+
+TODO
 
 From theory we would expect a steepening of the size spectrum ($b$ becoming more
 negative) under fishing
