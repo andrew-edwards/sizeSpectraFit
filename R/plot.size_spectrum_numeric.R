@@ -51,8 +51,8 @@ plot.size_spectrum_numeric <- function(res,
                                        style = "log_y_axis",
                                        xlim = c(min(res$x),
                                                 max(res$x)),
-                                       ylim = NA,
-                                       x_plb = NA,
+                                       ylim = NULL,
+                                       x_plb = NULL,
                                        y_scaling = 0.75,
                                        mle_round = 2,
                                        inset_label = c(0, -0.02),
@@ -79,7 +79,7 @@ plot.size_spectrum_numeric <- function(res,
               style %in% c("log_y_axis", "linear_y_axis", "both_y_axes",
                            "biomass", "biomass_and_isd"))
 
-  par_orig <- par(no.readonly = TRUE)
+  # par_orig <- par(no.readonly = TRUE)
 
   # Work out calculations needed for both types of plot and then pass them on to
   # plot_isd() (and plot_isd_binned() for `both`).:
@@ -101,7 +101,7 @@ plot.size_spectrum_numeric <- function(res,
   ##   }
 
   # x values to plot PLB if not provided; need high resolution for both plots.
-  if(is.na(x_plb)){
+  if(is.null(x_plb)){
     x_plb <- exp(seq(log(x_min),
                      log(x_max),
                      length = 10000))
@@ -128,7 +128,7 @@ plot.size_spectrum_numeric <- function(res,
                              xmin = min(x_plb),
                              xmax = max(x_plb))) * n
 
-  if(is.na(ylim)){
+  if(is.null(ylim)){
     ylim <- c(y_scaling,
               length(x))
    # TODO in help mention for this one it just scales
@@ -240,7 +240,8 @@ plot.size_spectrum_numeric <- function(res,
              ...)
   }
 
-  par(par_orig)      # Leave as was found
+  # par(par_orig)      # Leave as was found, but messes up (starts again) if have said par(mfrow
+                     # = c(4,1), so think best to not do.
 
   invisible()
 }

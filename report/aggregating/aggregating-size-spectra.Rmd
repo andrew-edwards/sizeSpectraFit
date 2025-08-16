@@ -8,8 +8,12 @@ output:
 fontsize: 12pt
 date: "Last compiled on `r format(Sys.time(), '%d %B, %Y')`"
 ---
+```{r, build, echo = FALSE, eval = FALSE}
+# To build either run this line or click knit button in RStudio:
+rmarkdown::render("aggregating-size-spectra.Rmd")
+```
 
-<!-- rmarkdown::render("aggregating-size-spectra.Rmd") -->
+
 
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
@@ -20,18 +24,17 @@ knitr::opts_chunk$set(
 )
 ```
 
-Juliana -- these are my working notes that helped me figure out the new plotting
-approach. See the "For Juliana" section at the end for instructions for your
-analyses -- don't worry if some of this does not make too much sense, it was me
-figuring things out. You need the "aggregating-functions.R" file in the same
-directory as when running this .Rmd file. You should be able to run this fine,
-as it uses simulated data.
+HERE - this looks good. Bit of tidying at some point. NEXT: do similar plotting
+function for class `mlebins_list` (and presumably `mlebin_list`) to apply to the
+proper results. Might need different `plot_aggregate.***()` functions.
 
-I have some simulated data with settings to help see the figures clearly, and
+TODO these are working notes, can then change to be an Appendix for Juliana's manuscript.
+
+TODO: edit as needed. I have some simulated data with settings to help see the figures clearly, and
 some based on eyeballing the ranges and using your fitted $b$ values from your
 2019 data (that you sent me).
 
-TODO these are working notes, can then change to be an Appendix for Juliana's manuscript.
+
 
 ```{r setup, results = FALSE}
 load_all()
@@ -144,80 +147,50 @@ set.seed(42)
 S = 4
 
 # Make up some values to check plotting in particular is working
-col_vec <- c("lightblue", "orange", "green", "magenta")
+col_vec <- c("orange", "lightblue", "green", "magenta") # these are the defaults
+                                        # I think in plot_aggregate(), but
+                                        # useful to have here
 n_vec <- c(6000, 6000, 1600, 2000)
 b_vec_known <- c(-1.09, -2, -3, -4)
-xmin_known <- c(0.3, 10, 100, 500)
-xmax_known <- c(80, 800, 1000, 1500)
+xmin_known <- c(0.3, 10, 100, 300)
+xmax_known <- c(80, 4000, 1000, 1500)
 
 expect_equal(c(length(n_vec), length(b_vec_known), length(xmin_known),
                length(xmax_known)),
              rep(S, 4))
 
-x <- list()                             # To get filled with list of vectors of
-                                        # simulated data, one vector for each sample.
-# To save results
-b_mle <- numeric(S)
-b_conf_min <- numeric(S)
-b_conf_max <- numeric(S)
-xmin_from_data <- numeric(S)            # xmin value based on the simulated data
-xmax_from_data <- numeric(S)            #  (not the known value)
-x_lim_global <- c(NA, NA)               # Global max and min for consistent
-                                        #  plotting axes
-x_full <- NULL    # anumeric(sum(n_vec))
+res_list <- list()                      # To save results
 
 for(s in 1:S){
-  x[[s]] <- rPLB(n_vec[s],
-                 b = b_vec_known[s],
-                 xmin = xmin_known[s],
-                 xmax = xmax_known[s])
+  x_values <- rPLB(n_vec[s],
+                   b = b_vec_known[s],
+                   xmin = xmin_known[s],
+                   xmax = xmax_known[s])
 
-  # Save having to keep calculating these when iterating - TODO functionalise
-  xmin <- min(x[[s]])
-  xmax <- max(x[[s]])
-  sum_log_x <- sum(log(x[[s]]))
-  PL_bMLE <- 1/(log(min(x[[s]])) - sum(log(x[[s]])/length(x[[s]]))) - 1
-
-  MLE_res <- calcLike(negLL.fn = negLL.PLB,
-                      p = PL_bMLE,
-                      x = x[[s]],
-                      n = n_vec[s],
-                      xmin = xmin,
-                      xmax = xmax,
-                      sumlogx = sum_log_x)
-  b_mle[s] <- MLE_res$MLE
-  b_conf_min[s] <- MLE_res$conf[1]
-  b_conf_max[s] <- MLE_res$conf[2]
-
-  xmin_from_data[s] <- min(x[[s]])
-  xmax_from_data[s] <- max(x[[s]])
-
-  x_full <- c(x_full,
-              x[[s]])             # concatenate all values
+  res_list[[s]] <- fit_size_spectrum(x_values)    # x_values get included in
+  # MLE_res[[s]]
 }
 
-x_lim_global <- range(x_full)     # for plotting on same axes
+
+# Getting automated into function:
+xlim_global <- range(res_list[[1]]$x)     # for plotting on same axes
+for(s in 2:S){
+  xlim_global <- range(xlim_global,
+                        range(res_list[[s]]$x))
+}
+xlim_global
 ```
 
 # Plot data and results
 
-```{r plotting, fig.cap = "Four simulated data sets, each fit separately with a PLB (fits are good as data were simulated from a PLB)."}
+```{r plotting, fig.cap = "Four simulated data sets, each fit separately with a PLB (fits are good as data were simulated from PLB distributions)."}
 par(mfrow = c(min(S, 4), 1),
     mai = c(0.6, 0.5, 0.05, 0.3))  # ISD_bin_plot default was 0.4, 0.5 0.05, 0.3
 
 for(s in 1:S){
-#  MLE.plot(x[[s]],
-#           b = b_mle[s],
-#           log.xy = "x",
-#           xlim_global = x_lim_global)
-
-  MLE.plot(x[[s]],
-           b = b_mle[s],
-           xlim_global = x_lim_global)
-  legJust(textVec = paste0("b=",
-                           round(b_mle[s], 2)),
-          logxy = TRUE)              # TODO add arguement for just logx
-
+  plot(res_list[[s]],
+       xlim = xlim_global,
+       fit_col = col_vec[s])
 }
 ```
 
@@ -225,127 +198,12 @@ for(s in 1:S){
 
 So we have `r S` fitted distributions that we want to aggregate.
 
-```{r plotagg, fig.cap = "Full data set (black circles), the four fitted PLB's using same colour coding as Juliana's plots. The thick yellow curve is the aggregated PLB distribution, the distribution obtained from aggregating the four fitted PLB's together. Fits are very good because the data are simulated from PLB's, and likelihood used to estimated the $b$ exponents. This figure demonstrates the code seems to be working well."}
-# Adapting from MLE.plot to get working, then make into new function
-plot(sort(x_full, decreasing = TRUE),
-     1:length(x_full),
-     log = "xy",
-     xlab = expression(paste("Values, ", italic(x))),
-     ylab = expression( paste("Number of ", values >= x), sep=""),
-     xlim = x_lim_global,
-     ylim = c(1, length(x_full)))
-
-# Add aggregated distriution first so that the right-most distribution shows up okay as
-# it overlays the aggregated one (and is thinner line).
-
-# Doing evenly on a log scale since range is quite large for aggregated, and
-# x-axis is always logged (so I really should have always done this)
-x.PLB_agg = 10^seq(log10(x_lim_global[1]),
-                   log10(x_lim_global[2]),
-                   length=1000)     # x values to plot PLB
-
-#  Need to insert value close to xmax to make log-log curve go down further;
-#   since log(1 - pPLB(xmax, ...)) = log(0) = -Inf   we need to force the asymptopte
-x.PLB_agg_length = length(x.PLB_agg)
-x.PLB_agg = c(x.PLB_agg[-x.PLB_agg_length],
-              0.9999999999 * x.PLB_agg[x.PLB_agg_length],
-              x.PLB_agg[x.PLB_agg_length])
-
-y.PLB_agg = (1 - pPLB_agg(x = x.PLB_agg,
-                          b_vec = b_vec_known,
-                          n_vec = n_vec,
-                          xmin = xmin_from_data,
-                          xmax = xmax_from_data)) * length(x_full)
-
-lines(x.PLB_agg,
-      y.PLB_agg,
-      col = "yellow",
-      lwd = 4)
-
-# Now plot each individually fitted sample, based on the range of the data.
-for(s in 1:S){
-  x.PLB = seq(min(x[[s]]),
-              max(x[[s]]),
-              length=1000)     # x values to plot PLB.  These are s-specific, as
-                               # just covering the correct range.
-
-  #  Need to insert value close to xmax to make log-log curve go down further;
-  #   since log(1 - pPLB(xmax, ...)) = log(0) = -Inf   we need to force the asymptopte
-  x.PLB.length = length(x.PLB)
-  x.PLB = c(x.PLB[-x.PLB.length],
-            0.9999999999 * x.PLB[x.PLB.length],
-            x.PLB[x.PLB.length])
-
-  y.PLB = (1 - pPLB(x = x.PLB,
-                    b = b_mle[s],
-                    xmin = min(x.PLB),
-                    xmax = max(x.PLB))) * length(x[[s]])
-
-  lines(x.PLB,
-        y.PLB,
-        col = col_vec[s],
-        lwd = 3)
-}
-
+```{r plotagg, fig.cap = "Full data set (black circles), the four fitted PLB's using same colour coding as Juliana's plots. The thick yellow curve is the aggregated PLB distribution, the distribution obtained from aggregating the four fitted PLB's together. Fits are very good because the data are simulated from PLB's, and likelihood was used to estimated the $b$ exponents. This figure demonstrates the code seems to be working well."}
+plot_aggregate(res_list)
 ```
 
-Did these to work out why the figure wasn't originally correct. Helps
-understanding so leaving here.
-```{r testing}
-head(y.PLB_agg)
-
-s <- 1
-y.s1 <- (1 - pPLB(x.PLB_agg, b_vec_known[s], xmin_from_data[s], xmax_from_data[s])) * length(x_full)
-
-# head should be the same as one above, since s=2 to 4 (below) are all 0:
-head(y.s1)
-
-# expect_different(head(y.PLB_agg), head(y.s1))   # fails as expected because x.PLB and
-#  x.PLB_agg are different (both 1001 spanning their range)
-expect_equal(min(x[[1]]), min(x.PLB_agg))
-
-s <- 2
-y.s2 <- (1 - pPLB(x.PLB_agg, b_vec_known[s], xmin_from_data[s], xmax_from_data[s])) * length(x_full)
-head(y.s2)
-
-s <- 3
-y.s3 <- (1 - pPLB(x.PLB_agg, b_vec_known[s], xmin_from_data[s], xmax_from_data[s])) * length(x_full)
-head(y.s3)
-
-s <- 4
-y.s4 <- (1 - pPLB(x.PLB_agg, b_vec_known[s], xmin_from_data[s], xmax_from_data[s])) * length(x_full)
-head(y.s4)
-
-
-# These aren't quite the same, as expected, because you never sample fully up
-# to the bounds (particularly xmax):
-range(c(xmin_known, xmax_known))
-c(min(xmin_from_data), max(xmax_from_data))
-x_lim_global   # is the same as preceding, by definition.
-```
-
-# Taking the above plotting code and functionalising it
-
-```{r functionalise, fig.cap="Same as previous figure but using functionalised code, and including tick marks."}
-MLE.plot_agg(x = x_full,
-             b_vec = b_vec_known,
-             n_vec = n_vec,
-             xmin_vec = xmin_from_data,
-             xmax_vec = xmax_from_data)
-```
-
-# For Juliana
-
-So you already have values for your four fitted samples of body sizes. So all
-you need is to run the following function (which is the same as above), with the arguments as described here by my comments:
-```{r forjuliana, fig.cap="Same as previous figure, with code annotated with instructions."}
-MLE.plot_agg(x = x_full,                 # vector containing all your body weights
-             b_vec = b_vec_known,        # vector, one element for each sample
-                                         # (Crustacea, etc.) representing your
-                                         # MLE for b for that sample
-             n_vec = n_vec,              # vector, one element for size of each sample
-             xmin_vec = xmin_from_data,  # vector, minimum body size for each sample
-             xmax_vec = xmax_from_data) # vector, minimum body size for each sample
+```{r, stop, cache = FALSE}
+knitr::knit_exit()
 ```
 
 ## Simulate data again, but with values based on 2019 results
