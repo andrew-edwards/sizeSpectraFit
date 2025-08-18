@@ -78,6 +78,8 @@ plot.size_spectrum_mlebin <- function(res_mlebin,
                                       ){   # TODO decide if want ... yes, just
                                         # make sure help files link to all functions
 
+  # Parts of this are included in plot_aggregate_mlebin() so if change things
+  #  here may need to check that and change there also.
   stopifnot("style must be log_y_axis, linear_y_axis, both_y_axes, biomass, or biomass_and_log" =
               style %in% c("log_y_axis", "linear_y_axis", "both_y_axes",
                            "biomass", "biomass_and_log"))

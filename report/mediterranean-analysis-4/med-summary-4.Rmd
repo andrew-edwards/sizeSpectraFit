@@ -35,27 +35,48 @@ updated for `mediterranean-analysis-3/`. Committing before changing anything
 further.
 
 Need to have already run `med-analysis-4.Rmd` which takes a while to run
-and saves three `.rds`
+and saves four `*_list.rds`
 files in the same directory. Or just have the three files. The files contain the
 results after some exploration and iterative calculations.
 
 ## Results
 
+TODO had originally used `aggregate_mlebins()` to make tailored list, but now
+just having all results then doing such wrangling here as will keep plotting code
+more general (and avoids unpacking what I packed up). Can delete this comment
+when done.
+
 ```{r, loadresults}
-baseline_agg <- readRDS("baseline_agg.rds")
-fg_agg <- readRDS("fg_agg.rds")
-ntr_agg <- readRDS("ntr_agg.rds")
+baseline_agg_list <- readRDS("baseline_agg_list.rds")
+fg_agg_list <- readRDS("fg_agg_list.rds")
+ntr_agg_list <- readRDS("ntr_agg_list.rds")
 res_table_agg <- readRDS("res_table_agg.rds")
 ```
 
-Each of the first three is a list for that strata, with: results for each of the
-full community and then the five species groups; the
-data all aggregated together for a master plot; and a summary table of results
-that contains the values needed. Probably don't want the full community, so
-exclude it from plots.
+Each is a list for that strata, with 6 objects of results of class
+`determine_xmin_and_fit_mlebins`. First of each is for fitting the full
+community in one go, we might want to show just the curve of that fit; the
+actual data will be created anyway by the amalagamating plotting.
 
-`res_table_agg` is all results regarding $b$ in
-one table for simplicity (the same values are parsed out in each strata).
+`res_table_agg` is the summary table that has been built up during analysis (and
+users should do that by using our .Rmd as a template). Was going to rebuild it
+but just what I created before for speed.
+
+Do not really need the histogram information in each list here, and may not even
+have it. So to generalise the code save strip out the histogram information if
+it is exists: (could functionalise this, but a bit more transparent like this)
+```{r, striphist}
+if("determine_xmin_and_fit_mlebins" %in% class(baseline_agg_list[[i]])){
+  baseline_agg <-   HERE strip out the histogram stuff from each, just do a
+  loop. May then make into a function.
+
+```
+
+
+
+
+TODO so making `aggregated_data` only in the plotting.
+data in objects).
 
 \clearpage
 
@@ -64,16 +85,15 @@ knitr::kable(res_table_agg,
              digits = 2)
 ```
 
-First, need a global range for the body sizes:
+First, need a global range for the body sizes, note those include full community
+that we might not look at, so may always want to come back and tweak
 ```{r, globalx}
 x_min_global <- min(res_table_agg$x_min)
 x_max_global <- max(res_table_agg$x_max)
 groups <- unique(res_table_agg$Group)    # Assume we're keeping everything in
                                          # the same order, no reason not to
+groups <- groups[groups != "Full community"]  # Since don't want plots for full community
 ```
-
-
-TODO Plot the aggregated fit.
 
 TODO Need to summarise those results in a plot of $b$ with confidence
 intervals.
@@ -83,8 +103,6 @@ intervals.
 Could also plot each one in turn with linear y-axis also will probably want in
 an Appendix. Do panel plot first.
 
-HERE try cowplot
-
 ```{r, panelplot, fig.cap = "Summary plot of all groups (rows) and strata(columns), with a consistent x-axis range throughout, and a consistent y-axis range for each group. Data are shown as rectangles representing the range of possible values within each body-mass bin, but due to the small bins these mostly show up as lines."}
 par(mfrow = c(5, 3),    # group in each row, strata in each column
     oma = c(0, 3, 3, 0),
@@ -93,7 +111,7 @@ par(mfrow = c(5, 3),    # group in each row, strata in each column
 seg_col = "black"      # bins are so small the default green does not really
                        # help
 
-for(i in 2:length(groups)){    # Start from 2 to exclude full community
+for(i in 1:length(groups)){
   # Based on calculation in plot.size_spectrum_mlebin():
   y_min_group <- 0.75 * min(c(baseline_agg[[i]]$data$count_gte_bin_min,
                               fg_agg[[i]]$data$count_gte_bin_min,
@@ -119,7 +137,7 @@ for(i in 2:length(groups)){    # Start from 2 to exclude full community
         side = 2,
         line = 3)
 
-  if(i ==2){
+  if(i == 1){
     mtext("Baseline",
           side = 3,
           line = 1)
@@ -135,7 +153,7 @@ for(i in 2:length(groups)){    # Start from 2 to exclude full community
        ylab = "",
        show_fit_on_top = FALSE)
 
-  if(i ==2){
+  if(i == 1){
     mtext("Fishing Grounds",
           side = 3,
           line = 1)
@@ -151,7 +169,7 @@ for(i in 2:length(groups)){    # Start from 2 to exclude full community
        ylab = "",
        show_fit_on_top = FALSE)
 
-  if(i ==2){
+  if(i == 1){
     mtext("No-take Reserve",
           side = 3,
           line = 1)

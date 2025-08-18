@@ -1,4 +1,7 @@
-aggregate_mlebins <- function(res_list,
+aggregate_mlebins <- function(res_list,    # Now doing just the lists in
+                                        # analysis.Rmd to save objects, then
+                                        # using some of this function in the
+                                        # plotting and tables maybe.
                               res_table,
                               strata){
                               #group_names = c("crust",
@@ -32,7 +35,7 @@ aggregate_mlebins <- function(res_list,
 
   # Next aggregate matching bin_min and bin_max (might not be any, as would
   # require two species in different groups to have same bin_min and bin_max),
-  # but need to recalculat anyway since count_gte_bin_min etc. will be different
+  # but need to recalculate anyway since count_gte_bin_min etc. will be different
   # for aggregated data set compared to values in each group.
 
   aggregated_data <- dplyr::summarise(group_by(aggregated_data_temp,

@@ -18,7 +18,10 @@ knitr::opts_chunk$set(
 )
   # comment = "#>",
 
-knitr::dep_auto()  # or dep_auto seems cleverer
+knitr::dep_auto()  # or dep_auto seems cleverer, though not always working it
+                   # seems so be careful (final chunk wasn't rerun when
+                   # penultimate one was changed). May be because have to have
+                   # this command in there from the beginning?
 ```
 
 ```{r, build, echo = FALSE, eval = FALSE}
@@ -1019,9 +1022,58 @@ knitr::kable(res_table_agg,
 
 ## Aggregated fit to data
 
+Now just saving the results for each strata in a list. (See end of file for what
+I originally did). Can include the full results (fitting in one go).
+
+Each object is of class `determine_xmin_and_fit_mlebins`.
+
+```{r, aggregatefitnew}
+baseline_agg_list <- list(full = res_full_baseline,
+                          crust = res_crust_baseline,
+                          actin = res_actin_baseline,
+                          chondr = res_chondr_baseline,
+                          cephsmall = res_cephsmall_baseline,
+                          cephlarge = res_cephlarge_baseline)
+
+fg_agg_list <- list(full = res_full_fg,
+                    crust = res_crust_fg,
+                    actin = res_actin_fg,
+                    chondr = res_chondr_fg,
+                    cephsmall = res_cephsmall_fg,
+                    cephlarge = res_cephlarge_fg)
+
+
+ntr_agg_list <- list(full = res_full_ntr,
+                     crust = res_crust_ntr,
+                     actin = res_actin_ntr,
+                     chondr = res_chondr_ntr,
+                     cephsmall = res_cephsmall_ntr,
+                     cephlarge = res_cephlarge_ntr)
+```
+
+## Saving what is needed for plots and tables, and doing in med-summary.Rmd
+
+```{r, savingnew}
+saveRDS(baseline_agg_list,
+        "baseline_agg_list.rds")
+saveRDS(fg_agg_list,
+        "fg_agg_list.rds")
+saveRDS(ntr_agg_list,
+        "ntr_agg_list.rds")
+```
+
+```{r, exit, cache = FALSE}
+knitr::knit_exit()
+```
+
+
+## Aggregated fit to data (OLD, what was done but now just saving the results more simply above and doing further analyses in summary.Rmd)
+
+Not saving the full analyses in here, just the separate groups of interest;
+including the full analyses means that the aggregated values then double count
+all the data, and will mess up the plotting.
 ```{r, aggregatefit}
-baseline_agg <- aggregate_mlebins(list(full = res_full_baseline,
-                                       crust = res_crust_baseline,
+baseline_agg <- aggregate_mlebins(list(crust = res_crust_baseline,
                                        actin = res_actin_baseline,
                                        chondr = res_chondr_baseline,
                                        cephsmall = res_cephsmall_baseline,
@@ -1029,8 +1081,7 @@ baseline_agg <- aggregate_mlebins(list(full = res_full_baseline,
                                   res_table_agg,
                                   strata = "Baseline")
 
-fg_agg <- aggregate_mlebins(list(full = res_full_fg,
-                                 crust = res_crust_fg,
+fg_agg <- aggregate_mlebins(list(crust = res_crust_fg,
                                  actin = res_actin_fg,
                                  chondr = res_chondr_fg,
                                  cephsmall = res_cephsmall_fg,
@@ -1038,8 +1089,7 @@ fg_agg <- aggregate_mlebins(list(full = res_full_fg,
                             res_table_agg,
                             strata = "fg")
 
-ntr_agg <- aggregate_mlebins(list(full = res_full_ntr,
-                                  crust = res_crust_ntr,
+ntr_agg <- aggregate_mlebins(list(crust = res_crust_ntr,
                                   actin = res_actin_ntr,
                                   chondr = res_chondr_ntr,
                                   cephsmall = res_cephsmall_ntr,
@@ -1049,20 +1099,3 @@ ntr_agg <- aggregate_mlebins(list(full = res_full_ntr,
 ```
 
 Each one is saved as a `mlebins_list object` to then create plotting function.
-
-## Saving what is needed for plots and tables, and doing in med-summary.Rmd
-
-```{r, saving}
-saveRDS(baseline_agg,
-        "baseline_agg.rds")
-saveRDS(fg_agg,
-        "fg_agg.rds")
-saveRDS(ntr_agg,
-        "ntr_agg.rds")
-saveRDS(res_table_agg,
-        "res_table_agg.rds")
-```
-
-```{r, exit, cache = FALSE}
-# knitr::knit_exit()
-```
