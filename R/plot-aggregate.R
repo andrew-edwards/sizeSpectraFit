@@ -6,7 +6,10 @@
 ##'
 ##' @param res_list list of results, with each component a list object of a
 ##'   given type TODO first doing for `size_spectrum_numeric`, might be somewhat
-##'   automatic to generalise.
+##'   automatic to generalise. Am making plot_aggregate_mlebins() and prob
+##'   plot_aggregate_mlebin(); could check the class here and keep this as the
+##'   user outfacing function, or also make plot_aggregate_numeric and just call
+##'   the right one. Some of the details could be shared here maybe.
 ##' @param col_vec vector of colours to assign for each group
 ##' @return
 ##' @export

@@ -24,17 +24,14 @@ knitr::opts_chunk$set(
 )
 ```
 
-HERE - this looks good. Bit of tidying at some point. NEXT: do similar plotting
+HERE - this looks good. Bit of tidying at some point to be an Appendix for
+Juliana's manuscrip.
+
+NEXT: do similar plotting
 function for class `mlebins_list` (and presumably `mlebin_list`) to apply to the
-proper results. Might need different `plot_aggregate.***()` functions.
-
-TODO these are working notes, can then change to be an Appendix for Juliana's manuscript.
-
-TODO: edit as needed. I have some simulated data with settings to help see the figures clearly, and
-some based on eyeballing the ranges and using your fitted $b$ values from your
-2019 data (that you sent me).
-
-
+proper results. Might need different `plot_aggregate.***()` functions. Doing in
+the mediterranean analysis part, as is hard to simulate data, and don't really
+need that here.
 
 ```{r setup, results = FALSE}
 load_all()
@@ -202,106 +199,6 @@ So we have `r S` fitted distributions that we want to aggregate.
 plot_aggregate(res_list)
 ```
 
-```{r, stop, cache = FALSE}
-knitr::knit_exit()
-```
-
-## Simulate data again, but with values based on 2019 results
-
-```{r simulate2019}
-# Eyeballing these numbers from Juliana's results for 2019, using her colours
-#  to give realistic numbers
-n_vec <- c(6000, 6000, 1600, 2000)
-# b_vec_known <- c(-1.09, -1.33, -1.17, -1.19)
-b_vec_known <- c(-2, -2, -2, -2)  # Try this to see if aggregated looks like
-                                  # just one size spectrum. TODO then try
-                                  # fitting b to the full spectrum, see what
-                                  # happens! Also need full fit for Juliana's anyway.
-xmin_known <- c(0.3, 1, 5, 3)
-xmax_known <- c(80, 800, 500, 550)
-
-# Copying some of the earlier code to do simulations - Juliana, you won't need
-# to do this as you have real data, just replace the above values with your
-# exact values.
-
-x_full <- NULL    # anumeric(sum(n_vec))
-
-for(s in 1:S){
-  x[[s]] <- rPLB(n_vec[s],
-                 b = b_vec_known[s],
-                 xmin = xmin_known[s],
-                 xmax = xmax_known[s])
-
-  # Save having to keep calculating these when iterating - TODO functionalise
-  xmin <- min(x[[s]])
-  xmax <- max(x[[s]])
-  sum_log_x <- sum(log(x[[s]]))
-  PL_bMLE <- 1/(log(min(x[[s]])) - sum(log(x[[s]])/length(x[[s]]))) - 1
-
-  MLE_res <- calcLike(negLL.fn = negLL.PLB,
-                      p = PL_bMLE,
-                      x = x[[s]],
-                      n = n_vec[s],
-                      xmin = xmin,
-                      xmax = xmax,
-                      sumlogx = sum_log_x)
-  b_mle[s] <- MLE_res$MLE
-  b_conf_min[s] <- MLE_res$conf[1]
-  b_conf_max[s] <- MLE_res$conf[2]
-
-  xmin_from_data[s] <- min(x[[s]])
-  xmax_from_data[s] <- max(x[[s]])
-
-  x_full <- c(x_full,
-              x[[s]])             # concatenate all values
-}
-
-x_lim_global <- range(x_full)     # for plotting on same axes
-```
-
-```{r plotsimulatedjuliana, fig.cap = "Resulting plot of roughly 2019 values, with aggregated PLB shown in yellow. Data are simulated from the four fitted distributions and then aggregated (i.e. not real raw data), based on sample size and b based on 2019 results."}
-MLE.plot_agg(x = x_full,                 # vector containing all your body weights
-             b_vec = b_vec_known,        # vector, one element for each sample
-                                         # (Crustacea, etc.) representing your
-                                         # MLE for b for that sample
-             n_vec = n_vec,              # vector, one element for size of each sample
-             xmin_vec = xmin_from_data,  # vector, minimum body size for each sample
-             xmax_vec = xmax_from_data) # vector, minimum body size for each sample
-```
-
-# Now use all data in list form, to show the data on the figure (to better match Juliana's)
-
-```{r plotlist, fig.cap = "Now using new function to show all the data."}
-MLE.plot_agg_list(x_list = x,                 # Data as a list object, one
-                                              #  vector for each sample
-                  b_vec = b_vec_known,        # vector, one element for each sample
-                                              #  (Crustacea, etc.) representing your
-                                              #  MLE for b for that sample
-                  n_vec = n_vec,              # vector, one element for size of each sample
-                  xmin_vec = xmin_from_data,  # vector, minimum body size for each sample
-                  xmax_vec = xmax_from_data)  # vector, minimum body size for each sample
-
-# This didn't quite work within my function for some reason, but it does here - I'll try it when I
-# get back TODO.
-for(s in 1:S){
-  points(sort(x[[s]],
-              decreasing = TRUE),
-         1:length(x[[s]]),
-         col = col_vec[s])
-}
-```
-
-Juliana - the code you probably want, if you just want to add the extra yellow
-curve to your plots, is L191 in aggregating-functions.R. It uses the pPLB
-function that you can just source from that same file. I can tidy some of this
-up and help out when I'm back from vacation in a few weeks.
-
-Hope this helps! I can certainly help writing any of it up if you want to use
-it. I think this is a neat new idea.
-
-
-# Further ideas
-
- - Also may want to add the red curve like Juliana has - the fit of the full
-community data set to a single PLB, to illustrate it.
- - think about incorporating conf intervals
+Did try some other values based on Juliana's 2019 data, and tweaked the above
+ones based on those. So deleting from here, but if needed see this file under
+commit ce15339 on 15th August 2025.

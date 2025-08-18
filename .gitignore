@@ -5,6 +5,7 @@
 *cache*
 *.Rproj
 *.rds
+*.log
 
 .Rproj.user
 
