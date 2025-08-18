@@ -60,23 +60,54 @@ actual data will be created anyway by the amalagamating plotting.
 
 `res_table_agg` is the summary table that has been built up during analysis (and
 users should do that by using our .Rmd as a template). Was going to rebuild it
-but just what I created before for speed.
+but just use what I created before for speed.
 
 Do not really need the histogram information in each list here, and may not even
 have it. So to generalise the code save strip out the histogram information if
 it is exists: (could functionalise this, but a bit more transparent like this)
+
+HERE (done) strip out the histogram stuff from each, just do a
+  loop. Could make into a function. seems best to do up front allow for
+  flexibility in how results were created (e.g. with hist or not), so check the class within the loop.
+
 ```{r, striphist}
-if("determine_xmin_and_fit_mlebins" %in% class(baseline_agg_list[[i]])){
-  baseline_agg <-   HERE strip out the histogram stuff from each, just do a
-  loop. May then make into a function.
+baseline_agg <- list()
+for(i in 1:length(baseline_agg_list)){
+  if("determine_xmin_and_fit_mlebins" %in% class(baseline_agg_list[[i]])){
+    baseline_agg[[i]] <- baseline_agg_list[[i]]$mlebins    # might need mlebin
+    # also if we have determine_xmin_and_fit_mlebin, or below TODO
+  } else {
+    baseline_agg[[i]] <- baseline_agg_list[[i]]    # presumably already the
+                                        # mlebins or mlebin results
+  }
+  names(baseline_agg)[i] <- names(baseline_agg_list)[i]
+}
+
+fg_agg <- list()
+for(i in 1:length(fg_agg_list)){
+  if("determine_xmin_and_fit_mlebins" %in% class(fg_agg_list[[i]])){
+    fg_agg[[i]] <- fg_agg_list[[i]]$mlebins    # might need mlebin
+    # also if we have determine_xmin_and_fit_mlebin, or below TODO
+  } else {
+    fg_agg[[i]] <- fg_agg_list[[i]]    # presumably already the
+                                        # mlebins or mlebin results
+  }
+  names(fg_agg)[i] <- names(fg_agg_list)[i]
+}
+
+ntr_agg <- list()
+for(i in 1:length(ntr_agg_list)){
+  if("determine_xmin_and_fit_mlebins" %in% class(ntr_agg_list[[i]])){
+    ntr_agg[[i]] <- ntr_agg_list[[i]]$mlebins    # might need mlebin
+    # also if we have determine_xmin_and_fit_mlebin, or below TODO
+  } else {
+    ntr_agg[[i]] <- ntr_agg_list[[i]]    # presumably already the
+                                        # mlebins or mlebin results
+  }
+  names(ntr_agg)[i] <- names(ntr_agg_list)[i]
+}
 
 ```
-
-
-
-
-TODO so making `aggregated_data` only in the plotting.
-data in objects).
 
 \clearpage
 
@@ -92,7 +123,8 @@ x_min_global <- min(res_table_agg$x_min)
 x_max_global <- max(res_table_agg$x_max)
 groups <- unique(res_table_agg$Group)    # Assume we're keeping everything in
                                          # the same order, no reason not to
-groups <- groups[groups != "Full community"]  # Since don't want plots for full community
+groups <- groups[groups != "Full community"]  # Since don't want plots for full
+                                        # community for this particular analysis
 ```
 
 TODO Need to summarise those results in a plot of $b$ with confidence
@@ -179,7 +211,7 @@ for(i in 1:length(groups)){
 
 ## Conclusions from these results
 
-TODO
+TODO not updated this text yet, doing figures first
 
 From theory we would expect a steepening of the size spectrum ($b$ becoming more
 negative) under fishing
@@ -219,39 +251,4 @@ be done differently.
 `aggregate_mlebins()` is used in analysis to combine.
 
 Think I just need to write the plotting function. It should work on
-`baseline_agg` etc. which have class `mlebins_list`.
-
-on 7/5/25. Found
-some .Rmd code (originally in data-raw/zabala-data/zabala-data-analysis.Rmd but
-that is now deleted, copying from GitHub; was the same commit as the new function).
-
-And also `aggregating-functions.R` that contains several functions that are
-needed for plotting. Was consistent with sizeSpectra, so just need to update
-those for sizeSpectra2. HERE. Copied into `R-aggregating/`, including .Rmd and
-.pdf.
-
-Maybe update the pdf first as a new report, as it counts for new methods also
-(likely needed as an appendix for the manuscript).
-
-
-
-
-
-```{r, aggregatefit, eval = FALSE}
-x_min_global <- min(res_table_agg$x_min)
-x_max_global <- max(res_table_agg$x_max)
-
-# Had this back in May, but saving has changed.
-
-
-# Already in res_table_agg: b_vec, n_vec, x_min_vec,
-
-# x_max_vec, for simplicity in plotting.
-# Save as a mlebins_list object, then create plotting function for that.
-
-# Plot all the data (should be the same way as MLEbins plot. So lots of boxes.
-# Could plot the five PLB fits like I did for MLE example.
-# Plot the aggregated fit.
-
-
-```
+`baseline_agg` etc. which have class `list`.

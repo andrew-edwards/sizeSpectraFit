@@ -1025,7 +1025,7 @@ knitr::kable(res_table_agg,
 Now just saving the results for each strata in a list. (See end of file for what
 I originally did). Can include the full results (fitting in one go).
 
-Each object is of class `determine_xmin_and_fit_mlebins`.
+Each object in each list is of class `determine_xmin_and_fit_mlebins`.
 
 ```{r, aggregatefitnew}
 baseline_agg_list <- list(full = res_full_baseline,
@@ -1060,6 +1060,10 @@ saveRDS(fg_agg_list,
         "fg_agg_list.rds")
 saveRDS(ntr_agg_list,
         "ntr_agg_list.rds")
+
+saveRDS(res_table_agg,
+        "res_table_agg.rds")
+
 ```
 
 ```{r, exit, cache = FALSE}
@@ -1073,6 +1077,8 @@ Not saving the full analyses in here, just the separate groups of interest;
 including the full analyses means that the aggregated values then double count
 all the data, and will mess up the plotting.
 ```{r, aggregatefit}
+
+OLD
 baseline_agg <- aggregate_mlebins(list(crust = res_crust_baseline,
                                        actin = res_actin_baseline,
                                        chondr = res_chondr_baseline,
