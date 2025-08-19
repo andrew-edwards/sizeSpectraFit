@@ -71,6 +71,8 @@ HERE (done) strip out the histogram stuff from each, just do a
   flexibility in how results were created (e.g. with hist or not), so check the class within the loop.
 
 ```{r, striphist}
+remove_full <- TRUE                # whether to remove the 'full' analysis
+
 baseline_agg <- list()
 for(i in 1:length(baseline_agg_list)){
   if("determine_xmin_and_fit_mlebins" %in% class(baseline_agg_list[[i]])){
@@ -82,6 +84,11 @@ for(i in 1:length(baseline_agg_list)){
   }
   names(baseline_agg)[i] <- names(baseline_agg_list)[i]
 }
+if(remove_full){
+  baseline_agg <- within(baseline_agg,
+                         rm("full"))
+}
+
 
 fg_agg <- list()
 for(i in 1:length(fg_agg_list)){
@@ -94,6 +101,11 @@ for(i in 1:length(fg_agg_list)){
   }
   names(fg_agg)[i] <- names(fg_agg_list)[i]
 }
+if(remove_full){
+  fg_agg <- within(fg_agg,
+                   rm("full"))
+}
+
 
 ntr_agg <- list()
 for(i in 1:length(ntr_agg_list)){
@@ -105,6 +117,10 @@ for(i in 1:length(ntr_agg_list)){
                                         # mlebins or mlebin results
   }
   names(ntr_agg)[i] <- names(ntr_agg_list)[i]
+}
+if(remove_full){
+  ntr_agg <- within(ntr_agg,
+                    rm("full"))
 }
 
 ```
@@ -252,3 +268,10 @@ be done differently.
 
 Think I just need to write the plotting function. It should work on
 `baseline_agg` etc. which have class `list`.
+
+HERE sort of works, needs tweaking but looking good
+Aiming for:
+```{r aggplot}
+plot_aggregate_mlebin(baseline_agg)
+
+```

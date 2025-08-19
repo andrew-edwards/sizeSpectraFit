@@ -2,22 +2,21 @@
 ##' group of individuals.
 ##'
 ##' TODO forcussing on MLEbins first, but should be general enough but need
-##' testing for MLEbin
+##' testing for MLEbin. This is copying [plot_aggregate] and then editing.
+##'
+##' TODO Am making plot_aggregate_mlebin() and maybe
+##'   plot_aggregate_mlebins(), though prob best to make the latter the same,
+##'   and don't want the green lines as a bit too confusing maybe.; could check
+##'   the class here and have a general outfacing function,
+##' or also make plot_aggregate_numeric and just call
+##'   the right one. Some of the details could be shared here maybe.
 ##'
 ##' Given a list of MLEbin results, combine
 ##' the data and show an aggregated distribution, as well as the individual fits.
 ##'
-##' Results are already aggregated in [aggregate_mlebins()]; TODO write an
-##'   mlebin equivalent. Includes object aggregated_data for the
-##'
 ##'
 ##' @param res_list list of results, with each component a list object of a
-##'   given type TODO share help with plot-aggregate. TODO first doing for `size_spectrum_numeric`, might be somewhat
-##'   automatic to generalise. Am making plot_aggregate_mlebin() and maybe
-##'   plot_aggregate_mlebins(), though prob best to make the latter the same,
-##'   and don't want the green lines as a bit too confusing maybe.; could check the class here and keep this as the
-##'   user outfacing function, or also make plot_aggregate_numeric and just call
-##'   the right one. Some of the details could be shared here maybe.
+##'   given type TODO share help with plot-aggregate.
 ##' @param col_vec vector of colours to assign for each group
 ##' @return
 ##' @export
@@ -28,12 +27,15 @@
 ##'
 plot_aggregate_mlebin <- function(res_list,
                                   col_vec = c("orange", "lightblue", "green",
-                                              "magenta"),
+                                              "magenta", "yellow"),
                                   xlim_global = NULL,
-                                  ylim_global = NULL){
+                                  ylim_global = NULL,
+                                  y_scaling = 0.75,
+                                  ...){
 
   # Basing this on plot_aggregate() for size_spectrum_numeric results and using
-  # code from plot.size_spectrum_mlebin(). Hard to make the plotting functions
+  # code from plot.size_spectrum_mlebin(). Also moving in calculations that were
+  # in aggregate_mlebins(). Hard to make the plotting functions
   # general enough to do this, so just copying the relevant bits here.
 
   if(length(res_list) > length(col_vec)){
@@ -41,58 +43,142 @@ plot_aggregate_mlebin <- function(res_list,
   }
 
   # TODO could generalise this in the master wrapper function
-  if(!("list" %in% class(res_list[[1]]))){
+  if(!("list" %in% class(res_list))){
     stop("res_list need to be a list of lists of MLE results.")
   }
 
-  S <- length(res_list)
-
-  # This is for size_spectrum_numeric:
-  x_global <- numeric()
-  for(s in 1:S){
-    x_global <- c(x_global,
-                  res_list[[s]]$x)
+  # TODO could generalise this in the master wrapper function; may want mlebin
+  # here also
+  if(!("size_spectrum_mlebins" %in% class(res_list[[1]]))){
+    stop("res_list need to be a list of size_spectrum_mlebinsTODO results.")
   }
 
-  x_global <- sort(x_global,
-                   decreasing = TRUE)
+  S <- length(res_list)                     # Number of species groups
+  group_names <- names(res_list)
+
+  # This is for size_spectrum_numeric:
+#  x_global <- numeric()
+#  for(s in 1:S){
+#    x_global <- c(x_global,
+#                  res_list[[s]]$x)
+#  }
+
+  # Aggregate all the data together to plot
+  aggregated_data_temp <- tibble::tibble()
+
+  for(i in 1:S){
+#    res <- res_list[[i]]
+    # Just want the mlebins_fit object, keeping it intact it is class
+    # size_spectrum_mlebins and the plotting works automatically.
+
+    aggregated_data_temp <- rbind(aggregated_data_temp,
+                                  res_list[[i]]$data)
+  }
+
+  # Next aggregate matching bin_min and bin_max (might not be any, as would
+  # require two species in different groups to have same bin_min and bin_max),
+  # but need to recalculate anyway since count_gte_bin_min etc. will be different
+  # for aggregated data set compared to values in each group (these get ignored
+  # once we do the summarise, so no need to filter out).
+
+  aggregated_data <- dplyr::summarise(group_by(aggregated_data_temp,
+                                               bin_min,
+                                               bin_max),
+                                      bin_count = sum(bin_count)) %>%
+    dplyr::ungroup() %>%
+    dplyr::arrange(bin_min)
+
+  # Can't do in dplyr, same approach as in fit_size_spectrum_mlebins(); maybe
+  # create a function TODO
+  count_gte_bin_min <- rep(NA,
+                           length = nrow(aggregated_data))
+  low_count <- count_gte_bin_min
+  high_count <- count_gte_bin_min
+# TODO think if this works for mlebin, expect it should
+  for(iii in 1:length(count_gte_bin_min)){
+    count_gte_bin_min[iii] <- sum( (aggregated_data$bin_min >= aggregated_data$bin_min[iii]) * aggregated_data$bin_count)
+    low_count[iii] <- sum( (aggregated_data$bin_min >= aggregated_data$bin_max[iii]) * aggregated_data$bin_count)
+    high_count[iii] <- sum( (aggregated_data$bin_max > aggregated_data$bin_min[iii]) * aggregated_data$bin_count)
+  }
+
+  aggregated_data$count_gte_bin_min <- count_gte_bin_min
+  aggregated_data$low_count <- low_count
+  aggregated_data$high_count <- high_count
+
 
   if(is.null(xlim_global)){
-    xlim_global <- range(x_global)
+    xlim_global <- c(min(aggregated_data$bin_min),
+                     max(aggregated_data$bin_min))
   }
 
   if(is.null(ylim_global)){
-    ylim_global <- c(1, length(x_global))
+    ylim_global <- c(y_scaling * min(aggregated_data$count_gte_bin_min),
+                     max(aggregated_data$high_count))
   }
 
-  # Extract required values
+  # Extract required values (need as vectors to create the aggregate fit)
   b_vec <- numeric()
   n_vec <- numeric()
   xmin_vec <- numeric()
   xmax_vec <- numeric()
   for(s in 1:S){
     b_vec[s] <- res_list[[s]]$b_mle
-    n_vec[s] <- length(res_list[[s]]$x)
+    n_vec[s] <- max(res_list[[s]]$data$high_count)
     xmin_vec[s] <- res_list[[s]]$x_min
     xmax_vec[s] <- res_list[[s]]$x_max   # TODO change to x_max_vec etc. Maybe,
-                                        # thought I was trying to be consistent
+                                        # thought I was trying to be
+                                        # consistent. See plot_aggregate also if do
   }
 
+  # col = col_vec[s])     need to decide on colurs of everything
+  rect_col = col_vec    # TODO just do that for now then tweak when working
   # Plot first one to automatically set up axes etc.
   plot(res_list[[1]],
        xlim = xlim_global,
        ylim = ylim_global,
-       col = col_vec[1],
+       # col = col_vec[1],
        fit_col = col_vec[1],
        legend_text_a = NA,
-       legend_text_a_n = NA)
+       legend_text_a_n = NA,
+       seg_col = seg_col
+       )   # want ... I think xlab etc
 
-  # Full data
-  points(x_global,
-         1:length(x_global))
+  # Full data, taking from plot_isd_binned():
+    rect(xleft = aggregated_data$bin_min,
+       ybottom = aggregated_data$low_count,
+       xright = aggregated_data$bin_max,
+       ytop = aggregated_data$high_count,
+       col = rect_col)
+  segments(x0 = aggregated_data$bin_min,
+           y0 = aggregated_data$count_gte_bin_min,
+           x1 = aggregated_data$bin_max,
+           y1 = aggregated_data$count_gte_bin_min,
+           col = seg_col)
+
+  # if(log == "xy")    # Not including any other option yet, TODO see if decide to
+
+  # Need to manually draw the rectangle with low_count = 0 since it doesn't
+  #  get plotted on log-log plot
+  extra_rect <- dplyr::filter(aggregated_data,
+                              low_count == 0)
+  # if(nrow(extra.rect) > 1) stop("Check rows of extra rect.")
+
+  rect(xleft = extra_rect$bin_min,
+       ybottom = rep(0.01 * ylim_global[1],
+                     nrow(extra_rect)),
+       xright = extra_rect$bin_max,
+       ytop = extra_rect$high_count,
+       col = rect_col)
+
+  segments(x0 = aggregated_data$bin_min,
+           y0 = aggregated_data$count_gte_bin_min,
+           x1 = aggregated_data$bin_max,
+           y1 = aggregated_data$count_gte_bin_min,
+           col = seg_col)
+  # }
 
   # x values at which to calculate PLB's and PLB_agg; may have to do each one
-  # manually here
+  # manually here, though have already automatically done the first one above TODO
   # Doing evenly on a log scale since range is quite large for aggregated, and
   # x-axis is always logged
   x_plb_agg <- 10^seq(log10(xlim_global[1]),
@@ -117,15 +203,43 @@ plot_aggregate_mlebin <- function(res_list,
                             xmax = xmax_vec)) * sum(n_vec)
   lines(x_plb_agg,
         y_plb_agg,
-        col = "yellow",
+        col = "yellow",  # TODO generalise
         lwd = 4)
 
   # Now do remaining groups, just add them manually here
   for(s in 2:S){
-    points(sort(res_list[[s]]$x,
-                decreasing = TRUE),
-           1:length(res_list[[s]]$x),
-           col = col_vec[s])
+    this_group_data <- res_list[[2]]$data
+
+    rect(xleft = this_group_data$bin_min,
+         ybottom = this_group_data$low_count,
+         xright = this_group_data$bin_max,
+         ytop = this_group_data$high_count,
+         col = rect_col)
+    segments(x0 = this_group_data$bin_min,
+             y0 = this_group_data$count_gte_bin_min,
+             x1 = this_group_data$bin_max,
+             y1 = this_group_data$count_gte_bin_min,
+             col = seg_col)
+
+  # if(log == "xy")    # Not including any other option yet, TODO see if decide to
+
+  # Need to manually draw the rectangle with low_count = 0 since it doesn't
+  #  get plotted on log-log plot
+    extra_rect <- dplyr::filter(this_group_data,
+                                low_count == 0)
+    # if(nrow(extra.rect) > 1) stop("Check rows of extra rect.")
+    rect(xleft = extra_rect$bin_min,
+         ybottom = rep(0.01 * ylim_global[1],
+                       nrow(extra_rect)),
+         xright = extra_rect$bin_max,
+         ytop = extra_rect$high_count,
+         col = rect_col)
+
+    segments(x0 = this_group_data$bin_min,
+             y0 = this_group_data$count_gte_bin_min,
+             x1 = this_group_data$bin_max,
+             y1 = this_group_data$count_gte_bin_min,
+             col = seg_col)
 
     x_plb <- 10^seq(log10(xmin_vec[s]),
                     log10(xmax_vec[s]),
@@ -146,5 +260,4 @@ plot_aggregate_mlebin <- function(res_list,
                     xmax = xmax_vec[s])) * n_vec[s],
           col = col_vec[s])
   }
-
 }

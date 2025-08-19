@@ -10,6 +10,8 @@ aggregate_mlebins <- function(res_list,    # Now doing just the lists in
                               #               "cephsmall",
                               #                "cephlarge")){
 
+  # TODO this has all gone into plot_aggregage_mlebin() so may not need
+
   # TODO might not need group_names as naming them in the call to this function
   res_all <- list()
 
@@ -37,6 +39,7 @@ aggregate_mlebins <- function(res_list,    # Now doing just the lists in
   # require two species in different groups to have same bin_min and bin_max),
   # but need to recalculate anyway since count_gte_bin_min etc. will be different
   # for aggregated data set compared to values in each group.
+
 
   aggregated_data <- dplyr::summarise(group_by(aggregated_data_temp,
                                                bin_min,
