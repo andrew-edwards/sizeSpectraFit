@@ -53,7 +53,7 @@ Also xmax, maybe biggest of each.
 
 Actin (small fish) - try both xmin.
 
-Crust and fish 1000 times better in NTR, so 'suspicous' of results.
+Crust and fish appear much better in NTR (from being out on the water), so 'suspicious' of results.
 
 Sharks like disturbed grounds so can find in FG. Try both xmin, not the big one
 (will probably do for completeness).
@@ -97,6 +97,12 @@ mediterranean-analysis-6/
 mediterranean-analysis-7/
   use 5 or 6 as template.
   ntr xmin for each
+
+mediterranean-analysis-8/
+  do a global xmin of the value obtained for the global community, namely
+  1.01...  Use for all fits for consistency.
+
+
 
 
 mediterranean-analysis-8/

@@ -597,7 +597,7 @@ Results combined are:
 knitr::kable(res_table_cephsmall, digits = 2)
 ```
 
-TODO Go the opposite direction to theory, though Juliana had a biological explanation.
+TODO Go the opposite direction to theory.
 
 ## Cephalopoda (large) baseline
 
