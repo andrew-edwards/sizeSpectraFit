@@ -73,10 +73,11 @@ whittle down the analyses in each as won't need everything.
 Simplify 4 to use as 5 as a template (can shorten the initial part), and then
   use for 6,7,8.
 
-Decide as go along whether to just rerun all results (even though some will be
-  duplicated analyses) - probably easiest to just do and just wait for them to
+Decided as went along to just rerun all results (even though some will be
+  duplicated analyses) - easiest to just edit a few lines and then wait for them to
   run. Will also allow confirmation, and automatically build the tables and
-  summary plots when done. And .pdfs will all look similar.
+  summary plots when done. And .pdfs will all look similar. Not updating text
+  for results (as indicated by TODO in there).
 
 So continuing based on 4, but, based on those results, trying
   different approaches for xmin as a sensitivity, to see how results change with
@@ -87,7 +88,6 @@ mediterranean-analysis-5/
 
   In 4 we did the histograms (1-g width) and used xmin as the minimum bin_min
   within the modal histogram bin.
-
 
 mediterranean-analysis-6/
   use 5 as template
@@ -102,12 +102,15 @@ mediterranean-analysis-8/
   do a global xmin of the value obtained for the global community, namely
   1.01...  Use for all fits for consistency.
 
-
-
-
-mediterranean-analysis-8/
-decide on base case of the above, and do sensitivity to xmax; just set xmax
-within each group to be the max of the xmax.
-
 mediterranean-analysis-9/
-do a global xmin of something low. Maybe 1 or 2.
+  decide on base case of the above, and do sensitivity to xmax; just set xmax
+  within each group to be the max of the xmax. So far 4 is still looking most
+  sensible, as some of the other fits are not good (since fitting a declining
+  function to an increasing then decreasing data set).
+  So set xmax to be the max xmax within each group, so allowing for the
+  possibility of, for example, a huge crustacean if we've seen one once. Be good
+  for understanding sensitivity to xmax.
+  So xmin still determined individually for each.
+
+mediterranean-analysis-10/
+  Probably want to fix xmin for some maybe? The chondr one is strange.
