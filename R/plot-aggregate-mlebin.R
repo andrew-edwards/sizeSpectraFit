@@ -27,10 +27,11 @@
 ##'
 plot_aggregate_mlebin <- function(res_list,
                                   col_vec = c("orange", "lightblue", "green",
-                                              "magenta", "yellow"),
+                                              "darkblue", "darkgreen"),
+                                  col_agg = "magenta",
                                   xlim_global = NULL,
                                   ylim_global = NULL,
-                                  y_scaling = 0.75,
+                                  y_scaling = 0.25,
                                   ...){
 
   # Basing this on plot_aggregate() for size_spectrum_numeric results and using
@@ -132,6 +133,7 @@ plot_aggregate_mlebin <- function(res_list,
 
   # col = col_vec[s])     need to decide on colurs of everything
   rect_col = col_vec    # TODO just do that for now then tweak when working
+  seg_col = col_vec     # TODO tidy up also, may want vec for borders of rect?
   # Plot first one to automatically set up axes etc.
   plot(res_list[[1]],
        xlim = xlim_global,
@@ -140,7 +142,8 @@ plot_aggregate_mlebin <- function(res_list,
        fit_col = col_vec[1],
        legend_text_a = NA,
        legend_text_a_n = NA,
-       seg_col = seg_col
+       seg_col = rect_col[1],    # make an argument? TODO  NEED arg for rect, colours
+                            # are off
        )   # want ... I think xlab etc
 
   # Full data, taking from plot_isd_binned():
@@ -148,12 +151,12 @@ plot_aggregate_mlebin <- function(res_list,
        ybottom = aggregated_data$low_count,
        xright = aggregated_data$bin_max,
        ytop = aggregated_data$high_count,
-       col = rect_col)
+       col = "black")  #rect_col[1])
   segments(x0 = aggregated_data$bin_min,
            y0 = aggregated_data$count_gte_bin_min,
            x1 = aggregated_data$bin_max,
            y1 = aggregated_data$count_gte_bin_min,
-           col = seg_col)
+           col = "black")  # seg_col[1])  # TODO even need these?
 
   # if(log == "xy")    # Not including any other option yet, TODO see if decide to
 
@@ -168,13 +171,13 @@ plot_aggregate_mlebin <- function(res_list,
                      nrow(extra_rect)),
        xright = extra_rect$bin_max,
        ytop = extra_rect$high_count,
-       col = rect_col)
+       col = "black")  # TODO argument
 
   segments(x0 = aggregated_data$bin_min,
            y0 = aggregated_data$count_gte_bin_min,
            x1 = aggregated_data$bin_max,
            y1 = aggregated_data$count_gte_bin_min,
-           col = seg_col)
+           col = "black")  # TODO
   # }
 
   # x values at which to calculate PLB's and PLB_agg; may have to do each one
@@ -203,23 +206,24 @@ plot_aggregate_mlebin <- function(res_list,
                             xmax = xmax_vec)) * sum(n_vec)
   lines(x_plb_agg,
         y_plb_agg,
-        col = "yellow",  # TODO generalise
+        col = col_agg,
         lwd = 4)
 
   # Now do remaining groups, just add them manually here
   for(s in 2:S){
-    this_group_data <- res_list[[2]]$data
+    this_group_data <- res_list[[s]]$data
 
     rect(xleft = this_group_data$bin_min,
          ybottom = this_group_data$low_count,
          xright = this_group_data$bin_max,
          ytop = this_group_data$high_count,
-         col = rect_col)
+         col = rect_col[s],
+         border = rect_col[s])
     segments(x0 = this_group_data$bin_min,
              y0 = this_group_data$count_gte_bin_min,
              x1 = this_group_data$bin_max,
              y1 = this_group_data$count_gte_bin_min,
-             col = seg_col)
+             col = seg_col[s])
 
   # if(log == "xy")    # Not including any other option yet, TODO see if decide to
 
@@ -233,13 +237,14 @@ plot_aggregate_mlebin <- function(res_list,
                        nrow(extra_rect)),
          xright = extra_rect$bin_max,
          ytop = extra_rect$high_count,
-         col = rect_col)
+         col = rect_col[s],
+         border = rect_col[s])
 
     segments(x0 = this_group_data$bin_min,
              y0 = this_group_data$count_gte_bin_min,
              x1 = this_group_data$bin_max,
              y1 = this_group_data$count_gte_bin_min,
-             col = seg_col)
+             col = seg_col[s])
 
     x_plb <- 10^seq(log10(xmin_vec[s]),
                     log10(xmax_vec[s]),

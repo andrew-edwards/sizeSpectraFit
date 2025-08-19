@@ -264,14 +264,29 @@ be done differently.
 
 ## Aggregating onto one plot
 
-`aggregate_mlebins()` is used in analysis to combine.
+TODO This is still rough, but the idea (and it won't be clear what is what), but
+the idea is to do the same kind of aggregated plot for baseline, FG, and NTR,
+and then maybe plot the aggregated fit from each on the same panel, which will
+hopefully show the effect of the NTR.
 
-Think I just need to write the plotting function. It should work on
-`baseline_agg` etc. which have class `list`.
-
-HERE sort of works, needs tweaking but looking good
+HERE sort of works, needs tweaking but getting there
 Aiming for:
-```{r aggplot}
-plot_aggregate_mlebin(baseline_agg)
+```{r aggplot, fig.height = 10}
+xlim_global <- c(0.3, 2000)   # TODO automate
+ylim_global <- c(1, 200000)
+par(mfrow = c(3, 1))
+plot_aggregate_mlebin(baseline_agg,
+                      main = "Baseline",   # Didn't get used TODO
+                      xlim_global = xlim_global,
+                      ylim_global = ylim_global)
+plot_aggregate_mlebin(fg_agg,
+                      main = "Fishing Grounds",
+                      xlim_global = xlim_global,
+                      ylim_global = ylim_global)
+plot_aggregate_mlebin(ntr_agg,
+                      main = "No-take Reserve",
+                      xlim_global = xlim_global,
+                      ylim_global = ylim_global)
+
 
 ```
