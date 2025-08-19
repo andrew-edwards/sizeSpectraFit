@@ -42,9 +42,9 @@ mediterranean-analysis-4/
  code from May 2025.
 
  Rerunning from scratch before doing analysis-5. Took 50 minutes to run.
---
 
-From chatting with Juliana on 19/8/25, decided to:
+--
+From chatting with Juliana on 19/8/25, decided to (see below for explicit plan):
 
 Crustacea - fix xmin across strata, using each of the three values that come
 out. Makes sense for crustacea. May as well do same assumption for full
@@ -64,35 +64,39 @@ commercial species, just there, and not that many.
 She mentioned that xmin = 0.2 worked well for her in the past analysis, sounds
 low, could try a global xmin of something low?
 
+--
+
 Going to work through the assumptions, starting assuming the baseline xmin, then
 the FG xmin, then the NTR xmin (based on Table on p84 of analysis-4). Will need a few .Rmd files, but gradually
 whittle down the analyses in each as won't need everything.
 
-mediterranean-analysis-5/ - as for 4, but, based on those results, trying
-different approach for xmin as a sensitivity, to see how results change with
-xmin assumption. In 4 we did the histograms (1-g width) and used xmin as the minimum bin_min
-within the modal histogram bin.
-
 Simplify 4 to use as 5 as a template (can shorten the initial part), and then
-use for 6,7,8.
+  use for 6,7,8.
 
 Decide as go along whether to just rerun all results (even though some will be
-duplicated analyses) - probably easiest to just do and just wait for them to
-run. Will also allow confirmation, and automatically build the tables and
-summary plots when done. And .pdfs will all look similar.
+  duplicated analyses) - probably easiest to just do and just wait for them to
+  run. Will also allow confirmation, and automatically build the tables and
+  summary plots when done. And .pdfs will all look similar.
 
-For 5, do:
-baseline xmin for each group (make notes in .Rmd). Obtain automatically from version 4 results.
+So continuing based on 4, but, based on those results, trying
+  different approaches for xmin as a sensitivity, to see how results change with
+  xmin assumption.
+
+mediterranean-analysis-5/
+  baseline xmin for each group (make notes in .Rmd) . Obtain automatically from version 4 results.
+
+  In 4 we did the histograms (1-g width) and used xmin as the minimum bin_min
+  within the modal histogram bin.
 
 
 mediterranean-analysis-6/
-use 5 as template
-fg xmin for each.
+  use 5 as template
+  fg xmin for each.
 
 
 mediterranean-analysis-7/
-use 5 or 6 as template.
-ntr xmin for each
+  use 5 or 6 as template.
+  ntr xmin for each
 
 
 mediterranean-analysis-8/

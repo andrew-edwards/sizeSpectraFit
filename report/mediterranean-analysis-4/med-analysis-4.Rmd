@@ -1071,6 +1071,8 @@ saveRDS(ntr_agg_list,
 saveRDS(res_table_agg,
         "res_table_agg.rds")
 
+saveRDS(ceph_small_large_delineation,
+        "ceph_small_large_delineation.rds")
 ```
 
 Was going to save `dat_joined` but with this small outlier taken out, as we
