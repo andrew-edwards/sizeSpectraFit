@@ -275,18 +275,67 @@ Aiming for:
 xlim_global <- c(0.3, 2000)   # TODO automate
 ylim_global <- c(1, 200000)
 par(mfrow = c(3, 1))
-plot_aggregate_mlebin(baseline_agg,
-                      main = "Baseline",   # Didn't get used TODO
-                      xlim_global = xlim_global,
-                      ylim_global = ylim_global)
-plot_aggregate_mlebin(fg_agg,
-                      main = "Fishing Grounds",
-                      xlim_global = xlim_global,
-                      ylim_global = ylim_global)
-plot_aggregate_mlebin(ntr_agg,
-                      main = "No-take Reserve",
-                      xlim_global = xlim_global,
-                      ylim_global = ylim_global)
+baseline_agg_fit <- plot_aggregate_mlebin(
+  baseline_agg,
+  main = "Baseline",   # Didn't get used TODO
+  xlim_global = xlim_global,
+  ylim_global = ylim_global)
+fg_agg_fit <- plot_aggregate_mlebin(
+  fg_agg,
+  main = "Fishing Grounds",
+  xlim_global = xlim_global,
+  ylim_global = ylim_global)
+ntr_agg_fit <- plot_aggregate_mlebin(
+  ntr_agg,
+  main = "No-take Reserve",
+  xlim_global = xlim_global,
+  ylim_global = ylim_global)
+```
 
 
+Try and plot all three fits on one plot:
+```{r combinedplot}
+strata_col <- c("black",
+                "blue",
+                "red")
+
+plot(baseline_agg_fit[["x_plb_agg"]],
+     baseline_agg_fit[["y_plb_agg"]],
+     log = "xy",
+     type = "l",
+     xlim = xlim_global,
+     ylim = ylim_global,
+     col = strata_col[1],
+     main = "Base black, fg blue, ntr red")
+
+lines(fg_agg_fit[["x_plb_agg"]],
+      fg_agg_fit[["y_plb_agg"]],
+      col = strata_col[2])
+
+lines(ntr_agg_fit[["x_plb_agg"]],
+      ntr_agg_fit[["y_plb_agg"]],
+      col = strata_col[3])
+```
+
+Now normalise the y-axis:
+```{r combinedplotnorm}
+plot(baseline_agg_fit[["x_plb_agg"]],
+     baseline_agg_fit[["y_plb_agg"]] / max(baseline_agg_fit[["y_plb_agg"]]),
+     log = "xy",
+     type = "l",
+     xlim = xlim_global,
+     ylim = c(0.001, 1),
+     col = strata_col[1],
+     main = "Base black, fg blue, ntr red",
+     lwd = 2)
+
+lines(fg_agg_fit[["x_plb_agg"]],
+      fg_agg_fit[["y_plb_agg"]] / max(fg_agg_fit[["y_plb_agg"]]),
+      col = strata_col[2],
+     lwd = 2)
+
+lines(ntr_agg_fit[["x_plb_agg"]],
+      ntr_agg_fit[["y_plb_agg"]] / max(ntr_agg_fit[["y_plb_agg"]]),
+      col = strata_col[3],
+      lwd = 2)
 ```

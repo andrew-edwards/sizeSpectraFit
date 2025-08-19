@@ -35,9 +35,10 @@ load_all()
 #library(sizeSpectra2)    # Need latest version
 ```
 
-HERE - Fix some TODOs, including figure
-scaling. Maybe change some variable names to things more sensible. Carry on with
-other species groups and compare previous one for understanding.
+This does some data wrangling (saving the data as `dat_joined.rds`) and then a
+full analysis. Then trimming this down to use as a template for versions 5, 6,
+etc. to test different settings. See READreport.txt for
+details of each version (summarising the settings).
 
 When doing the MLEbins vignette realised that had not properly considered the
 length resolutions. Did some analysis in mediterranean-analysis-4/med-analysis-length-resolution.Rmd concluding that:
@@ -225,9 +226,9 @@ dat_sp_excluded <- dplyr::filter(dat_with_breaks,
                                  species %in% sp_excluded)
 dat_sp_excluded
 
-# This has difference of 6
-#expect_equal(nrow(dat_with_breaks),
-#             nrow(dat_joined) + nrow(dat_sp_excluded))
+expect_equal(nrow(dat_with_breaks),
+             nrow(dat_joined) + nrow(dat_sp_excluded))   # note dat_joined gets
+                                        # changed later
 
 sp_excluded_but_with_length_weight <- intersect(sp_excluded,
                                                 mediterranean_length_weight_coefficients$species)
@@ -237,8 +238,6 @@ dplyr::filter(dat_with_breaks,
 dplyr::filter(mediterranean_length_weight_coefficients,
               species %in% sp_excluded_but_with_length_weight)
 ```
-
-TODO - just figure out where those 6 numbers went. Carry on as won't be hugely consequential.
 
 There are very few large individuals, and these are all fish:
 ```{r, largefish}
@@ -260,6 +259,11 @@ dat_joined <- dplyr::filter(dat_joined,
                             weight_bin_min <= 1500)
 ```
 That will get used in all the analyses.
+
+```{r, savedatjoined}
+saveRDS(dat_joined,
+        "dat_joined.rds")
+```
 
 \clearpage
 
@@ -409,7 +413,7 @@ plot(res_full_ntr,
 
 Now to compare the three strata for full community.
 
-TODO move to a function
+Keep defined here, as fairly specific to this data set.
 ```{r, fullsumm}
 add_row_to_summary_table <- function(summary, res, group, strata){
   rbind(summary,
@@ -431,11 +435,11 @@ res_table_full <- add_row_to_summary_table(res_table_full,
 res_table_full <- add_row_to_summary_table(res_table_full,
                                       res_full_fg,
                                       "Full community",
-                                      "fg")
+                                      "FG")
 res_table_full <- add_row_to_summary_table(res_table_full,
                                       res_full_ntr,
                                       "Full community",
-                                      "ntr")
+                                      "NTR")
 ```
 
 Results combined are:
@@ -448,9 +452,12 @@ So for the full community, from the baseline, the size spectrum steepens (more
 negative $b$) in the fishing grounds, but shallows (less negative $b$) in the
 no-take reserve, consistent with theory.
 
-I had thought we shouldn't really analyse the full community
-together due to different sampling protocols, but text at the start seems to
-imply not so bad; think Juliana had further justification for splitting up.
+The fits for the full community do not look great. To understand the changes we
+now analyse the data separately for the different species groups.
+Juliana felt before: ceph and chondrichthytes seemed to pull the fit a lot for full
+community, and the sharks can move
+around a lot. Also, although the sampling was the same for all species groups, the main interest is in seeing how
+crustaceans changed (especially as they do not move as much).
 
 \clearpage
 
@@ -526,11 +533,11 @@ res_table_crust <- add_row_to_summary_table(res_table_crust,
 res_table_crust <- add_row_to_summary_table(res_table_crust,
                                       res_crust_fg,
                                       "Crustacea",
-                                      "fg")
+                                      "FG")
 res_table_crust <- add_row_to_summary_table(res_table_crust,
                                       res_crust_ntr,
                                       "Crustacea",
-                                      "ntr")
+                                      "NTR")
 ```
 
 Results combined are:
@@ -613,11 +620,11 @@ res_table_actin <- add_row_to_summary_table(res_table_actin,
 res_table_actin <- add_row_to_summary_table(res_table_actin,
                                       res_actin_fg,
                                       "Actinopterygii",
-                                      "fg")
+                                      "FG")
 res_table_actin <- add_row_to_summary_table(res_table_actin,
                                       res_actin_ntr,
                                       "Actinopterygii",
-                                      "ntr")
+                                      "NTR")
 ```
 
 Results combined are:
@@ -699,11 +706,11 @@ res_table_chondr <- add_row_to_summary_table(res_table_chondr,
 res_table_chondr <- add_row_to_summary_table(res_table_chondr,
                                       res_chondr_fg,
                                       "Chondrichthyes",
-                                      "fg")
+                                      "FG")
 res_table_chondr <- add_row_to_summary_table(res_table_chondr,
                                       res_chondr_ntr,
                                       "Chondrichthyes",
-                                      "ntr")
+                                      "NTR")
 ```
 
 Results combined are:
@@ -795,11 +802,11 @@ res_table_cephall <- add_row_to_summary_table(res_table_cephall,
 res_table_cephall <- add_row_to_summary_table(res_table_cephall,
                                       res_cephall_fg,
                                       "Cephalopoda all",
-                                      "fg")
+                                      "FG")
 res_table_cephall <- add_row_to_summary_table(res_table_cephall,
                                       res_cephall_ntr,
                                       "Cephalopoda all",
-                                      "ntr")
+                                      "NTR")
 ```
 
 Results combined are:
@@ -908,11 +915,11 @@ res_table_cephsmall <- add_row_to_summary_table(res_table_cephsmall,
 res_table_cephsmall <- add_row_to_summary_table(res_table_cephsmall,
                                       res_cephsmall_fg,
                                       "Cephalopoda small",
-                                      "fg")
+                                      "FG")
 res_table_cephsmall <- add_row_to_summary_table(res_table_cephsmall,
                                       res_cephsmall_ntr,
                                       "Cephalopoda small",
-                                      "ntr")
+                                      "NTR")
 ```
 
 Results combined are:
@@ -982,11 +989,11 @@ res_table_cephlarge <- add_row_to_summary_table(res_table_cephlarge,
 res_table_cephlarge <- add_row_to_summary_table(res_table_cephlarge,
                                       res_cephlarge_fg,
                                       "Cephalopoda large",
-                                      "fg")
+                                      "FG")
 res_table_cephlarge <- add_row_to_summary_table(res_table_cephlarge,
                                       res_cephlarge_ntr,
                                       "Cephalopoda large",
-                                      "ntr")
+                                      "NTR")
 ```
 
 Results combined are:
@@ -1078,7 +1085,7 @@ including the full analyses means that the aggregated values then double count
 all the data, and will mess up the plotting.
 ```{r, aggregatefit}
 
-OLD
+# OLD
 baseline_agg <- aggregate_mlebins(list(crust = res_crust_baseline,
                                        actin = res_actin_baseline,
                                        chondr = res_chondr_baseline,

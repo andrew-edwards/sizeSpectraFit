@@ -265,4 +265,6 @@ plot_aggregate_mlebin <- function(res_list,
                     xmax = xmax_vec[s])) * n_vec[s],
           col = col_vec[s])
   }
+  return(list(x_plb_agg = x_plb_agg,
+              y_plb_agg = y_plb_agg))  # TODO add option
 }
