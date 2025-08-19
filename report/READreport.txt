@@ -41,6 +41,7 @@ mediterranean-analysis-4/
  med-summary-4.Rmd - summarising results and doing aggregate plots, found some
  code from May 2025.
 
+ Rerunning from scratch before doing analysis-5. Took 50 minutes to run.
 --
 
 From chatting with Juliana on 19/8/25, decided to:
@@ -81,7 +82,7 @@ run. Will also allow confirmation, and automatically build the tables and
 summary plots when done. And .pdfs will all look similar.
 
 For 5, do:
-baseline xmin for each (make notes in .Rmd). Obtain automatically from version 4 results.
+baseline xmin for each group (make notes in .Rmd). Obtain automatically from version 4 results.
 
 
 mediterranean-analysis-6/

@@ -1073,6 +1073,26 @@ saveRDS(res_table_agg,
 
 ```
 
+Was going to save `dat_joined` but with this small outlier taken out, as we
+remove it both times it comes up (though in practice it would get removed when
+we fix prescribed $x_{min}$ anyway):
+```{r, outlier}
+mediterranean_for_mlebins(dat_joined,
+                          group_name = "Crustacea",
+                          strata_name = "ntr") %>%
+  dplyr::filter(bin_min <= 0.35)
+```
+
+But there are other small ones in the data
+that get ignored when $x_{min}$ is calculated for the strate in question, so keep it in to keep everything
+consistent.
+```{r, savedat}
+dplyr::filter(dat_joined,
+              weight_bin_min < 0.35)
+```
+
+So stick with `dat_joined` as saved above.
+
 ```{r, exit, cache = FALSE}
 knitr::knit_exit()
 ```

@@ -11,8 +11,8 @@ knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "",
   cache = TRUE,
-  cache_path = "med-analysis-4-cache/",
-  fig.path = "med-analysis-4-figs-cache/",
+  cache_path = "med-analysis-5-cache/",
+  fig.path = "med-analysis-5-figs-cache/",
   fig.width = 7,
   fig.height = 9
 )
@@ -22,11 +22,15 @@ knitr::dep_auto()  # or dep_auto seems cleverer, though not always working it
                    # seems so be careful (final chunk wasn't rerun when
                    # penultimate one was changed). May be because have to have
                    # this command in there from the beginning?
+
+options(pillar.sigfig = 6)   # show 6 sig figs when printing tibbles (so can see
+                             # length resolutions, but not overwhelmed by
+                             # details for bin_min and bin_max
 ```
 
 ```{r, build, echo = FALSE, eval = FALSE}
 # To build either run this line or click knit button in RStudio:
-rmarkdown::render("med-analysis-4.Rmd")
+rmarkdown::render("med-analysis-5.Rmd")
 ```
 
 ```{r, packages, echo = FALSE, cache = FALSE}
@@ -35,234 +39,43 @@ load_all()
 #library(sizeSpectra2)    # Need latest version
 ```
 
-This does some data wrangling (saving the data as `dat_joined.rds`) and then a
-full analysis. Then trimming this down to use as a template for versions 5, 6,
-etc. to test different settings. See READreport.txt for
-details of each version (summarising the settings).
+Using `dat_joined.rds` from `med-analysis-4.Rmd`, using the latter as
+a template to shorten down the analysis, and then try different assumptions.
 
-When doing the MLEbins vignette realised that had not properly considered the
-length resolutions. Did some analysis in mediterranean-analysis-4/med-analysis-length-resolution.Rmd concluding that:
+Here (`med-analysis-5.Rmd`) we set $x_{min}$ for each group to be the baseline value for that group, as
+calculated in `med-analysis-4.Rmd`.
 
-**Crustacea for baseline were to nearest 0.01 mm**
+```{r, loaddatjoined}
+dat_joined <- readRDS(paste0(here::here(),
+                             "/report/mediterranean-analysis-4/dat_joined.rds"))
 
-**Crustacea for FG and NTR were measured to nearest 0.1 mm (with a very few minor exceptions).**
-
-**All non-crustacea are measured to nearest 1 mm (except one measurement that
-doesn't matter)**
-
-So here updating the analysis from mediterranean-analysis-3. Now need to do the
-calculation of length bin min and max separately for each type of data (could do
-once up front but a bit fiddly). Also rewrote `calc_max_of_bin()` as new
-function to
-return a tibble, so user doesn't have to join things up.
-
-For analysis-3, this is after setting xmin to be the min `bin_min` value above the histogram
-determined minimum. Now removing the big fish. For Actin, big fish are very
-rare, not really sampling for them. Bit random to catch
-them, so suggest removing. We agreed a cut off of 1500 g because of the gaps
-in the sizes. Nothing between 1335 and 2396, clear gap. Can see details below.
-
-Data are saved in the package. Doing MLEbins on full community and then each
-species group in turn. Not worth fully functionalising as have to manually check
-some things.
-
-In earlier analysis we had looked at determining a global xmin and xmax within
-each strata, but this ends up throwing out a lot of data (lots of small fish),
-so going to stick with determining xmin using the modal approach independently
-for each strata within a group. This is what we did for the North Sea data in
-the MEPS paper.
-
-Copy and pasting analysis for a particular species group, then just find and
-replacing the group name and the short name. Need to examine results and so
-can't just make one giant function. The later groups are probably best to use as
-templates as the analyses and code got refined along the way.
-
-## Data
-
-We have data and the length-weight coefficients saved in a standard form in the
-package, and also knowledge of the accuracty of the measurements. We need to
-combine these to get the inputs required for MLEbins, namely counts in each
-species-specific weight bin.
-
-So we have three pieces of information. First is the measurements:
-```{r medcalcs}
-options(pillar.sigfig = 6)   # show 6 sig figs when printing tibbles (so can see
-                             # length resolutions, but not overwhelmed by
-                             # details for bin_min and bin_max
-mediterranean_data
-summary(mediterranean_data)
-```
-which we want to fit the size spectrum for each strata-group
-combination. The data can have repeated measurements for the same
-strata-group-length combination. We will aggregate such examples at the analysis
-stage.
-
-Second piece is the definition of lengths, as discussed above.
-Lengths are assumed to be midpoints (e.g. 10 mm represents
-9.5-10.5 mm).
-
-Thirdly, we have species-specific length-weight coefficients.
-```{r lwcoeffs}
-mediterranean_length_weight_coefficients
-```
-which assume units of cm (not mm) and grammes.
-
-Could amalgamate the data early, for duplicated strata-group-species-length
-combinations, just sum the numbers. Does get done in MLEbins but makes sense to
-do straight away before doing lots of calculations. Want to check results first.
-Though this does move things out of order, so might be good to avoid, and keep
-the data close to how it is originally saved.
-Something like this but NOT RUNNING:
-
-```{r, amalgamate, eval = FALSE}
-dat_amalgamate <- dplyr::summarise(group_by(mediterranean_data,
-                                            strata,
-                                            group,
-                                            species,
-                                            length),
-                                   number = sum(number)) %>%
-  ungroup()
-dat_amalgamate   # would need to verify, and check why the message only mentions three summaries
+med_4_results_table <- readRDS(paste0(here::here(),
+                             "/report/mediterranean-analysis-4/res_table_agg.rds"))
 ```
 
-## Convert length measurements into length bins and then body-mass bins
+Now to tease out the $x_{min}$ values for this particular analysis. Safest to do
+explicitly, and then change `strata_for_xmin` for each analysis as required:
+```{r setxmin}
+strata_for_xmin <- "Baseline"
 
-Had thought might want to leave the length bins min and max calculations to the
-strata-group specific analyses, but need to do up front to then look at what
-large sporadic values to exclude (though they are all Actinopterygii, but good
-to have this more general).
-
-Could functionalise this, but worth doing in steps since other data sets will
-have subtleties specific to them.
-
-Given the three different measurement protocols, it seems best to split the data
-into the three sets, calculate the bins, then bind them back together. Then do
-the body-mass conversions.
-
-**Crustacea for baseline were to nearest 0.01 mm**
-
-```{r lengthbinscrustbaseline}
-crust_baseline <- dplyr::filter(mediterranean_data,
-                                strata == "baseline",
-                                group == "Crustacea")
-
-crust_baseline_with_breaks <- calc_bin_breaks(crust_baseline,
-                                              bin_width = 0.01)
-
-crust_baseline_with_breaks
-```
-
-**Crustacea for FG and NTR were measured to nearest 0.1 mm (with a very few minor exceptions).**
-
-```{r lengthbinscrustfgntr}
-crust_fg_ntr <- dplyr::filter(mediterranean_data,
-                              strata %in% c("fg", "ntr"),
-                              group == "Crustacea")
-
-crust_fg_ntr_with_breaks <- calc_bin_breaks(crust_fg_ntr,
-                                            bin_width = 0.1)
-
-crust_fg_ntr_with_breaks
-```
-
-**All non-crustacea are measured to nearest 1 mm (except one measurement that
-doesn't matter)**
-
-```{r lengthbinsnon}
-non_crust <- dplyr::filter(mediterranean_data,
-                           group != "Crustacea")
-
-non_crust_with_breaks <- calc_bin_breaks(non_crust,
-                                         bin_width = 1)
-
-non_crust_with_breaks
-```
-
-Then combine them back into one tibble:
-```{r, combine}
-dat_with_breaks <- rbind(crust_baseline_with_breaks,
-                         crust_fg_ntr_with_breaks,
-                         non_crust_with_breaks)
-```
-
-Confirm that the summaries match (orders of factors get retained):
-```{r confirm}
-expect_equal(summary(mediterranean_data),
-             summary(dplyr::select(dat_with_breaks,
-                                   -c("length_bin_min",
-                                      "length_bin_max"))))
-```
-
-### Now to construct body-mass bins
-
-Now use the length-weight coefficients to construct the body-mass bins. First
-need to rename the `number` column to be `bin_count` (required by `length_bins_to_body_mass_bins()`):
-```{r bodymassbins}
-dat_with_breaks <- dplyr::rename(dat_with_breaks,
-                                 bin_count = number)
-dat_joined <-
-  length_bins_to_body_mass_bins(dat_with_breaks,
-                                mediterranean_length_weight_coefficients,
-                                length_data_unit = "mm")
-dat_joined
-
-dat_joined[1:5, ] %>% a()
-```
-
-Useful for users to see all the values, even though only some of it is
-needed for the likelihood fitting. There are less rows than the original data;
-presumably these are only due to species that do not have length-weight
-coefficients (such rows of data get excluded in
-`length_bins_to_body_mass_bins()`. Just check that:
-
-```{r, checkspecies}
-dat_with_breaks_sp <- unique(dat_with_breaks$species)
-dat_joined_sp <- unique(dat_joined$species)
-
-sp_excluded <- setdiff(dat_with_breaks_sp,
-                       dat_joined_sp)
-
-dat_sp_excluded <- dplyr::filter(dat_with_breaks,
-                                 species %in% sp_excluded)
-dat_sp_excluded
-
-expect_equal(nrow(dat_with_breaks),
-             nrow(dat_joined) + nrow(dat_sp_excluded))   # note dat_joined gets
-                                        # changed later
-
-sp_excluded_but_with_length_weight <- intersect(sp_excluded,
-                                                mediterranean_length_weight_coefficients$species)
-
-dplyr::filter(dat_with_breaks,
-              species %in% sp_excluded_but_with_length_weight)
-dplyr::filter(mediterranean_length_weight_coefficients,
-              species %in% sp_excluded_but_with_length_weight)
-```
-
-There are very few large individuals, and these are all fish:
-```{r, largefish}
-dplyr::arrange(dat_joined, weight_bin_min) %>%
-  dplyr::select(-c("length", "length_bin_min", "length_bin_max", "alpha",
-                   "beta", "weight_bin_max")) %>%
-    tail(n=25) %>%
-    a()
-```
-
-Can see a gradual increase in weights, but then a clear jump between 1334
-and 2395. The largest 12 measurements are all occasional rare individual fish,
-which are going to be sporadically caught. Given that, and the big jump, we
-determined that removing fish $>1500$~g is a sensible thing to do. Do it here in
-the data processing stage so it's done throughout.
-
-```{r, largefish2}
-dat_joined <- dplyr::filter(dat_joined,
-                            weight_bin_min <= 1500)
-```
-That will get used in all the analyses.
-
-```{r, savedatjoined}
-saveRDS(dat_joined,
-        "dat_joined.rds")
+xmin_full <- filter(med_4_results_table,
+                    Group == "Full community",
+                    Strata == strata_for_xmin)$x_min
+xmin_crust <- filter(med_4_results_table,
+                    Group == "Crustacea",
+                    Strata == strata_for_xmin)$x_min
+xmin_actin <- filter(med_4_results_table,
+                    Group == "Actinopterygii",
+                    Strata == strata_for_xmin)$x_min
+xmin_chondr <- filter(med_4_results_table,
+                    Group == "Chondrichthyes",
+                    Strata == strata_for_xmin)$x_min
+xmin_cephsmall <- filter(med_4_results_table,
+                    Group == "Cephalopoda small",
+                    Strata == strata_for_xmin)$x_min
+xmin_cephlarge <- filter(med_4_results_table,
+                    Group == "Cephalopoda large",
+                    Strata == strata_for_xmin)$x_min
 ```
 
 \clearpage
@@ -285,7 +98,8 @@ it all).
 data_full_baseline <- mediterranean_for_mlebins(dat_joined,
                                                 strata_name = "baseline")
 
-res_full_baseline <- determine_xmin_and_fit_mlebins(data_full_baseline)
+res_full_baseline <- determine_xmin_and_fit_mlebins(data_full_baseline,
+                                                    x_min = xmin_full)
 
 res_full_baseline$mlebins_fit      # full list includes histogram values which
                                    # are not a tibble (am printing them all for
@@ -306,7 +120,8 @@ plot(res_full_baseline,
 data_full_fg <- mediterranean_for_mlebins(dat_joined,
                                           strata_name = "fg")
 
-res_full_fg <- determine_xmin_and_fit_mlebins(data_full_fg)
+res_full_fg <- determine_xmin_and_fit_mlebins(data_full_fg,
+                                              x_min = xmin_full)
 
 res_full_fg$mlebins_fit      # full list includes histogram values which
                                    # are not a tibble (am printing them all for
@@ -320,80 +135,18 @@ plot(res_full_fg,
      seg_col = "black")
 ```
 
-## Full Community ntr all data (suggests removing the smallest, so doing that after this)
 
-Appendng with `_all` before removing the outlier small value and redoing.
+## Full Community ntr
 
-```{r, fullntrall}
-data_full_ntr_all <- mediterranean_for_mlebins(dat_joined,
-                                               strata_name = "ntr")
-
-res_full_ntr_all <- determine_xmin_and_fit_mlebins(data_full_ntr_all)
-
-res_full_ntr_all$mlebins_fit      # full list includes histogram values which
-                                   # are not a tibble (am printing them all for
-                                   # some later species groups).
-```
-
-```{r, fullntrallplot}
-plot(res_full_ntr_all,
-     xlim_hist = c(0, 60),
-     main = "Full Community NTR_ALL",
-     seg_col = "black")
-```
-
-This figure looks strange, in the data do not show the usual spanning all the
-way down to the lowest value ($x_{min}$). The plotting code is working
-correctly. It's just that the first bins are very small:
-```{r, fullntralldetails}
-res_full_ntr_all$mlebins_fit$data %>% filter(bin_min < 0.5)
-```
-The first bin gets overplotted by the red line, and the second bin is in fact
-the lowest one that can be seen around 0.4 on the x-axis.
-Can see a bit more clearly in these figures, the second of which exaggerates the
-first two bins:
-
-```{r, fullntrallplot2}
-plot.size_spectrum_mlebin(res_full_ntr_all$mlebins_fit,
-                          xlim = c(0.1, 0.5))  # note plot..._mlebin
-```
-
-
-```{r, fullntrallplot3}
-plot.size_spectrum_mlebin(res_full_ntr_all$mlebins_fit,
-                          xlim = c(0.1, 0.5))  # note plot..._mlebin
-ind <- 1
-rect(xleft = res_full_ntr_all$mlebins_fit$data[ind, "bin_min"],
-       #exaggerate bin:
-     ybottom = res_full_ntr_all$mlebins_fit$data[ind, "low_count"] * 0.01,
-     xright = res_full_ntr_all$mlebins_fit$data[ind, "bin_max"],
-     ytop = res_full_ntr_all$mlebins_fit$data[ind, "high_count"],
-     col = "green")
-ind <- 2
-rect(xleft = res_full_ntr_all$mlebins_fit$data[ind, "bin_min"],
-     ybottom = res_full_ntr_all$mlebins_fit$data[ind, "low_count"] * 0.01,
-     xright = res_full_ntr_all$mlebins_fit$data[ind, "bin_max"],
-     ytop = res_full_ntr_all$mlebins_fit$data[ind, "high_count"],
-     col = "pink")
-```
-
-Given the gap between the first two bins, suggests removing the lowest bin and
-refitting. Does not make sense to fit to such an outlier (hard to automate that
-though).
-
-## Full Community ntr having removed outlier
-
-Check it's just the one count to remove, yes it is:
-```{r, fullntrcheck}
-data_full_ntr_all %>% arrange(bin_min)
-
-data_full_ntr <- dplyr::filter(data_full_ntr_all,
-                               bin_min > 0.35)
-data_full_ntr %>% arrange(bin_min)
-```
+In `med-analysis-4.Rmd` we removed the small outlier that had `bin_min = 0.12`,
+but this (and other small ones) will automatically below all $x_{min}$ we
+prescribe, so can keep it in.
 
 Now do the analysis without the outlier:
 ```{r, fullntr}
+data_full_ntr <- mediterranean_for_mlebins(dat_joined,
+                                           strata_name = "ntr")
+
 res_full_ntr <- determine_xmin_and_fit_mlebins(data_full_ntr)
 
 res_full_ntr$mlebins_fit      # full list includes histogram values which
@@ -447,6 +200,12 @@ Results combined are:
 ```{r, resfulltable}
 knitr::kable(res_table_full, digits = 2)
 ```
+
+```{r, exit, cache = FALSE}
+knitr::knit_exit()
+```
+
+
 
 So for the full community, from the baseline, the size spectrum steepens (more
 negative $b$) in the fishing grounds, but shallows (less negative $b$) in the
@@ -1072,43 +831,3 @@ saveRDS(res_table_agg,
         "res_table_agg.rds")
 
 ```
-
-```{r, exit, cache = FALSE}
-knitr::knit_exit()
-```
-
-
-## Aggregated fit to data (OLD, what was done but now just saving the results more simply above and doing further analyses in summary.Rmd)
-
-Not saving the full analyses in here, just the separate groups of interest;
-including the full analyses means that the aggregated values then double count
-all the data, and will mess up the plotting.
-```{r, aggregatefit}
-
-# OLD
-baseline_agg <- aggregate_mlebins(list(crust = res_crust_baseline,
-                                       actin = res_actin_baseline,
-                                       chondr = res_chondr_baseline,
-                                       cephsmall = res_cephsmall_baseline,
-                                       cephlarge = res_cephlarge_baseline),
-                                  res_table_agg,
-                                  strata = "Baseline")
-
-fg_agg <- aggregate_mlebins(list(crust = res_crust_fg,
-                                 actin = res_actin_fg,
-                                 chondr = res_chondr_fg,
-                                 cephsmall = res_cephsmall_fg,
-                                 cephlarge = res_cephlarge_fg),
-                            res_table_agg,
-                            strata = "fg")
-
-ntr_agg <- aggregate_mlebins(list(crust = res_crust_ntr,
-                                  actin = res_actin_ntr,
-                                  chondr = res_chondr_ntr,
-                                  cephsmall = res_cephsmall_ntr,
-                                  cephlarge = res_cephlarge_ntr),
-                             res_table_agg,
-                             strata = "ntr")
-```
-
-Each one is saved as a `mlebins_list object` to then create plotting function.
