@@ -317,6 +317,28 @@ lines(ntr_agg_fit[["x_plb_agg"]],
       col = strata_col[3])
 ```
 
+Do not log the y-axis:
+```{r combinedplotnolog}
+plot(baseline_agg_fit[["x_plb_agg"]],
+     baseline_agg_fit[["y_plb_agg"]],
+     log = "x",
+     type = "l",
+     xlim = xlim_global,
+     ylim = ylim_global,
+     col = strata_col[1],
+     main = "Base black, fg blue, ntr red")
+
+lines(fg_agg_fit[["x_plb_agg"]],
+      fg_agg_fit[["y_plb_agg"]],
+      col = strata_col[2])
+
+lines(ntr_agg_fit[["x_plb_agg"]],
+      ntr_agg_fit[["y_plb_agg"]],
+      col = strata_col[3])
+```
+
+
+
 Now normalise the y-axis:
 ```{r combinedplotnorm}
 plot(baseline_agg_fit[["x_plb_agg"]],
@@ -339,3 +361,5 @@ lines(ntr_agg_fit[["x_plb_agg"]],
       col = strata_col[3],
       lwd = 2)
 ```
+
+Might look better if xmin are consistent?

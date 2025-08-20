@@ -89,9 +89,24 @@ mediterranean-analysis-5/
   In 4 we did the histograms (1-g width) and used xmin as the minimum bin_min
   within the modal histogram bin.
 
+  Fits generally look worse when xmin not determined by that data set (as
+  expected). Chondr NTR is almost uniform (b = 0).
+
 mediterranean-analysis-6/
   use 5 as template
   fg xmin for each.
+
+  full: baseline fit not great, ntr not too bad, b still changes in the expected
+  direction
+  crust: baseline fit poor, ntr a bit better, spectra still steepening with
+   fishing
+  actin: baseline fit good (since data are declining), ntr not so good, spectra
+   steepening with fishing
+  chondr: baseline not bad, ntr also not too bad. b values actually go in the expected
+   direction.
+  ceph small: only change slightly since xmins from analysis-4 are all fairly
+   close
+  ceph large: fits not great.
 
 
 mediterranean-analysis-7/
@@ -101,16 +116,31 @@ mediterranean-analysis-7/
 mediterranean-analysis-8/
   do a global xmin of the value obtained for the global community, namely
   1.01...  Use for all fits for consistency.
+  Lots of the fits look very poor, so not recommending.
 
 mediterranean-analysis-9/
   decide on base case of the above, and do sensitivity to xmax; just set xmax
-  within each group to be the max of the xmax. So far 4 is still looking most
+  to baseline value (didn't mean to do this, see 10). So far 4 is still looking most
   sensible, as some of the other fits are not good (since fitting a declining
   function to an increasing then decreasing data set).
-  So set xmax to be the max xmax within each group, so allowing for the
-  possibility of, for example, a huge crustacean if we've seen one once. Be good
-  for understanding sensitivity to xmax.
-  So xmin still determined individually for each.
+    So xmin still determined individually for each group.
+
+  Accidentally set xmax to baseline xmax, so keep results, but then do 10:
 
 mediterranean-analysis-10/
+  as for 9 but with just set xmax
+  within each group to be the max of the xmax from analysis-4.
+  So allowing for the
+  possibility of, for example, a huge crustacean if we've seen one once. Be good
+  for understanding sensitivity to xmax.
+  So xmin still determined individually for each group.
+
+
+
+[and see emails maybe]
+
+mediterranean-analysis-10/
+
+
+further ideas?
   Probably want to fix xmin for some maybe? The chondr one is strange.

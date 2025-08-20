@@ -44,9 +44,8 @@ a template to shorten down the analysis, and then try different assumptions.
 
 Here (`med-analysis-9.Rmd`) we determine $x_{\text min}$ independently for all
 groups (using the modal method) as for `med-analysis-4.Rmd`, and set
-$x_{\text max}$ for each group to be the $x_{\text max}$ determined for the
-baseline in each group `med-analysis-4.Rmd` (hadn't meant to do this, and it
-will actually exclude some data maybe; good for understanding though).
+$x_{\text max}$ for each group to be the maximum $x_{\text max}$ determined for
+that group in `med-analysis-4.Rmd` (then not excluding any data).
 
 ```{r, loaddatjoined}
 dat_joined <- readRDS(paste0(here::here(),
