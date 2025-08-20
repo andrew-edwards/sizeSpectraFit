@@ -11,8 +11,8 @@ knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "",
   cache = TRUE,
-  cache_path = "med-analysis-9-cache/",
-  fig.path = "med-analysis-9-figs-cache/",
+  cache_path = "med-analysis-10-cache/",
+  fig.path = "med-analysis-10-figs-cache/",
   fig.width = 7,
   fig.height = 9
 )
@@ -30,7 +30,7 @@ options(pillar.sigfig = 6)   # show 6 sig figs when printing tibbles (so can see
 
 ```{r, build, echo = FALSE, eval = FALSE}
 # To build either run this line or click knit button in RStudio:
-rmarkdown::render("med-analysis-9.Rmd")
+rmarkdown::render("med-analysis-10.Rmd")
 ```
 
 ```{r, packages, echo = FALSE, cache = FALSE}
@@ -42,7 +42,7 @@ load_all()
 Using `dat_joined.rds` from `med-analysis-4.Rmd`, using `med-analysis-5.Rmd` as
 a template to shorten down the analysis, and then try different assumptions.
 
-Here (`med-analysis-9.Rmd`) we determine $x_{\text min}$ independently for all
+Here (`med-analysis-10.Rmd`) we determine $x_{\text min}$ independently for all
 groups (using the modal method) as for `med-analysis-4.Rmd`, and set
 $x_{\text max}$ for each group to be the maximum $x_{\text max}$ determined for
 that group in `med-analysis-4.Rmd` (then not excluding any data).
@@ -61,30 +61,27 @@ ceph_small_large_delineation <- readRDS(paste0(here::here(),
                              "/report/mediterranean-analysis-4/ceph_small_large_delineation.rds"))
 ```
 Now to tease out the $x_{\text max}$ values for this particular analysis. Safest to do
-explicitly, and then change `strata_for_xmax` for each analysis as required
-(that's all that needs changing):
+explicitly, no need for `strata_for_xmax` here:
 ```{r setxmax}
-strata_for_xmax <- "Baseline"
+# strata_for_xmax <- "Baseline"
 
 xmax_full <- filter(med_4_results_table,
-                    Group == "Full community",
-                    Strata == strata_for_xmax)$x_max
-xmax_crust <- filter(med_4_results_table,
-                    Group == "Crustacea",
-                    Strata == strata_for_xmax)$x_max
-xmax_actin <- filter(med_4_results_table,
-                    Group == "Actinopterygii",
-                    Strata == strata_for_xmax)$x_max
-xmax_chondr <- filter(med_4_results_table,
-                    Group == "Chondrichthyes",
-                    Strata == strata_for_xmax)$x_max
-xmax_cephsmall <- filter(med_4_results_table,
-                    Group == "Cephalopoda small",
-                    Strata == strata_for_xmax)$x_max
-xmax_cephlarge <- filter(med_4_results_table,
-                    Group == "Cephalopoda large",
-                    Strata == strata_for_xmax)$x_max
+                    Group == "Full community")$x_max %>% max()
 
+xmax_crust <- filter(med_4_results_table,
+                    Group == "Crustacea")$x_max %>% max()
+
+xmax_actin <- filter(med_4_results_table,
+                    Group == "Actinopterygii")$x_max %>% max()
+
+xmax_chondr <- filter(med_4_results_table,
+                    Group == "Chondrichthyes")$x_max %>% max()
+
+xmax_cephsmall <- filter(med_4_results_table,
+                    Group == "Cephalopoda small")$x_max %>% max()
+
+xmax_cephlarge <- filter(med_4_results_table,
+                    Group == "Cephalopoda large")$x_max %>% max()
 ```
 
 \clearpage
