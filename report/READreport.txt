@@ -83,6 +83,7 @@ So continuing based on 4, but, based on those results, trying
   different approaches for xmin as a sensitivity, to see how results change with
   xmin assumption.
 
+
 mediterranean-analysis-5/
   baseline xmin for each group (make notes in .Rmd) . Obtain automatically from version 4 results.
 
@@ -125,19 +126,45 @@ mediterranean-analysis-9/
   function to an increasing then decreasing data set).
     So xmin still determined individually for each group.
 
-  Accidentally set xmax to baseline xmax, so keep results, but then do 10:
+  Accidentally set xmax to baseline xmax (and hadn't taken out low outlier (small crustacea in NTR) so the baseline and crustacea NTR need to be redone), so keep results, but then do 10:
 
 mediterranean-analysis-10/
-  as for 9 but with just set xmax
+  as for 9 but with just setting xmax
   within each group to be the max of the xmax from analysis-4.
   So allowing for the
   possibility of, for example, a huge crustacean if we've seen one once. Be good
   for understanding sensitivity to xmax.
   So xmin still determined individually for each group.
+  Looking at properly now:
+
+
+mediterranean-analysis-12/
+
+TODO redo 10:  hadn't taken out low outlier (small crustacea in NTR) so the baseline and crustacea NTR need to be redone
+
+mediterranean-analysis summary table
+Version Description
+4
 
 
 
-[and see emails maybe]
+
+Juliana 21/8/25:
+
+Thanks a lot for all the documents!
+
+I agree with you that setting the xmin as we did for version 4 is best. I would discard versions 5, 6, 7 and 8. I am conflicted between versions 9 and 10 since having the highest xmax also changes the results quite a bit when its only a couple of individuals with that size.
+
+I'm leaning more to version 4, but I don't know how to make the results between groups (baseline, fg, ntr) comparable, if they all have different xmin. I know it fits the model best if we start with the highest bin but it means we're excluding a good portion of the sample to fit the model, when we know by the histograms that those individuals had a good chance of being caught since they're larger than 12mm (net size). Especially in the case of the sharks (chondrichthyes), which would have a value closer to 0 in the NTR as the sizes seem to be 'levelling' - a good indicator of an area in transition to recovery. Perhaps if we use smaller bin we can incorporate more of the data, for example 0.5g bins. Do you think this makes sense? Could you tell me a bit about how the comparison between groups can be done this way?
+
+I've talked to a couple cephalopod experts here and the variability in results could be due to the fact that cephalopods reproduce once a year and then die, so the protected area wouldn't have much of an effect on them. Its normal that they're divided in small and big groups, its just due to the species types that live in the area. Its also normal to find more of the smaller species.
+
+Thank you so much again!
+
+Juliana
+
+
+[and see other emails maybe]
 
 mediterranean-analysis-10/
 
