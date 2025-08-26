@@ -70,8 +70,63 @@ HERE (done) strip out the histogram stuff from each, just do a
   loop. Could make into a function. seems best to do up front allow for
   flexibility in how results were created (e.g. with hist or not), so check the class within the loop.
 
+MWE for removing a strata, as not working with within in the function
+
+```{r, mwe}
+# I'm trying to write a function to remove certain named elements from a list
+
+my_list <- list(a = 1, b = 2:5, c = 6)
+
+# This works:
+within(my_list,
+       rm("b"))    # returns the list without b, the desired behaviour
+
+# But cannot get it to parse correctly within a function, to make it general
+remove <- function(input_list,
+                   remove_me){
+  within(input_list,
+         # Trying various lines next, somewhat guessing
+
+         # rm(remove_me))
+            # Warning message: In rm(remove_me) : object
+            # 'remove_me' not found
+
+         # rm(expr(remove_me))          # same as above
+
+         # rm(as.character(remove_me)))
+          # Error in rm(as.character(remove_me)) (from #3) :
+          #  ... must contain names or character strings
+         # rm(parse(remove_me)))   # same as previous
+}
+
+remove(my_list,
+       "b")
+
+```
+
+
+
+
+
 ```{r, striphist}
 remove_full <- TRUE                # whether to remove the 'full' analysis
+
+baseline_agg_2 <- remove_hist(baseline_agg_list,
+                              remove_strata = "full")
+expect_equal(baseline_agg_2,
+             baseline_agg)
+
+baseline_agg_3 <- remove_hist(baseline_agg_2,
+                              remove_strata = c("crust"))
+baseline_agg_7 <- remove_hist(baseline_agg_list,
+                              remove_strata = c("full", "crust"))
+
+expect_equal(baseline_agg_3,
+             baseline_agg_7)
+
+then delete this if that works:   YES IT DOES HERE HERE
+
+
 
 baseline_agg <- list()
 for(i in 1:length(baseline_agg_list)){
@@ -88,7 +143,6 @@ if(remove_full){
   baseline_agg <- within(baseline_agg,
                          rm("full"))
 }
-
 
 fg_agg <- list()
 for(i in 1:length(fg_agg_list)){

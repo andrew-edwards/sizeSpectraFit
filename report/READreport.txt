@@ -68,7 +68,8 @@ low, could try a global xmin of something low?
 
 Going to work through the assumptions, starting assuming the baseline xmin, then
 the FG xmin, then the NTR xmin (based on Table on p84 of analysis-4). Will need a few .Rmd files, but gradually
-whittle down the analyses in each as won't need everything.
+whittle down the analyses in each as won't need everything. Then doing min(xmin)
+for each group, which actually makes more sense.
 
 Simplify 4 to use as 5 as a template (can shorten the initial part), and then
   use for 6,7,8.
@@ -77,7 +78,7 @@ Decided as went along to just rerun all results (even though some will be
   duplicated analyses) - easiest to just edit a few lines and then wait for them to
   run. Will also allow confirmation, and automatically build the tables and
   summary plots when done. And .pdfs will all look similar. Not updating text
-  for results (as indicated by TODO in there).
+  for results (as indicated by TO DO in there).
 
 So continuing based on 4, but, based on those results, trying
   different approaches for xmin as a sensitivity, to see how results change with
@@ -126,7 +127,9 @@ mediterranean-analysis-9/
   function to an increasing then decreasing data set).
     So xmin still determined individually for each group.
 
-  Accidentally set xmax to baseline xmax (and hadn't taken out low outlier (small crustacea in NTR) so the baseline and crustacea NTR need to be redone), so keep results, but then do 10:
+  Accidentally set xmax to baseline xmax (and hadn't taken out low outlier
+  (small crustacea in NTR) so the baseline and crustacea NTR need to be redone),
+  so keep results, but then do 10 (and now doing 11 and 12 anyway):
 
 mediterranean-analysis-10/
   as for 9 but with just setting xmax
@@ -136,20 +139,34 @@ mediterranean-analysis-10/
   for understanding sensitivity to xmax.
   So xmin still determined individually for each group.
   Looking at properly now:
+ also hadn't taken out low outlier (small crustacea in NTR) so the
+baseline and crustacea NTR need to be redone, but doing 11 and 12 now anyway.
 
+mediterranean-analysis-11/
+  redo 4 but with min(xmin) for each group. Make sure to take out small
+  crustacea outlier in NTR (and leave that code in now, since always needed -
+ actually don't need to add in here as are fixing xmin) so can use 10 as
+ template, commenting out xmax stuff since will use it in 12.
+ Results may well already be spread out between .pdfs, but simpler to rerun all
+ in one go.
+
+ has run, not looked at results
 
 mediterranean-analysis-12/
+  use 11, and set xmax to be max(xmax) within each group. So a bit like 10.
 
-TODO redo 10:  hadn't taken out low outlier (small crustacea in NTR) so the baseline and crustacea NTR need to be redone
-
-mediterranean-analysis summary table
-Version Description
-4
+ has run, not looked at results
 
 
+TODO Carry on with tidying up summary 4, including
+ making a summary plot, then apply to 10 and 11 and maybe others.
 
 
-Juliana 21/8/25:
+
+
+
+
+Juliana 21/8/25 (based on up to 10):
 
 Thanks a lot for all the documents!
 
