@@ -102,7 +102,8 @@ groups <- groups[groups != "Full community"]  # Since don't want plots for full
 
 
 TODO Need to summarise those results in a plot of $b$ with confidence
-intervals.
+intervals. See `plot_multiple_exponents(res_table_agg, ylim = c(-5, 0))` and
+finish tidying up the function.
 
 ## Figures -- one figure with 12 panels
 
