@@ -35,16 +35,14 @@ updated for `mediterranean-analysis-3/`. Committing before changing anything
 further.
 
 Need to have already run `med-analysis-4.Rmd` which takes a while to run
-and saves four `*_list.rds`
-files in the same directory. Or just have the three files. The files contain the
-results after some exploration and iterative calculations.
+and saves three `*_list.rds`
+files in the same directory. The files contain the
+results after some exploration and iterative calculations, plus
+`res_table_agg.rds` contains the combined table results.
 
 ## Results
 
-TODO had originally used `aggregate_mlebins()` to make tailored list, but now
-just having all results then doing such wrangling here as will keep plotting code
-more general (and avoids unpacking what I packed up). Can delete this comment
-when done.
+Load in saved results.
 
 ```{r, loadresults}
 baseline_agg_list <- readRDS("baseline_agg_list.rds")
@@ -62,121 +60,22 @@ actual data will be created anyway by the amalagamating plotting.
 users should do that by using our .Rmd as a template). Was going to rebuild it
 but just use what I created before for speed.
 
-Do not really need the histogram information in each list here, and may not even
-have it. So to generalise the code save strip out the histogram information if
-it is exists: (could functionalise this, but a bit more transparent like this)
-
-HERE (done) strip out the histogram stuff from each, just do a
-  loop. Could make into a function. seems best to do up front allow for
-  flexibility in how results were created (e.g. with hist or not), so check the class within the loop.
-
-MWE for removing a strata, as not working with within in the function
-
-```{r, mwe}
-# I'm trying to write a function to remove certain named elements from a list
-
-my_list <- list(a = 1, b = 2:5, c = 6)
-
-# This works:
-within(my_list,
-       rm("b"))    # returns the list without b, the desired behaviour
-
-# But cannot get it to parse correctly within a function, to make it general
-remove <- function(input_list,
-                   remove_me){
-  within(input_list,
-         # Trying various lines next, somewhat guessing
-
-         # rm(remove_me))
-            # Warning message: In rm(remove_me) : object
-            # 'remove_me' not found
-
-         # rm(expr(remove_me))          # same as above
-
-         # rm(as.character(remove_me)))
-          # Error in rm(as.character(remove_me)) (from #3) :
-          #  ... must contain names or character strings
-         # rm(parse(remove_me)))   # same as previous
-}
-
-remove(my_list,
-       "b")
-
-```
-
-
-
-
+Do not really need the histogram information in each list here, so stripping out
+the histogram information here, and also removing the `"full"` analyses as do
+not want to include them:
 
 ```{r, striphist}
-remove_full <- TRUE                # whether to remove the 'full' analysis
+remove_strata <- "full"   # make NULL to keep everything, or "full" to remove
+                          # the full analysis
 
-baseline_agg_2 <- remove_hist(baseline_agg_list,
-                              remove_strata = "full")
-expect_equal(baseline_agg_2,
-             baseline_agg)
+baseline_agg <- remove_hist(baseline_agg_list,
+                            remove_strata = remove_strata)
 
-baseline_agg_3 <- remove_hist(baseline_agg_2,
-                              remove_strata = c("crust"))
-baseline_agg_7 <- remove_hist(baseline_agg_list,
-                              remove_strata = c("full", "crust"))
+fg_agg <- remove_hist(fg_agg_list,
+                      remove_strata = remove_strata)
 
-expect_equal(baseline_agg_3,
-             baseline_agg_7)
-
-then delete this if that works:   YES IT DOES HERE HERE
-
-
-
-baseline_agg <- list()
-for(i in 1:length(baseline_agg_list)){
-  if("determine_xmin_and_fit_mlebins" %in% class(baseline_agg_list[[i]])){
-    baseline_agg[[i]] <- baseline_agg_list[[i]]$mlebins    # might need mlebin
-    # also if we have determine_xmin_and_fit_mlebin, or below TODO
-  } else {
-    baseline_agg[[i]] <- baseline_agg_list[[i]]    # presumably already the
-                                        # mlebins or mlebin results
-  }
-  names(baseline_agg)[i] <- names(baseline_agg_list)[i]
-}
-if(remove_full){
-  baseline_agg <- within(baseline_agg,
-                         rm("full"))
-}
-
-fg_agg <- list()
-for(i in 1:length(fg_agg_list)){
-  if("determine_xmin_and_fit_mlebins" %in% class(fg_agg_list[[i]])){
-    fg_agg[[i]] <- fg_agg_list[[i]]$mlebins    # might need mlebin
-    # also if we have determine_xmin_and_fit_mlebin, or below TODO
-  } else {
-    fg_agg[[i]] <- fg_agg_list[[i]]    # presumably already the
-                                        # mlebins or mlebin results
-  }
-  names(fg_agg)[i] <- names(fg_agg_list)[i]
-}
-if(remove_full){
-  fg_agg <- within(fg_agg,
-                   rm("full"))
-}
-
-
-ntr_agg <- list()
-for(i in 1:length(ntr_agg_list)){
-  if("determine_xmin_and_fit_mlebins" %in% class(ntr_agg_list[[i]])){
-    ntr_agg[[i]] <- ntr_agg_list[[i]]$mlebins    # might need mlebin
-    # also if we have determine_xmin_and_fit_mlebin, or below TODO
-  } else {
-    ntr_agg[[i]] <- ntr_agg_list[[i]]    # presumably already the
-                                        # mlebins or mlebin results
-  }
-  names(ntr_agg)[i] <- names(ntr_agg_list)[i]
-}
-if(remove_full){
-  ntr_agg <- within(ntr_agg,
-                    rm("full"))
-}
-
+ntr_agg <- remove_hist(ntr_agg_list,
+                       remove_strata = remove_strata)
 ```
 
 \clearpage
@@ -187,15 +86,20 @@ knitr::kable(res_table_agg,
 ```
 
 First, need a global range for the body sizes, note those include full community
-that we might not look at, so may always want to come back and tweak
+that we might not look at, so may always want to come back and tweak:
 ```{r, globalx}
 x_min_global <- min(res_table_agg$x_min)
 x_max_global <- max(res_table_agg$x_max)
 groups <- unique(res_table_agg$Group)    # Assume we're keeping everything in
                                          # the same order, no reason not to
 groups <- groups[groups != "Full community"]  # Since don't want plots for full
-                                        # community for this particular analysis
+                                        # community for this particular
+                                        # analysis. Edit manually if want to
+                                        # ignore more.
+
 ```
+
+
 
 TODO Need to summarise those results in a plot of $b$ with confidence
 intervals.

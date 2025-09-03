@@ -1,17 +1,19 @@
-##' Remove histogram information from a list of objects of class `determine_xmin_and_fit_mlebins`
-##'  <desc>
+##' Remove histogram information from a list of objects of class
+##'  `determine_xmin_and_fit_mlebins`, and also specific strata if desired.
 ##'
-##' @return List of objects of class TODO
+##' @param agg_list List of objects of class `determine_xmin_and_fit_mlebins`,
+##'   from running `determine_xmin_and_fit_mlebins()` and then putting results
+##'   into one list (TODO see vignette).
+##' @param remove_strata vector of names of any strata to remove, each must be one of `names(agg_list)`.
+##'
+##' @return the input list but with the histogram information removed as well as
+##'   any results (elements) of name in `remove_strata`.
 ##' @export
 ##' @author Andrew Edwards
 ##' @examples
 ##' \dontrun{
 ##'
 ##' }
-##' @param agg_list List of objects of class `determine_xmin_and_fit_mlebins`,
-##'   from running `determine_xmin_and_fit_mlebins()` and then putting results
-##'   into one list (TODO see vignette).
-##' @param remove_strata vector of names of any strata to remove, each must be one of `names(agg_list)`.
 remove_hist <- function(agg_list,
                         remove_strata = NULL){
   return_agg <- list()
@@ -33,8 +35,8 @@ remove_hist <- function(agg_list,
       }
 
       return_agg <- within(return_agg,
-                           rm(list = remove_strata[j]))  # TODO can probably
-                                        # remove loop
+                           rm(list = remove_strata[j]))  # can probably
+                                        # remove loop, but it works fine
     }
   }
 
