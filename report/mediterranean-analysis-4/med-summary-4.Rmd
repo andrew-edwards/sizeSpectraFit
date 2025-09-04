@@ -4,6 +4,10 @@ author: "Andrew Edwards and Juliana Zabala"
 output: pdf_document
 fontsize: 12pt
 date: "Last compiled on `r format(Sys.time(), '%d %B, %Y')`"
+header-includes:
+- \usepackage{pdflscape}
+- \newcommand{\blandscape}{\begin{landscape}}
+- \newcommand{\elandscape}{\end{landscape}}
 ---
 
 ```{r, setup, include = FALSE}
@@ -16,7 +20,7 @@ knitr::opts_chunk$set(
   fig.width = 8,
   fig.height = 10
 )
-  # comment = "#>",
+# comment = "#>",
 ```
 
 ```{r, build, echo = FALSE, eval = FALSE}
@@ -30,17 +34,14 @@ load_all()
 #library(sizeSpectra2)    # Need latest version
 ```
 
-Copying from `mediterranean-analysis-2/zabala-summary.Rmd`, which I hadn't
-updated for `mediterranean-analysis-3/`. Committing before changing anything
-further.
-
-Need to have already run `med-analysis-4.Rmd` which takes a while to run
+This summarises the results from `med-analysis-4.Rmd`, which takes a while to run
 and saves three `*_list.rds`
 files in the same directory. The files contain the
 results after some exploration and iterative calculations, plus
-`res_table_agg.rds` contains the combined table results.
+`res_table_agg.rds` contains the combined table results. Still might need some
+of the other plots in `med-analysis-*.Rmd` in Supplementary Information.
 
-## Results
+## Load results
 
 Load in saved results.
 
@@ -53,12 +54,17 @@ res_table_agg <- readRDS("res_table_agg.rds")
 
 Each is a list for that strata, with 6 objects of results of class
 `determine_xmin_and_fit_mlebins`. First of each is for fitting the full
-community in one go, we might want to show just the curve of that fit; the
-actual data will be created anyway by the amalagamating plotting.
+community in one go, for which we will first show the curve of that fit.
 
 `res_table_agg` is the summary table that has been built up during analysis (and
-users should do that by using our .Rmd as a template). Was going to rebuild it
-but just use what I created before for speed.
+users should do that by using our .Rmd as a template).
+
+## Fits to full community
+
+
+
+## Fits to each species group
+
 
 Do not really need the histogram information in each list here, so stripping out
 the histogram information here, and also removing the `"full"` analyses as do
@@ -101,9 +107,12 @@ groups <- groups[groups != "Full community"]  # Since don't want plots for full
 ## Figures -- one figure with 12 panels
 
 Could also plot each one in turn with linear y-axis also will probably want in
-an Appendix. Do panel plot first.
+an Appendix. Do panel plot first. Two sets of code, first for portrait version,
+second (not echoed) original code for landscape to have it available; bit hard
+to functionalise as usually want to tailor the plots.
 
-```{r, panelplot, fig.cap = "Summary plot of all groups (rows) and strata(columns), with a consistent x-axis range throughout, and a consistent y-axis range for each group. Data are shown as rectangles representing the range of possible values within each body-mass bin, but due to the small bins these mostly show up as lines."}
+```{r, panelplotportrait, fig.cap = "Summary plot of all groups (rows) and strata(columns), with a consistent x-axis range throughout, and a consistent y-axis range for each group. Data are shown as rectangles representing the range of possible values within each body-mass bin, but due to the small bins these mostly show up as lines.", echo = FALSE, eval = FALSE}
+# NOT EVALUATED
 par(mfrow = c(5, 3),    # group in each row, strata in each column
     oma = c(0, 3, 3, 0),
     mar = c(3, 3, 1, 0.2))
@@ -177,6 +186,195 @@ for(i in 1:length(groups)){
 }
 ```
 
+\blandscape
+
+```{r, panelplotlandscape, fig.cap = "Summary plot of all groups (rows) and strata(columns), with a consistent x-axis range throughout, and a consistent y-axis range for each group. Data are shown as rectangles representing the range of possible values within each body-mass bin, but due to the small bins these mostly show up as lines. Solid curves are the fits using the maximum likelihood estimates for exponent $b$, dashed lines use the 95% confidence intervals, but these only show up in a few cases.", echo = FALSE, fig.width = 11, fig.height = 8}
+strata_col = c("blue",
+               "darkgreen",
+               "red")  # used in later figures also
+
+par(mfcol = c(3, 5),    # strata in each row, group in each colum, fill by group
+    oma = c(0, 3, 3, 0),
+    mar = c(3, 3, 1, 0.2))
+
+seg_col = "black"      # bins are so small the default green does not really
+                       # help
+
+for(i in 1:length(groups)){
+  # Based on calculation in plot.size_spectrum_mlebin():
+  y_min_group <- 0.75 * min(c(baseline_agg[[i]]$data$count_gte_bin_min,
+                              fg_agg[[i]]$data$count_gte_bin_min,
+                              ntr_agg[[i]]$data$count_gte_bin_min))
+
+  y_max_group <- max(c(baseline_agg[[i]]$data$high_count,
+                       fg_agg[[i]]$data$high_count,
+                       ntr_agg[[i]]$data$high_count))
+
+  y_lim_group = c(y_min_group,
+                  y_max_group)
+
+  # Only label y-axis for first column
+  y_lab <- ifelse(i == 1,
+                  expression(paste("Total ",
+                                   counts >= x),
+                             sep=""),
+                  "")
+
+  plot(baseline_agg[[i]],
+       xlim = c(x_min_global,
+                x_max_global),
+       ylim = y_lim_group,
+       style = "log_y_axis",
+       legend_text_second_row_multiplier = 3,
+       seg_col = seg_col,
+       xlab = "",
+       ylab = y_lab,
+       fit_col = strata_col[1],
+       show_fit_on_top = FALSE)
+
+  mtext(groups[i],
+        side = 3,
+        line = 1)
+
+  if(i == 1){
+    mtext("Baseline",
+          side = 2,
+          line = 3)
+  }
+
+  plot(fg_agg[[i]],
+       xlim = c(x_min_global,
+                x_max_global),
+       ylim = y_lim_group,
+       style = "log_y_axis",
+       legend_text_second_row_multiplier = 3,
+       seg_col = seg_col,
+       xlab = "",
+       ylab = y_lab,
+       fit_col = strata_col[2],
+       show_fit_on_top = FALSE)
+
+  if(i == 1){
+    mtext("Fishing Grounds",
+          side = 2,
+          line = 3)
+  }
+
+  plot(ntr_agg[[i]],
+       xlim = c(x_min_global,
+                x_max_global),
+       ylim = y_lim_group,
+       style = "log_y_axis",
+       legend_text_second_row_multiplier = 3,
+       seg_col = seg_col,
+       ylab = y_lab,
+       fit_col = strata_col[3],
+       show_fit_on_top = FALSE)
+
+  if(i == 1){
+    mtext("No-take Reserve",
+          side = 2,
+          line = 3)
+  }
+}
+```
+
+\elandscape
+
+
+\blandscape
+
+```{r, panelplotlandscapelinear, fig.cap = "As for previous figure but with linear y-axes.", echo = FALSE, fig.width = 11, fig.height = 8}
+par(mfcol = c(3, 5),    # strata in each row, group in each colum, fill by group
+    oma = c(0, 3, 3, 0),
+    mar = c(3, 3, 1, 0.2))
+
+seg_col = "black"      # bins are so small the default green does not really
+                       # help
+
+for(i in 1:length(groups)){
+  # Based on calculation in plot.size_spectrum_mlebin():
+  y_min_group <- 0.75 * min(c(baseline_agg[[i]]$data$count_gte_bin_min,
+                              fg_agg[[i]]$data$count_gte_bin_min,
+                              ntr_agg[[i]]$data$count_gte_bin_min))
+
+  y_max_group <- max(c(baseline_agg[[i]]$data$high_count,
+                       fg_agg[[i]]$data$high_count,
+                       ntr_agg[[i]]$data$high_count))
+
+  y_lim_group = c(y_min_group,
+                  y_max_group)
+
+  # Only label y-axis for first column
+  y_lab <- ifelse(i == 1,
+                  expression(paste("Total ",
+                                   counts >= x),
+                             sep=""),
+                  "")
+
+  plot(baseline_agg[[i]],
+       xlim = c(x_min_global,
+                x_max_global),
+       ylim = y_lim_group,
+       style = "linear_y_axis",
+       legend_text_second_row_multiplier = 3,
+       seg_col = seg_col,
+       xlab = "",
+       ylab = y_lab,
+       fit_col = strata_col[1],
+       show_fit_on_top = FALSE)
+
+  mtext(groups[i],
+        side = 3,
+        line = 1)
+
+  if(i == 1){
+    mtext("Baseline",
+          side = 2,
+          line = 3)
+  }
+
+  plot(fg_agg[[i]],
+       xlim = c(x_min_global,
+                x_max_global),
+       ylim = y_lim_group,
+       style = "linear_y_axis",
+       legend_text_second_row_multiplier = 3,
+       seg_col = seg_col,
+       xlab = "",
+       ylab = y_lab,
+       fit_col = strata_col[2],
+       show_fit_on_top = FALSE)
+
+  if(i == 1){
+    mtext("Fishing Grounds",
+          side = 2,
+          line = 3)
+  }
+
+  plot(ntr_agg[[i]],
+       xlim = c(x_min_global,
+                x_max_global),
+       ylim = y_lim_group,
+       style = "linear_y_axis",
+       legend_text_second_row_multiplier = 3,
+       seg_col = seg_col,
+       ylab = y_lab,
+       fit_col = strata_col[3],
+       show_fit_on_top = FALSE)
+
+  if(i == 1){
+    mtext("No-take Reserve",
+          side = 2,
+          line = 3)
+  }
+}
+```
+
+\elandscape
+
+
+
 ## Summarise exponent values
 
 ```{r plotsummary, fig.width = 10.2, fig.height = 6, fig.cap = "Maximum likelihood estimates of size-spectrum exponent $b$ (symbols) with 95% confidence intervals (lines), most of which are too narrow to show up. Results are for Baseline, Fishing Grounds (FG) and No-take Reserve (NTR) for each species group."}
@@ -186,7 +384,8 @@ plot_multiple_exponents(res_table_agg)
 The low value does dictate the y-axis range, so limit the axis here:
 ```{r plotsummary2, fig.width = 11, fig.height = 6, fig.cap = "As for previous Figure but restricting the y-axis (which misses the NTR results for Chondrichthyes)."}
 plot_multiple_exponents(res_table_agg,
-                        ylim = c(-5, 0))
+                        ylim = c(-5, 0),
+                        col_strata = strata_col)
 ```
 
 ## Conclusions from these results
@@ -259,10 +458,6 @@ ntr_agg_fit <- plot_aggregate_mlebin(
 
 Try and plot all three fits on one plot:
 ```{r combinedplot}
-strata_col <- c("black",
-                "blue",
-                "red")
-
 plot(baseline_agg_fit[["x_plb_agg"]],
      baseline_agg_fit[["y_plb_agg"]],
      log = "xy",

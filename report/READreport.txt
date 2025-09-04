@@ -159,7 +159,8 @@ mediterranean-analysis-12/
 
 
 TODO Carry on with tidying up summary 4, including
- making a summary plot, then apply to 10 and 11 and maybe others.
+ making a summary plot, showing full community first (maybe not needed for
+ manuscript) then apply to 10 and 11 and maybe others.
 
 
 
