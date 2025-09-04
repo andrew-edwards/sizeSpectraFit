@@ -17,51 +17,32 @@
 ##'  - `Low b`: the 95\% lower confidence limit of the exponent *b*
 ##'  - `MLE b`: the maximum likelihood estimate of *b*
 ##'  -  `High b` the 95\% upper confidence limit of *b*
-##'
-##' ##' @param legName legend name for that panel
-##' @param method method used to obtain the inputted estimates of `b`
-##' @param weightReg  TRUE if doing weighted regression (using standard errors)
-##'   or FALSE to not do weighted regression.
-##' @param bCol colour for points for *b*
-##' @param pchVal pch for points for *b*
-##' @param cexVal size of points for *b*
-##' @param confCol colour for confidence intervals for *b*
-##' @param confThick thickness of vertical line for confidence intervals
-##' @param xLim x-axis limits
-##' @param yLim y-axis limits
-##' @param xLab label for x-axis
-##' @param yLab label for y-axis
-##' @param xTicksSmallInc increments for where to have small (unlabelled)
-##'   tickmarks on x-axis
-##' @param xTicksSmallTck tick length for small (unlabelled) tickmarks on x-axis
-##' @param yLabels whether or not to label main tickmarks on y-axis
-##' @param yTicksSmallInc increments for where to have small (unlabelled)
-##' tickmarks on y-axis
-##' @param yTicksSmallTck tick length for small (unlabelled) tickmarks on y-axis
-##' @param legPos legend position
-##' @param newPlot TRUE to create a new plot, FALSE to add to existing
-##' @param regPlot TRUE to plot the regression line and conf intervals
-##' @param regColNotSig colour for regression line (and its confidence intervals)
-##' if the trend is not significant
-##' @param regColSig colour for regression line (and its confidence intervals)
-##' if the trend is significant
-##' @param legExtra extra manually-specified legend (e.g. to distinguish two
-##' sets of results)
-##' @param legExtraPos position for extra manually-specified legend
-##' @param legExtraCol colours (vector) for extra manually-specified legend
-##' @param insetVal inset shift for naming the panel
-##' @param xJitter value to jitter the x-values by (for comparison plot the
-##'   confidence intervals overlap)
-##' @param doRegression whether to calculate a regression for the time series of estimates
-##' @return if `doRegression` is TRUE (default) then return dataframe of just
-##'   one row with columns (else return nothing):
-##'   * Method: method used
-##'   * Low: lower bound of 95\% confidence interval
-##'   * Trend: gradient of regression fit
-##'   * High: upper bound of 95\% confidence interval
-##'   * p: p-value of regression fit
-##'   * Rsquared: r-squared of regression fit
-##'   * adjRsquared: adjusted r-squared of regression fit
+##' @param col_strata character vector of colours, need one colour for each strata
+##' @param pch_strata vector of pch numeric values, one for each strata
+##' @param pch_cex numeric, size of the points, gets used by `points(..., cex = pch_cex)`
+##' @param xlim
+##' @param ylim
+##' @param x_jitter Amount to left/right jitter each strata within a group;
+##'   default works great for an example plot, needs generalising TODO
+##' @param legend_position character description of keyword of where to put
+##'   legend using `legend()`, one of '"bottomright"', '"bottom"',
+##'   '"bottomleft"', '"left"', '"topleft"', '"top"', '"topright"', '"right"'
+##'   or '"center"'
+##' @param legend_inset inset distance(s) from the margins as a fraction of the plot
+##'          region when legend is placed by keyword, used as `legend(..., inset = legend_inset)`.
+##' @param legend_bty type of box to be drawn around the legend, either '"o"'
+##'   (the default) or '"n"'. Used as `legend(..., bty = legend_bty)`.
+##' @param xlab label for x-axis (default is nothing, as Group headings are
+##'   shown at the top
+##' @param ylab label for y-axis
+##' @param y_minor_tick_start used as `add_minor_tickmarks(..., y_tick_start =
+##'   y_minor_tick_start)` but is automatically calculated; specify a value if
+##'   it needs tweaking
+##' @param y_minor_tick_by numeric increment of minor tick marks, set to a high
+##'   value (like 100) to have no minor tick marks.
+##' @param gap_axis used as `axis(3, gap.axis = gap_axis)` to specify minimal
+##'   gap between labels on the top axis
+##' @return desired plot in current device
 ##' @export
 ##' @author Andrew Edwards, adapted from `timeSerPlot()`
 plot_multiple_exponents = function(res_tib,
@@ -69,28 +50,20 @@ plot_multiple_exponents = function(res_tib,
                                                   "darkgreen",
                                                   "red"),
                                    pch_strata = c(15, 16, 17),
+                                   pch_cex = 1.3,
                                    xlim = NULL,
                                    ylim = NULL,
-                                   x_jitter = NULL,    # Amount to left/right jitter each
-                                        # strata within a group; generalise for
-                                   # more strata
+                                   x_jitter = NULL,
                                    legend_position = "bottomright",
                                    legend_inset = c(0, 0),
                                    legend_bty = "o",
+                                   xlab= "",
                                    ylab = expression(paste("Estimate of ", italic(b)),
                                                      sep=""),
-                                   xlab= "",
-                                   cexVal = 1,
-                                   confCol = "black",
-                                   confThick = 1,
+                                   y_minor_tick_start = NULL,
+                                   y_minor_tick_by = 0.2,
+                                   gap_axis = 0.3){
 
-                       xTicksSmallInc = NULL,
-                       xTicksSmallTck = 0.01,
-                       yLabels = TRUE,
-                       yTicksSmallInc = NULL,
-                       yTicksSmallTck = 0.01)  # TODO remove what not needed
-
-  {
   if(is.null(x_jitter)){
     x_jitter <- 0.5
   }
@@ -102,6 +75,17 @@ plot_multiple_exponents = function(res_tib,
   num_strata <- length(strata)
 
   num_combinations <- num_groups * num_strata
+
+  if(length(col_strata) != num_strata){
+    stop(paste("Need col_strata to have", num_strata,
+               "colours, one for each strata."))
+  }
+  if(length(pch_strata) != num_strata){
+    stop(paste("Need pch_strata to have", num_strata,
+               "values, one for each strata."))
+  }
+
+
 
   # Centre for each group
   x_group <- (1:num_groups) * num_strata - 1
@@ -133,14 +117,24 @@ plot_multiple_exponents = function(res_tib,
   box()
 
   axis(2)
-  # TODO add tickmarks, use my function add_ticks or probably
-  # add_ticks_to_one_axis() since only doing one
 
+  # Minor tickmarks on y-axis
+  if(is.null(y_minor_tick_start)){
+    y_minor_tick_start <- floor(par("usr")[3])
+  }
+
+  add_minor_tickmarks(x_tick_start = 1000,   # don't want any
+                      x_tick_by = 10,
+                      x_tick_end = 1020,
+                      y_tick_start = y_minor_tick_start,
+                      y_tick_by = y_minor_tick_by,
+                      y_tick_end = NULL)
 
   axis(3,
        at = x_group,
        tick = FALSE,
-       labels = groups)
+       labels = groups,
+       gap.axis = gap_axis)
 
   # Just the MLEs
   points(x_values,
@@ -148,7 +142,9 @@ plot_multiple_exponents = function(res_tib,
          pch = rep(pch_strata,
                    num_groups),
          col = rep(col_strata,
-                   num_groups))
+                   num_groups),
+         cex = pch_cex
+         )
 
   # Confidence intervals:
   segments(x0 = x_values,
@@ -167,22 +163,9 @@ plot_multiple_exponents = function(res_tib,
          legend = strata,
          col = col_strata,
          pch = pch_strata,
+         pt.cex = pch_cex,
          inset = legend_inset,
          bty = legend_bty)
-
-  if(FALSE){
-       legend(legPos, legName, bty="n", inset=insetVal)
-       if(!is.null(yTicksSmallInc))
-           { yTicksSmall = seq(yLim[1], yLim[-1], by=yTicksSmallInc)
-             axis(2, at = yTicksSmall, labels = rep("", length(yTicksSmall)),
-                tck=-yTicksSmallTck)
-           }
-       if(!is.null(xTicksSmallInc))
-           { xTicksSmall = seq(xLim[1], xLim[-1], by=xTicksSmallInc)
-             axis(1, at = xTicksSmall, labels = rep("", length(xTicksSmall)),
-                tck=-xTicksSmallTck)
-           }
-  }
 
   invisible()
 }

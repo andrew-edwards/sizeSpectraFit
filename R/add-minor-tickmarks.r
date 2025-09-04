@@ -2,6 +2,8 @@
 ##'
 ##' Add sensible smaller (unlabelled) tickmarks to both axes of an existing
 ##' plot. Adapted from `pacea::add_tickmarks()`. Is exported but unlikely to be needed externally.
+##' Need to specify `x_tick_start` and `y_tick_start` manually (rather than
+##' based on current axis) to ensure they are sensible (e.g. starting at 0 not -0.05).
 ##'
 ##' @param x_tick_start start of small tickmarks on x-axis
 ##' @param x_tick_by interval between small tickmarks on x-axis

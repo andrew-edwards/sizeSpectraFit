@@ -96,14 +96,7 @@ groups <- groups[groups != "Full community"]  # Since don't want plots for full
                                         # community for this particular
                                         # analysis. Edit manually if want to
                                         # ignore more.
-
 ```
-
-
-
-TODO Need to summarise those results in a plot of $b$ with confidence
-intervals. See `plot_multiple_exponents(res_table_agg, ylim = c(-5, 0))` and
-finish tidying up the function.
 
 ## Figures -- one figure with 12 panels
 
@@ -182,6 +175,18 @@ for(i in 1:length(groups)){
           line = 1)
   }
 }
+```
+
+## Summarise exponent values
+
+```{r plotsummary, fig.width = 10.2, fig.height = 6, fig.cap = "Maximum likelihood estimates of size-spectrum exponent $b$ (symbols) with 95% confidence intervals (lines), most of which are too narrow to show up. Results are for Baseline, Fishing Grounds (FG) and No-take Reserve (NTR) for each species group."}
+plot_multiple_exponents(res_table_agg)
+```
+
+The low value does dictate the y-axis range, so limit the axis here:
+```{r plotsummary2, fig.width = 11, fig.height = 6, fig.cap = "As for previous Figure but restricting the y-axis (which misses the NTR results for Chondrichthyes)."}
+plot_multiple_exponents(res_table_agg,
+                        ylim = c(-5, 0))
 ```
 
 ## Conclusions from these results
