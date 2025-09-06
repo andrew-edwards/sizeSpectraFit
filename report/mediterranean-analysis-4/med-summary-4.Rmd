@@ -14,13 +14,15 @@ header-includes:
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "",
-  cache = FALSE,
-  # cache_path = "med-summary-4-cache/",
-  # fig.path = "med-summary-4-figs-cache/",
+  cache = TRUE,
+  cache_path = "med-summary-4-cache/",
+  fig.path = "med-summary-4-figs-cache/",
   fig.width = 8,
   fig.height = 10
 )
 # comment = "#>",
+
+knitr::dep_auto()
 ```
 
 ```{r, build, echo = FALSE, eval = FALSE}
@@ -30,6 +32,7 @@ rmarkdown::render("med-summary-4.Rmd")
 
 ```{r, packages, echo = FALSE, cache = FALSE}
 library(dplyr)
+library(knitr)
 load_all()
 #library(sizeSpectra2)    # Need latest version
 ```
@@ -54,17 +57,16 @@ res_table_agg <- readRDS("res_table_agg.rds")
 
 Each is a list for that strata, with 6 objects of results of class
 `determine_xmin_and_fit_mlebins`. First of each is for fitting the full
-community in one go, for which we will first show the curve of that fit.
+community in one go, which we won't use as not a great fit and there are issues
+with assuming the same catchability (TODO?) between groups. Fits for all
+group/strata combination (including the full community) are shown at the end of
+this document.
 
 `res_table_agg` is the summary table that has been built up during analysis (and
 users should do that by using our .Rmd as a template).
 
-## Fits to full community
-
-
 
 ## Fits to each species group
-
 
 Do not really need the histogram information in each list here, so stripping out
 the histogram information here, and also removing the `"full"` analyses as do
@@ -87,7 +89,8 @@ ntr_agg <- remove_hist(ntr_agg_list,
 \clearpage
 
 ```{r, aggregatetable}
-knitr::kable(res_table_agg,
+knitr::kable(dplyr::filter(res_table_agg,
+                           Group != "Full community"),
              digits = 2)
 ```
 
@@ -102,6 +105,8 @@ groups <- groups[groups != "Full community"]  # Since don't want plots for full
                                         # community for this particular
                                         # analysis. Edit manually if want to
                                         # ignore more.
+strata <- unique(dplyr::filter(res_table_agg,
+                               Group != "Full community")$Strata)
 ```
 
 ## Figures -- one figure with 12 panels
@@ -378,7 +383,8 @@ for(i in 1:length(groups)){
 ## Summarise exponent values
 
 ```{r plotsummary, fig.width = 10.2, fig.height = 6, fig.cap = "Maximum likelihood estimates of size-spectrum exponent $b$ (symbols) with 95% confidence intervals (lines), most of which are too narrow to show up. Results are for Baseline, Fishing Grounds (FG) and No-take Reserve (NTR) for each species group."}
-plot_multiple_exponents(res_table_agg)
+plot_multiple_exponents(res_table_agg,
+                        col_strata = strata_col)
 ```
 
 The low value does dictate the y-axis range, so limit the axis here:
@@ -387,6 +393,8 @@ plot_multiple_exponents(res_table_agg,
                         ylim = c(-5, 0),
                         col_strata = strata_col)
 ```
+
+\clearpage
 
 ## Conclusions from these results
 
@@ -427,98 +435,251 @@ be done differently.
 
 ## Aggregating onto one plot
 
-TODO This is still rough, but the idea (and it won't be clear what is what), but
-the idea is to do the same kind of aggregated plot for baseline, FG, and NTR,
-and then maybe plot the aggregated fit from each on the same panel, which will
-hopefully show the effect of the NTR.
-
-HERE sort of works, needs tweaking but getting there
-Aiming for:
-```{r aggplot, fig.height = 10}
-xlim_global <- c(0.3, 2000)   # TODO automate
+```{r aggplot, fig.height = 8, fig.width = 4, fig.cap = "For each strata, the data and fits previously shown for the five species groups are plotted on the same axes. The thick pink lines are then aggregated size spectra, which combine the five fitted size spectra (all the data are also shown in black, though this is hard to see). While the results are a little hard to interpret, the point is to show how the three aggregated pink curves are defined, and these are then compared in the next figure."}
+xlim_global <- c(x_min_global,
+                 x_max_global)
 ylim_global <- c(1, 200000)
-par(mfrow = c(3, 1))
+par(mfrow = c(3, 1),
+    oma = c(0, 3, 3, 0),
+    mar = c(4, 3, 1, 0.2))
+
 baseline_agg_fit <- plot_aggregate_mlebin(
   baseline_agg,
-  main = "Baseline",   # Didn't get used TODO
   xlim_global = xlim_global,
   ylim_global = ylim_global)
+mtext("Baseline",
+      side = 3,
+      line = 0.5)
+
 fg_agg_fit <- plot_aggregate_mlebin(
   fg_agg,
-  main = "Fishing Grounds",
+  # main = "Fishing Grounds",
   xlim_global = xlim_global,
   ylim_global = ylim_global)
+mtext("Fishing Grounds",
+      side = 3,
+      line = 0.5)
+
 ntr_agg_fit <- plot_aggregate_mlebin(
   ntr_agg,
-  main = "No-take Reserve",
+  # main = "No-take Reserve",
   xlim_global = xlim_global,
   ylim_global = ylim_global)
+mtext("No-take Reserve",
+      side = 3,
+      line = 0.5)
 ```
 
 
 Try and plot all three fits on one plot:
-```{r combinedplot}
+```{r combinedplot, fig.cap = "The three aggregated plots from the previous Figure.", fig.height = 6}
 plot(baseline_agg_fit[["x_plb_agg"]],
      baseline_agg_fit[["y_plb_agg"]],
      log = "xy",
      type = "l",
      xlim = xlim_global,
      ylim = ylim_global,
+     xlab = expression(paste("Body mass, ",
+                             italic(x), "(g)")),
+     ylab = expression(paste("Total ", counts >= x),
+                       sep=""),
      col = strata_col[1],
-     main = "Base black, fg blue, ntr red")
+     axes = FALSE,
+     lwd = 2)
+
+box()
+
+add_ticks(log = "xy")
 
 lines(fg_agg_fit[["x_plb_agg"]],
       fg_agg_fit[["y_plb_agg"]],
-      col = strata_col[2])
+      col = strata_col[2],
+      lwd = 2)
 
 lines(ntr_agg_fit[["x_plb_agg"]],
       ntr_agg_fit[["y_plb_agg"]],
-      col = strata_col[3])
+      col = strata_col[3],
+      lwd = 2)
+
+legend(x = "topright",
+       legend = strata,
+       col = strata_col,
+       lwd = 2)
+       # pch = pch_strata,
+       # pt.cex = pch_cex,
+       # inset = legend_inset,
+       # bty = legend_bty)
 ```
 
-Do not log the y-axis:
-```{r combinedplotnolog}
+Do not log the y-axis:  TODO could make function
+```{r combinedplotnolog, fig.cap = "As for previous figure but linear y-axis.", fig.height = 6}
 plot(baseline_agg_fit[["x_plb_agg"]],
      baseline_agg_fit[["y_plb_agg"]],
      log = "x",
      type = "l",
      xlim = xlim_global,
      ylim = ylim_global,
+     xlab = expression(paste("Body mass, ",
+                             italic(x), "(g)")),
+     ylab = expression(paste("Total ", counts >= x),
+                       sep=""),
      col = strata_col[1],
-     main = "Base black, fg blue, ntr red")
+     axes = FALSE,
+     lwd = 2)
+
+box()
+
+add_ticks(log = "x")
 
 lines(fg_agg_fit[["x_plb_agg"]],
       fg_agg_fit[["y_plb_agg"]],
-      col = strata_col[2])
+      col = strata_col[2],
+      lwd = 2)
 
 lines(ntr_agg_fit[["x_plb_agg"]],
       ntr_agg_fit[["y_plb_agg"]],
-      col = strata_col[3])
-```
-
-
-
-Now normalise the y-axis:
-```{r combinedplotnorm}
-plot(baseline_agg_fit[["x_plb_agg"]],
-     baseline_agg_fit[["y_plb_agg"]] / max(baseline_agg_fit[["y_plb_agg"]]),
-     log = "xy",
-     type = "l",
-     xlim = xlim_global,
-     ylim = c(0.001, 1),
-     col = strata_col[1],
-     main = "Base black, fg blue, ntr red",
-     lwd = 2)
-
-lines(fg_agg_fit[["x_plb_agg"]],
-      fg_agg_fit[["y_plb_agg"]] / max(fg_agg_fit[["y_plb_agg"]]),
-      col = strata_col[2],
-     lwd = 2)
-
-lines(ntr_agg_fit[["x_plb_agg"]],
-      ntr_agg_fit[["y_plb_agg"]] / max(ntr_agg_fit[["y_plb_agg"]]),
       col = strata_col[3],
       lwd = 2)
+
+legend(x = "topright",
+       legend = strata,
+       col = strata_col,
+       lwd = 2)
 ```
 
-Might look better if xmin are consistent?
+Restrict the curves to the max of the xmin, then normalise:
+```{r combinedplotnorm, fig.cap = "The three aggregated plots restricted to a common range of body masses and then normalised, to properly compare them.", fig.height = 6}
+x_restrict_start <- max(c(min(baseline_agg_fit[["x_plb_agg"]]),
+                          min(fg_agg_fit[["x_plb_agg"]]),
+                          min(ntr_agg_fit[["x_plb_agg"]])))
+
+baseline_agg_fit_x <- baseline_agg_fit[["x_plb_agg"]][baseline_agg_fit[["x_plb_agg"]] >=
+                                                      x_restrict_start]
+baseline_agg_fit_y <- baseline_agg_fit[["y_plb_agg"]][baseline_agg_fit[["x_plb_agg"]] >=
+                                                      x_restrict_start]
+baseline_agg_fit_y_norm <- baseline_agg_fit_y / max(baseline_agg_fit_y)
+
+plot(baseline_agg_fit_x,
+     baseline_agg_fit_y_norm,
+     log = "xy",
+     type = "l",
+     xlim = c(1, xlim_global[2]),
+     ylim = c(10^(-4), 1),
+     xlab = expression(paste("Body mass, ",
+                             italic(x), "(g)")),
+     ylab = expression(paste("Proportion of ", counts >= x),
+                       sep=""),
+     col = strata_col[1],
+     axes = FALSE,
+     lwd = 2)
+
+box()
+
+add_ticks(log = "xy")
+
+fg_agg_fit_x <- fg_agg_fit[["x_plb_agg"]][fg_agg_fit[["x_plb_agg"]] >=
+                                                      x_restrict_start]
+fg_agg_fit_y <- fg_agg_fit[["y_plb_agg"]][fg_agg_fit[["x_plb_agg"]] >=
+                                                      x_restrict_start]
+fg_agg_fit_y_norm <- fg_agg_fit_y / max(fg_agg_fit_y)
+
+
+lines(fg_agg_fit_x,
+      fg_agg_fit_y_norm,
+      col = strata_col[2],
+      lwd = 2)
+
+ntr_agg_fit_x <- ntr_agg_fit[["x_plb_agg"]][ntr_agg_fit[["x_plb_agg"]] >=
+                                                      x_restrict_start]
+ntr_agg_fit_y <- ntr_agg_fit[["y_plb_agg"]][ntr_agg_fit[["x_plb_agg"]] >=
+                                                      x_restrict_start]
+ntr_agg_fit_y_norm <- ntr_agg_fit_y / max(ntr_agg_fit_y)
+
+
+lines(ntr_agg_fit_x,
+      ntr_agg_fit_y_norm,
+      col = strata_col[3],
+      lwd = 2)
+
+legend(x = "topright",
+       legend = strata,
+       col = strata_col,
+       lwd = 2)
+       # pch = pch_strata,
+       # pt.cex = pch_cex,
+       # inset = legend_inset,
+       # bty = legend_bty)
+```
+
+```{r combinedplotnormlinear, fig.cap = "As previous figure but with a linear y-axis.",fig.height = 6}
+plot(baseline_agg_fit_x,
+     baseline_agg_fit_y_norm,
+     log = "x",
+     type = "l",
+     xlim = c(1, xlim_global[2]),
+     ylim = c(10^(-4), 1),
+     xlab = expression(paste("Body mass, ",
+                             italic(x), "(g)")),
+     ylab = expression(paste("Proportion of ", counts >= x),
+                       sep=""),
+     col = strata_col[1],
+     axes = FALSE,
+     lwd = 2)
+
+box()
+
+add_ticks(log = "x",
+          y_big_ticks_labels = seq(0, 1, 0.2),
+          y_small_ticks_by = 0.1)
+
+lines(fg_agg_fit_x,
+      fg_agg_fit_y_norm,
+      col = strata_col[2],
+      lwd = 2)
+
+lines(ntr_agg_fit_x,
+      ntr_agg_fit_y_norm,
+      col = strata_col[3],
+      lwd = 2)
+
+legend(x = "topright",
+       legend = strata,
+       col = strata_col,
+       lwd = 2)
+       # pch = pch_strata,
+       # pt.cex = pch_cex,
+       # inset = legend_inset,
+       # bty = legend_bty)
+```
+
+TODO totally make a function I think, since ended up calling several times, but
+was useful to tweak.
+
+
+## Fits to each group/strata combination in turn
+
+Might just want to show the figures here, basically copying just the plotting
+code from `med-analysis-*.Rmd`.
+
+```{r, stop, cache = FALSE}
+knitr::knit_exit()
+```
+
+
+## Failed attempts as referencing figures
+
+Fig. \@ref(fig:cars)
+
+Fig. \\@ref(fig:cars)
+
+(ref:first-fig-caption) Here's a complicated figure caption for the first figure, which can include complicated text styling like $m^2$ and references to other elements in the document, like Fig. \@ref(fig:cars).
+
+```{r pressure, fig.cap = '(ref:first-fig-caption)'}
+plot(1:10)
+```
+
+(ref:second-fig-caption) Here's a second complicated figure caption.
+
+```{r, cars, fig.cap = '(ref:second-fig-caption)'}
+plot(10:200)
+```

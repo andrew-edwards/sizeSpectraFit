@@ -106,12 +106,6 @@ plot_aggregate_mlebin <- function(res_list,
   aggregated_data$low_count <- low_count
   aggregated_data$high_count <- high_count
 
-
-  if(is.null(xlim_global)){
-    xlim_global <- c(min(aggregated_data$bin_min),
-                     max(aggregated_data$bin_min))
-  }
-
   if(is.null(ylim_global)){
     ylim_global <- c(y_scaling * min(aggregated_data$count_gte_bin_min),
                      max(aggregated_data$high_count))
@@ -130,6 +124,22 @@ plot_aggregate_mlebin <- function(res_list,
                                         # thought I was trying to be
                                         # consistent. See plot_aggregate also if do
   }
+
+  # x_min and x_max for fitting
+  xmin_agg <- min(xmin_vec)
+  xmax_agg <- max(xmax_vec)
+
+
+  # xlim for plotting
+  if(is.null(xlim_global)){
+    xlim_global <- c(xmin_agg,
+                     xmax_agg)
+    expect_equal(c(min(aggregated_data$bin_min),
+                   max(aggregated_data$bin_max)),
+                 c(xmin_agg,
+                   xmax_agg))    # TODO take out once have run it.
+  }
+
 
   # col = col_vec[s])     need to decide on colurs of everything
   rect_col = col_vec    # TODO just do that for now then tweak when working
@@ -184,8 +194,8 @@ plot_aggregate_mlebin <- function(res_list,
   # manually here, though have already automatically done the first one above TODO
   # Doing evenly on a log scale since range is quite large for aggregated, and
   # x-axis is always logged
-  x_plb_agg <- 10^seq(log10(xlim_global[1]),
-                      log10(xlim_global[2]),
+  x_plb_agg <- 10^seq(log10(xmin_agg),
+                      log10(xmax_agg),
                       length = 1000)     # x values to plot PLB
 
   #  Need to insert value close to xmax to make log-log curve go down further;
