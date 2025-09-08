@@ -98,18 +98,18 @@ pPLB <- function(x = 10,
                  xmax = 100){
   if(xmin <= 0 | xmin >= xmax) stop("Parameters out of bounds in pPLB")
   y <- 0 * x        # so have zeros where x < xmin
-  y[x > xmax] <- 1
+  y[x >= xmax] <- 1
   if(b != -1){
     xmintobplus1 <- xmin^(b+1)
     denom <- xmax^(b+1) - xmintobplus1
-    y[x >= xmin & x <= xmax] <-
-      ( x[x >= xmin & x <= xmax]^(b + 1) -
+    y[x >= xmin & x < xmax] <-
+      ( x[x >= xmin & x < xmax]^(b + 1) -
         xmintobplus1 ) / denom
   } else {
     logxmin <- log(xmin)
     denom <- log(xmax) - logxmin
-    y[x >= xmin & x <= xmax] =
-      ( log( x[x >= xmin & x <= xmax] ) - logxmin ) / denom
+    y[x >= xmin & x < xmax] =
+      ( log( x[x >= xmin & x < xmax] ) - logxmin ) / denom
   }
   return(y)
 }

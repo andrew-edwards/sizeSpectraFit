@@ -33,9 +33,9 @@ plot_aggregate_fits <- function(agg_list,
                                         # automatically, but likely want to
                                         # manually tweak
                                 ylim = NULL, # likely also want to manually
-                                        # tweak to all fits can be seen to
-                                        # asymptote (but automatic axis likely
-                                        # overdoes it)
+                                        # tweak so all fits can be seen to
+                                        # asymptote (but automatic axis usually
+                                        # goes too low, hard to automate this)
                                 log_axes = "xy",
                                 ...){    # passed onto plot(...)
 
@@ -122,7 +122,6 @@ plot_aggregate_fits <- function(agg_list,
       unlist() %>%
       max()
 
-browser()
     ylim = c(ymin,
              ymax)
   }

@@ -216,6 +216,12 @@ plot_aggregate_mlebin <- function(res_list,
                             n_vec = n_vec,
                             xmin = xmin_vec,
                             xmax = xmax_vec)) * sum(n_vec)
+  # Above can give negative value due to rounding, so change any negative value
+  #  to a small value. Pretty sure it's just numerical errors close to 0; just
+  #  set to the minimum one.
+
+  y_plb_agg[y_plb_agg < 0] <-  min(y_plb_agg[y_plb_agg > 0]) * 0.01
+
   lines(x_plb_agg,
         y_plb_agg,
         col = col_agg,
