@@ -18,7 +18,9 @@
 ##' @param res_list list of results, with each component a list object of a
 ##'   given type TODO share help with plot-aggregate.
 ##' @param col_vec vector of colours to assign for each group
-##' @return
+##' @return list with two objects, `x_plb_agg` and `y_plb_agg`, which are the
+##'   fitted x and y values for the aggregated size spectrum (which does not
+##'   have a simple exponent). To then use for plotting multiple strata in [plot_aggregate_fits()].
 ##' @export
 ##' @author Andrew Edwards
 ##' @examples

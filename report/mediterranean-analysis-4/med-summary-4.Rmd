@@ -547,8 +547,12 @@ legend(x = "topright",
        lwd = 2)
 ```
 
+\clearpage
+
 Restrict the curves to the max of the xmin, then normalise:
-```{r combinedplotnorm, fig.cap = "The three aggregated plots restricted to a common range of body masses and then normalised, to properly compare them.", fig.height = 6}
+
+```{r combinedplotnorm, fig.cap = "The three aggregated plots restricted to a common range of body masses and then normalised, to properly compare them.", fig.height = 6, echo = FALSE}
+# COPYING to make function
 x_restrict_start <- max(c(min(baseline_agg_fit[["x_plb_agg"]]),
                           min(fg_agg_fit[["x_plb_agg"]]),
                           min(ntr_agg_fit[["x_plb_agg"]])))
@@ -611,6 +615,16 @@ legend(x = "topright",
        # bty = legend_bty)
 ```
 
+\clearpage
+
+Again, using function
+
+```{r combinedplotnormfunct, fig.cap = "The three aggregated plots restricted to a common range of body masses and then normalised, to properly compare them.", fig.height = 6, echo = FALSE}
+plot_aggregate_fits(agg_list,
+                    strata_names = strata)
+```
+
+
 ```{r combinedplotnormlinear, fig.cap = "As previous figure but with a linear y-axis.",fig.height = 6}
 plot(baseline_agg_fit_x,
      baseline_agg_fit_y_norm,
@@ -655,6 +669,15 @@ legend(x = "topright",
 TODO totally make a function I think, since ended up calling several times, but
 was useful to tweak.
 
+TRYING function for the above
+```{r aggplotfun}
+agg_list <- list(baseline_agg_fit,
+                 fg_agg_fit,
+                 ntr_agg_fit)
+plot_aggregate_fits(agg_list,
+                    strata_names = strata)
+
+```
 
 ## Fits to each group/strata combination in turn
 

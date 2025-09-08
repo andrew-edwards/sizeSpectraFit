@@ -1,0 +1,139 @@
+##' Plot the aggregate fits for several strata
+##'
+##' Uses the results from [plot_aggregate_mlebin()] to plot aggregated size
+##' spectra for several strata on a single plot. Has options for normalising and
+##' restricting x range to give justifiable comparisons.
+##' ##'   the right one. Some of the details could be shared here maybe.
+##'
+##' Given a list of MLEbin results, combine
+##' the data and show an aggregated distribution, as well as the individual fits.
+##'
+##'
+##' @param agg_list list of aggregated fits, with each component corresponding
+##'   to the list object resulting from [plot_aggregate_mlebin()] for a
+##'   particular strata.
+##' ##' @param col_vec vector of colours to assign for each group
+##' @return list with two objects, `x_plb_agg` and `y_plb_agg`, which are the
+##'   fitted x and y values for the aggregated size spectrum (which does not
+##'   have a simple exponent). To then use for plotting multiple strata in [plot_aggregate_fits()].
+##' @export
+##' @author Andrew Edwards
+##' @examples
+##' # See aggregating-size-spectra.Rmd TODO copy something to here maybe
+##' }
+##'
+plot_aggregate_fits <- function(agg_list,
+                                strata_names,
+                                col_strata = c("blue",
+                                               "darkgreen",
+                                               "red"),
+                                xlim = NULL,   # if null gets calculated
+                                        # automatically, but likely want to
+                                        # manually tweak
+                                ylim = c(10^(-4), 1),  # just manually tweak to
+                                # look appropriate (all fits asymptoting
+                                log_axes = "xy",
+                                ...){    # passed onto plot(...)
+
+   # TODO check works for agg_list of just length 1
+
+  num_strata <- length(strata_names)
+
+  if(!("list" %in% class(agg_list))){
+    stop("agg_list need to be a list.")
+  }
+
+  if(length(agg_list) > length(strata_names)){
+    stop("Need agg_list and strata_names to be the same length, one name corresponding to each component of agg_list.")
+  }
+
+  if(length(col_strata) != num_strata){
+    stop(paste("Need col_strata to have", num_strata,
+               "colours, one for each strata."))
+  }
+
+
+  # x start for restricting all strata to start at the same value when plotting
+  x_restrict_start <- lapply(agg_list,
+                             function(agg_list_one_strata){
+                               min(agg_list_one_strata$x_plb_agg)
+                             }) %>%
+    unlist() %>%
+    max()
+
+
+  if(is.null(xlim)){
+    x_max_max <- lapply(agg_list,
+                        function(agg_list_one_strata){
+                          max(agg_list_one_strata$x_plb_agg)
+                        }) %>%
+      unlist() %>%
+      max()
+
+    xlim = c(x_restrict_start,
+             x_max_max)
+  }
+
+
+  # Now determine the new x and y for each agg_list component (each
+  # strata). Restricted regarding starting, and then normalised.
+
+  agg_fit_x <- list()    # restricted
+  agg_fit_y <- list()
+  agg_fit_y_norm <- list()
+
+  for(i in 1:length(agg_list)){
+    agg_fit_x[[i]] <-
+      agg_list[[i]][["x_plb_agg"]][agg_list[[i]][["x_plb_agg"]] >=
+                                    x_restrict_start]
+    agg_fit_y[[i]] <-
+      agg_list[[i]][["y_plb_agg"]][agg_list[[i]][["x_plb_agg"]] >=
+                                    x_restrict_start]
+
+    agg_fit_y_norm[[i]] <- agg_fit_y[[i]] / max(agg_fit_y[[i]])
+  }
+
+  plot(agg_fit_x[[1]],
+       agg_fit_y_norm[[1]],
+       log = log_axes,                  # TODO generalise options, prob use ...
+       type = "l",
+       xlim = xlim,
+       ylim = ylim,
+       xlab = expression(paste("Body mass, ",
+                               italic(x), "(g)")),
+       ylab = expression(paste("Proportion of ", counts >= x),
+                         sep=""),
+       col = col_strata[1],
+       axes = FALSE,
+       lwd = 2,
+       ...)
+
+  box()
+
+  add_ticks(log = "xy")
+
+  if(length(agg_list) > 1){
+    for(j in 2:length(agg_list)){
+      lines(agg_fit_x[[j]],
+            agg_fit_y_norm[[j]],
+        col = col_strata[j],
+        lwd = 2)
+    }
+  }
+
+
+lines(ntr_agg_fit_x,
+      ntr_agg_fit_y_norm,
+      col = col_strata[3],
+      lwd = 2)
+
+legend(x = "topright",
+       legend = strata_names,
+       col = col_strata,
+       lwd = 2)
+       # pch = pch_strata,
+       # pt.cex = pch_cex,
+       # inset = legend_inset,
+       # bty = legend_bty)
+
+}
