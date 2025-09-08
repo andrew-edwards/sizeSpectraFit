@@ -471,99 +471,43 @@ mtext("No-take Reserve",
 ```
 
 
-Try and plot all three fits on one plot:
+Plot all three fits on one plot:
 ```{r combinedplot, fig.cap = "The three aggregated plots from the previous Figure.", fig.height = 6}
-plot(baseline_agg_fit[["x_plb_agg"]],
-     baseline_agg_fit[["y_plb_agg"]],
-     log = "xy",
-     type = "l",
-     xlim = xlim_global,
-     ylim = ylim_global,
-     xlab = expression(paste("Body mass, ",
-                             italic(x), "(g)")),
-     ylab = expression(paste("Total ", counts >= x),
-                       sep=""),
-     col = strata_col[1],
-     axes = FALSE,
-     lwd = 2)
-
-box()
-
-add_ticks(log = "xy")
-
-lines(fg_agg_fit[["x_plb_agg"]],
-      fg_agg_fit[["y_plb_agg"]],
-      col = strata_col[2],
-      lwd = 2)
-
-lines(ntr_agg_fit[["x_plb_agg"]],
-      ntr_agg_fit[["y_plb_agg"]],
-      col = strata_col[3],
-      lwd = 2)
-
-legend(x = "topright",
-       legend = strata,
-       col = strata_col,
-       lwd = 2)
-       # pch = pch_strata,
-       # pt.cex = pch_cex,
-       # inset = legend_inset,
-       # bty = legend_bty)
-```
-
-Do not log the y-axis:  TODO could make function
-```{r combinedplotnolog, fig.cap = "As for previous figure but linear y-axis.", fig.height = 6}
-plot(baseline_agg_fit[["x_plb_agg"]],
-     baseline_agg_fit[["y_plb_agg"]],
-     log = "x",
-     type = "l",
-     xlim = xlim_global,
-     ylim = ylim_global,
-     xlab = expression(paste("Body mass, ",
-                             italic(x), "(g)")),
-     ylab = expression(paste("Total ", counts >= x),
-                       sep=""),
-     col = strata_col[1],
-     axes = FALSE,
-     lwd = 2)
-
-box()
-
-add_ticks(log = "x")
-
-lines(fg_agg_fit[["x_plb_agg"]],
-      fg_agg_fit[["y_plb_agg"]],
-      col = strata_col[2],
-      lwd = 2)
-
-lines(ntr_agg_fit[["x_plb_agg"]],
-      ntr_agg_fit[["y_plb_agg"]],
-      col = strata_col[3],
-      lwd = 2)
-
-legend(x = "topright",
-       legend = strata,
-       col = strata_col,
-       lwd = 2)
-```
-
-\clearpage
-
-Restrict the curves to the max of the xmin, then normalise:
-
-```{r combinedplotnormfunct, fig.cap = "The three aggregated plots restricted to a common range of body masses and then normalised, to properly compare them.", fig.height = 6, echo = FALSE}
 agg_list <- list(baseline_agg_fit,
                  fg_agg_fit,
                  ntr_agg_fit)
 
 plot_aggregate_fits(agg_list,
                     strata_names = strata,
+                    restrict = FALSE,
+                    normalise = FALSE,
+                    ylim = ylim_global)
+```
+
+```{r combinedplotnolog, fig.cap = "As for previous figure but linear y-axis.", fig.height = 6, eval = FALSE}
+plot_aggregate_fits(agg_list,
+                    strata_names = strata,
+                    restrict = FALSE,
+                    normalise = FALSE,
+                    ylim = ylim_global,
+                    log_axes = "x")
+```
+
+Since there is no simple size-spectrum exponent for such aggregated fits, and
+they have different $x_{min}$ values and sample sizes, we restrict the fits to
+values above a common value (namely the maximum of the three aggregated
+$x_{min}$ values), and then normalise each aggregated fit by it's resulting
+sample size, such that each starts at the same point (same body-mass on the
+x-axis and at 1 on the y-axis, which now represents the proportion of values
+above each body-mass). The resulting plot is:
+
+```{r combinedplotnormfunct, fig.cap = "The three aggregated plots restricted to a common range of body masses and then normalised, to properly compare them.", fig.height = 6, echo = FALSE}
+plot_aggregate_fits(agg_list,
+                    strata_names = strata,
                     ylim = c(10^(-4), 1))
 ```
 
-As above but linear y-axis:
-
-```{r combinedplotnormlinear, fig.cap = "As previous figure but with a linear y-axis.",fig.height = 6}
+```{r combinedplotnormlinear, fig.cap = "As previous figure but with a linear y-axis.",fig.height = 6, eval = FALSE}
 plot_aggregate_fits(agg_list,
                     strata_names = strata,
                     log_axes = "x")

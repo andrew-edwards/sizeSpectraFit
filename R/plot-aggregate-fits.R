@@ -3,16 +3,27 @@
 ##' Uses the results from [plot_aggregate_mlebin()] to plot aggregated size
 ##' spectra for several strata on a single plot. Has options for normalising and
 ##' restricting x range to give justifiable comparisons.
-##' ##'   the right one. Some of the details could be shared here maybe.
-##'
-##' Given a list of MLEbin results, combine
-##' the data and show an aggregated distribution, as well as the individual fits.
-##'
 ##'
 ##' @param agg_list list of aggregated fits, with each component corresponding
 ##'   to the list object resulting from [plot_aggregate_mlebin()] for a
 ##'   particular strata.
-##' ##' @param col_vec vector of colours to assign for each group
+##'col_vec vector of colours to assign for each group
+##' @param strata_names
+##' @param log_axes which axes to log (gets passed to `plot(..., log =
+##'   log_axes)`, either `"xy"` or `"x"` are of interest (although `"y"`
+##'   and `""` automatically work).
+##' @param restrict logical, whether or not to restrict the aggregated fits to
+##'   only being above a common x value
+##' @param normalise logical, whether or not to normalise each aggregated fit by
+##'   it's maximum, so that all fits are on the same scale
+##' @param col_strata
+##' @param xlim, ylim vectors for axes limits; if NULL (the default) it gets
+##'   calculated automatically, but users likely want to then manually adjust
+##'   them, especially `ylim` to be able to see all fits asymptoting at their
+##'   xmin values, but the
+##'   default axis will go way too low (it is hard to automate this, so just
+##'   refine `ylim` to celarly show the aymptotes).
+##' @param ... additional arguments passed onto [plot()]
 ##' @return list with two objects, `x_plb_agg` and `y_plb_agg`, which are the
 ##'   fitted x and y values for the aggregated size spectrum (which does not
 ##'   have a simple exponent). To then use for plotting multiple strata in [plot_aggregate_fits()].
@@ -24,19 +35,14 @@
 ##'
 plot_aggregate_fits <- function(agg_list,
                                 strata_names,
+                                log_axes = "xy",
                                 restrict = TRUE,
                                 normalise = TRUE,
                                 col_strata = c("blue",
                                                "darkgreen",
                                                "red"),
-                                xlim = NULL,   # if null gets calculated
-                                        # automatically, but likely want to
-                                        # manually tweak
-                                ylim = NULL, # likely also want to manually
-                                        # tweak so all fits can be seen to
-                                        # asymptote (but automatic axis usually
-                                        # goes too low, hard to automate this)
-                                log_axes = "xy",
+                                xlim = NULL,
+                                ylim = NULL, #
                                 ...){    # passed onto plot(...)
 
    # TODO check works for agg_list of just length 1
@@ -137,7 +143,7 @@ plot_aggregate_fits <- function(agg_list,
        ylab = ifelse(normalise,
                      expression(paste("Proportion of ", counts >= x),
                                 sep=""),
-                     expression(paste("Total counts ", counts >= x),
+                     expression(paste("Total ", counts >= x),
                          sep="")),
        col = col_strata[1],
        axes = FALSE,
