@@ -17,8 +17,8 @@ knitr::opts_chunk$set(
   cache = TRUE,
   cache_path = "med-summary-4-cache/",
   fig.path = "med-summary-4-figs-cache/",
-  fig.width = 8,
-  fig.height = 10
+  fig.width = 7,   # Good for the hist and spectra plots
+  fig.height = 9
 )
 # comment = "#>",
 
@@ -516,9 +516,100 @@ plot_aggregate_fits(agg_list,
 ## Fits to each group/strata combination in turn
 
 Might just want to show the figures here, basically copying just the plotting
-code from `med-analysis-*.Rmd`.
+code from `med-analysis-12.Rmd` (which is latest so probably simplified) and
+then editing it here. Yes, not showing code or text, just have figures.
 
-```{r, stop, cache = FALSE}
+```{r, crustbaselineplot, echo = FALSE}
+plot(baseline_agg_list[["crust"]],
+     xlim_hist = c(0, 60),
+     main = "Crustacea baseline")
+```
+
+```{r, crustfgplot, echo = FALSE}
+plot(fg_agg_list[["crust"]],
+     xlim_hist = c(0, 60),
+     main = "Crustacea FG")
+```
+
+```{r, crustntrplot, echo = FALSE}
+plot(ntr_agg_list[["crust"]],
+     xlim_hist = c(0, 60),
+     main = "Crustacea NTR")
+```
+
+```{r, actinbaselineplot, echo = FALSE}
+plot(baseline_agg_list[["actin"]],
+     xlim_hist = c(0, 60),
+     main = "Actinopterygii baseline")
+```
+
+```{r, actinfgplot, echo = FALSE}
+plot(fg_agg_list[["actin"]],
+     xlim_hist = c(0, 60),
+     main = "Actinopterygii FG")
+```
+
+```{r, actinntrplot, echo = FALSE}
+plot(ntr_agg_list[["actin"]],
+     xlim_hist = c(0, 60),
+     main = "Actinopterygii NTR")
+```
+
+```{r, chondrbaselineplot, echo = FALSE}
+plot(baseline_agg_list[["chondr"]],
+     xlim_hist = c(0, 300),
+     main = "Chondrichthyes baseline")
+```
+
+```{r, chondrfgplot, echo = FALSE}
+plot(fg_agg_list[["chondr"]],
+     xlim_hist = c(0, 300),
+     main = "Chondrichthyes FG")
+```
+
+```{r, chondrntrplot, echo = FALSE}
+plot(ntr_agg_list[["chondr"]],
+     xlim_hist = c(0, 300),
+     main = "Chondrichthyes NTR")
+```
+
+```{r, cephsmallbaselineplot, echo = FALSE}
+plot(baseline_agg_list[["cephsmall"]],
+     xlim_hist = c(0, 21),
+     main = "Cephalopoda (small) baseline")
+```
+
+```{r, cephsmallfgplot, echo = FALSE}
+plot(fg_agg_list[["cephsmall"]],
+     xlim_hist = c(0, 21),
+     main = "Cephalopoda (small) FG")
+```
+
+```{r, cephsmallntrplot, echo = FALSE}
+plot(ntr_agg_list[["cephsmall"]],
+     xlim_hist = c(0, 21),
+     main = "Cephalopoda (small) NTR")
+```
+
+```{r, cephlargebaselineplot, echo = FALSE}
+plot(baseline_agg_list[["cephlarge"]],
+     xlim_hist = c(0, 100),
+     main = "Cephalopoda (large) baseline")
+```
+
+```{r, cephlargefgplot, echo = FALSE}
+plot(fg_agg_list[["cephlarge"]],
+     xlim_hist = c(0, 100),
+     main = "Cephalopoda (large) FG")
+```
+
+```{r, cephlargentrplot, echo = FALSE}
+plot(ntr_agg_list[["cephlarge"]],
+     xlim_hist = c(0, 100),
+     main = "Cephalopoda (large) NTR")
+```
+
+```{r, stop, cache = FALSE, echo = FALSE}
 knitr::knit_exit()
 ```
 

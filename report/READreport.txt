@@ -152,6 +152,9 @@ mediterranean-analysis-11/
 
  has run, not looked at results
 
+TODO do summary .Rmd for 11
+
+
 mediterranean-analysis-12/
   use 11, and set xmax to be max(xmax) within each group. So a bit like 10.
 
@@ -180,6 +183,11 @@ I've talked to a couple cephalopod experts here and the variability in results c
 Thank you so much again!
 
 Juliana
+
+Juliana felt before: ceph and chondrichthytes seemed to pull the fit a lot for full
+community, and the sharks can move
+around a lot. Also, although the sampling was the same for all species groups, the main interest is in seeing how
+crustaceans changed (especially as they do not move as much).
 
 
 [and see other emails maybe]
