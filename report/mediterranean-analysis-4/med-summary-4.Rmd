@@ -551,132 +551,22 @@ legend(x = "topright",
 
 Restrict the curves to the max of the xmin, then normalise:
 
-```{r combinedplotnorm, fig.cap = "The three aggregated plots restricted to a common range of body masses and then normalised, to properly compare them.", fig.height = 6, echo = FALSE}
-# COPYING to make function
-x_restrict_start <- max(c(min(baseline_agg_fit[["x_plb_agg"]]),
-                          min(fg_agg_fit[["x_plb_agg"]]),
-                          min(ntr_agg_fit[["x_plb_agg"]])))
-
-baseline_agg_fit_x <- baseline_agg_fit[["x_plb_agg"]][baseline_agg_fit[["x_plb_agg"]] >=
-                                                      x_restrict_start]
-baseline_agg_fit_y <- baseline_agg_fit[["y_plb_agg"]][baseline_agg_fit[["x_plb_agg"]] >=
-                                                      x_restrict_start]
-baseline_agg_fit_y_norm <- baseline_agg_fit_y / max(baseline_agg_fit_y)
-
-plot(baseline_agg_fit_x,
-     baseline_agg_fit_y_norm,
-     log = "xy",
-     type = "l",
-     xlim = c(1, xlim_global[2]),
-     ylim = c(10^(-4), 1),
-     xlab = expression(paste("Body mass, ",
-                             italic(x), "(g)")),
-     ylab = expression(paste("Proportion of ", counts >= x),
-                       sep=""),
-     col = strata_col[1],
-     axes = FALSE,
-     lwd = 2)
-
-box()
-
-add_ticks(log = "xy")
-
-fg_agg_fit_x <- fg_agg_fit[["x_plb_agg"]][fg_agg_fit[["x_plb_agg"]] >=
-                                                      x_restrict_start]
-fg_agg_fit_y <- fg_agg_fit[["y_plb_agg"]][fg_agg_fit[["x_plb_agg"]] >=
-                                                      x_restrict_start]
-fg_agg_fit_y_norm <- fg_agg_fit_y / max(fg_agg_fit_y)
-
-
-lines(fg_agg_fit_x,
-      fg_agg_fit_y_norm,
-      col = strata_col[2],
-      lwd = 2)
-
-ntr_agg_fit_x <- ntr_agg_fit[["x_plb_agg"]][ntr_agg_fit[["x_plb_agg"]] >=
-                                                      x_restrict_start]
-ntr_agg_fit_y <- ntr_agg_fit[["y_plb_agg"]][ntr_agg_fit[["x_plb_agg"]] >=
-                                                      x_restrict_start]
-ntr_agg_fit_y_norm <- ntr_agg_fit_y / max(ntr_agg_fit_y)
-
-
-lines(ntr_agg_fit_x,
-      ntr_agg_fit_y_norm,
-      col = strata_col[3],
-      lwd = 2)
-
-legend(x = "topright",
-       legend = strata,
-       col = strata_col,
-       lwd = 2)
-       # pch = pch_strata,
-       # pt.cex = pch_cex,
-       # inset = legend_inset,
-       # bty = legend_bty)
-```
-
-\clearpage
-
-Again, using function
-
 ```{r combinedplotnormfunct, fig.cap = "The three aggregated plots restricted to a common range of body masses and then normalised, to properly compare them.", fig.height = 6, echo = FALSE}
-plot_aggregate_fits(agg_list,
-                    strata_names = strata)
-```
-
-
-```{r combinedplotnormlinear, fig.cap = "As previous figure but with a linear y-axis.",fig.height = 6}
-plot(baseline_agg_fit_x,
-     baseline_agg_fit_y_norm,
-     log = "x",
-     type = "l",
-     xlim = c(1, xlim_global[2]),
-     ylim = c(10^(-4), 1),
-     xlab = expression(paste("Body mass, ",
-                             italic(x), "(g)")),
-     ylab = expression(paste("Proportion of ", counts >= x),
-                       sep=""),
-     col = strata_col[1],
-     axes = FALSE,
-     lwd = 2)
-
-box()
-
-add_ticks(log = "x",
-          y_big_ticks_labels = seq(0, 1, 0.2),
-          y_small_ticks_by = 0.1)
-
-lines(fg_agg_fit_x,
-      fg_agg_fit_y_norm,
-      col = strata_col[2],
-      lwd = 2)
-
-lines(ntr_agg_fit_x,
-      ntr_agg_fit_y_norm,
-      col = strata_col[3],
-      lwd = 2)
-
-legend(x = "topright",
-       legend = strata,
-       col = strata_col,
-       lwd = 2)
-       # pch = pch_strata,
-       # pt.cex = pch_cex,
-       # inset = legend_inset,
-       # bty = legend_bty)
-```
-
-TODO totally make a function I think, since ended up calling several times, but
-was useful to tweak.
-
-TRYING function for the above
-```{r aggplotfun}
 agg_list <- list(baseline_agg_fit,
                  fg_agg_fit,
                  ntr_agg_fit)
-plot_aggregate_fits(agg_list,
-                    strata_names = strata)
 
+plot_aggregate_fits(agg_list,
+                    strata_names = strata,
+                    ylim = c(10^(-4), 1))
+```
+
+As above but linear y-axis:
+
+```{r combinedplotnormlinear, fig.cap = "As previous figure but with a linear y-axis.",fig.height = 6}
+plot_aggregate_fits(agg_list,
+                    strata_names = strata,
+                    log_axes = "x")
 ```
 
 ## Fits to each group/strata combination in turn

@@ -24,14 +24,18 @@
 ##'
 plot_aggregate_fits <- function(agg_list,
                                 strata_names,
+                                restrict = TRUE,
+                                normalise = TRUE,
                                 col_strata = c("blue",
                                                "darkgreen",
                                                "red"),
                                 xlim = NULL,   # if null gets calculated
                                         # automatically, but likely want to
                                         # manually tweak
-                                ylim = c(10^(-4), 1),  # just manually tweak to
-                                # look appropriate (all fits asymptoting
+                                ylim = NULL, # likely also want to manually
+                                        # tweak to all fits can be seen to
+                                        # asymptote (but automatic axis likely
+                                        # overdoes it)
                                 log_axes = "xy",
                                 ...){    # passed onto plot(...)
 
@@ -53,14 +57,25 @@ plot_aggregate_fits <- function(agg_list,
   }
 
 
-  # x start for restricting all strata to start at the same value when plotting
-  x_restrict_start <- lapply(agg_list,
-                             function(agg_list_one_strata){
-                               min(agg_list_one_strata$x_plb_agg)
-                             }) %>%
-    unlist() %>%
-    max()
-
+  if(restrict){
+    # x start for restricting all strata to start at the same value (max of the
+    #  x_mins) when plotting
+    x_restrict_start <- lapply(agg_list,
+                               function(agg_list_one_strata){
+                                 min(agg_list_one_strata$x_plb_agg)
+                               }) %>%
+      unlist() %>%
+      max()
+  } else {
+    # just set to the min of the xmins, so nothing being restricted by the rest
+    #  of the code will work fine; no need for more if statements.
+    x_restrict_start <- lapply(agg_list,
+                               function(agg_list_one_strata){
+                                 min(agg_list_one_strata$x_plb_agg)
+                               }) %>%
+      unlist() %>%
+      min()
+  }
 
   if(is.null(xlim)){
     x_max_max <- lapply(agg_list,
@@ -90,7 +105,26 @@ plot_aggregate_fits <- function(agg_list,
       agg_list[[i]][["y_plb_agg"]][agg_list[[i]][["x_plb_agg"]] >=
                                     x_restrict_start]
 
-    agg_fit_y_norm[[i]] <- agg_fit_y[[i]] / max(agg_fit_y[[i]])
+    ifelse(normalise,
+           agg_fit_y_norm[[i]] <- agg_fit_y[[i]] / max(agg_fit_y[[i]]),
+           agg_fit_y_norm[[i]] <- agg_fit_y[[i]])  # so not normalised, but rest
+                                        # of code will work
+  }
+
+  if(is.null(ylim)){
+    ymin <- lapply(agg_fit_y_norm,
+                   min) %>%
+      unlist() %>%
+      min()
+
+    ymax <- lapply(agg_fit_y_norm,
+                   max) %>%
+      unlist() %>%
+      max()
+
+browser()
+    ylim = c(ymin,
+             ymax)
   }
 
   plot(agg_fit_x[[1]],
@@ -101,8 +135,11 @@ plot_aggregate_fits <- function(agg_list,
        ylim = ylim,
        xlab = expression(paste("Body mass, ",
                                italic(x), "(g)")),
-       ylab = expression(paste("Proportion of ", counts >= x),
-                         sep=""),
+       ylab = ifelse(normalise,
+                     expression(paste("Proportion of ", counts >= x),
+                                sep=""),
+                     expression(paste("Total counts ", counts >= x),
+                         sep="")),
        col = col_strata[1],
        axes = FALSE,
        lwd = 2,
@@ -110,7 +147,7 @@ plot_aggregate_fits <- function(agg_list,
 
   box()
 
-  add_ticks(log = "xy")
+  add_ticks(log = log_axes)
 
   if(length(agg_list) > 1){
     for(j in 2:length(agg_list)){
@@ -121,11 +158,6 @@ plot_aggregate_fits <- function(agg_list,
     }
   }
 
-
-lines(ntr_agg_fit_x,
-      ntr_agg_fit_y_norm,
-      col = col_strata[3],
-      lwd = 2)
 
 legend(x = "topright",
        legend = strata_names,
