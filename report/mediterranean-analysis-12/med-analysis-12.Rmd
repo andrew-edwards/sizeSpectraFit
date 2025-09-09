@@ -1,0 +1,805 @@
+---
+title: "Analysing Mediterranean data using MLEbins"
+author: "Andrew Edwards and Juliana Zabala"
+output: pdf_document
+fontsize: 12pt
+date: "Last compiled on `r format(Sys.time(), '%d %B, %Y')`"
+---
+
+```{r, setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "",
+  cache = TRUE,
+  cache_path = "med-analysis-12-cache/",
+  fig.path = "med-analysis-12-figs-cache/",
+  fig.width = 7,
+  fig.height = 9
+)
+  # comment = "#>",
+
+knitr::dep_auto()  # or dep_auto seems cleverer, though not always working it
+                   # seems so be careful (final chunk wasn't rerun when
+                   # penultimate one was changed). May be because have to have
+                   # this command in there from the beginning?
+
+options(pillar.sigfig = 6)   # show 6 sig figs when printing tibbles (so can see
+                             # length resolutions, but not overwhelmed by
+                             # details for bin_min and bin_max
+```
+
+```{r, build, echo = FALSE, eval = FALSE}
+# To build either run this line or click knit button in RStudio:
+rmarkdown::render("med-analysis-12.Rmd")
+```
+
+```{r, packages, echo = FALSE, cache = FALSE}
+library(dplyr)
+load_all()
+#library(sizeSpectra2)    # Need latest version
+```
+
+Using `dat_joined.rds` from `med-analysis-4.Rmd`, using `med-analysis-5.Rmd` as
+a template to shorten down the analysis, and then try different assumptions.
+
+Here (`med-analysis-12.Rmd`) we determine $x_{\text min}$ as being the minimum
+$x_{\text min}$ determined in analysis-4 for each group. So being consistent
+within groups, which will make comparisons easier.
+
+Setting $x_{\text max}$ for each group to be the maximum $x_{\text max}$ determined for
+that group in `med-analysis-4.Rmd` (then not excluding any data).
+
+```{r, loaddatjoined}
+dat_joined <- readRDS(paste0(here::here(),
+                             "/report/mediterranean-analysis-4/dat_joined.rds"))
+
+med_4_results_table <- readRDS(paste0(here::here(),
+                             "/report/mediterranean-analysis-4/res_table_agg.rds"))
+```
+
+Also need the cephalopod small/large delineation:
+```{r, loadcephdelin}
+ceph_small_large_delineation <- readRDS(paste0(here::here(),
+                             "/report/mediterranean-analysis-4/ceph_small_large_delineation.rds"))
+```
+
+Now to tease out the $x_{\text min}$ values for this particular analysis. Safest to do
+explicitly, no need for `strata_for_xmin` here:
+```{r setxmin}
+# strata_for_xmin <- "Baseline"
+
+xmin_full <- filter(med_4_results_table,
+                    Group == "Full community")$x_min %>% min()
+
+xmin_crust <- filter(med_4_results_table,
+                    Group == "Crustacea")$x_min %>% min()
+
+xmin_actin <- filter(med_4_results_table,
+                    Group == "Actinopterygii")$x_min %>% min()
+
+xmin_chondr <- filter(med_4_results_table,
+                    Group == "Chondrichthyes")$x_min %>% min()
+
+xmin_cephsmall <- filter(med_4_results_table,
+                    Group == "Cephalopoda small")$x_min %>% min()
+
+xmin_cephlarge <- filter(med_4_results_table,
+                    Group == "Cephalopoda large")$x_min %>% min()
+```
+
+Not doing this for 11, but need it for 12, so just not running here.
+Now to tease out the $x_{\text max}$ values for this particular analysis. Safest to do
+explicitly, no need for `strata_for_xmax` here, set first `if()` depending on analysis
+```{r setxmax}
+# strata_for_xmax <- "Baseline"
+if(FALSE){
+  # Determine xmax independently for each data set
+  xmax_full <- NULL
+  xmax_crust <- NULL
+  xmax_actin <- NULL
+  xmax_chondr <- NULL
+  xmax_cephsmall <- NULL
+  xmax_cephlarge <- NULL
+} else {
+  # Use max of xmax within each group
+  xmax_full <- filter(med_4_results_table,
+                      Group == "Full community")$x_max %>% max()
+
+  xmax_crust <- filter(med_4_results_table,
+                       Group == "Crustacea")$x_max %>% max()
+
+  xmax_actin <- filter(med_4_results_table,
+                       Group == "Actinopterygii")$x_max %>% max()
+
+  xmax_chondr <- filter(med_4_results_table,
+                        Group == "Chondrichthyes")$x_max %>% max()
+
+  xmax_cephsmall <- filter(med_4_results_table,
+                           Group == "Cephalopoda small")$x_max %>% max()
+
+  xmax_cephlarge <- filter(med_4_results_table,
+                           Group == "Cephalopoda large")$x_max %>% max()
+}
+
+```
+
+\clearpage
+
+# Full community
+
+Doing full community of values, which is okay because the sampling protocol
+(trawl fishing) is the same
+for each species group and the counts are standardised to be numbers per
+km$^2$. For species groups, copying and pasting the analyses and then just
+changing the group names (need to see everything and not worth it to functionalise
+it all).
+
+## Full Community baseline (takes a while)
+
+```{r, fullbaseline}
+# This function extracts the required data and returns what is needed for
+# MLEbins; keeps species column for understanding even though not strictly
+# needed for MLEbins.
+data_full_baseline <- mediterranean_for_mlebins(dat_joined,
+                                                strata_name = "baseline")
+
+res_full_baseline <- determine_xmin_and_fit_mlebins(data_full_baseline,
+                                                    x_min = xmin_full,
+                                                    x_max = xmax_full)
+
+res_full_baseline$mlebins_fit      # full list includes histogram values which
+                                   # are not a tibble (am printing them all for
+                                   # some later species groups).
+```
+
+```{r, fullbaselineplot}
+plot(res_full_baseline,
+     xlim_hist = c(0, 60),
+     main = "Full Community baseline",
+     seg_col = "black")
+
+```
+
+## Full Community fg
+
+```{r, fullfg}
+data_full_fg <- mediterranean_for_mlebins(dat_joined,
+                                          strata_name = "fg")
+
+res_full_fg <- determine_xmin_and_fit_mlebins(data_full_fg,
+                                              x_min = xmin_full,
+                                              x_max = xmax_full)
+
+res_full_fg$mlebins_fit      # full list includes histogram values which
+                                   # are not a tibble (am printing them all for
+                                   # some later species groups).
+```
+
+```{r, fullfgplot}
+plot(res_full_fg,
+     xlim_hist = c(0, 60),
+     main = "Full Community FG",
+     seg_col = "black")
+```
+
+
+## Full Community ntr
+
+In `med-analysis-4.Rmd` we removed the small outlier that had `bin_min = 0.12`,
+but this (and other small ones) will automatically below all $x_{\text min}$ we
+prescribe, so can keep it in.
+
+Now do the analysis without the outlier:
+```{r, fullntr}
+data_full_ntr <- mediterranean_for_mlebins(dat_joined,
+                                           strata_name = "ntr")
+
+res_full_ntr <- determine_xmin_and_fit_mlebins(data_full_ntr,
+                                               x_min = xmin_full,
+                                               x_max = xmax_full)
+
+res_full_ntr$mlebins_fit      # full list includes histogram values which
+                              # are not a tibble (am printing them all for
+                              # some later species groups).
+```
+
+```{r, fullntrplot}
+plot(res_full_ntr,
+     xlim_hist = c(0, 60),
+     main = "Full Community NTR",
+     seg_col = "black")
+```
+
+
+## Compare strata for full community
+
+Now to compare the three strata for full community.
+
+Keep defined here, as fairly specific to this data set.
+```{r, fullsumm}
+add_row_to_summary_table <- function(summary, res, group, strata){
+  rbind(summary,
+        dplyr::tibble("Group" = group,
+                      "Strata" = strata,
+                      "x_min" = res$mlebins_fit$x_min,
+                      "x_max" = res$mlebins_fit$x_max,
+                      "Low b" = res$mlebins_fit$b_conf[1],
+                      "MLE b" = res$mlebins_fit$b_mle,
+                      "High b" = res$mlebins_fit$b_conf[2]))
+}
+
+res_table_full <- dplyr::tibble()
+res_table_full <- add_row_to_summary_table(res_table_full,
+                                      res_full_baseline,
+                                      "Full community",
+                                      "Baseline")
+
+res_table_full <- add_row_to_summary_table(res_table_full,
+                                      res_full_fg,
+                                      "Full community",
+                                      "FG")
+res_table_full <- add_row_to_summary_table(res_table_full,
+                                      res_full_ntr,
+                                      "Full community",
+                                      "NTR")
+```
+
+Results combined are:
+
+```{r, resfulltable}
+knitr::kable(res_table_full, digits = 2)
+```
+
+
+
+So for the full community, from the baseline, the size spectrum steepens (more
+negative $b$) in the fishing grounds, but shallows (less negative $b$) in the
+no-take reserve, consistent with theory.
+
+TODO The fits for the full community do not look great. To understand the changes we
+now analyse the data separately for the different species groups.
+Juliana felt before: ceph and chondrichthytes seemed to pull the fit a lot for full
+community, and the sharks can move
+around a lot. Also, although the sampling was the same for all species groups, the main interest is in seeing how
+crustaceans changed (especially as they do not move as much).
+
+\clearpage
+
+# Crustacea
+
+## Crustacea baseline
+
+```{r, crustbaseline}
+data_crust_baseline <- mediterranean_for_mlebins(dat_joined,
+                                                 group_name = "Crustacea",
+                                                 strata_name = "baseline")
+
+res_crust_baseline <- determine_xmin_and_fit_mlebins(data_crust_baseline,
+                                                     x_min = xmin_crust,
+                                                     x_max = xmax_crust)
+
+res_crust_baseline$mlebins_fit
+```
+
+```{r, crustbaselineplot}
+plot(res_crust_baseline,
+     xlim_hist = c(0, 60),
+     main = "Crustacea baseline")
+```
+
+## Crustacea FG
+
+```{r, crustfg}
+data_crust_fg <- mediterranean_for_mlebins(dat_joined,
+                                           group_name = "Crustacea",
+                                           strata_name = "fg")
+
+res_crust_fg <- determine_xmin_and_fit_mlebins(data_crust_fg,
+                                               x_min = xmin_crust,
+                                               x_max = xmax_crust)
+
+
+res_crust_fg$mlebins_fit
+```
+
+```{r, crustfgplot}
+plot(res_crust_fg,
+     xlim_hist = c(0, 60),
+     main = "Crustacea FG")
+```
+
+## Crustacea NTR
+
+As for full community NTR, need to remove Aegaeon lacazei as an outlier
+(including it gives similar plot here to that earlier).
+
+```{r, crustntr}
+data_crust_ntr <- mediterranean_for_mlebins(dat_joined,
+                                            group_name = "Crustacea",
+                                            strata_name = "ntr")
+
+res_crust_ntr <- determine_xmin_and_fit_mlebins(data_crust_ntr,
+                                               x_min = xmin_crust,
+                                               x_max = xmax_crust)
+
+res_crust_ntr$mlebins_fit
+```
+
+```{r, crustntrplot}
+plot(res_crust_ntr,
+     xlim_hist = c(0, 60),
+     main = "Crustacea NTR")
+```
+
+Now to compare the three strata for Crustacea.
+
+```{r, crustsumm}
+res_table_crust <- dplyr::tibble()
+res_table_crust <- add_row_to_summary_table(res_table_crust,
+                                      res_crust_baseline,
+                                      "Crustacea",
+                                      "Baseline")
+
+res_table_crust <- add_row_to_summary_table(res_table_crust,
+                                      res_crust_fg,
+                                      "Crustacea",
+                                      "FG")
+res_table_crust <- add_row_to_summary_table(res_table_crust,
+                                      res_crust_ntr,
+                                      "Crustacea",
+                                      "NTR")
+```
+
+Results combined are:
+
+```{r, rescrusttable}
+knitr::kable(res_table_crust, digits = 2)
+```
+
+TODO As for full community, from the baseline, the size spectrum steepens (more
+negative $b$) in the fishing grounds, but shallows (less negative $b$) slightly
+(confidence intervals do not overlap) in the
+no-take reserve, consistent with theory.
+
+
+# Actinopterygii
+
+## Actinopterygii baseline
+
+```{r, actinbaseline}
+data_actin_baseline <- mediterranean_for_mlebins(dat_joined,
+                                                 group_name = "Actinopterygii",
+                                                 strata_name = "baseline")
+
+res_actin_baseline <- determine_xmin_and_fit_mlebins(data_actin_baseline,
+                                               x_min = xmin_actin,
+                                               x_max = xmax_actin)
+
+
+res_actin_baseline$mlebins_fit
+```
+
+```{r, actinbaselineplot}
+plot(res_actin_baseline,
+     xlim_hist = c(0, 60),
+     main = "Actinopterygii baseline")
+```
+
+## Actinopterygii FG
+
+```{r, actinfg}
+data_actin_fg <- mediterranean_for_mlebins(dat_joined,
+                                           group_name = "Actinopterygii",
+                                           strata_name = "fg")
+
+res_actin_fg <- determine_xmin_and_fit_mlebins(data_actin_fg,
+                                               x_min = xmin_actin,
+                                               x_max = xmax_actin)
+
+res_actin_fg$mlebins_fit
+```
+
+```{r, actinfgplot}
+plot(res_actin_fg,
+     xlim_hist = c(0, 60),
+     main = "Actinopterygii FG")
+```
+
+## Actinopterygii NTR
+
+```{r, actinntr}
+data_actin_ntr <- mediterranean_for_mlebins(dat_joined,
+                                            group_name = "Actinopterygii",
+                                            strata_name = "ntr")
+
+res_actin_ntr <- determine_xmin_and_fit_mlebins(data_actin_ntr,
+                                               x_min = xmin_actin,
+                                               x_max = xmax_actin)
+
+res_actin_ntr$mlebins_fit
+```
+
+```{r, actinntrplot}
+plot(res_actin_ntr,
+     xlim_hist = c(0, 60),
+     main = "Actinopterygii NTR")
+```
+
+Now to compare the three strata for Actinopterygii.
+
+```{r, actinsumm}
+res_table_actin <- dplyr::tibble()
+res_table_actin <- add_row_to_summary_table(res_table_actin,
+                                      res_actin_baseline,
+                                      "Actinopterygii",
+                                      "Baseline")
+
+res_table_actin <- add_row_to_summary_table(res_table_actin,
+                                      res_actin_fg,
+                                      "Actinopterygii",
+                                      "FG")
+res_table_actin <- add_row_to_summary_table(res_table_actin,
+                                      res_actin_ntr,
+                                      "Actinopterygii",
+                                      "NTR")
+```
+
+Results combined are:
+```{r, resactintable}
+knitr::kable(res_table_actin, digits = 2)
+```
+
+TODO From the baseline, the size spectrum steepens (more
+negative $b$) in the fishing grounds but also for the no-take reserve but not as
+much (unlike for the Crustacea above).
+
+
+\clearpage
+
+# Chondrichthyes
+
+## Chondrichthyes baseline
+
+```{r, chondrbaseline}
+data_chondr_baseline <- mediterranean_for_mlebins(dat_joined,
+                                                 group_name = "Chondrichthyes",
+                                                 strata_name = "baseline")
+
+res_chondr_baseline <- determine_xmin_and_fit_mlebins(data_chondr_baseline,
+                                                      x_min = xmin_chondr,
+                                                      x_max = xmax_chondr)
+
+res_chondr_baseline$mlebins_fit
+```
+
+```{r, chondrbaselineplot}
+plot(res_chondr_baseline,
+     xlim_hist = c(0, 300),
+     main = "Chondrichthyes baseline")
+```
+
+## Chondrichthyes FG
+
+```{r, chondrfg}
+data_chondr_fg <- mediterranean_for_mlebins(dat_joined,
+                                           group_name = "Chondrichthyes",
+                                           strata_name = "fg")
+
+res_chondr_fg <- determine_xmin_and_fit_mlebins(data_chondr_fg,
+                                                x_min = xmin_chondr,
+                                                x_max = xmax_chondr)
+
+
+res_chondr_fg$mlebins_fit
+```
+
+```{r, chondrfgplot}
+plot(res_chondr_fg,
+     xlim_hist = c(0, 300),
+     main = "Chondrichthyes FG")
+```
+
+## Chondrichthyes NTR
+
+```{r, chondrntr}
+data_chondr_ntr <- mediterranean_for_mlebins(dat_joined,
+                                            group_name = "Chondrichthyes",
+                                            strata_name = "ntr")
+
+res_chondr_ntr <- determine_xmin_and_fit_mlebins(data_chondr_ntr,
+                                                 x_min = xmin_chondr,
+                                                 x_max = xmax_chondr)
+
+res_chondr_ntr$mlebins_fit
+```
+
+```{r, chondrntrplot}
+plot(res_chondr_ntr,
+     xlim_hist = c(0, 300),
+     main = "Chondrichthyes NTR")
+```
+
+Now to compare the three strata for Chondrichthyes.
+
+```{r, chondrsumm}
+res_table_chondr <- dplyr::tibble()
+res_table_chondr <- add_row_to_summary_table(res_table_chondr,
+                                      res_chondr_baseline,
+                                      "Chondrichthyes",
+                                      "Baseline")
+res_table_chondr <- add_row_to_summary_table(res_table_chondr,
+                                      res_chondr_fg,
+                                      "Chondrichthyes",
+                                      "FG")
+res_table_chondr <- add_row_to_summary_table(res_table_chondr,
+                                      res_chondr_ntr,
+                                      "Chondrichthyes",
+                                      "NTR")
+```
+
+Results combined are:
+```{r, reschondrtable}
+knitr::kable(res_table_chondr, digits = 2)
+```
+
+TODO
+
+From the baseline, the size spectrum steepens (more
+negative $b$) in the fishing grounds, and also steepens strongly in the NTR, but
+the $x_{\text min}$ is much higher. Not too clear what to do here, as $x_{\text min}$ are
+quite different between all three, and hard to see a consistent value to use.
+
+but shallows (less negative $b$) slightly
+(confidence intervals do not overlap) in the
+no-take reserve, consistent with theory.
+
+Steepening size spectrum from the baseline, but then big steepening
+
+# Cephalopoda (all) data
+
+Need to split the Cephaloda data (see `med-analysis-4.Rmd`). First load it all.
+
+```{r, cephload}
+data_cephall_baseline <- mediterranean_for_mlebins(dat_joined,
+                                                   group_name = "Cephalopoda",
+                                                   strata_name = "baseline")
+
+data_cephall_fg <- mediterranean_for_mlebins(dat_joined,
+                                             group_name = "Cephalopoda",
+                                             strata_name = "fg")
+
+data_cephall_ntr <- mediterranean_for_mlebins(dat_joined,
+                                              group_name = "Cephalopoda",
+                                              strata_name = "ntr")
+
+ceph_small_large_delineation
+```
+
+## Cephalopoda (small) baseline
+
+```{r, cephsmallbaseline}
+data_cephsmall_baseline <- dplyr::filter(data_cephall_baseline,
+                                         bin_min < ceph_small_large_delineation)
+
+max(data_cephsmall_baseline$bin_min)
+
+res_cephsmall_baseline <-
+  determine_xmin_and_fit_mlebins(data_cephsmall_baseline,
+                                 x_min = xmin_cephsmall,
+                                 x_max = xmax_cephsmall)
+```
+
+```{r, cephsmallbaselineplot}
+plot(res_cephsmall_baseline,
+     xlim_hist = c(0, 21),
+     main = "Cephalopoda (small) baseline")
+```
+
+## Cephalopoda (small) FG
+
+```{r, cephsmallfg}
+data_cephsmall_fg <- dplyr::filter(data_cephall_fg,
+                                   bin_min < ceph_small_large_delineation)
+
+res_cephsmall_fg <- determine_xmin_and_fit_mlebins(data_cephsmall_fg,
+                                                   x_min = xmin_cephsmall,
+                                                   x_max = xmax_cephsmall)
+```
+
+```{r, cephsmallfgplot}
+plot(res_cephsmall_fg,
+     xlim_hist = c(0, 21),
+     main = "Cephalopoda (small) FG")
+```
+
+## Cephalopoda (small) NTR
+
+```{r, cephsmallbaeline}
+data_cephsmall_ntr <- dplyr::filter(data_cephall_ntr,
+                                    bin_min < ceph_small_large_delineation)
+
+res_cephsmall_ntr <- determine_xmin_and_fit_mlebins(data_cephsmall_ntr,
+                                                    x_min = xmin_cephsmall,
+                                                    x_max = xmax_cephsmall)
+```
+
+```{r, cephsmallntrplot}
+plot(res_cephsmall_ntr,
+     xlim_hist = c(0, 21),
+     main = "Cephalopoda (small) NTR")
+```
+
+Now to compare the three strata for Cephalopoda (small):
+
+```{r, cephsmallsumm}
+res_table_cephsmall <- dplyr::tibble()
+res_table_cephsmall <- add_row_to_summary_table(res_table_cephsmall,
+                                      res_cephsmall_baseline,
+                                      "Cephalopoda small",
+                                      "Baseline")
+
+res_table_cephsmall <- add_row_to_summary_table(res_table_cephsmall,
+                                      res_cephsmall_fg,
+                                      "Cephalopoda small",
+                                      "FG")
+res_table_cephsmall <- add_row_to_summary_table(res_table_cephsmall,
+                                      res_cephsmall_ntr,
+                                      "Cephalopoda small",
+                                      "NTR")
+```
+
+Results combined are:
+
+```{r, rescephsmalltable}
+knitr::kable(res_table_cephsmall, digits = 2)
+```
+
+TODO Go the opposite direction to theory.
+
+## Cephalopoda (large) baseline
+
+```{r, cephlargebaseline}
+data_cephlarge_baseline <- dplyr::filter(data_cephall_baseline,
+                                         bin_min >= ceph_small_large_delineation)
+
+res_cephlarge_baseline <-
+  determine_xmin_and_fit_mlebins(data_cephlarge_baseline,
+                                 x_min = xmin_cephlarge,
+                                 x_max = xmax_cephlarge)
+```
+
+
+```{r, cephlargebaselineplot}
+plot(res_cephlarge_baseline,
+     xlim_hist = c(0, 100),
+     main = "Cephalopoda (large) baseline")
+```
+
+## Cephalopoda (large) FG
+
+```{r, cephlargefg}
+data_cephlarge_fg <- dplyr::filter(data_cephall_fg,
+                                   bin_min >= ceph_small_large_delineation)
+
+res_cephlarge_fg <- determine_xmin_and_fit_mlebins(data_cephlarge_fg,
+                                                   x_min = xmin_cephlarge,
+                                                   x_max = xmax_cephlarge)
+```
+
+```{r, cephlargefgplot}
+plot(res_cephlarge_fg,
+     xlim_hist = c(0, 100),
+     main = "Cephalopoda (large) FG")
+```
+
+## Cephalopoda (large) NTR
+
+```{r, cephlargebaeline}
+data_cephlarge_ntr <- dplyr::filter(data_cephall_ntr,
+                                    bin_min >= ceph_small_large_delineation)
+
+res_cephlarge_ntr <- determine_xmin_and_fit_mlebins(data_cephlarge_ntr,
+                                                    x_min = xmin_cephlarge,
+                                                    x_max = xmax_cephlarge)
+```
+
+```{r, cephlargentrplot}
+plot(res_cephlarge_ntr,
+     xlim_hist = c(0, 100),
+     main = "Cephalopoda (large) NTR")
+```
+
+Now to compare the three strata for Cephalopoda (large):
+
+```{r, cephlargesummfix}
+res_table_cephlarge <- dplyr::tibble()
+res_table_cephlarge <- add_row_to_summary_table(res_table_cephlarge,
+                                      res_cephlarge_baseline,
+                                      "Cephalopoda large",
+                                      "Baseline")
+
+res_table_cephlarge <- add_row_to_summary_table(res_table_cephlarge,
+                                      res_cephlarge_fg,
+                                      "Cephalopoda large",
+                                      "FG")
+res_table_cephlarge <- add_row_to_summary_table(res_table_cephlarge,
+                                      res_cephlarge_ntr,
+                                      "Cephalopoda large",
+                                      "NTR")
+```
+
+Results combined are:
+
+```{r, rescephlargetable}
+knitr::kable(res_table_cephlarge, digits = 2)
+```
+
+TODO comment
+
+# Combining results
+
+First, let's create a table of the main results from above that we want to move
+forward with. Just from the `res_table_***` objects. Then we'll need the raw
+data from each in turn. Could then functionalise this maybe, but probably best
+to keep explicit and tailored for different applications. Aggregated plots done
+in `med-analysis-**.Rmd`.
+
+```{r, aggregatetable}
+res_table_agg <- rbind(res_table_full,
+                       res_table_crust,
+                       res_table_actin,
+                       res_table_chondr,
+                       res_table_cephsmall,
+                       res_table_cephlarge)
+
+
+knitr::kable(res_table_agg,
+             digits = 2)
+```
+
+## Aggregated fit to data
+
+Now just saving the results for each strata in a list. (See end of file for what
+I originally did). Can include the full results (fitting in one go). Not going
+to change filenames for each analysis (`med-analysis-6.Rmd` etc.), files will be in the correct directory
+
+Each object in each list is of class `determine_xmin_and_fit_mlebins`.
+
+```{r, aggregatefitnew}
+baseline_agg_list <- list(full = res_full_baseline,
+                          crust = res_crust_baseline,
+                          actin = res_actin_baseline,
+                          chondr = res_chondr_baseline,
+                          cephsmall = res_cephsmall_baseline,
+                          cephlarge = res_cephlarge_baseline)
+
+fg_agg_list <- list(full = res_full_fg,
+                    crust = res_crust_fg,
+                    actin = res_actin_fg,
+                    chondr = res_chondr_fg,
+                    cephsmall = res_cephsmall_fg,
+                    cephlarge = res_cephlarge_fg)
+
+
+ntr_agg_list <- list(full = res_full_ntr,
+                     crust = res_crust_ntr,
+                     actin = res_actin_ntr,
+                     chondr = res_chondr_ntr,
+                     cephsmall = res_cephsmall_ntr,
+                     cephlarge = res_cephlarge_ntr)
+```
+
+## Saving what is needed for plots and tables, and doing in med-summary.Rmd
+
+```{r, savingnew}
+saveRDS(baseline_agg_list,
+        "baseline_agg_list.rds")
+saveRDS(fg_agg_list,
+        "fg_agg_list.rds")
+saveRDS(ntr_agg_list,
+        "ntr_agg_list.rds")
+
+saveRDS(res_table_agg,
+        "res_table_agg.rds")
+
+```

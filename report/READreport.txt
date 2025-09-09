@@ -162,9 +162,9 @@ mediterranean-analysis-12/
 
 
 
-then run for 11 and maybe 12, just to see how look. Expect will stick with 4.
+then run summary for 11 and maybe 12, just to see how look. Expect will stick with 4.
 
-Then convert to a summary appendix for the manuscript.
+Then convert to a summary appendix for the manuscript, deciding what to include.
 
 
 Juliana 21/8/25 (based on up to 10):

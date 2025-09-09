@@ -15,8 +15,8 @@ knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "",
   cache = TRUE,
-  cache_path = "med-summary-4-cache/",
-  fig.path = "med-summary-4-figs-cache/",
+  cache_path = "med-summary-11-cache/",
+  fig.path = "med-summary-11-figs-cache/",
   fig.width = 7,   # Good for the hist and spectra plots
   fig.height = 9
 )
@@ -27,7 +27,7 @@ knitr::dep_auto()
 
 ```{r, build, echo = FALSE, eval = FALSE}
 # To build either run this line or click knit button in RStudio:
-rmarkdown::render("med-summary-4.Rmd")
+rmarkdown::render("med-summary-11.Rmd")
 ```
 
 ```{r, packages, echo = FALSE, cache = FALSE}
@@ -37,7 +37,7 @@ load_all()
 #library(sizeSpectra2)    # Need latest version
 ```
 
-This summarises the results from `med-analysis-4.Rmd`, which takes a while to run
+This summarises the results from `med-analysis-11.Rmd`, which takes a while to run
 and saves three `*_list.rds`
 files in the same directory. The files contain the
 results after some exploration and iterative calculations, plus
@@ -48,7 +48,8 @@ The useful results are here, building up to the final aggregated plot than can
 be in the main manuscript. First are the fits to each group-strata
 combination in turn, and then summary panel plots, the exponents on a single
 plot, and then the aggregated plots. Table of exponents and ranges also
-given. This file can then be used to make the appendix for the desired run.
+given. This file can then be used to make the appendix for the desired
+run, and is copied from `med-summary-4.Rmd`.
 
 ## Load results
 
