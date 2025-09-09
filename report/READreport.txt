@@ -163,11 +163,11 @@ mediterranean-analysis-12/
 
 TODO Carry on with tidying up summary 4, including
  making a summary plot, showing full community first (maybe not needed for
- manuscript) then apply to 10 and 11 and maybe others.
+ manuscript): just do the text regarding each plot.
 
-Then do a summary appendix for the manuscript.
+then run for 11 and maybe 12, just to see how look. Expect will stick with 4.
 
-
+Then convert to a summary appendix for the manuscript.
 
 
 Juliana 21/8/25 (based on up to 10):
