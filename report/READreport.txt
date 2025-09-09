@@ -152,7 +152,7 @@ mediterranean-analysis-11/
 
  has run, not looked at results
 
-TODO do summary .Rmd for 11
+TODO do summary .Rmd for 11 and 12.
 
 
 mediterranean-analysis-12/
@@ -161,9 +161,6 @@ mediterranean-analysis-12/
  has run, not looked at results
 
 
-TODO Carry on with tidying up summary 4, including
- making a summary plot, showing full community first (maybe not needed for
- manuscript): just do the text regarding each plot.
 
 then run for 11 and maybe 12, just to see how look. Expect will stick with 4.
 

@@ -80,7 +80,8 @@ not want to include them:
 
 ```{r, striphist}
 remove_strata <- "full"   # make NULL to keep everything, or "full" to remove
-                          # the full analysis
+                          # the full analysis. Change "Full community" below
+                          # also if change this.
 
 baseline_agg <- remove_hist(baseline_agg_list,
                             remove_strata = remove_strata)
@@ -90,6 +91,9 @@ fg_agg <- remove_hist(fg_agg_list,
 
 ntr_agg <- remove_hist(ntr_agg_list,
                        remove_strata = remove_strata)
+
+res_table_agg_use <- filter(res_table_agg,
+                            Group != "Full community")
 ```
 
 \clearpage
@@ -97,16 +101,12 @@ ntr_agg <- remove_hist(ntr_agg_list,
 First, need a global range for the body sizes, note those include full community
 that we might not look at, so may always want to come back and tweak:
 ```{r, globalx}
-x_min_global <- min(res_table_agg$x_min)
-x_max_global <- max(res_table_agg$x_max)
-groups <- unique(res_table_agg$Group)    # Assume we're keeping everything in
+x_min_global <- min(res_table_agg_use$x_min)
+x_max_global <- max(res_table_agg_use$x_max)
+groups <- unique(res_table_agg_use$Group)    # Assume we're keeping everything in
                                          # the same order, no reason not to
-groups <- groups[groups != "Full community"]  # Since don't want plots for full
-                                        # community for this particular
-                                        # analysis. Edit manually if want to
-                                        # ignore more.
-strata <- unique(dplyr::filter(res_table_agg,
-                               Group != "Full community")$Strata)
+strata <- unique(res_table_agg_use$Strata)
+
 ```
 
 ## Fits to each group/strata combination in turn
@@ -508,26 +508,26 @@ for(i in 1:length(groups)){
 
 
 ```{r plotsummary, fig.width = 10.2, fig.height = 6, fig.cap = "Maximum likelihood estimates of size-spectrum exponent $b$ (symbols) with 95% confidence intervals (lines), most of which are too narrow to show up. Results are for Baseline, Fishing Grounds (FG) and No-take Reserve (NTR) for each species group.", echo = FALSE}
-plot_multiple_exponents(res_table_agg,
+plot_multiple_exponents(res_table_agg_use,
                         col_strata = strata_col)
 ```
 
 <!-- The low value does dictate the y-axis range, so limit the axis here: -->
 ```{r plotsummary2, fig.width = 11, fig.height = 6, fig.cap = "As for previous Figure but restricting the y-axis (which misses the NTR results for Chondrichthyes).", eval = FALSE, echo = FALSE}
-plot_multiple_exponents(res_table_agg,
+plot_multiple_exponents(res_table_agg_use,
                         ylim = c(-5, 0),
                         col_strata = strata_col)
 ```
 
 ```{r, aggregatetable, tab.cap = "Summary table of results for each group-strata combination.", echo = FALSE}
-knitr::kable(dplyr::filter(res_table_agg,
-                           Group %in% groups),
+knitr::kable(res_table_agg_use,
              digits = 2)
 ```
 
 ## Conclusions from these results
 
-TODO not updated this text yet, doing figures first
+TODO not updated this text yet, doing figures first, going to do manual text in
+the appendix write up.
 
 From theory we would expect a steepening of the size spectrum ($b$ becoming more
 negative) under fishing
