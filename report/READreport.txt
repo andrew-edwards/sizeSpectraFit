@@ -150,21 +150,26 @@ mediterranean-analysis-11/
  Results may well already be spread out between .pdfs, but simpler to rerun all
  in one go.
 
- has run, not looked at results
-
-TODO do summary .Rmd for 11 and 12.
-
+ has run, done summary.
+Fits are just not as good, because sometimes fitting a decreasing distribution
+to unimodal data.
 
 mediterranean-analysis-12/
-  use 11, and set xmax to be max(xmax) within each group. So a bit like 10.
+  xmin as min(xmin) for each group (run 11),
+  then with xmax to  be max(xmax) within each group.
+ has run, done summary.
+Again, fits are just not as good.
 
- has run, not looked at results
+So conclude to stick with 4 (as per Robinson et al), can say we tried 11 and 12
+but fits to data not satisfactory. The aggregated, restricted and normalised
+method overcomes some of the issues. Can show crustacea results in main text
+maybe as that is the focus of the manuscript, and will show some real data.
 
+Taking med-summary-4.Rmd, copying .tex over to
+size-spectra-applications\zabala\supp-material\ and using as template for
+supp-size-spectra.tex. Copied the figures over for simplicity.
 
-
-then run summary for 11 and maybe 12, just to see how look. Expect will stick with 4.
-
-Then convert to a summary appendix for the manuscript, deciding what to include.
+TODO HERE - now just write on .tex in size-spectra-applications/
 
 
 Juliana 21/8/25 (based on up to 10):
