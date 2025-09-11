@@ -94,22 +94,48 @@ fg_agg <- remove_hist(fg_agg_list,
 ntr_agg <- remove_hist(ntr_agg_list,
                        remove_strata = remove_strata)
 
-res_table_agg_use <- filter(res_table_agg,
+# But probably ending up showing Full and then explaining why dig deeper
+res_table_agg_no_full <- filter(res_table_agg,
                             Group != "Full community")
 ```
 
 \clearpage
 
-First, need a global range for the body sizes, note those include full community
-that we might not look at, so may always want to come back and tweak:
+First, need a global range for the body sizes:
 ```{r, globalx}
-x_min_global <- min(res_table_agg_use$x_min)
-x_max_global <- max(res_table_agg_use$x_max)
-groups <- unique(res_table_agg_use$Group)    # Assume we're keeping everything in
+x_min_global <- min(res_table_agg_no_full$x_min)
+x_max_global <- max(res_table_agg_no_full$x_max)
+groups <- unique(res_table_agg_no_full$Group)    # Assume we're keeping everything in
                                          # the same order, no reason not to
-strata <- unique(res_table_agg_use$Strata)
+strata <- unique(res_table_agg_no_full$Strata)
 
 ```
+
+## First show fits to full community to then explain why not using
+
+```{r, fullbaselineplot, echo = FALSE, fig.cap = "Full community baseline."}
+seg_col = "lightgreen"
+
+plot(baseline_agg_list[["full"]],
+     xlim_hist = c(0, 60),
+     main = "Full community baseline",
+     seg_col = seg_col)
+```
+
+```{r, fullfgplot, echo = FALSE, fig.cap = "Full community fishing grounds."}
+plot(fg_agg_list[["full"]],
+     xlim_hist = c(0, 60),
+     main = "Full community FG",
+     seg_col = seg_col)
+```
+
+```{r, fullntrplot, echo = FALSE, fig.cap = "Full community no-take reserve."}
+plot(ntr_agg_list[["full"]],
+     xlim_hist = c(0, 60),
+     main = "Full community NTR",
+     seg_col = seg_col)
+```
+
 
 ## Fits to each group/strata combination in turn
 
@@ -133,8 +159,6 @@ code from `med-analysis-12.Rmd` (which is latest so probably simplified) and
 then editing it here. Yes, not showing code or text, just have figures. -->
 
 ```{r, crustbaselineplot, echo = FALSE, fig.cap = "Crustacea baseline."}
-seg_col = "lightgreen"
-
 plot(baseline_agg_list[["crust"]],
      xlim_hist = c(0, 60),
      main = "Crustacea baseline",
@@ -510,19 +534,23 @@ for(i in 1:length(groups)){
 
 
 ```{r plotsummary, fig.width = 10.2, fig.height = 6, fig.cap = "Maximum likelihood estimates of size-spectrum exponent $b$ (symbols) with 95% confidence intervals (lines), most of which are too narrow to show up. Results are for Baseline, Fishing Grounds (FG) and No-take Reserve (NTR) for each species group.", echo = FALSE}
-plot_multiple_exponents(res_table_agg_use,
-                        col_strata = strata_col)
+plot_multiple_exponents(res_table_agg,
+                        col_strata = strata_col,
+                        shade_first = TRUE)
 ```
 
 <!-- The low value does dictate the y-axis range, so limit the axis here: -->
-```{r plotsummary2, fig.width = 11, fig.height = 6, fig.cap = "As for previous Figure but restricting the y-axis (which misses the NTR results for Chondrichthyes).", eval = FALSE, echo = FALSE}
-plot_multiple_exponents(res_table_agg_use,
-                        ylim = c(-5, 0),
-                        col_strata = strata_col)
+```{r plotsummary2, fig.width = 11, fig.height = 6, fig.cap = "As for previous Figure but restricting the y-axis (which misses the NTR results for Chondrichthyes).", echo = FALSE}
+plot_multiple_exponents(res_table_agg,
+                        ylim = c(-5, -1),
+                        col_strata = strata_col,
+                          shade_first = TRUE)
 ```
 
+\clearpage
+
 ```{r, aggregatetable, tab.cap = "Summary table of results for each group-strata combination.", echo = FALSE}
-knitr::kable(res_table_agg_use,
+knitr::kable(res_table_agg,
              digits = 2)
 ```
 

@@ -4,7 +4,10 @@
 ##' groups fitted for three strata, but applicable to other sets of results.
 ##' For each group there will be three strata (to do with fishing being
 ##' allowed), and we want to see how *b* changes within each group under the
-##' changes in fishing. Bascially plotting out the results saved in `res_tib`.
+##' changes in fishing. Bascially plotting out the results saved in
+##' `res_tib`. For the Mediterranean analyses we also show the results for the
+##' Full community, but with an option to shade that area in grey because the
+##' fits were not great.
 ##'
 ##' For doing time series probably best to adapt and make a new function.
 ##'
@@ -19,7 +22,11 @@
 ##'  -  `High b` the 95\% upper confidence limit of *b*
 ##' @param col_strata character vector of colours, need one colour for each strata
 ##' @param pch_strata vector of pch numeric values, one for each strata
-##' @param pch_cex numeric, size of the points, gets used by `points(..., cex = pch_cex)`
+##' @param pch_cex numeric, size of the points, gets used by `points(..., cex =
+##'   pch_cex)`
+##' @param shade_first logical, whether to shade the background for the first
+##'   strata in lightgrey, because (for Mediterranean analyses) this is the full
+##'   community and the fits were not great, so the results are not so reliable.
 ##' @param xlim
 ##' @param ylim
 ##' @param x_jitter Amount to left/right jitter each strata within a group;
@@ -51,6 +58,7 @@ plot_multiple_exponents = function(res_tib,
                                                   "red"),
                                    pch_strata = c(15, 16, 17),
                                    pch_cex = 1.3,
+                                   shade_first = FALSE,
                                    xlim = NULL,
                                    ylim = NULL,
                                    x_jitter = NULL,
@@ -114,8 +122,16 @@ plot_multiple_exponents = function(res_tib,
        ylab = ylab,
        axes = FALSE,
        xaxs = "i")
-  box()
 
+  if(shade_first){
+    rect(xlim[1],
+         par("usr")[3],
+         x_group[1] + 0.5 * diff(x_group)[1],
+         par("usr")[4],
+         col = "lightgrey")
+  }
+
+  box()
   axis(2)
 
   # Minor tickmarks on y-axis
