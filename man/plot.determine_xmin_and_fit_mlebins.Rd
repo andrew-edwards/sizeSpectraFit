@@ -3,33 +3,40 @@
 \name{plot.determine_xmin_and_fit_mlebins}
 \alias{plot.determine_xmin_and_fit_mlebins}
 \title{Plot results from determining xmin by mode method and then fitting use
-MLEbins method # TODO function is actually the same as
-plot.determine_xmin_and fit, since plot is already assigned correctly. So
-might not need this one, or just call the other one. TODO TODO NOT quite,
-two lines changed.}
+MLEbins method}
 \usage{
-\method{plot}{determine_xmin_and_fit_mlebins}(res, xlim_hist = NULL, ...)
+\method{plot}{determine_xmin_and_fit_mlebins}(
+  res,
+  xlim_hist = NULL,
+  par_mai = c(0.4, 0.5, 0.05, 0.3),
+  par_cex = 0.7,
+  seg_col = "green",
+  ...
+)
 }
 \arguments{
 \item{res}{list of class \code{determine_xmin_for_mlebins_and_fit} as output from \code{determine_xmin_for_mlebins_and_fit()}}
 
 \item{xlim_hist}{numeric vector of two values representing \code{xlim} for histogram plot; default is the full range
 of breaks (which might be too large for a clear figure, especially given
-the linear axis). TODO could maybe add in log-x axis, but not option in
-\code{plot.hist()} so would have to make it up here.}
+the linear axis).}
 
-\item{...}{arguments to passed onto \code{\link[=hist]{hist()}} for now, but probably want
-more. TODO \code{sizeSpectra::ISD_bin_plot_nonoverlapping()}}
+\item{par_mai}{vector of values to use for \code{par(mai)}}
+
+\item{par_cex}{numeric value to use for \code{par(cex)} (font size)}
+
+\item{seg_col}{colour to use for the segments (green in Fig. 7 of
+MEPS paper).}
+
+\item{...}{arguments to passed onto \code{\link[=hist]{hist()}} or \code{\link[=plot.size_spectrum_mlebins]{plot.size_spectrum_mlebins()}}}
 }
 \value{
-figure in current device
+figure in current device  TODO inheritParams
+plot.size_spectrum_mlebin   did not work TODO check everything flows through
 }
 \description{
 Plot results from determining xmin by mode method and then fitting use
-MLEbins method # TODO function is actually the same as
-plot.determine_xmin_and fit, since plot is already assigned correctly. So
-might not need this one, or just call the other one. TODO TODO NOT quite,
-two lines changed.
+MLEbins method
 }
 \examples{
 \dontrun{

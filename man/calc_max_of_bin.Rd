@@ -2,8 +2,7 @@
 % Please edit documentation in R/calc-max-of_bin.R
 \name{calc_max_of_bin}
 \alias{calc_max_of_bin}
-\title{Calculate the maximum value of each bin
-minimum or midpoint)}
+\title{Calculate the maximum value of each bin minimum or midpoint}
 \usage{
 calc_max_of_bin(vec, bin_widths = 1, vec_represents_bin_mid = TRUE)
 }
@@ -21,6 +20,12 @@ midpoints of bins, if \code{FALSE} then represents the minima of bins.}
 tibble of bin_min, bin_max
 }
 \description{
+Likely deprecated, see \code{\link[=calc_bin_breaks]{calc_bin_breaks()}}. TODO decide if want to keep
+this, keep the 0.01/1 code somewhere in case want to incorporate it, though
+splitting up like I'm doing for Med data seems best. Actually, might need it
+for that, just need to change name maybe.
+}
+\details{
 Given a vector of values representing either the midpoint or the minimum of
 each bin, calculate the correponding maximum value of each bin. The defined
 bin widths can be specified (currently either all identical or some are 0.01

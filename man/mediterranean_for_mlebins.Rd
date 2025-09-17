@@ -16,7 +16,8 @@ mediterranean_for_mlebins(
 \arguments{
 \item{dat}{tibble of data already with certain columns TODO}
 
-\item{group_name}{group to analyse, if not specified then use all}
+\item{group_name}{group to analyse, if not specified then use all  TODO
+think if can be vector, is.null might not work}
 
 \item{strata_name}{strata to analyse, if not specified then use all}
 

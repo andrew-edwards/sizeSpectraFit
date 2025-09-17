@@ -24,6 +24,7 @@
 ##' @export
 ##' @author Andrew Edwards
 ##' @examples
+##' \dontrun{
 ##' # See aggregating-size-spectra.Rmd TODO copy something to here maybe
 ##' }
 ##'

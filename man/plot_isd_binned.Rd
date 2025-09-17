@@ -42,7 +42,8 @@ plot_isd_binned(
   rect_col = "grey",
   fit_col = "red",
   fit_lwd = 2,
-  conf_lty = 2
+  conf_lty = 2,
+  show_fit_on_top = TRUE
 )
 }
 \arguments{
@@ -83,6 +84,10 @@ MEPS paper).}
 \item{fit_lwd}{line thickness to use for fitted curves}
 
 \item{conf_lty}{line type to use for confidence intervals}
+
+\item{show_fit_on_top}{logical, whether to plot the fitted PLB curve on top of the
+data or underneath. Usually on top (the default) is fine, but sometimes
+having it underneath is better.}
 
 \item{par_mai}{vector of values to use for \code{par(mai)}}
 

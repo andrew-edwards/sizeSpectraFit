@@ -21,7 +21,8 @@ more. TODO \code{sizeSpectra::ISD_bin_plot_nonoverlapping()}}
 figure in current device
 }
 \description{
-Plot results from determining xmin by mode method and then fitting use MLE hake spectra results
+TODO check if want features from plot.determine_xmin_and_fit_mlebins(),
+which was adapted and improved from this.
 }
 \examples{
 \dontrun{

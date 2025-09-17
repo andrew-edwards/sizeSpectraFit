@@ -83,7 +83,8 @@ MEPS paper).}
 
 \item{par_cex}{numeric value to use for \code{par(cex)} (font size)}
 
-\item{...}{Further arguments for \code{plot_isd()} and then \code{plot()} TODO check}
+\item{...}{Further arguments for \code{plot_isd()} and then \code{plot()}, except
+cannot have \code{log} as that gets overridden. TODO check}
 
 \item{log_y_axis}{TODO delete a bunch of these params.....character either \code{"both"}, do two plots (like Fig. 7 of
 MEPS paper), \code{"no"} for single plot with linear y axis (like Fig. 7a of

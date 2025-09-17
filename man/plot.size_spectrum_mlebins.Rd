@@ -4,10 +4,14 @@
 \alias{plot.size_spectrum_mlebins}
 \title{Plot a binned ISD plots similar to MEPS Figure 7 from MLEbins method.}
 \usage{
-\method{plot}{size_spectrum_mlebins}(res_mlebins, ...)
+\method{plot}{size_spectrum_mlebins}(res_mlebins, seg_col = "green", ...)
 }
 \arguments{
-\item{...}{Further arguments for \code{plot_isd()} and then \code{plot()} TODO check}
+\item{seg_col}{colour to use for the segments (green in Fig. 7 of
+MEPS paper).}
+
+\item{...}{Further arguments for \code{plot_isd()} and then \code{plot()}, except
+cannot have \code{log} as that gets overridden. TODO check}
 }
 \value{
 one- or two-panel plot of the ISD with data in binned form like in

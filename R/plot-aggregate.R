@@ -11,10 +11,11 @@
 ##'   user outfacing function, or also make plot_aggregate_numeric and just call
 ##'   the right one. Some of the details could be shared here maybe.
 ##' @param col_vec vector of colours to assign for each group
-##' @return
+##' @return nothing TODO, should this return something?
 ##' @export
 ##' @author Andrew Edwards
 ##' @examples
+##' \dontrun{
 ##' # See aggregating-size-spectra.Rmd TODO copy something to here maybe
 ##' }
 ##'

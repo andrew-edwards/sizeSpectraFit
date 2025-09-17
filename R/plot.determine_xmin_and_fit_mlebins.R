@@ -6,12 +6,11 @@
 ##'   of breaks (which might be too large for a clear figure, especially given
 ##'   the linear axis).
 ##' @param ... arguments to passed onto [hist()] or [plot.size_spectrum_mlebins()]
-##' @inheritParams plot.size_spectrum_mlebin
-##' # @inheritParams plot.size_spectrum_numeric   might need these two if not
-##'   everything captured (i.e. if help doesn't flow through from these) TODO
-##' # @inheritParams plot_isd_binned
+##' @inheritParams plot.size_spectrum_numeric
+##' @inheritParams plot_isd_binned
 ##'
-##' @return figure in current device
+##' @return figure in current device  TODO inheritParams
+##'   plot.size_spectrum_mlebin   did not work TODO check everything flows through
 ##' @export
 ##' @author Andrew Edwards
 ##' @examples

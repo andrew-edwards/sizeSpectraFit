@@ -32,6 +32,8 @@ adds minor tickmarks to an existing plot
 \description{
 Add sensible smaller (unlabelled) tickmarks to both axes of an existing
 plot. Adapted from \code{pacea::add_tickmarks()}. Is exported but unlikely to be needed externally.
+Need to specify \code{x_tick_start} and \code{y_tick_start} manually (rather than
+based on current axis) to ensure they are sensible (e.g. starting at 0 not -0.05).
 }
 \examples{
 \dontrun{

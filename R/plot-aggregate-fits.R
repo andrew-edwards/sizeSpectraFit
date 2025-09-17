@@ -7,8 +7,8 @@
 ##' @param agg_list list of aggregated fits, with each component corresponding
 ##'   to the list object resulting from [plot_aggregate_mlebin()] for a
 ##'   particular strata.
-##'col_vec vector of colours to assign for each group
-##' @param strata_names
+##' @param strata_names vector of strings, the names to use to annotate each
+##'   curve in turn (names correspond to the order in `agg_list`).
 ##' @param log_axes which axes to log (gets passed to `plot(..., log =
 ##'   log_axes)`, either `"xy"` or `"x"` are of interest (although `"y"`
 ##'   and `""` automatically work).
@@ -16,8 +16,8 @@
 ##'   only being above a common x value
 ##' @param normalise logical, whether or not to normalise each aggregated fit by
 ##'   it's maximum, so that all fits are on the same scale
-##' @param col_strata
-##' @param xlim, ylim vectors for axes limits; if NULL (the default) it gets
+##' @param col_strata vector of strings, each being a colour to use for each strata
+##' @param xlim, ylim vectors for axes limits; if NULL (the default) they get
 ##'   calculated automatically, but users likely want to then manually adjust
 ##'   them, especially `ylim` to be able to see all fits asymptoting at their
 ##'   xmin values, but the
@@ -30,6 +30,7 @@
 ##' @export
 ##' @author Andrew Edwards
 ##' @examples
+##' \dontrun{
 ##' # See aggregating-size-spectra.Rmd TODO copy something to here maybe
 ##' }
 ##'

@@ -9,8 +9,8 @@ confidence intervals}
   res,
   style = "log_y_axis",
   xlim = c(min(res$x), max(res$x)),
-  ylim = NA,
-  x_plb = NA,
+  ylim = NULL,
+  x_plb = NULL,
   y_scaling = 0.75,
   mle_round = 2,
   inset_label = c(0, -0.02),
@@ -47,7 +47,8 @@ TODO prob have to make that consistent in other plotting function
 \item{xlab}{ylab x/y labels, explicitly given default values here which can
 be modified as required.}
 
-\item{...}{Further arguments for \code{plot_isd()} and then \code{plot()} TODO check}
+\item{...}{Further arguments for \code{plot_isd()} and then \code{plot()}, except
+cannot have \code{log} as that gets overridden. TODO check}
 }
 \value{
 One- or two-panel plot of raw data and PLB distribution (and fits of
