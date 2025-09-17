@@ -1,5 +1,5 @@
 ---
-title: "Putting Juliana Zabala's Mediterranean data into sizeSpectra2"
+title: "Putting Juliana Zabala's Mediterranean data into sizeSpectraFit"
 author: "Andrew Edwards and Juliana Zabala"
 output: pdf_document
 fontsize: 12pt
@@ -39,7 +39,7 @@ library(readxl)
 
 # Adapting this from using-sizeSpectra2.R in size-spectra-applications, and also
 #  using that file for the analyses that are being done in report/
-# using-sizeSpectra2.R - size spectrum fits using sizeSpectra2 functions.
+# using-sizeSpectra2.R - size spectrum fits using sizeSpectraFit functions.
 #  Run from the same directory as 2023-03-22_Dades_RESNEP.xlsx, or setwd to the
 #  required directory.
 # Starting from analysis-juliana-2024-12-05.R

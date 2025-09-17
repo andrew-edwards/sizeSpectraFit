@@ -7,6 +7,6 @@
 # * https://testthat.r-lib.org/articles/special-files.html
 
 library(testthat)
-library(sizeSpectra2)
+library(sizeSpectraFit)
 
-test_check("sizeSpectra2")
+test_check("sizeSpectraFit")

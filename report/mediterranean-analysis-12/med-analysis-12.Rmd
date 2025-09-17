@@ -36,7 +36,7 @@ rmarkdown::render("med-analysis-12.Rmd")
 ```{r, packages, echo = FALSE, cache = FALSE}
 library(dplyr)
 load_all()
-#library(sizeSpectra2)    # Need latest version
+#library(sizeSpectraFit)    # Need latest version
 ```
 
 Using `dat_joined.rds` from `med-analysis-4.Rmd`, using `med-analysis-5.Rmd` as

@@ -4,7 +4,7 @@
 ##'
 ##' Called from `determine_xmin_and_fit_mlebins()` to determine xmin for MLEbins
 ##' method, and should work for MLEbin
-##' method also TODO. Adapting from `sizeSpectra2::make_hist()` and
+##' method also TODO. Adapting from `sizeSpectraFit::make_hist()` and
 ##' sizeSpectraHake::make_hist()`, think the first was adapted from the former,
 ##' for simple counts, but now we want the more complex latter version for
 ##' binned data.

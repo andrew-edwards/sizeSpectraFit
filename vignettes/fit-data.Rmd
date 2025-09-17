@@ -16,7 +16,7 @@ rmarkdown::render("fit-data.Rmd")
 ```
 
 ```{r, load, include = FALSE}
-load_all()   # TODO replace with library(sizeSpectra2)
+load_all()   # TODO replace with library(sizeSpectraFit)
 
 knitr::opts_chunk$set(
   collapse = TRUE,
@@ -45,7 +45,7 @@ body lengths. We fit the size spectrum by calculating the maximum likelihood est
 As an example we use the simulated data from a bounded power-law distribution as used for Figures 1 and 2 of
 our [MEE
 paper](http://onlinelibrary.wiley.com/doi/10.1111/2041-210X.12641/full). The
-values are included in sizeSpectra2 as the data object `sim_vec` (which stands
+values are included in sizeSpectraFit as the data object `sim_vec` (which stands
 for simulated vector), and we assume they are individual body masses measured in
 grammes. Note that the fit will be great
 because the data are sampled from the expected power-law distribution.
@@ -152,7 +152,7 @@ TODO add in GoF once done.
 Often, data are only available in binned form, motivating our MLEbin and MLEbins
 methods (see our MEPS paper for details).
 
-Saved in sizeSpectra2 is a binned version of the simulated data set used above:
+Saved in sizeSpectraFit is a binned version of the simulated data set used above:
 ```{r}
 sim_vec_binned
 ```

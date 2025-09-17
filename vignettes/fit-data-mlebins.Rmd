@@ -16,7 +16,7 @@ rmarkdown::render("fit-data-mlebins.Rmd")
 ```
 
 ```{r, load, include = FALSE}
-load_all()   # TODO replace with library(sizeSpectra2)
+load_all()   # TODO replace with library(sizeSpectraFit)
 
 knitr::opts_chunk$set(
   collapse = TRUE,
@@ -48,11 +48,11 @@ We use real data of measured lengths from experimental trawl surveys conducted i
 the Northwestern Mediterranean Sea, as part of the research projects RESNEP and
 BITER by the Instituto de Ciencias del Mar (ICM-CSIC), Spain; data courtesy of
 Juliana Quevedo, Joan B. Company, Nixon Bahamon, and Jordi Ribera Altimir. The full data are
-available in sizeSpectra2 as simply
+available in sizeSpectraFit as simply
 ```{r meddata}
 mediterranean_data
 ```
-and are being analysed using sizeSpectra2 as part of a separate manuscript
+and are being analysed using sizeSpectraFit as part of a separate manuscript
 (see `?mediterranean_data` for more details). Here we demonstrate the code on a
 subset of the data.
 
@@ -282,7 +282,7 @@ body lengths. We fit the size spectrum by calculating the maximum likelihood est
 As an example we use the simulated data from a bounded power-law distribution as used for Figures 1 and 2 of
 our [MEE
 paper](http://onlinelibrary.wiley.com/doi/10.1111/2041-210X.12641/full). The
-values are included in sizeSpectra2 as the data object `sim_vec` (which stands
+values are included in sizeSpectraFit as the data object `sim_vec` (which stands
 for simulated vector), and we assume they are individual body masses measured in
 grammes. Note that the fit will be great
 because the data are sampled from the expected power-law distribution.
@@ -389,7 +389,7 @@ TODO add in GoF once done.
 Often, data are only available in binned form, motivating our MLEbin and MLEbins
 methods (see our MEPS paper for details).
 
-Saved in sizeSpectra2 is a binned version of the simulated data set used above:
+Saved in sizeSpectraFit is a binned version of the simulated data set used above:
 ```{r}
 sim_vec_binned
 ```

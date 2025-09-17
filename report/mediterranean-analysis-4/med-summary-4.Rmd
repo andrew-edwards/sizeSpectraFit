@@ -36,7 +36,7 @@ rmarkdown::render("med-summary-4.Rmd")
 library(dplyr)
 library(knitr)
 load_all()
-#library(sizeSpectra2)    # Need latest version
+#library(sizeSpectraFit)    # Need latest version
 ```
 
 This summarises the results from `med-analysis-4.Rmd`, which takes a while to run
