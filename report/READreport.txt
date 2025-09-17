@@ -169,7 +169,7 @@ Taking med-summary-4.Rmd, copying .tex over to
 size-spectra-applications\zabala\supp-material\ and using as template for
 supp-size-spectra.tex. Copied the figures over for simplicity.
 
-TODO HERE - now just write on .tex in size-spectra-applications/
+HERE - now just writing on .tex in size-spectra-applications/
 
 
 Juliana 21/8/25 (based on up to 10):
@@ -199,3 +199,5 @@ mediterranean-analysis-10/
 
 further ideas?
   Probably want to fix xmin for some maybe? The chondr one is strange.
+
+magick <filename>.pdf <filename>.png   to make .png's I included into the doc file.
