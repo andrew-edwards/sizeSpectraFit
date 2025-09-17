@@ -30,7 +30,8 @@
 ##'   panel rather than points) and the `"log_y_axis"` plot described above.
 ##' TODO prob have to make that consistent in other plotting function
 ##'
-##' @param ... Further arguments for `plot_isd()` and then `plot()` TODO check
+##' @param ... Further arguments for `plot_isd()` and then `plot()`, except
+##'   cannot have `log` as that gets overridden. TODO check
 ##' @return One- or two-panel plot of raw data and PLB distribution (and fits of
 ##'   confidence limits) as solid (and dashed) fitted using MLE method; returns
 ##'   nothing. TODO could return invisible biomass calcs
@@ -78,6 +79,11 @@ plot.size_spectrum_numeric <- function(res,
   stopifnot("style must be log_y_axis, linear_y_axis, both_y_axes, biomass, or biomass_and_isd" =
               style %in% c("log_y_axis", "linear_y_axis", "both_y_axes",
                            "biomass", "biomass_and_isd"))
+  args <- list(...)
+  if ("log" %in% names(args)) {
+    stop("Cannot specify argument `log`, since it gets overridden within plot.size_spectrum_numeric().")
+  }
+
 
   # par_orig <- par(no.readonly = TRUE)
 
