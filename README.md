@@ -5,15 +5,17 @@ GitHub uses README.md to make the page you see on GitHub). See pacea if want to
 save figures.
 -->
 
-# sizeSpectra2
+# sizeSpectraFit
 
 <!-- badges: start -->
+<!-- [![](https://img.shields.io/badge/lifecycle-under%20development-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#under development) connection timed out, -->
+<!-- 17/9/25, but extracting what's needed here:-->
 
-[![](https://img.shields.io/badge/lifecycle-under%20development-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#under%20development)
-[![R-CMD-check](https://github.com/andrew-edwards/sizeSpectra2/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/andrew-edwards/sizeSpectra2/actions/workflows/R-CMD-check.yaml)
+![](https://img.shields.io/badge/lifecycle-under%20development-orange.svg)
+[![R-CMD-check](https://github.com/andrew-edwards/sizeSpectraFit/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/andrew-edwards/sizeSpectraFit/actions/workflows/R-CMD-check.yaml)
 [![Codecov test
-coverage](https://codecov.io/gh/andrew-edwards/sizeSpectra2/branch/main/graph/badge.svg)](https://app.codecov.io/gh/andrew-edwards/sizeSpectra2?branch=main)
-![Visitors](https://api.visitorbadge.io/api/visitors?path=https%3A%2F%2Fgithub.com%2Fandrew-edwards%2FsizeSpectra2&label=VISITORS&countColor=%23263759&style=flat&labelStyle=lower)
+coverage](https://codecov.io/gh/andrew-edwards/sizeSpectraFit/branch/main/graph/badge.svg)](https://app.codecov.io/gh/andrew-edwards/sizeSpectraFit?branch=main)
+![Visitors](https://api.visitorbadge.io/api/visitors?path=https%3A%2F%2Fgithub.com%2Fandrew-edwards%2FsizeSpectraFit&label=VISITORS&countColor=%23263759&style=flat&labelStyle=lower)
 <!-- badges: end -->
 
 A streamlined R package for fitting size spectra to ecological data
@@ -83,7 +85,7 @@ To install the latest version just:
 
     install.packages("remotes")    # If you do not already have the "remotes" package
 
-    remotes::install_github("andrew-edwards/sizeSpectra2")
+    remotes::install_github("andrew-edwards/sizeSpectraFit")
 
 If you get an error like
 
