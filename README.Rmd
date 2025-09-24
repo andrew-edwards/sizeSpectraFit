@@ -35,6 +35,7 @@ library(badger)
 [![Codecov test coverage](https://codecov.io/gh/andrew-edwards/sizeSpectraFit/branch/main/graph/badge.svg)](https://app.codecov.io/gh/andrew-edwards/sizeSpectraFit?branch=main)
 ![Visitors](https://api.visitorbadge.io/api/visitors?path=https%3A%2F%2Fgithub.com%2Fandrew-edwards%2FsizeSpectraFit&label=VISITORS&countColor=%23263759&style=flat&labelStyle=lower)
 <!-- badges: end -->
+<!-- see data-raw/ for logo hexSticker code-->
 
 A streamlined R package for fitting size spectra to ecological data
 
