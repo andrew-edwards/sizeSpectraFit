@@ -172,6 +172,7 @@ supp-size-spectra.tex. Copied the figures over for simplicity.
 HERE - now just writing on .tex in size-spectra-applications/
 
 
+
 Juliana 21/8/25 (based on up to 10):
 
 Thanks a lot for all the documents!
@@ -201,3 +202,34 @@ further ideas?
   Probably want to fix xmin for some maybe? The chondr one is strange.
 
 magick <filename>.pdf <filename>.png   to make .png's I included into the doc file.
+
+
+2/10/25 and just before from Juliana:
+
+I think the current graphs are very nice and my supervisors think we should
+include the multi-graph graph, as it gives a good idea of where the final graph
+come from. We also wonder if we could try the code with a set xmin for all
+groups and also with the minimum xmin, as with the histogram frequency
+distribution method we seem to leave some data out.
+
+then:
+
+Not quite, sorry I didn't explain it well before, I meant the following:
+
+a) a fixed xmin across the three strata for that group. For example, xmin crustacea = 0.2 for baseline, fg and ntr. We choose the xmin based on the smallest 'continuous' value we have for each strata. For example, for crustacea we have the following small values: 0.001, 0.002, 0.20, 0.22, 0.22, 0.23... We would choose 0.20 as the xmin as there's a gap between 0.002 and 0.20 and then its continuous values.
+
+This is a little tricky to automate (as it sounds a little subjective), so let's
+discuss it. [Or start looking at in mediterranean-analysis-12/ below]
+
+b) xmin = the min(xmin) for each group and each strata. So, no modifications, just the minimum value for each group and strata.
+
+This is what is done in med-summary-11.pdf (which I realise I didn't send
+you before I don't think). The xmin for each group is the minimum of the three
+xmin determined in analysis-4 for each group. See Table 1 on page 22 for the
+
+
+mediterranean-analysis-12/
+Juliana suggested an xmin for each group, but based on looking for gaps in data
+(see a) above).
+
+Would have to manually look at each strata.
