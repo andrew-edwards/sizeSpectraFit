@@ -1,0 +1,705 @@
+---
+title: "Summarising the analysis of Mediterranean data using MLEbins"
+author: "Andrew Edwards and Juliana Zabala"
+output:
+  pdf_document:
+    keep_tex: true
+fontsize: 12pt
+date: "Last compiled on `r format(Sys.time(), '%d %B, %Y')`"
+header-includes:
+- \usepackage{pdflscape}
+- \newcommand{\blandscape}{\begin{landscape}}
+- \newcommand{\elandscape}{\end{landscape}}
+---
+
+```{r, setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "",
+  cache = TRUE,
+  cache_path = "med-summary-4-cache/",
+  fig.path = "med-summary-4-figs-cache/",
+  fig.width = 7,   # Good for the hist and spectra plots
+  fig.height = 9
+)
+# comment = "#>",
+
+knitr::dep_auto()
+```
+
+```{r, build, echo = FALSE, eval = FALSE}
+# To build either run this line or click knit button in RStudio:
+rmarkdown::render("med-summary-13.Rmd")
+```
+
+```{r, packages, echo = FALSE, cache = FALSE}
+library(dplyr)
+library(knitr)
+load_all()
+#library(sizeSpectraFit)    # Need latest version
+```
+
+This summarises the results from `med-analysis-13.Rmd`, which takes a while to run
+and saves three `*_list.rds`
+files in the same directory. The files contain the
+results after some exploration and iterative calculations, plus
+`res_table_agg.rds` contains the combined table results. Still might need some
+of the other plots in `med-analysis-*.Rmd` in Supplementary Information.
+
+The useful results are here, building up to the final aggregated plot than can
+be in the main manuscript. First are the fits to each group-strata
+combination in turn, and then summary panel plots, the exponents on a single
+plot, and then the aggregated plots. Table of exponents and ranges also
+given. This file can then be used to make the appendix for the desired run.
+
+## Load results
+
+Load in saved results.
+
+```{r, loadresults}
+baseline_agg_list <- readRDS("baseline_agg_list.rds")
+fg_agg_list <- readRDS("fg_agg_list.rds")
+ntr_agg_list <- readRDS("ntr_agg_list.rds")
+res_table_agg <- readRDS("res_table_agg.rds")
+```
+
+Each is a list for that strata, with 6 objects of results of class
+`determine_xmin_and_fit_mlebins`. First of each is for fitting the full
+community in one go, which we won't use as not a great fit and there are issues
+with assuming the same catchability (TODO?) between groups. Fits for all
+group/strata combination (including the full community) are shown at the end of
+this document.
+
+`res_table_agg` is the summary table that has been built up during analysis (and
+users should do that by using our .Rmd as a template).
+
+
+## Fits to each species group
+
+Do not really need the histogram information in each list here, so stripping out
+the histogram information here, and also removing the `"full"` analyses as do
+not want to include them:
+
+```{r, striphist}
+remove_strata <- "full"   # make NULL to keep everything, or "full" to remove
+                          # the full analysis. Change "Full community" below
+                          # also if change this.
+
+baseline_agg <- remove_hist(baseline_agg_list,
+                            remove_strata = remove_strata)
+
+fg_agg <- remove_hist(fg_agg_list,
+                      remove_strata = remove_strata)
+
+ntr_agg <- remove_hist(ntr_agg_list,
+                       remove_strata = remove_strata)
+
+# But probably ending up showing Full and then explaining why dig deeper
+res_table_agg_no_full <- filter(res_table_agg,
+                            Group != "Full community")
+```
+
+\clearpage
+
+First, need a global range for the body sizes:
+```{r, globalx}
+x_min_global <- min(res_table_agg_no_full$x_min)
+x_max_global <- max(res_table_agg_no_full$x_max)
+groups <- unique(res_table_agg_no_full$Group)    # Assume we're keeping everything in
+                                         # the same order, no reason not to
+strata <- unique(res_table_agg_no_full$Strata)
+
+```
+
+## First show fits to full community to then explain why not using
+
+```{r, fullbaselineplot, echo = FALSE, fig.cap = "Full community baseline."}
+seg_col = "lightgreen"
+
+plot(baseline_agg_list[["full"]],
+     xlim_hist = c(0, 60),
+     main = "Full community baseline",
+     seg_col = seg_col)
+```
+
+```{r, fullfgplot, echo = FALSE, fig.cap = "Full community fishing grounds."}
+plot(fg_agg_list[["full"]],
+     xlim_hist = c(0, 60),
+     main = "Full community FG",
+     seg_col = seg_col)
+```
+
+```{r, fullntrplot, echo = FALSE, fig.cap = "Full community no-take reserve."}
+plot(ntr_agg_list[["full"]],
+     xlim_hist = c(0, 60),
+     main = "Full community NTR",
+     seg_col = seg_col)
+```
+
+
+## Fits to each group/strata combination in turn
+
+Figure for each combination is based on Figure 7 of our MEPS paper, with the new
+top panel used to determine $x_{min}$. The following is the common caption.
+
+Top panel: histogram of total counts of body sizes within each 1-g body-size
+bin, used to determine $x_{min}$, with left-most red bin being the modal bin,
+and so its minimum bound is used for $x_{min}$ for this group-strata
+combination. Middle and bottom panels: fit of the bounded power-law distribution
+using the MLEbins method with a linear and lograthmic y-axes, respectively. For
+each body-mass bin, the green horizontal line show the range of body sizes, with
+its value on the y-axis corresponding to the total number of individuals in bins
+whose minima are $\geq$ the bin's minimum; the green lines help to distinguish
+each bin when bins are overlapping.
+The vertical span of each grey rectangle shows the possible range of number of individuals with body masses $\geq$
+body mass of individuals in that bin (horizontal span matches the green line);
+rectangles are easier to see in the later figures. Red curves are fits of the MLE, with dashed lines showing 95% confidence intervals (can be hard to see). MLE of exponent $b$ and the sample size $n$ are also given."
+<!-- Basically copying just the plotting
+code from `med-analysis-12.Rmd` (which is latest so probably simplified) and
+then editing it here. Yes, not showing code or text, just have figures. -->
+
+```{r, crustbaselineplot, echo = FALSE, fig.cap = "Crustacea baseline."}
+plot(baseline_agg_list[["crust"]],
+     xlim_hist = c(0, 60),
+     main = "Crustacea baseline",
+     seg_col = seg_col)
+```
+
+```{r, crustfgplot, echo = FALSE, fig.cap = "Crustacea fishing grounds."}
+plot(fg_agg_list[["crust"]],
+     xlim_hist = c(0, 60),
+     main = "Crustacea FG",
+     seg_col = seg_col)
+```
+
+```{r, crustntrplot, echo = FALSE, fig.cap = "Crustacea no-take reserve."}
+plot(ntr_agg_list[["crust"]],
+     xlim_hist = c(0, 60),
+     main = "Crustacea NTR",
+     seg_col = seg_col)
+```
+
+```{r, actinbaselineplot, echo = FALSE, fig.cap = "Actinopterygii baseline."}
+plot(baseline_agg_list[["actin"]],
+     xlim_hist = c(0, 60),
+     main = "Actinopterygii baseline",
+     seg_col = seg_col)
+```
+
+```{r, actinfgplot, echo = FALSE, fig.cap = "Actinopterygii fishing grounds."}
+plot(fg_agg_list[["actin"]],
+     xlim_hist = c(0, 60),
+     main = "Actinopterygii FG",
+     seg_col = seg_col)
+```
+
+```{r, actinntrplot, echo = FALSE, fig.cap = "Actinopterygii no-take reserve."}
+plot(ntr_agg_list[["actin"]],
+     xlim_hist = c(0, 60),
+     main = "Actinopterygii NTR",
+     seg_col = seg_col)
+```
+
+```{r, chondrbaselineplot, echo = FALSE, fig.cap = "Chondrichthyes baseline."}
+plot(baseline_agg_list[["chondr"]],
+     xlim_hist = c(0, 300),
+     main = "Chondrichthyes baseline",
+     seg_col = seg_col)
+```
+
+```{r, chondrfgplot, echo = FALSE, fig.cap = "Chondrichthyes fishing grounds."}
+plot(fg_agg_list[["chondr"]],
+     xlim_hist = c(0, 300),
+     main = "Chondrichthyes FG",
+     seg_col = seg_col)
+```
+
+```{r, chondrntrplot, echo = FALSE, fig.cap = "Chondrichthyes no-take reserve."}
+plot(ntr_agg_list[["chondr"]],
+     xlim_hist = c(0, 300),
+     main = "Chondrichthyes NTR",
+     seg_col = seg_col)
+```
+
+```{r, cephsmallbaselineplot, echo = FALSE, fig.cap = "Cephalopoda (small) baseline."}
+plot(baseline_agg_list[["cephsmall"]],
+     xlim_hist = c(0, 21),
+     main = "Cephalopoda (small) baseline",
+     seg_col = seg_col)
+```
+
+```{r, cephsmallfgplot, echo = FALSE, fig.cap = "Cephalopoda (small) fishing grounds."}
+plot(fg_agg_list[["cephsmall"]],
+     xlim_hist = c(0, 21),
+     main = "Cephalopoda (small) FG",
+     seg_col = seg_col)
+```
+
+```{r, cephsmallntrplot, echo = FALSE, fig.cap = "Cephalopoda (small) no-take reserve."}
+plot(ntr_agg_list[["cephsmall"]],
+     xlim_hist = c(0, 21),
+     main = "Cephalopoda (small) NTR",
+     seg_col = seg_col)
+```
+
+```{r, cephlargebaselineplot, echo = FALSE, fig.cap = "Cephalopoda (large) baseline."}
+plot(baseline_agg_list[["cephlarge"]],
+     xlim_hist = c(0, 100),
+     main = "Cephalopoda (large) baseline",
+     seg_col = seg_col)
+```
+
+```{r, cephlargefgplot, echo = FALSE, fig.cap = "Cephalopoda (large) fishing grounds."}
+plot(fg_agg_list[["cephlarge"]],
+     xlim_hist = c(0, 100),
+     main = "Cephalopoda (large) FG",
+     seg_col = seg_col)
+```
+
+```{r, cephlargentrplot, echo = FALSE, fig.cap = "Cephalopoda (large) no-take reserve."}
+plot(ntr_agg_list[["cephlarge"]],
+     xlim_hist = c(0, 100),
+     main = "Cephalopoda (large) NTR",
+     seg_col = seg_col)
+```
+
+\clearpage
+
+## Summary plots and table
+
+The bottom panel for each group-strata combination is shown as a panel here,
+with panels aligned by species group (columns) and strata (rows), to allow comparisons.
+
+```{r, panelplotportrait, fig.cap = "Summary plot of all groups (rows) and strata(columns), with a consistent x-axis range throughout, and a consistent y-axis range for each group. Data are shown as rectangles representing the range of possible values within each body-mass bin, but due to the small bins these mostly show up as lines.", echo = FALSE, eval = FALSE}
+# NOT EVALUATED, is for for portrait version, bit hard
+# to functionalise as usually want to tailor the plots.
+par(mfrow = c(5, 3),    # group in each row, strata in each column
+    oma = c(0, 3, 3, 0),
+    mar = c(3, 3, 1, 0.2))
+
+
+for(i in 1:length(groups)){
+  # Based on calculation in plot.size_spectrum_mlebin():
+  y_min_group <- 0.75 * min(c(baseline_agg[[i]]$data$count_gte_bin_min,
+                              fg_agg[[i]]$data$count_gte_bin_min,
+                              ntr_agg[[i]]$data$count_gte_bin_min))
+
+  y_max_group <- max(c(baseline_agg[[i]]$data$high_count,
+                       fg_agg[[i]]$data$high_count,
+                       ntr_agg[[i]]$data$high_count))
+
+  y_lim_group = c(y_min_group,
+                  y_max_group)
+
+  plot(baseline_agg[[i]],
+       xlim = c(x_min_global,
+                x_max_global),
+       ylim = y_lim_group,
+       style = "log_y_axis",
+       legend_text_second_row_multiplier = 4,
+       seg_col = seg_col,
+       show_fit_on_top = FALSE)
+
+  mtext(groups[i],
+        side = 2,
+        line = 3)
+
+  if(i == 1){
+    mtext("Baseline",
+          side = 3,
+          line = 1)
+  }
+
+  plot(fg_agg[[i]],
+       xlim = c(x_min_global,
+                x_max_global),
+       ylim = y_lim_group,
+       style = "log_y_axis",
+       legend_text_second_row_multiplier = 4,
+       seg_col = seg_col,
+       ylab = "",
+       show_fit_on_top = FALSE)
+
+  if(i == 1){
+    mtext("Fishing Grounds",
+          side = 3,
+          line = 1)
+  }
+
+  plot(ntr_agg[[i]],
+       xlim = c(x_min_global,
+                x_max_global),
+       ylim = y_lim_group,
+       style = "log_y_axis",
+       legend_text_second_row_multiplier = 4,
+       seg_col = seg_col,
+       ylab = "",
+       show_fit_on_top = FALSE)
+
+  if(i == 1){
+    mtext("No-take Reserve",
+          side = 3,
+          line = 1)
+  }
+}
+```
+
+\blandscape
+
+```{r, panelplotlandscape, fig.cap = "Summary plot of all groups (rows) and strata(columns), with a consistent x-axis range throughout, and a consistent y-axis range for each group. Data are shown as rectangles representing the range of possible values within each body-mass bin, but due to the small bins these mostly show up as lines. Solid curves are the fits using the maximum likelihood estimates for exponent $b$, dashed lines use the 95% confidence intervals, but these only show up in a few cases.", echo = FALSE, fig.width = 11, fig.height = 8}
+# Uncommenting this and dev.off() below to just run this chunk manually to make
+# a .tiff to insert into Word file
+seg_col = "black"      # bins are so small the default green does not really
+                       # help
+
+
+strata_col = c("blue",
+               "darkgreen",
+               "red")  # used in later figures also
+
+par(mfcol = c(3, 5),    # strata in each row, group in each colum, fill by group
+    oma = c(0, 3, 3, 0),
+    mar = c(3, 3, 1, 0.2))
+
+seg_col = "black"      # bins are so small the default green does not really
+                       # help
+
+for(i in 1:length(groups)){
+  # Based on calculation in plot.size_spectrum_mlebin():
+  y_min_group <- 0.75 * min(c(baseline_agg[[i]]$data$count_gte_bin_min,
+                              fg_agg[[i]]$data$count_gte_bin_min,
+                              ntr_agg[[i]]$data$count_gte_bin_min))
+
+  y_max_group <- max(c(baseline_agg[[i]]$data$high_count,
+                       fg_agg[[i]]$data$high_count,
+                       ntr_agg[[i]]$data$high_count))
+
+  y_lim_group = c(y_min_group,
+                  y_max_group)
+
+  # Only label y-axis for first column
+  y_lab <- ifelse(i == 1,
+                  expression(paste("Total ",
+                                   counts >= x),
+                             sep=""),
+                  "")
+
+  plot(baseline_agg[[i]],
+       xlim = c(x_min_global,
+                x_max_global),
+       ylim = y_lim_group,
+       style = "log_y_axis",
+       legend_text_second_row_multiplier = 3,
+       seg_col = seg_col,
+       xlab = "",
+       ylab = y_lab,
+       fit_col = strata_col[1],
+       show_fit_on_top = FALSE)
+
+  mtext(groups[i],
+        side = 3,
+        line = 1)
+
+  if(i == 1){
+    mtext("Baseline",
+          side = 2,
+          line = 3)
+  }
+
+  plot(fg_agg[[i]],
+       xlim = c(x_min_global,
+                x_max_global),
+       ylim = y_lim_group,
+       style = "log_y_axis",
+       legend_text_second_row_multiplier = 3,
+       seg_col = seg_col,
+       xlab = "",
+       ylab = y_lab,
+       fit_col = strata_col[2],
+       show_fit_on_top = FALSE)
+
+  if(i == 1){
+    mtext("Fishing Grounds",
+          side = 2,
+          line = 3)
+  }
+
+  plot(ntr_agg[[i]],
+       xlim = c(x_min_global,
+                x_max_global),
+       ylim = y_lim_group,
+       style = "log_y_axis",
+       legend_text_second_row_multiplier = 3,
+       seg_col = seg_col,
+       ylab = y_lab,
+       fit_col = strata_col[3],
+       show_fit_on_top = FALSE)
+
+  if(i == 1){
+    mtext("No-take Reserve",
+          side = 2,
+          line = 3)
+  }
+}
+```
+
+\elandscape
+
+
+\blandscape
+
+```{r, panelplotlandscapelinear, fig.cap = "As for previous figure but with linear y-axes.", echo = FALSE, fig.width = 11, fig.height = 8}
+par(mfcol = c(3, 5),    # strata in each row, group in each colum, fill by group
+    oma = c(0, 3, 3, 0),
+    mar = c(3, 3, 1, 0.2))
+
+for(i in 1:length(groups)){
+  # Based on calculation in plot.size_spectrum_mlebin():
+  y_min_group <- 0.75 * min(c(baseline_agg[[i]]$data$count_gte_bin_min,
+                              fg_agg[[i]]$data$count_gte_bin_min,
+                              ntr_agg[[i]]$data$count_gte_bin_min))
+
+  y_max_group <- max(c(baseline_agg[[i]]$data$high_count,
+                       fg_agg[[i]]$data$high_count,
+                       ntr_agg[[i]]$data$high_count))
+
+  y_lim_group = c(y_min_group,
+                  y_max_group)
+
+  # Only label y-axis for first column
+  y_lab <- ifelse(i == 1,
+                  expression(paste("Total ",
+                                   counts >= x),
+                             sep=""),
+                  "")
+
+  plot(baseline_agg[[i]],
+       xlim = c(x_min_global,
+                x_max_global),
+       ylim = y_lim_group,
+       style = "linear_y_axis",
+       legend_text_second_row_multiplier = 3,
+       seg_col = seg_col,
+       xlab = "",
+       ylab = y_lab,
+       fit_col = strata_col[1],
+       show_fit_on_top = FALSE)
+
+  mtext(groups[i],
+        side = 3,
+        line = 1)
+
+  if(i == 1){
+    mtext("Baseline",
+          side = 2,
+          line = 3)
+  }
+
+  plot(fg_agg[[i]],
+       xlim = c(x_min_global,
+                x_max_global),
+       ylim = y_lim_group,
+       style = "linear_y_axis",
+       legend_text_second_row_multiplier = 3,
+       seg_col = seg_col,
+       xlab = "",
+       ylab = y_lab,
+       fit_col = strata_col[2],
+       show_fit_on_top = FALSE)
+
+  if(i == 1){
+    mtext("Fishing Grounds",
+          side = 2,
+          line = 3)
+  }
+
+  plot(ntr_agg[[i]],
+       xlim = c(x_min_global,
+                x_max_global),
+       ylim = y_lim_group,
+       style = "linear_y_axis",
+       legend_text_second_row_multiplier = 3,
+       seg_col = seg_col,
+       ylab = y_lab,
+       fit_col = strata_col[3],
+       show_fit_on_top = FALSE)
+
+  if(i == 1){
+    mtext("No-take Reserve",
+          side = 2,
+          line = 3)
+  }
+}
+```
+
+\elandscape
+
+
+```{r plotsummary, fig.width = 10.2, fig.height = 6, fig.cap = "Maximum likelihood estimates of size-spectrum exponent $b$ (symbols) with 95% confidence intervals (lines), most of which are too narrow to show up. Results are for Baseline, Fishing Grounds (FG) and No-take Reserve (NTR) for each species group.", echo = FALSE}
+plot_multiple_exponents(res_table_agg,
+                        col_strata = strata_col,
+                        shade_first = TRUE,
+                        ylim = c(-2, 1))
+```
+
+<!-- The low value does dictate the y-axis range, so limit the axis here: -->
+```{r plotsummary2, fig.width = 11, fig.height = 6, fig.cap = "As for previous Figure but restricting the y-axis (which misses the NTR results for Chondrichthyes).", echo = FALSE, eval = FALSE}
+plot_multiple_exponents(res_table_agg,
+                        ylim = c(-5, -1),
+                        col_strata = strata_col,
+                          shade_first = TRUE)
+```
+
+\clearpage
+
+```{r, aggregatetable, tab.cap = "Summary table of results for each group-strata combination.", echo = FALSE}
+knitr::kable(res_table_agg,
+             digits = 2)
+```
+
+## Conclusions from these results
+
+TODO not updated this text yet, doing figures first, going to do manual text in
+the appendix write up.
+
+From theory we would expect a steepening of the size spectrum ($b$ becoming more
+negative) under fishing
+pressure, because larger organisms get fished out, releasing some predation pressure on
+smaller organisms. For a No-take Reserve we would conversely expect a shallowing
+of the size spectrum ($b$ become less negative).
+
+Presumably the baseline ecosystem was already experiencing fishing pressure, so
+the ideal theoretical results would be the FG staying the same as the baseline
+(or maybe shallowing as the area is adjacent to the NTR), and the NTR shallowing.
+
+The table and figure show the following:
+
+Crustacea: From the baseline, FG steepens quite a bit and NTR less so. So NTR
+indeed shallower than FG, but it did steepen a little from baseline.
+
+Actinopterygii: From the baseline, FG steepened and NTR got shallower.
+
+Chondrichthyes: From the baseline, FG got shallower, and NTR got even
+shallower.
+
+Cephalopoda small: Cephalopoda were tricky to fit, in terms of specifying xmin
+and xmax. Strangely, from the baseline the FG got shallower (by quite a bit) and the NTR
+steepened, opposite to what we would theoretically expect.
+
+Cephalopoda large: From the baseline, the FG shallowed slightly, while NTR
+steepened.
+
+So the first three groups all find the resulting NTR to have a shallower size
+spectrum than for the FG, in agreement with the ideal theoretically expected
+directions. For both Cephalopoda, the results were opposite to what was
+expected, but the data had to be divided into small and large, which could maybe
+be done differently.
+
+```{r aggplot, fig.height = 8, fig.width = 4, fig.cap = "For each strata, the data and fits previously shown for the five species groups are plotted on the same axes. The thick pink lines are then aggregated size spectra, which combine the five fitted size spectra (all the data are also shown in black, though this is hard to see). While the results are a little hard to interpret, the point is to show how the three aggregated pink curves are defined, and these are then compared in the next figure.", echo = FALSE}
+xlim_global <- c(x_min_global,
+                 x_max_global)
+ylim_global <- c(1, 200000)
+par(mfrow = c(3, 1),
+    oma = c(0, 3, 3, 0),
+    mar = c(4, 3, 1, 0.2))
+
+baseline_agg_fit <- plot_aggregate_mlebin(
+  baseline_agg,
+  xlim_global = xlim_global,
+  ylim_global = ylim_global)
+mtext("Baseline",
+      side = 3,
+      line = 0.5)
+
+fg_agg_fit <- plot_aggregate_mlebin(
+  fg_agg,
+  # main = "Fishing Grounds",
+  xlim_global = xlim_global,
+  ylim_global = ylim_global)
+mtext("Fishing Grounds",
+      side = 3,
+      line = 0.5)
+
+ntr_agg_fit <- plot_aggregate_mlebin(
+  ntr_agg,
+  # main = "No-take Reserve",
+  xlim_global = xlim_global,
+  ylim_global = ylim_global)
+mtext("No-take Reserve",
+      side = 3,
+      line = 0.5)
+```
+
+\clearpage
+
+```{r combinedplot, fig.cap = "The three aggregated plots from the previous figure.", fig.height = 6, echo = FALSE}
+agg_list <- list(baseline_agg_fit,
+                 fg_agg_fit,
+                 ntr_agg_fit)
+
+plot_aggregate_fits(agg_list,
+                    strata_names = strata,
+                    restrict = FALSE,
+                    normalise = FALSE,
+                    ylim = ylim_global)
+```
+
+```{r combinedplotnolog, fig.cap = "As for previous figure but linear y-axis.", fig.height = 6, eval = FALSE, echo = FALSE}
+plot_aggregate_fits(agg_list,
+                    strata_names = strata,
+                    restrict = FALSE,
+                    normalise = FALSE,
+                    ylim = ylim_global,
+                    log_axes = "x")
+```
+
+Since there is no simple size-spectrum exponent for such aggregated fits, and
+they have different $x_{min}$ values and sample sizes, we restrict the fits to
+values above a common value (namely the maximum of the three aggregated
+$x_{min}$ values), and then normalise each aggregated fit by it's resulting
+sample size, such that each starts at the same point (same body-mass on the
+x-axis and at 1 on the y-axis, which now represents the proportion of values
+above each body-mass).
+
+This clearly shows a `steepening' of the size spectrum for the fishing grounds
+compared to the baseline -- the counts are dropping off faster under
+fishing. The no-take reserve shows some improvement from the baseline, with the
+aggregated normalised fit above that for the baseline. Note the logarithmic
+y-axis, such that apparently minor differences are actually quite large, and the
+appearance of large organisms in the no-take reserve.
+
+```{r combinedplotnormfunct, fig.cap = "The three aggregated plots restricted to a common range of body masses and then normalised, to properly compare them.", fig.height = 6, echo = FALSE}
+plot_aggregate_fits(agg_list,
+                    strata_names = strata,
+                    ylim = c(10^(-4), 1))
+```
+
+```{r combinedplotnormlinear, fig.cap = "As previous figure but with a linear y-axis.",fig.height = 6, eval = FALSE, echo = FALSE}
+plot_aggregate_fits(agg_list,
+                    strata_names = strata,
+                    log_axes = "x")
+```
+
+
+```{r, stop, cache = FALSE, echo = FALSE}
+knitr::knit_exit()
+```
+
+
+## Failed attempts as referencing figures
+
+Fig. \@ref(fig:cars)
+
+Fig. \\@ref(fig:cars)
+
+(ref:first-fig-caption) Here's a complicated figure caption for the first figure, which can include complicated text styling like $m^2$ and references to other elements in the document, like Fig. \@ref(fig:cars).
+
+```{r pressure, fig.cap = '(ref:first-fig-caption)'}
+plot(1:10)
+```
+
+(ref:second-fig-caption) Here's a second complicated figure caption.
+
+```{r, cars, fig.cap = '(ref:second-fig-caption)'}
+plot(10:200)
+```
