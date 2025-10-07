@@ -11,8 +11,8 @@ knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "",
   cache = TRUE,
-  cache_path = "med-analysis-13-cache/",
-  fig.path = "med-analysis-13-figs-cache/",
+  cache_path = "med-analysis-15-cache/",
+  fig.path = "med-analysis-15-figs-cache/",
   fig.width = 7,
   fig.height = 9
 )
@@ -26,12 +26,17 @@ knitr::dep_auto()  # or dep_auto seems cleverer, though not always working it
 options(pillar.sigfig = 6)   # show 6 sig figs when printing tibbles (so can see
                              # length resolutions, but not overwhelmed by
                              # details for bin_min and bin_max
+
 ```
 
 ```{r, build, echo = FALSE, eval = FALSE}
 # To build either run this line or click knit button in RStudio:
-rmarkdown::render("med-analysis-13.Rmd")
+rmarkdown::render("med-analysis-15.Rmd")
 ```
+
+
+
+
 
 ```{r, packages, echo = FALSE, cache = FALSE}
 library(dplyr)
@@ -39,18 +44,19 @@ load_all()
 #library(sizeSpectraFit)    # Need latest version
 ```
 
-Using `dat_joined.rds` from `med-analysis-4.Rmd`, using `med-analysis-5.Rmd` as
-a template to shorten down the analysis, and then try different assumptions.
+Using `med-analysis-13.Rmd` as a template, but needing to look at the original
+`med-analysis-4.Rmd` results first.
 
-Here (`med-analysis-13.Rmd`) we determine $x_{\text min}$ as being the values
-Juliana obtained from looking at the data, seeing where the data start being
-continuous. And using same value within each group.
+Here (`med-analysis-15.Rmd`) we determine $x_{\text min}$ as for analysis-4,
+independently for each group-strata combination, but for that $x_{\text max}$ in
+a few cases looked hugely influenced by a single measurement, that was not
+continuous with the previous ones, even on a log scale.
 
-Determining $x_{\text max}$ independently within each group.
-
-<!-- groups (using the modal method) as for `med-analysis-4.Rmd`, and set
-$x_{\text max}$ for each group to be the maximum $x_{\text max}$ determined for
-that group in `med-analysis-4.Rmd` (then not excluding any data). -->
+Looks like this occurs for:
+ - crustacea baseline
+ - ceph small baseline
+ - maybe ceph large ntr
+ - check others.
 
 ```{r, loaddatjoined}
 dat_joined <- readRDS(paste0(here::here(),
@@ -67,18 +73,191 @@ ceph_small_large_delineation <- 10    # Juliana said to use
     #                         "/report/mediterranean-analysis-4/ceph_small_large_delineation.rds"))
 ```
 
-Now to tease out the $x_{\text min}$ values for this particular analysis. Safest to do
+## Look at analysis-4 results to see which ones to remove outliers
+
+Need some from `med-summary-4.Rmd` to load in results. Look at that pdf to
+narrow down which datasets to look at more carefully.
+
+
+## Load results
+
+Load in saved results.
+
+```{r, loadresults}
+baseline_agg_list <- readRDS(paste0(here::here(),
+                             "/report/mediterranean-analysis-4/baseline_agg_list.rds"))
+fg_agg_list <- readRDS(paste0(here::here(),
+                              "/report/mediterranean-analysis-4/fg_agg_list.rds"))
+ntr_agg_list <- readRDS(paste0(here::here(),
+                               "/report/mediterranean-analysis-4/ntr_agg_list.rds"))
+res_table_agg <- readRDS(paste0(here::here(),
+                                "/report/mediterranean-analysis-4/res_table_agg.rds"))
+```
+
+Each is a list for that strata, with 6 objects of results of class
+`determine_xmin_and_fit_mlebins`. First of each is for fitting the full
+community in one g.
+
+`res_table_agg` is the summary table that has been built up during analysis (and
+users should do that by using our .Rmd as a template).
+
+
+## Fits to each species group
+
+Do not really need the histogram information in each list here, so stripping out
+the histogram information here, and also removing the `"full"` analyses as do
+not want to include them:
+
+```{r, striphist}
+remove_strata <- "full"   # make NULL to keep everything, or "full" to remove
+                          # the full analysis. Change "Full community" below
+                          # also if change this.
+
+baseline_agg <- remove_hist(baseline_agg_list,
+                            remove_strata = remove_strata)
+
+fg_agg <- remove_hist(fg_agg_list,
+                      remove_strata = remove_strata)
+
+ntr_agg <- remove_hist(ntr_agg_list,
+                       remove_strata = remove_strata)
+
+# But probably ending up showing Full and then explaining why dig deeper
+res_table_agg_no_full <- filter(res_table_agg,
+                            Group != "Full community")
+```
+
+\clearpage
+
+First, need a global range for the body sizes:
+```{r, globalx}
+x_min_global <- min(res_table_agg_no_full$x_min)
+x_max_global <- max(res_table_agg_no_full$x_max)
+groups <- unique(res_table_agg_no_full$Group)    # Assume we're keeping everything in
+                                         # the same order, no reason not to
+strata <- unique(res_table_agg_no_full$Strata)
+
+```
+
+Just looking through `med-summary-4.Rmd`, look carefully into the ones that
+might have the outliers at large size. Just skip those that look fine.
+
+Approach:
+
+### Crustacea baseline
+
+Look at the gap between biggest and second biggest, based on `bin_min` (looked
+at `bin-max` to `bin_min` but can be negative, so just stick with `bin_min`). 
+
+```{r, crustbase}
+baseline_crust_gap <- detect_outliers(baseline_agg$crust)
+
+baseline_crust_gap %>% tail(10)   # gap_ratio is ratio of gap to second largest
+
+plot(baseline_crust_gap$gap_ratio)
+```
+
+Clearly continuous and then a big jump, so remove the final one.
+
+```{r, crustbase2}
+baseline_crust_rem <- remove_outliers(baseline_agg$crust)
+
+baseline_crust_rem$dat_keep %>% tail()
+
+baseline_crust_rem$dat_removed
+
+baseline_crust_rem$bin_count_removed_prop
+```
+
+Could iterate to see if should remove the next one, this is how it could be
+automated. But have to decide on a cut off.
+
+```{r, crustbase}
+HERE - decide what to do for classes.
+
+baseline_crust_gap_2 <- detect_outliers(baseline_crust_rem)
+
+baseline_crust_gap %>% tail(10)   # gap_ratio is ratio of gap to second largest
+
+plot(baseline_crust_gap$gap_ratio)
+```
+
+
+TODO also going to have to remove the same records from the full analysis?
+Aggregated fits I think will be fine though.
+
+TODO then rerun analyses
+
+### Crustacea FG
+
+```{r, crustfgremove}
+fg_agg_appended <-
+    fg_agg$crust$data %>%
+    dplyr::select(-c(low_count, high_count)) %>%
+    dplyr::mutate(gap = bin_min - lag(bin_max)
+
+fg_agg_appended %>%
+    tail(10)
+
+plot(fg_agg_appended$gap)
+
+fg_agg$crust$data %>% tail(10)
+fg_crust_removed <- remove_outliers(fg_agg$crust)
+
+
+
+```
+
+TODO Not as clear cut as baseline, but seems sensible to remove the final one.
+
+TODO then rerun analyses
+
+### Crustacea NTR
+
+```{r, crustntrremove}
+ntr_agg$crust$data %>% tail(20)
+ntr_crust_removed <- remove_outliers(ntr_agg$crust,
+                                     number = 4)
+
+ntr_crust_removed %>% tail(10)
+```
+
+Suggest leaving them all in, as there's a slight jump from 110 but then still
+four more values, not just one outlier. Then again, still a small proportion of
+the values (since more crustaceans in general), so suggest removing the last four.
+
+TODO then rerun analyses
+
+### Actin baseline
+
+```{r, actinbase}
+baseline_agg$actin$data %>% tail(20)
+
+
+ntr_crust_removed <- remove_outliers(ntr_agg$crust,
+                                     number = 4)
+ntr_crust_removed %>% tail(10)
+```
+
+
+
+
+```{r, stop, cache = FALSE}
+knitr::knit_exit()
+```
+
+TODO No, have values already created., actually justNow to tease  out the $x_{\text min}$ values for this particular analysis. Safest to do
 explicitly, no need for `strata_for_xmin` here:
-```{r setxmin}
-xmin_full <- 0.2
+```{r setxmin};
+xmin_full <- NULL
 
-xmin_crust <- 0.2
+xmin_crust <- NULL
 
-xmin_actin <- 0.2
+xmin_actin <- NULL
 
-xmin_chondr <- 2
+xmin_chondr <- NULL
 
-xmin_cephsmall <- 1
+xmin_cephsmall <- NULL
 
 xmin_cephlarge <- ceph_small_large_delineation
 ```
@@ -782,6 +961,7 @@ ntr_agg_list <- list(full = res_full_ntr,
                      chondr = res_chondr_ntr,
                      cephsmall = res_cephsmall_ntr,
                      cephlarge = res_cephlarge_ntr)
+
 ```
 
 ## Saving what is needed for plots and tables, and doing in med-summary.Rmd
