@@ -66,11 +66,13 @@ med_4_results_table <- readRDS(paste0(here::here(),
                              "/report/mediterranean-analysis-4/res_table_agg.rds"))
 ```
 
-Also need the cephalopod small/large delineation:
+Also need the cephalopod small/large delineation. Juliana said to use 10, but I
+think it's best to stick with the value done from the analysis in `med-analysis-4`:
 ```{r, loadcephdelin}
-ceph_small_large_delineation <- 10    # Juliana said to use
-    #readRDS(paste0(here::here(),
-    #                         "/report/mediterranean-analysis-4/ceph_small_large_delineation.rds"))
+ceph_small_large_delineation <-  readRDS(paste0(here::here(),
+                                                "/report/mediterranean-analysis-4/ceph_small_large_delineation.rds"))
+
+ceph_small_large_delineation
 ```
 
 ## Look at analysis-4 results to see which ones to remove outliers
@@ -162,6 +164,8 @@ Clearly continuous and then a big jump, so remove the final one.
 ```{r, crustbase2}
 baseline_crust_rem <- remove_outliers(baseline_agg$crust)
 
+baseline_crust_rem
+
 baseline_crust_rem$dat_keep %>% tail()
 
 baseline_crust_rem$dat_removed
@@ -172,72 +176,206 @@ baseline_crust_rem$bin_count_removed_prop
 Could iterate to see if should remove the next one, this is how it could be
 automated. But have to decide on a cut off.
 
-```{r, crustbase}
-HERE - decide what to do for classes.
-
+```{r, crustbase3}
 baseline_crust_gap_2 <- detect_outliers(baseline_crust_rem)
 
-baseline_crust_gap %>% tail(10)   # gap_ratio is ratio of gap to second largest
+baseline_crust_gap_2 %>% tail(10)
 
-plot(baseline_crust_gap$gap_ratio)
+plot(baseline_crust_gap_2$gap_ratio)
 ```
 
+So there is a gap that's double the next biggest, but it's not the final bin, so
+no justification in removing any more.
+
+A rule of thumb could be a gap for the final bin of five times the next biggest gap?
+
+### Crustacea FG
+
+```{r, crustfgremove}
+fg_crust_gap <- detect_outliers(fg_agg$crust)
+
+fg_crust_gap %>% tail(10)
+
+max(fg_crust_gap$gap_ratio, na.rm = TRUE)
+
+plot(fg_crust_gap$gap_ratio)
+```
+
+Not as clear cut as baseline, but seems sensible pragmatic to keep final one.
+
+### Crustacea NTR
+
+```{r, crustntrremove}
+ntr_crust_gap <- detect_outliers(ntr_agg$crust)
+
+ntr_crust_gap %>% tail(10)
+
+max(ntr_crust_gap$gap_ratio, na.rm = TRUE)
+
+plot(ntr_crust_gap$gap_ratio)
+```
+
+Keep. Could put in a rule for whether max ratio is $> 5$ or whatever, but just
+keep doing manually for now.
+
+
+Now just looking at ones that might need examining, based on plots in `med-analysis-4.Rmd`.
+
+### Actin baseline
+
+```{r, actinbaselineremove}
+baseline_actin_gap <- detect_outliers(baseline_agg$actin)
+
+baseline_actin_gap %>% tail(10)
+
+max(baseline_actin_gap$gap_ratio, na.rm = TRUE)
+
+plot(baseline_actin_gap$gap_ratio)
+```
+
+Keep.
+
+### Chondr baseline
+
+```{r, chondrbaselineremove}
+baseline_chondr_gap <- detect_outliers(baseline_agg$chondr)
+
+baseline_chondr_gap %>% tail(10)
+
+max(baseline_chondr_gap$gap_ratio, na.rm = TRUE)
+
+plot(baseline_chondr_gap$gap_ratio)
+```
+
+Keep.
+
+### Chondr ntr
+
+```{r, chondrntrremove}
+ntr_chondr_gap <- detect_outliers(ntr_agg$chondr)
+
+ntr_chondr_gap %>% tail(10)
+
+max(ntr_chondr_gap$gap_ratio, na.rm = TRUE)
+
+plot(ntr_chondr_gap$gap_ratio)
+```
+
+Keep.
+
+
+### Cephsmall baseline
+
+```{r, cephsmallbaselineremove}
+baseline_cephsmall_gap <- detect_outliers(baseline_agg$cephsmall)
+
+baseline_cephsmall_gap %>% tail(10)
+
+max(baseline_cephsmall_gap$gap_ratio, na.rm = TRUE)
+
+plot(baseline_cephsmall_gap$gap_ratio)
+```
+
+Yes, definitely remove.
+
+```{r, cephsmallbase2}
+baseline_cephsmall_rem <- remove_outliers(baseline_agg$cephsmall)
+
+baseline_cephsmall_rem
+
+baseline_cephsmall_rem$dat_keep %>% tail()
+
+baseline_cephsmall_rem$dat_removed
+
+baseline_cephsmall_rem$bin_count_removed_prop
+```
+
+Could iterate to see if should remove the next one, this is how it could be
+automated. But have to decide on a cut off.
+
+```{r, cephsmallbase3}
+baseline_cephsmall_gap_2 <- detect_outliers(baseline_cephsmall_rem)
+
+baseline_cephsmall_gap_2 %>% tail(10)
+
+plot(baseline_cephsmall_gap_2$gap_ratio)
+```
+
+Keep the rest then, so just removing the one, as anticipated from original figure.
+
+### Cephlarge baseline
+
+```{r, cephlargebaselineremove}
+baseline_cephlarge_gap <- detect_outliers(baseline_agg$cephlarge)
+
+baseline_cephlarge_gap %>% tail(10)
+
+max(baseline_cephlarge_gap$gap_ratio, na.rm = TRUE)
+
+plot(baseline_cephlarge_gap$gap_ratio)
+```
+
+Keep.
+
+### Cephlarge fg
+
+```{r, cephlargefgremove}
+fg_cephlarge_gap <- detect_outliers(fg_agg$cephlarge)
+
+fg_cephlarge_gap %>% tail(10)
+
+max(fg_cephlarge_gap$gap_ratio, na.rm = TRUE)
+
+plot(fg_cephlarge_gap$gap_ratio)
+```
+
+### Cephlarge ntr
+
+```{r, cephlargentrremove}
+ntr_cephlarge_gap <- detect_outliers(ntr_agg$cephlarge)
+
+ntr_cephlarge_gap %>% tail(10)
+
+max(ntr_cephlarge_gap$gap_ratio, na.rm = TRUE)
+
+plot(ntr_cephlarge_gap$gap_ratio)
+```
+
+Yes, remove that one.
+
+```{r, cephlargebase2}
+ntr_cephlarge_rem <- remove_outliers(ntr_agg$cephlarge)
+
+ntr_cephlarge_rem
+
+ntr_cephlarge_rem$dat_keep %>% tail()
+
+ntr_cephlarge_rem$dat_removed
+
+ntr_cephlarge_rem$bin_count_removed_prop
+```
+
+Could iterate to see if should remove the next one, this is how it could be
+automated. But have to decide on a cut off.
+
+```{r, cephlargebase3}
+ntr_cephlarge_gap_2 <- detect_outliers(ntr_cephlarge_rem)
+
+ntr_cephlarge_gap_2 %>% tail(10)
+
+plot(ntr_cephlarge_gap_2$gap_ratio)
+```
+
+Keep the rest then, so just removing the one, as anticipated from original figure.
+
+
+HERE
 
 TODO also going to have to remove the same records from the full analysis?
 Aggregated fits I think will be fine though.
 
 TODO then rerun analyses
 
-### Crustacea FG
-
-```{r, crustfgremove}
-fg_agg_appended <-
-    fg_agg$crust$data %>%
-    dplyr::select(-c(low_count, high_count)) %>%
-    dplyr::mutate(gap = bin_min - lag(bin_max)
-
-fg_agg_appended %>%
-    tail(10)
-
-plot(fg_agg_appended$gap)
-
-fg_agg$crust$data %>% tail(10)
-fg_crust_removed <- remove_outliers(fg_agg$crust)
-
-
-
-```
-
-TODO Not as clear cut as baseline, but seems sensible to remove the final one.
-
-TODO then rerun analyses
-
-### Crustacea NTR
-
-```{r, crustntrremove}
-ntr_agg$crust$data %>% tail(20)
-ntr_crust_removed <- remove_outliers(ntr_agg$crust,
-                                     number = 4)
-
-ntr_crust_removed %>% tail(10)
-```
-
-Suggest leaving them all in, as there's a slight jump from 110 but then still
-four more values, not just one outlier. Then again, still a small proportion of
-the values (since more crustaceans in general), so suggest removing the last four.
-
-TODO then rerun analyses
-
-### Actin baseline
-
-```{r, actinbase}
-baseline_agg$actin$data %>% tail(20)
-
-
-ntr_crust_removed <- remove_outliers(ntr_agg$crust,
-                                     number = 4)
-ntr_crust_removed %>% tail(10)
-```
 
 
 
@@ -246,8 +384,8 @@ ntr_crust_removed %>% tail(10)
 knitr::knit_exit()
 ```
 
-TODO No, have values already created., actually justNow to tease  out the $x_{\text min}$ values for this particular analysis. Safest to do
-explicitly, no need for `strata_for_xmin` here:
+Estimating $x_{\text min}$ for each scenario:
+
 ```{r setxmin};
 xmin_full <- NULL
 
@@ -259,12 +397,11 @@ xmin_chondr <- NULL
 
 xmin_cephsmall <- NULL
 
-xmin_cephlarge <- ceph_small_large_delineation
+xmin_cephlarge <- NULL
 ```
 
-Not doing this for 11, but need it for 12, so just not running here.
-Now to tease out the $x_{\text max}$ values for this particular analysis. Safest to do
-explicitly, no need for `strata_for_xmax` here, set first `if()` depending on analysis
+Now to tease out the $x_{\text max}$ values for this particular analysis, just
+estimating each time.
 ```{r setxmax}
 # strata_for_xmax <- "Baseline"
 if(TRUE){
@@ -717,19 +854,6 @@ Results combined are:
 ```{r, reschondrtable}
 knitr::kable(res_table_chondr, digits = 2)
 ```
-
-TODO
-
-From the baseline, the size spectrum steepens (more
-negative $b$) in the fishing grounds, and also steepens strongly in the NTR, but
-the $x_{\text min}$ is much higher. Not too clear what to do here, as $x_{\text min}$ are
-quite different between all three, and hard to see a consistent value to use.
-
-but shallows (less negative $b$) slightly
-(confidence intervals do not overlap) in the
-no-take reserve, consistent with theory.
-
-Steepening size spectrum from the baseline, but then big steepening
 
 # Cephalopoda (all) data
 

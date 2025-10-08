@@ -16,8 +16,11 @@ remove_outliers.size_spectrum_mlebins <- function(res,
   bin_count_removed <- sum(dat_removed$bin_count)
   bin_count_removed_prop <- bin_count_removed / sum(dat_orig$bin_count)
 
-  return(list(dat_keep = dat_keep,
+  ret <- list(dat_keep = dat_keep,
               dat_removed = dat_removed,
               bin_count_removed = bin_count_removed,
-              bin_count_removed_prop = bin_count_removed_prop))
+              bin_count_removed_prop = bin_count_removed_prop)
+  class(ret) <- c("remove_outliers_mlebins",
+                  class(ret))
+  return(ret)
 }

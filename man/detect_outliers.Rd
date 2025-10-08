@@ -11,10 +11,14 @@ detect_outliers(dat, ...)
 \item{res}{One of:
 \itemize{
 \item \code{sizespectrum_mlebins} object.
-##' @return tibble TODO list containing two tibbles plus two numerics. Each tibble contains just the data values needed for
+##' @return tibble
+}
+
+\code{gap_ratio} is gap divided by second largest gapTODO list containing two tibbles plus two numerics. Each tibble contains just the data values needed for
 calculations, which are \code{species}, \code{bin_min}, \code{bin_max}, and
 \code{bin_count}. \code{count_gte_bin_min} etc. will be recalculated in the new
 analysis. They are:
+\itemize{
 \item \code{dat-keep} records that are being kept
 \item \code{dat-removed} records that are removed
 Numeric values are:
@@ -24,12 +28,12 @@ removed (total counts removed divided by total counts in original data set).
 }}
 }
 \description{
-Analyse gaps to look for outliers (large values with gaps from remaining
-continuous values) from MLEbins (TODO others to come) results object
+If already run through remove_outliers.size_spectrum_mlebins then it wil
+use \code{detect_outliers.remove_outliers.mlebins()} and can keep iterating that.
 }
 \examples{
 \dontrun{
-detect_outliers(**)
+detect_outliers(todo)
 }
 }
 \author{

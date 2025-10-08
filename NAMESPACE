@@ -2,6 +2,7 @@
 
 S3method(bin_data,data.frame)
 S3method(bin_data,numeric)
+S3method(detect_outliers,remove_outliers_mlebins)
 S3method(detect_outliers,size_spectrum_mlebins)
 S3method(fit_size_spectrum,data.frame)
 S3method(fit_size_spectrum,numeric)

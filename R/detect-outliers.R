@@ -1,6 +1,8 @@
 ##' Analyse gaps to look for outliers (large values with gaps from remaining
 ##' continuous values) from MLEbins (TODO others to come) results object
 ##'
+##' If already run through remove_outliers.size_spectrum_mlebins then it wil
+##' use `detect_outliers.remove_outliers.mlebins()` and can keep iterating that.
 ##' @param res One of:
 ##' * `sizespectrum_mlebins` object.
 ##' ##' @return tibble
