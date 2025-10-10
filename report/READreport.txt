@@ -229,13 +229,7 @@ you before I don't think). The xmin for each group is the minimum of the three
 xmin determined in analysis-4 for each group. See Table 1 on page 22 for the values.
 
 
-Juliana chat (3/10/25):
-- me add to methods, why weights not lengths?
-- Fig 16 Supp can go in main text (I think, the multipanel one)
-- less space in the panel plots
-- caption mention the resolution (?)
-- send pdf figures to her for the .doc
-
+Juliana chat (3/10/25) (see details below as have to do them):
 new runs:
 
 mediterranean-analysis-13/
@@ -243,9 +237,9 @@ mediterranean-analysis-13/
 Juliana suggested an xmin for each group, but based on looking for gaps in data
 (see a) above).
  copying -11 to here and editing.
-- use xmin from Juliana's visual suggestions (where it starts to be continuous),
+D use xmin from Juliana's visual suggestions (where it starts to be continuous),
 saved in 'Ranges table.xls'.
-- xmax independently within each strata/group combination
+D xmax independently within each strata/group combination
 D then copy summary-4 and use
 
 Text for justification is:
@@ -282,13 +276,44 @@ not doing yet:
 to keep continuous
 
 mediterranean-analysis-15/
-TODO next:
-- do as med-4, but for crustacea baseline and ceph small also (maybe ceph large
+next:
+D do as med-4, but for crustacea baseline and ceph small also (maybe ceph large
 ntr also): reduce xmax to
 keep continuous. There are some outliers, even on log scale, that do drive xmax.
-- copy analysis-13 as a template
+D copy analysis-13 as a template
 
 Have to look at those manually in med-4, and determine values.
 
-So load in med-4 results in analysis-15, and look at the tail values. See if
+D - So load in med-4 results in analysis-15, and look at the tail values. See if
 there's any easy way to automate a rule.
+
+Total bin counts of 21 removed. So no difference to full fits (since not
+affecting xmax values).
+
+Next:
+D compare results to med-4, check that only the intended ones have
+changed. Rerunning all plots, tables and saving, just not the calculations
+(cacheing wasn't properly updating everything).
+ - D baseline full - n is 15 less in med-15, b unchanged
+   D ntr full - n is 7 less in med-15, b unchanged
+   D baseline crust - n is 7 less, b -1.28 to -1.15
+   D baseline cephsmall - n is 7 less, b -3.88 to -1.95
+   D ntr cephlarge - n is 7 less, b -3.63 to  -3.20
+
+D check crustacea ntr when recalculated, unchanged as expected
+D build med-summary-15.pdf
+- update supp info if needed. Text: removed outliers for which the gap between
+the largest measurement and the second largest was $>5$ the next biggest gap
+between any measurements. Such values could be errors in the measurements, or
+very occasional....     Also removed small one (see med-analysis-15.pdf)
+
+Then, just edit supp info
+Juliana chat (3/10/25):
+- me add to methods, why weights not lengths?
+- finish editing the supp material
+D Fig 16 Supp can go in main text (I think, the multipanel one)
+- less space in the panel plots
+- caption mention the resolution (?)
+- send pdf figures to her for the .doc
+
+- get github into usable format, and add something to the README

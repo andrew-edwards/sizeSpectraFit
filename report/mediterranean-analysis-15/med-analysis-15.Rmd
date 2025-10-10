@@ -201,7 +201,9 @@ max(fg_crust_gap$gap_ratio, na.rm = TRUE)
 plot(fg_crust_gap$gap_ratio)
 ```
 
-Not as clear cut as baseline, but seems sensible pragmatic to keep final one.
+Not as clear cut as baseline, but seems sensible and pragmatic to keep final
+one, want to remove as little data as possible, and need to be justified when
+doing so.
 
 ### Crustacea NTR
 
@@ -328,6 +330,7 @@ max(fg_cephlarge_gap$gap_ratio, na.rm = TRUE)
 
 plot(fg_cephlarge_gap$gap_ratio)
 ```
+Keep.
 
 ### Cephlarge ntr
 
@@ -368,25 +371,40 @@ plot(ntr_cephlarge_gap_2$gap_ratio)
 
 Keep the rest then, so just removing the one, as anticipated from original figure.
 
+## Summary of outlier analyses
 
-HERE
+So removing the following (`$dat_keep` will be what we keep), and also the small
+outlier we manually removed in `med-analysis-4.Rmd` but didn't need to for later
+analyses (since xmin was fixed in those).
+```{r, removingthese}
+baseline_crust_rem$dat_removed
 
-TODO also going to have to remove the same records from the full analysis?
-Aggregated fits I think will be fine though.
+baseline_cephsmall_rem$dat_removed
 
-TODO then rerun analyses
-
-
-
-
-
-```{r, stop, cache = FALSE}
-knitr::knit_exit()
+ntr_cephlarge_rem$dat_removed
 ```
+
+Also, in `med-analysis-4.Rmd` we removed the small outlier that had `bin_min =
+0.12`, and need to here. It was Aegaeon lacazei, crustacea in ntr, can just
+filter $>0.35$.
+
+
+So remove those from the full analyses also, and technically only need to rerun
+these ones as other results won't change, but a bit simpler to just rerun
+everything, after wrangling the data for these. Gets a bit fiddly and
+situation-specific to mix old and new results.
+
+So just need to do slightly different runs to `med-analysis-4.Rmd`normal for:
+
+- baseline full
+- ntr full
+- baseline crust
+- baseline cephsmall
+- ntr cephlarge
 
 Estimating $x_{\text min}$ for each scenario:
 
-```{r setxmin};
+```{r setxmin}
 xmin_full <- NULL
 
 xmin_crust <- NULL
@@ -437,6 +455,13 @@ if(TRUE){
 
 \clearpage
 
+Copying then editing the next stuff from `med-analysis-13.Rmd` (rather than
+med-4) because likely more streamlined.
+
+`mediterranean_for_mlebins()` combines duplicated bins, but don't need that
+function for ones we already have above, so when doing ones from above will
+combine manually and check the tibble sizes. Also need to remove relevant data
+from full community analyses.
 
 # Full community
 
@@ -456,7 +481,15 @@ it all).
 data_full_baseline <- mediterranean_for_mlebins(dat_joined,
                                                 strata_name = "baseline")
 
-res_full_baseline <- determine_xmin_and_fit_mlebins(data_full_baseline,
+# Reduce:
+data_full_baseline_red <- dplyr::setdiff(data_full_baseline,
+                                         rbind(baseline_crust_rem$dat_removed,
+                                               baseline_cephsmall_rem$dat_removed))
+# Double check:
+data_full_baseline
+data_full_baseline_red
+
+res_full_baseline <- determine_xmin_and_fit_mlebins(data_full_baseline_red,
                                                     x_min = xmin_full,
                                                     x_max = xmax_full)
 
@@ -498,16 +531,18 @@ plot(res_full_fg,
 
 ## Full Community ntr
 
-In `med-analysis-4.Rmd` we removed the small outlier that had `bin_min = 0.12`,
-but this (and other small ones) will automatically below all $x_{\text min}$ we
-prescribe, so can keep it in.
 
 Now do the analysis without the outlier:
 ```{r, fullntr}
 data_full_ntr <- mediterranean_for_mlebins(dat_joined,
-                                           strata_name = "ntr")
+                                           strata_name = "ntr") %>%
+    dplyr::filter(bin_min > 0.35)
 
-res_full_ntr <- determine_xmin_and_fit_mlebins(data_full_ntr,
+# Reduced:
+data_full_ntr_red <- dplyr::setdiff(data_full_ntr,
+                                    ntr_cephlarge_rem$dat_removed)
+
+res_full_ntr <- determine_xmin_and_fit_mlebins(data_full_ntr_red,
                                                x_min = xmin_full,
                                                x_max = xmax_full)
 
@@ -563,21 +598,6 @@ Results combined are:
 knitr::kable(res_table_full, digits = 2)
 ```
 
-
-
-So for the full community, from the baseline, the size spectrum steepens (more
-negative $b$) in the fishing grounds, but shallows (less negative $b$) in the
-no-take reserve, consistent with theory.
-
-TODO The fits for the full community do not look great. To understand the changes we
-now analyse the data separately for the different species groups.
-Juliana felt before: ceph and chondrichthytes seemed to pull the fit a lot for full
-community, and the sharks can move
-around a lot. Also, although the sampling was the same for all species groups, the main interest is in seeing how
-crustaceans changed (especially as they do not move as much).
-
-\clearpage
-
 # Crustacea
 
 ## Crustacea baseline
@@ -587,7 +607,11 @@ data_crust_baseline <- mediterranean_for_mlebins(dat_joined,
                                                  group_name = "Crustacea",
                                                  strata_name = "baseline")
 
-res_crust_baseline <- determine_xmin_and_fit_mlebins(data_crust_baseline,
+data_crust_baseline_red <- dplyr::setdiff(data_crust_baseline,
+                                          baseline_crust_rem$dat_removed)
+
+
+res_crust_baseline <- determine_xmin_and_fit_mlebins(data_crust_baseline_red,
                                                      x_min = xmin_crust,
                                                      x_max = xmax_crust)
 
@@ -629,7 +653,8 @@ As for full community NTR, need to remove Aegaeon lacazei as an outlier
 ```{r, crustntr}
 data_crust_ntr <- mediterranean_for_mlebins(dat_joined,
                                             group_name = "Crustacea",
-                                            strata_name = "ntr")
+                                            strata_name = "ntr") %>%
+    dplyr::filter(bin_min > 0.35)
 
 res_crust_ntr <- determine_xmin_and_fit_mlebins(data_crust_ntr,
                                                x_min = xmin_crust,
@@ -668,12 +693,6 @@ Results combined are:
 ```{r, rescrusttable}
 knitr::kable(res_table_crust, digits = 2)
 ```
-
-TODO As for full community, from the baseline, the size spectrum steepens (more
-negative $b$) in the fishing grounds, but shallows (less negative $b$) slightly
-(confidence intervals do not overlap) in the
-no-take reserve, consistent with theory.
-
 
 # Actinopterygii
 
@@ -855,6 +874,7 @@ Results combined are:
 knitr::kable(res_table_chondr, digits = 2)
 ```
 
+
 # Cephalopoda (all) data
 
 Need to split the Cephaloda data (see `med-analysis-4.Rmd`). First load it all.
@@ -881,10 +901,14 @@ ceph_small_large_delineation
 data_cephsmall_baseline <- dplyr::filter(data_cephall_baseline,
                                          bin_min < ceph_small_large_delineation)
 
-max(data_cephsmall_baseline$bin_min)
+data_cephsmall_baseline_red <- dplyr::setdiff(data_cephsmall_baseline,
+                                              baseline_cephsmall_rem$dat_removed)
+
+
+max(data_cephsmall_baseline_red$bin_min)
 
 res_cephsmall_baseline <-
-  determine_xmin_and_fit_mlebins(data_cephsmall_baseline,
+  determine_xmin_and_fit_mlebins(data_cephsmall_baseline_red,
                                  x_min = xmin_cephsmall,
                                  x_max = xmax_cephsmall)
 ```
@@ -996,7 +1020,10 @@ plot(res_cephlarge_fg,
 data_cephlarge_ntr <- dplyr::filter(data_cephall_ntr,
                                     bin_min >= ceph_small_large_delineation)
 
-res_cephlarge_ntr <- determine_xmin_and_fit_mlebins(data_cephlarge_ntr,
+data_cephlarge_ntr_red <- dplyr::setdiff(data_cephlarge_ntr,
+                                         ntr_cephlarge_rem$dat_removed)
+
+res_cephlarge_ntr <- determine_xmin_and_fit_mlebins(data_cephlarge_ntr_red,
                                                     x_min = xmin_cephlarge,
                                                     x_max = xmax_cephlarge)
 ```
@@ -1031,9 +1058,6 @@ Results combined are:
 ```{r, rescephlargetable}
 knitr::kable(res_table_cephlarge, digits = 2)
 ```
-
-TODO comment
-
 # Combining results
 
 First, let's create a table of the main results from above that we want to move
@@ -1085,7 +1109,6 @@ ntr_agg_list <- list(full = res_full_ntr,
                      chondr = res_chondr_ntr,
                      cephsmall = res_cephsmall_ntr,
                      cephlarge = res_cephlarge_ntr)
-
 ```
 
 ## Saving what is needed for plots and tables, and doing in med-summary.Rmd
