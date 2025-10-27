@@ -1,5 +1,6 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file. -->
+
 <!-- which builds the .html that can be viewed locally (but isn't pushed to GitHub;
 GitHub uses README.md to make the page you see on GitHub). See pacea if want to
 save figures.
@@ -8,30 +9,34 @@ save figures.
 # sizeSpectraFit
 
 <!-- badges: start -->
+
 <!-- [![](https://img.shields.io/badge/lifecycle-under%20development-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#under development) connection timed out, -->
-<!-- 17/9/25, but extracting what's needed here:-->
+
+<!-- 17/9/25, but extracting what's needed here, just does not link to a website-->
 
 ![](https://img.shields.io/badge/lifecycle-under%20development-orange.svg)
 [![R-CMD-check](https://github.com/andrew-edwards/sizeSpectraFit/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/andrew-edwards/sizeSpectraFit/actions/workflows/R-CMD-check.yaml)
 [![Codecov test
 coverage](https://codecov.io/gh/andrew-edwards/sizeSpectraFit/branch/main/graph/badge.svg)](https://app.codecov.io/gh/andrew-edwards/sizeSpectraFit?branch=main)
 ![Visitors](https://api.visitorbadge.io/api/visitors?path=https%3A%2F%2Fgithub.com%2Fandrew-edwards%2FsizeSpectraFit&label=VISITORS&countColor=%23263759&style=flat&labelStyle=lower)
-<!-- badges: end -->
+<!-- badges: end --> <!-- see data-raw/ for logo hexSticker code-->
 
 A streamlined R package for fitting size spectra to ecological data
 
-**Under development – though functions mentioned on this page should
-work (they just might change slightly before the formal release of
-version 1.0.0) **
+**Under development**
 
-Provides code for fitting size spectra to ecological data using maximum
-likelihood methods. This is a more user-friendly version of
-[sizeSpectra](https://github.com/andrew-edwards/sizeSpectra), being
-written from scratch (rather than adapting old code into a package), and
-with a focus on applying methods to users’ data rather than reproducing
-results from our earlier papers. The methods used are described and
-fully simulation tested in our two earlier papers \[1, 2\], which should
-be read to properly understand the package.
+All functions should work (they just might change slightly before the
+formal release of version 1.0.0). I need to write the vignettes and
+tests so that users know what can be done.
+
+For code associated with our manuscript ‘No-take marine reserve improves
+size spectra and community structure of demersal megafauna in the
+Northwestern Mediterranean Sea’, see the
+[report/mediterranean](https://github.com/andrew-edwards/sizeSpectraFit/tree/main/report/mediterranean)
+folder and it’s README file
+[READmediterranean.txt](https://github.com/andrew-edwards/sizeSpectraFit/tree/main/report/mediterranean/READmediterranean.txt).
+
+## Background
 
 The size spectrum of an ecological community characterizes how a
 property, such as abundance or biomass, varies with body size. Size
@@ -40,9 +45,23 @@ applications have included groundfish trawl surveys, visual surveys of
 fish in kelp forests and coral reefs, sediment samples of benthic
 invertebrates and satellite remote sensing of chlorophyll, as well as
 terrestrial systems. Various methods have been used to fit size spectra
-over the past decades, and in \[1\] we tested eight of them and
-recommend the use of maximum likelihood. In \[2\] we extended the
-likelihood method to properly account for the bin structure of data.
+over the past decades. In our *Methods in Ecology and Evolution* paper
+[\[1\]](http://onlinelibrary.wiley.com/doi/10.1111/2041-210X.12641/full)
+we tested eight such methods and recommended the use of maximum
+likelihood. In our *Marine Ecology Progress Series* paper
+[\[2\]](https://www.int-res.com/abstracts/meps/v636/p19-33/) we extended
+the likelihood method to properly account for the bin structure of data.
+
+This package provides code for fitting size spectra to ecological data
+using maximum likelihood methods. This is a new user-friendly package
+written from the ground up rather than adapting old code into a package,
+and with a focus on applying methods to users’ data rather than
+reproducing results from our earlier papers. This overcomes some
+shortcomings of the earlier
+[sizeSpectra](https://github.com/andrew-edwards/sizeSpectra) package.
+The methods used are described and fully simulation tested in \[1\] and
+\[2\]. The papers should be read to properly understand the package (we
+aim not to repeat too much from the papers in the package).
 
 ## Fit a vector of values
 
@@ -75,7 +94,8 @@ plot(res_restricted)
 
 <img src="man/figures/README-vecfit2-1.png" width="60%" />
 
-For more details see the vignettes (not submitted rendered version yet).
+For more details see the vignettes (not submitted rendered versions yet,
+so stay tuned).
 
 <!-- ## Fit a dataframe of values representing binned data -->
 
@@ -114,16 +134,16 @@ L. Blanchard, Julia K. Baum and Michael J. Plank. ***Marine Ecology
 Progress Series*** (2020, 636:19-33). Freely available at
 <https://www.int-res.com/abstracts/meps/v636/p19-33/>.
 
-### Ignore the rest, saving for possible use
+### Ignore this, still adapting for possible use
 
 Could be useful template:
 
--   [results.html](http://htmlpreview.github.io/?https://github.com/andrew-edwards/hdiAnalysis/blob/main/vignettes/results.html)
-    – Designed as a template for users to analyse their own data, by
-    reproducing the results in the manuscript as an example.
--   [results-extra.html](http://htmlpreview.github.io/?https://github.com/andrew-edwards/hdiAnalysis/blob/main/vignettes/results-extra.html)
-    – Includes further results, calculations, explanations, and figure
-    options.
+- [results.html](http://htmlpreview.github.io/?https://github.com/andrew-edwards/hdiAnalysis/blob/main/vignettes/results.html)
+  – Designed as a template for users to analyse their own data, by
+  reproducing the results in the manuscript as an example.
+- [results-extra.html](http://htmlpreview.github.io/?https://github.com/andrew-edwards/hdiAnalysis/blob/main/vignettes/results-extra.html)
+  – Includes further results, calculations, explanations, and figure
+  options.
 
 To run and adapt the code yourself, simply download the raw R Markdown
 files from

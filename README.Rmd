@@ -39,17 +39,47 @@ library(badger)
 
 A streamlined R package for fitting size spectra to ecological data
 
-**Under development -- though functions mentioned on this page should work (they
-just might change slightly before the formal release of version 1.0.0) **
+**Under development **
 
-Provides code for fitting size spectra to ecological data using maximum
-likelihood methods. This is a more user-friendly version of [sizeSpectra](https://github.com/andrew-edwards/sizeSpectra), being
-written from scratch (rather than adapting old code into a package), and with a
+All functions should work (they just might change slightly before the formal
+release of version 1.0.0). I need to write the vignettes and tests so that users
+know what can be done.
+
+For code associated with our manuscript 'No-take
+marine reserve improves size spectra and community structure of demersal
+megafauna in the Northwestern Mediterranean Sea', see the
+[report/mediterranean](https://github.com/andrew-edwards/sizeSpectraFit/tree/main/report/mediterranean)
+folder and it's README file 
+[READmediterranean.txt](https://github.com/andrew-edwards/sizeSpectraFit/tree/main/report/mediterranean/READmediterranean.txt).
+
+## Background
+
+The size spectrum of an ecological community characterizes how a property, such
+as abundance or biomass, varies with body size. Size spectra are often used as
+ecosystem indicators of marine systems. Past applications have included
+groundfish trawl surveys, visual surveys of fish in kelp forests and coral
+reefs, sediment samples of benthic invertebrates and satellite remote sensing of
+chlorophyll, as well as terrestrial systems. Various methods have been used to
+fit size spectra over the past decades. In our *Methods in Ecology and
+Evolution* paper
+[[1]](http://onlinelibrary.wiley.com/doi/10.1111/2041-210X.12641/full) we tested
+eight such methods and
+recommended the use of maximum likelihood. In our *Marine Ecology Progress
+Series* paper 
+[[2]](https://www.int-res.com/abstracts/meps/v636/p19-33/) we extended the likelihood
+method to properly account for the bin structure of data. 
+
+This package provides code for fitting size spectra to ecological data using maximum
+likelihood methods. This is a new user-friendly package written from the ground up rather than
+adapting old code into a package, and with a 
 focus on applying methods to users' data rather than reproducing results from
-our earlier papers. The methods used are described and fully simulation tested
-in our two earlier papers [1, 2], which should be read to properly understand the package.
+our earlier papers. This overcomes some shortcomings of the earlier
+[sizeSpectra](https://github.com/andrew-edwards/sizeSpectra) package.
+The methods used are described and fully simulation tested
+in [1] and [2]. The papers should be read
+to properly understand the package (we aim not to repeat too much from the
+papers in the package).
 
-The size spectrum of an ecological community characterizes how a property, such as abundance or biomass, varies with body size. Size spectra are often used as ecosystem indicators of marine systems. Past applications have included groundfish trawl surveys, visual surveys of fish in kelp forests and coral reefs, sediment samples of benthic invertebrates and satellite remote sensing of chlorophyll, as well as terrestrial systems. Various methods have been used to fit size spectra over the past decades, and in [1] we tested eight of them and recommend the use of maximum likelihood. In [2] we extended the likelihood method to properly account for the bin structure of data.
 
 ## Fit a vector of values
 
@@ -75,9 +105,8 @@ res_restricted <- fit_size_spectrum(x,
 plot(res_restricted)
 ```
 
-
-
-For more details see the vignettes (not submitted rendered version yet).
+For more details see the vignettes (not submitted rendered versions yet, so stay
+tuned).
 
 <!-- ## Fit a dataframe of values representing binned data -->
 
@@ -109,7 +138,7 @@ or contact <a href="mailto:andrew.edwards@dfo-mpo.gc.ca">Andy</a> for help.
 
 [2] **Accounting for the bin structure of data removes bias when fitting size spectra** by Andrew M. Edwards, James P. W. Robinson, Julia L. Blanchard, Julia K. Baum and Michael J. Plank. ***Marine Ecology Progress Series*** (2020, 636:19-33). Freely available at <https://www.int-res.com/abstracts/meps/v636/p19-33/>.
 
-### Ignore the rest, saving for possible use
+### Ignore this, still adapting for possible use
 
 Could be useful template:
 
