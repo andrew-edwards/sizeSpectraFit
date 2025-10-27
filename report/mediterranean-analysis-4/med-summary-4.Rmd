@@ -348,7 +348,13 @@ for(i in 1:length(groups)){
 
 ```{r, panelplotlandscape, fig.cap = "Summary plot of all groups (rows) and strata(columns), with a consistent x-axis range throughout, and a consistent y-axis range for each group. Data are shown as rectangles representing the range of possible values within each body-mass bin, but due to the small bins these mostly show up as lines. Solid curves are the fits using the maximum likelihood estimates for exponent $b$, dashed lines use the 95% confidence intervals, but these only show up in a few cases.", echo = FALSE, fig.width = 11, fig.height = 8}
 # Uncommenting this and dev.off() below to just run this chunk manually to make
-# a .tiff to insert into Word file
+# a .tiff to insert into Word file, based on Nick's suggestion:
+## tiff(filename = "panelplot.tiff",
+##      height = 7,
+##      width = 9,
+##      units = 'in',
+##      compression = "lzw",
+##      res = 500)
 seg_col = "black"      # bins are so small the default green does not really
                        # help
 
@@ -441,6 +447,8 @@ for(i in 1:length(groups)){
           line = 3)
   }
 }
+
+# dev.off()    # uncomment to make .tiff manually
 ```
 
 \elandscape

@@ -17,13 +17,14 @@
 ##' @param normalise logical, whether or not to normalise each aggregated fit by
 ##'   it's maximum, so that all fits are on the same scale
 ##' @param col_strata vector of strings, each being a colour to use for each strata
+##' @param lty_strata vector of `lty` values for line type for each strata, see [par()].
+##' @param ... additional arguments passed onto [plot()]
 ##' @param xlim, ylim vectors for axes limits; if NULL (the default) they get
 ##'   calculated automatically, but users likely want to then manually adjust
 ##'   them, especially `ylim` to be able to see all fits asymptoting at their
 ##'   xmin values, but the
 ##'   default axis will go way too low (it is hard to automate this, so just
 ##'   refine `ylim` to celarly show the aymptotes).
-##' @param ... additional arguments passed onto [plot()]
 ##' @return list with two objects, `x_plb_agg` and `y_plb_agg`, which are the
 ##'   fitted x and y values for the aggregated size spectrum (which does not
 ##'   have a simple exponent). To then use for plotting multiple strata in [plot_aggregate_fits()].
@@ -42,6 +43,7 @@ plot_aggregate_fits <- function(agg_list,
                                 col_strata = c("blue",
                                                "darkgreen",
                                                "red"),
+                                lty_strata = c(1, 4, 5),
                                 xlim = NULL,
                                 ylim = NULL, #
                                 ...){    # passed onto plot(...)
@@ -63,6 +65,10 @@ plot_aggregate_fits <- function(agg_list,
                "colours, one for each strata."))
   }
 
+  if(length(lty_strata) != num_strata){
+    stop(paste("Need lty_strata to have", num_strata,
+               "values, one for each strata."))
+  }
 
   if(restrict){
     # x start for restricting all strata to start at the same value (max of the
@@ -147,6 +153,7 @@ plot_aggregate_fits <- function(agg_list,
                      expression(paste("Total ", counts >= x),
                          sep="")),
        col = col_strata[1],
+       lty = lty_strata[1],
        axes = FALSE,
        lwd = 2,
        ...)
@@ -159,7 +166,8 @@ plot_aggregate_fits <- function(agg_list,
     for(j in 2:length(agg_list)){
       lines(agg_fit_x[[j]],
             agg_fit_y_norm[[j]],
-        col = col_strata[j],
+            col = col_strata[j],
+            lty = lty_strata[j],
         lwd = 2)
     }
   }
@@ -168,6 +176,7 @@ plot_aggregate_fits <- function(agg_list,
 legend(x = "topright",
        legend = strata_names,
        col = col_strata,
+       lty = lty_strata,
        lwd = 2)
        # pch = pch_strata,
        # pt.cex = pch_cex,

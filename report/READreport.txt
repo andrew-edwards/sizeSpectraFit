@@ -291,29 +291,46 @@ Total bin counts of 21 removed. So no difference to full fits (since not
 affecting xmax values).
 
 Next:
+D rerunning med-15 since cache messed up and I can't rerun summary either to
+update and check figures. So check these again:
+
 D compare results to med-4, check that only the intended ones have
 changed. Rerunning all plots, tables and saving, just not the calculations
 (cacheing wasn't properly updating everything).
- - D baseline full - n is 15 less in med-15, b unchanged
+   D baseline full - n is 15 less in med-15, b unchanged
    D ntr full - n is 7 less in med-15, b unchanged
    D baseline crust - n is 7 less, b -1.28 to -1.15
    D baseline cephsmall - n is 7 less, b -3.88 to -1.95
    D ntr cephlarge - n is 7 less, b -3.63 to  -3.20
 
 D check crustacea ntr when recalculated, unchanged as expected
-D build med-summary-15.pdf
-- update supp info if needed. Text: removed outliers for which the gap between
-the largest measurement and the second largest was $>5$ the next biggest gap
-between any measurements. Such values could be errors in the measurements, or
-very occasional....     Also removed small one (see med-analysis-15.pdf)
+D rebuild med-summary-15.pdf
 
 Then, just edit supp info
+
 Juliana chat (3/10/25):
-- me add to methods, why weights not lengths?
-- finish editing the supp material
-D Fig 16 Supp can go in main text (I think, the multipanel one)
-- less space in the panel plots
-- caption mention the resolution (?)
-- send pdf figures to her for the .doc
+D me add to methods, why weights not lengths?
+D finish editing the supp material
+ D read through (double check fig numbers from new version)
+ D - print and read her latest version
+D rerunning med-15 analysis and summary (see above)
+
+D redo summary4 plots and copy over, check they worked
+D check edits
+D spell check in Supp
+
+D caption mention the resolution (wasn't sure what that meant)
+
+D dotted and dashed lines in aggregated plots
+D send pdf, jpeg, jpg, or tiff, figures to her for the .doc. Maybe just do .tiff
+for the Word and send the .pdf's. 
+
+D do a latexdiff, maybe not bother as so much has changed
+D check about the summary plot being in main text; if not then add back into
+   that section and check text again.
+
+
+magick - see READpbs
 
 - get github into usable format, and add something to the README
+

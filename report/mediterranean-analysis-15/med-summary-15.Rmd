@@ -39,7 +39,7 @@ load_all()
 #library(sizeSpectraFit)    # Need latest version
 ```
 
-This summarises the results from `med-analysis-13.Rmd`, which takes a while to run
+This summarises the results from `med-analysis-15.Rmd`, which takes a while to run
 and saves three `*_list.rds`
 files in the same directory. The files contain the
 results after some exploration and iterative calculations, plus
@@ -66,7 +66,7 @@ res_table_agg <- readRDS("res_table_agg.rds")
 Each is a list for that strata, with 6 objects of results of class
 `determine_xmin_and_fit_mlebins`. First of each is for fitting the full
 community in one go, which we won't use as not a great fit and there are issues
-with assuming the same catchability (TODO?) between groups. Fits for all
+with assuming the same catchability between groups. Fits for all
 group/strata combination (including the full community) are shown at the end of
 this document.
 
