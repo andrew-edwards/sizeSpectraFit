@@ -6,6 +6,10 @@
 *.Rproj
 *.rds
 *.log
+*.Rhistory
+*.tex
+*.tiff
+
 
 .Rproj.user
 
@@ -24,6 +28,6 @@ data-raw/mediterranean-data/north-sea-data.Rmd
 data-raw/zabala-data/using-sizeSpectra2.Rmd
 report/using-sizeSpectra2.Rmd
 
-report/mediterranean-analysis-1/
-report/mediterranean-analysis-2/
-report/mediterranean-analysis-4/med-summary-4.tex
+report/mediterranean/READmediterranean-long.txt
+report/mediterranean/mediterranean-analysis-1/
+report/mediterranean/mediterranean-analysis-2/
