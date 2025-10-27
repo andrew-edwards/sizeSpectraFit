@@ -60,13 +60,12 @@ ecosystem indicators of marine systems. Past applications have included
 groundfish trawl surveys, visual surveys of fish in kelp forests and coral
 reefs, sediment samples of benthic invertebrates and satellite remote sensing of
 chlorophyll, as well as terrestrial systems. Various methods have been used to
-fit size spectra over the past decades. In our *Methods in Ecology and
-Evolution* paper
-[[1]](http://onlinelibrary.wiley.com/doi/10.1111/2041-210X.12641/full) we tested
-eight such methods and
-recommended the use of maximum likelihood. In our *Marine Ecology Progress
-Series* paper 
-[[2]](https://www.int-res.com/abstracts/meps/v636/p19-33/) we extended the likelihood
+fit size spectra over the past decades. In our [*Methods in Ecology and
+Evolution*
+paper](http://onlinelibrary.wiley.com/doi/10.1111/2041-210X.12641/full) [1] we
+tested eight such methods and
+recommended the use of maximum likelihood. In our [*Marine Ecology Progress
+Series* paper](https://www.int-res.com/abstracts/meps/v636/p19-33/) [2] we extended the likelihood
 method to properly account for the bin structure of data. 
 
 This package provides code for fitting size spectra to ecological data using maximum
@@ -138,7 +137,8 @@ or contact <a href="mailto:andrew.edwards@dfo-mpo.gc.ca">Andy</a> for help.
 
 [2] **Accounting for the bin structure of data removes bias when fitting size spectra** by Andrew M. Edwards, James P. W. Robinson, Julia L. Blanchard, Julia K. Baum and Michael J. Plank. ***Marine Ecology Progress Series*** (2020, 636:19-33). Freely available at <https://www.int-res.com/abstracts/meps/v636/p19-33/>.
 
-### Ignore this, still adapting for possible use
+<!-- 
+### Might still want to copy these dieas from hdiAnalysis:
 
 Could be useful template:
 
@@ -153,3 +153,4 @@ from
 [results.Rmd](https://github.com/andrew-edwards/hdiAnalysis/blob/main/vignettes/results.Rmd)
 or [results-extra.Rmd](https://github.com/andrew-edwards/hdiAnalysis/blob/main/vignettes/results-extra.Rmd).
 Run the file locally, and then adapt it for your own data.
+-->

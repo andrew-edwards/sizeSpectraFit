@@ -45,12 +45,13 @@ applications have included groundfish trawl surveys, visual surveys of
 fish in kelp forests and coral reefs, sediment samples of benthic
 invertebrates and satellite remote sensing of chlorophyll, as well as
 terrestrial systems. Various methods have been used to fit size spectra
-over the past decades. In our *Methods in Ecology and Evolution* paper
-[\[1\]](http://onlinelibrary.wiley.com/doi/10.1111/2041-210X.12641/full)
-we tested eight such methods and recommended the use of maximum
-likelihood. In our *Marine Ecology Progress Series* paper
-[\[2\]](https://www.int-res.com/abstracts/meps/v636/p19-33/) we extended
-the likelihood method to properly account for the bin structure of data.
+over the past decades. In our [*Methods in Ecology and Evolution*
+paper](http://onlinelibrary.wiley.com/doi/10.1111/2041-210X.12641/full)
+\[1\] we tested eight such methods and recommended the use of maximum
+likelihood. In our [*Marine Ecology Progress Series*
+paper](https://www.int-res.com/abstracts/meps/v636/p19-33/) \[2\] we
+extended the likelihood method to properly account for the bin structure
+of data.
 
 This package provides code for fitting size spectra to ecological data
 using maximum likelihood methods. This is a new user-friendly package
@@ -134,20 +135,17 @@ L. Blanchard, Julia K. Baum and Michael J. Plank. ***Marine Ecology
 Progress Series*** (2020, 636:19-33). Freely available at
 <https://www.int-res.com/abstracts/meps/v636/p19-33/>.
 
-### Ignore this, still adapting for possible use
-
-Could be useful template:
-
-- [results.html](http://htmlpreview.github.io/?https://github.com/andrew-edwards/hdiAnalysis/blob/main/vignettes/results.html)
-  – Designed as a template for users to analyse their own data, by
-  reproducing the results in the manuscript as an example.
-- [results-extra.html](http://htmlpreview.github.io/?https://github.com/andrew-edwards/hdiAnalysis/blob/main/vignettes/results-extra.html)
-  – Includes further results, calculations, explanations, and figure
-  options.
-
-To run and adapt the code yourself, simply download the raw R Markdown
-files from
+<!-- 
+### Might still want to copy these dieas from hdiAnalysis:
+&#10;Could be useful template:
+&#10;* [results.html](http://htmlpreview.github.io/?https://github.com/andrew-edwards/hdiAnalysis/blob/main/vignettes/results.html)
+  -- Designed as a template for users to analyse their own data, by reproducing the results in
+  the manuscript as an example.
+* [results-extra.html](http://htmlpreview.github.io/?https://github.com/andrew-edwards/hdiAnalysis/blob/main/vignettes/results-extra.html)
+  -- Includes further results, calculations, explanations, and figure options.
+&#10;To run and adapt the code yourself, simply download the raw R Markdown files
+from
 [results.Rmd](https://github.com/andrew-edwards/hdiAnalysis/blob/main/vignettes/results.Rmd)
-or
-[results-extra.Rmd](https://github.com/andrew-edwards/hdiAnalysis/blob/main/vignettes/results-extra.Rmd).
+or [results-extra.Rmd](https://github.com/andrew-edwards/hdiAnalysis/blob/main/vignettes/results-extra.Rmd).
 Run the file locally, and then adapt it for your own data.
+-->
