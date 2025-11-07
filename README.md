@@ -29,8 +29,8 @@ All functions should work (they just might change slightly before the
 formal release of version 1.0.0). I need to write the vignettes and
 tests so that users know what can be done.
 
-For code associated with our manuscript ‘No-take marine reserve improves
-size spectra and community structure of demersal megafauna in the
+For code associated with our manuscript ‘No-take reserve improves size
+spectra and community structure of demersal megafauna in the
 Northwestern Mediterranean Sea’, see the
 [report/mediterranean](https://github.com/andrew-edwards/sizeSpectraFit/tree/main/report/mediterranean)
 folder and it’s README file
