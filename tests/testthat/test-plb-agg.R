@@ -38,8 +38,7 @@ test_that("dPLB_agg() etc. functions work with different settings", {
 
   # Pick out some values to confirm:
   expect_equal(p[c(10, 20, 100, 500, 1900)],
-               c(0.2414386, 0.4839062, 0.7351509, 0.8657657, 1.0000000))
-
+               c(0.241438641, 0.483906189, 0.735150925, 0.865765739, 1.000000000))
 
   # Should match when just have one PLB to aggregate:
   expect_equal(dPLB_agg(x,
