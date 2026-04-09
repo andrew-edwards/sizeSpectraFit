@@ -37,7 +37,7 @@
 ##' @author Andrew Edwards
 ##' @examples
 ##' \dontrun{
-##' x <- 1:10000
+##' x <- 1:2000
 ##' y <- dPLB_agg(x,
 ##'   b_vec = c(-1, -2, -3, -4),
 ##'   n_vec = c(6000, 6000, 1600, 2000),
@@ -83,7 +83,7 @@ pPLB_agg <- function(x,
                  length(xmin_vec),
                  length(xmax_vec)))
 
-  y <- 0 * x     # so have zeros where x < xmin; TODO check get 1's further up
+  y <- 0 * x     # so have zeros where x < xmin
 
   for(s in 1:length(b_vec)){
     y <- y + n_vec[s] * pPLB(x,
