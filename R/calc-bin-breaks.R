@@ -69,7 +69,7 @@ calc_bin_breaks <- function(tib,
   result <- cbind(tib,
                   new_bin_min = bin_min_values,
                   new_bin_max = bin_max_values) %>%
-    as_tibble() %>%
+    dplyr::as_tibble() %>%
     dplyr::rename_with(~ new_bin_min_name,
                        new_bin_min) %>%
     dplyr::rename_with(~ new_bin_max_name,
