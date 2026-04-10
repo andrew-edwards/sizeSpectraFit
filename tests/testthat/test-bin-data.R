@@ -33,6 +33,19 @@ test_that("bin_data() works correctly on an example", {
                  8.0568333,
                  0.5168333))    # Calculated 19/9/24 from the code.
 
+  df_binned_2  <- bin_data(df,
+                           bin_width = 6,
+                           truncate_top_bin = TRUE)
+  expect_equal(df_binned_2$bin_vals$bin_count_norm,
+               c(6.588500,
+                 11.06516666666,
+                 8.0568333333,
+                 7.073500,
+                 6.557000,
+                 6.588500, 11.0651666666,
+                 8.0568333333,
+                 3.101))      # Calculated 10/4/26 from the code.
+
   # Work through the errors to get full code coverage
   expect_error(bin_data.numeric(df, bin_width = "2k"))
   expect_error(bin_data(c(1, 2, 3, NA), bin_width = "2k"))

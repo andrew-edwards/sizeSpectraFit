@@ -48,20 +48,10 @@ fit_size_spectrum_mlebins <- function(dat,
     x_max <- max(df$bin_max)
   }
 
-  stopifnot("Need x_min < x_max (if not NULL)" =
-              x_min < x_max)
-
   if(x_min <= 0 | x_min >= x_max){
-    stop("Parameters out of bounds in fit_size_spectrum.data.frame() for MLEbins method")
+    stop("Parameters x_min and/or x_max out of bounds in fit_size_spectrum_mlebins(), maybe called by fit_spectrum.data.frame(), for MLEbins method")
   }
 
-
-# Had for MLEbin but dont want for MLEbins, can delete once happy.
-#  w <- c(df$bin_min,
-#         max(df$bin_max))
-
-#  d <- df$bin_count
-#  J <- length(d)             # Number of bins
   n <- sum(df$bin_count)
 
   mle_and_conf <- calc_mle_conf(this_neg_ll_fn = neg_ll_mlebins_method,
