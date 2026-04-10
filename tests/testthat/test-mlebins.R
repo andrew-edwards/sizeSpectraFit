@@ -22,15 +22,38 @@ test_that("MLEbins fitting and plotting works and matches original results", {
   dat_needed <- mediterranean_for_mlebins(dat_joined) %>%
     dplyr::filter(bin_min < 20)
 
+  expect_equal(nrow(mediterranean_for_mlebins(dat_joined, minimum_length =
+                                                            100)),
+               48)
+
   # sum(dat_needed$bin_count)
    #   [1] 1085.234   doesn't seem to match figure
 
   res_cephsmall_fg <- determine_xmin_and_fit_mlebins(dat_needed)
 
+  expect_equal(fit_size_spectrum_mlebins(dat_needed,
+                                         x_min = NULL,
+                                         x_max = 40)$b_mle,
+               -2.53006084)
+
+
+  expect_error(fit_size_spectrum_mlebins(dat_needed,
+                                         x_min = 20,
+                                         x_max = 10))
+
+  expect_invisible(plot(res_cephsmall_fg))
 
   expect_invisible(plot(res_cephsmall_fg,
                         xlim_hist = c(0, 21),
                         main = "Cephalopoda (small) FG"))
+
+  expect_invisible(plot(res_cephsmall_fg$mlebins_fit))
+
+  expect_equal(neg_ll_mlebins_method(b = -1,
+                                     x_min = 1,  # made up numbers just for b=-1
+                                     x_max = 10,
+                                     dat_needed, 1000),
+               4222.39879)
 
   expect_equal(res_cephsmall_fg$mlebins_fit$b_mle,
                -2.99753213)
@@ -38,6 +61,9 @@ test_that("MLEbins fitting and plotting works and matches original results", {
   expect_equal(res_cephsmall_fg$mlebins_fit$b_conf,
                c(-3.16269213,
                  -2.83629213))
+
+  expect_equal(remove_outliers(res_cephsmall_fg$mlebins_fit)$bin_count_removed,
+               7.151)
 
 # Prob want some more based on these to up the coverage.
 
