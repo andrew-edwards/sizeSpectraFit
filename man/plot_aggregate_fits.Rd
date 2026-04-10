@@ -11,6 +11,7 @@ plot_aggregate_fits(
   restrict = TRUE,
   normalise = TRUE,
   col_strata = c("blue", "darkgreen", "red"),
+  lty_strata = c(1, 4, 5),
   xlim = NULL,
   ylim = NULL,
   ...
@@ -34,6 +35,8 @@ only being above a common x value}
 it's maximum, so that all fits are on the same scale}
 
 \item{col_strata}{vector of strings, each being a colour to use for each strata}
+
+\item{lty_strata}{vector of \code{lty} values for line type for each strata, see \code{\link[=par]{par()}}.}
 
 \item{xlim, }{ylim vectors for axes limits; if NULL (the default) they get
 calculated automatically, but users likely want to then manually adjust

@@ -54,7 +54,7 @@ sampling protocols, or are not comparable for other reasons).
 }
 \examples{
 \dontrun{
-x <- 1:10000
+x <- 1:2000
 y <- dPLB_agg(x,
   b_vec = c(-1, -2, -3, -4),
   n_vec = c(6000, 6000, 1600, 2000),
