@@ -34,8 +34,7 @@ determine_xmin_and_fit_mlebins <- function(dat_for_mlebins,
                                     bin_start = bin_start)
 
   if(is.null(x_min)){
-    x_min_based_on_hist <- determine_xmin(hh)     # TODO change function name to
-                                                  # determine_xmin_based_on_hist
+    x_min_based_on_hist <- determine_xmin_based_on_hist(hh)
 
     # Now set x_min to be the minimum value that is above x_min_based_on_hist,
     #  because the latter is based on histograms bin breaks (which are somewhat
