@@ -20,6 +20,17 @@ test_that("fit_size_spectrum() works with different settings and matches previou
                                  x_max = 100)$b_mle,
                -2.02652123)
 
+  # To estimate xmin from the data
+  set.seed(42)
+  sim_vec_2 <- c(runif(100, 0.1, 10),
+            rPLB(1000, -2, xmin = 10))     #a few values then a PLB
+  res_vec_2 <- determine_xmin_and_fit(sim_vec_2)
+
+  expect_equal(res_vec_2$mle_fit$b_mle,
+               -2.08368159)
+  expect_invisible(plot(res_vec_2))
+
+
   # For MLEbin, from the fit-data.html vignette:
   res_mlebin <- fit_size_spectrum(sim_vec_binned)
 

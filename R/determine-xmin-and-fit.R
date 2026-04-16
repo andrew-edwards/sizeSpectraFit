@@ -25,7 +25,9 @@
 ##' \dontrun{
 ##' # see .Rmd file
 ##' HERE:
-##' res <- determine_xmin_and_fit(sim_vec)
+##' # Make data that needs xmin determined
+##' data <- c(sim_vec + 9, runif(100, 0.1, 10))
+##' res <- determine_xmin_and_fit(data)
 ##' plot(res)
 ##'
 ##' TODO  res_all_strata <- fit_all_years(raw_simp_prop,
@@ -38,7 +40,6 @@ determine_xmin_and_fit <- function(x,
   hh <- make_hist(x,
                   bin_width = bin_width,
                   bin_start = bin_start)
-
 
   x_min <- determine_xmin_based_on_hist(hh)
 
