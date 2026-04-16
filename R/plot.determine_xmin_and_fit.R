@@ -41,7 +41,7 @@ plot.determine_xmin_and_fit <- function(res,
 
 
 
-  col_hist <- ifelse(res$h$mids < res$x_min,
+  col_hist <- ifelse(res$h$mids < res$mle_fit$x_min,
                      "grey",
                      "red")
 

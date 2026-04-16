@@ -1,10 +1,12 @@
 ##' Determine x_min as the mode and then fit it. TODO only on a numeric vector
-##' for now
+##' for now  TODO can't make a generic function because for mlebins we don't
+##' have a class of input.  Seems better to explicitly specify the method to be
+##' used, either mle, mlebin or mlebins.
+##' TODO going to see if mlebins code will work for mlebin
 ##'
-##' @param x `numeric` vector of values (such as individual body masses or lengths), which uses
-##'   the MLE method (via the function [fit_size_spectrum.numeric()] TODO could
-##'   make `dat` for consistency with fit_size_spectrum() if going to make this
-##'   more general. TODO join help files together
+##' @param dat `numeric` vector of values (such as individual body masses or lengths), which uses
+##'   the MLE method (via the function [fit_size_spectrum.numeric()]
+##'   TODO join help files together
 ##' @param ... arguments to pass onto fit....
 ##' @return list of class `determine_xmin_and_fit` for plotting, containing TODO
 ##' \describe{
@@ -23,35 +25,31 @@
 ##' @author Andrew Edwards
 ##' @examples
 ##' \dontrun{
-##' # see .Rmd file
-##' HERE:
 ##' # Make data that needs xmin determined
 ##' data <- c(sim_vec + 9, runif(100, 0.1, 10))
 ##' res <- determine_xmin_and_fit(data)
 ##' plot(res)
 ##'
-##' TODO  res_all_strata <- fit_all_years(raw_simp_prop,
-##'                     bin_width_each_year = bin_width_each_year)
 ##' }
-determine_xmin_and_fit <- function(x,
+determine_xmin_and_fit <- function(dat,
                                    bin_width = 1,
                                    bin_start = NULL,
                                    ...){
-  hh <- make_hist(x,
+  stopifnot("dat needs to be a numeric vector" =
+              class(dat) == "numeric")
+
+  hh <- make_hist(dat,
                   bin_width = bin_width,
                   bin_start = bin_start)
 
   x_min <- determine_xmin_based_on_hist(hh)
 
   # TODO change this to be the minimum x above that x_min
-  mle_fit <- fit_size_spectrum.numeric(x,
+  mle_fit <- fit_size_spectrum.numeric(dat,
                                        x_min = x_min,
                                        ...)
-  res <- list(mle_fit = mle_fit,   # contains x, TODO change this if ends up
-                                   # containing x_min and x_max
-              h = hh,
-              x_min = x_min)
-              # TODO x_max = x_max)
+  res <- list(mle_fit = mle_fit,
+              h = hh)
 
   class(res) <- c("determine_xmin_and_fit", class(res))
   return(res)

@@ -31,6 +31,7 @@ test_that("fit_size_spectrum() works with different settings and matches previou
   expect_invisible(plot(res_vec_2))
   expect_invisible(plot(res_vec_2,
                         xlim_hist = c(7, 100)))
+  expect_error(determine_xmin_and_fit("hello"))
 
   # For MLEbin, from the fit-data.html vignette:
   res_mlebin <- fit_size_spectrum(sim_vec_binned)
