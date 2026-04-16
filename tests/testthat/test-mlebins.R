@@ -82,4 +82,8 @@ test_that("MLEbins fitting and plotting works and matches original results", {
   expect_equal(res_remove$bin_count_removed,
                14.463)
 
+  res_remove_2 <- detect_outliers(res_remove)   # class(res_remove) is
+  # remove_outliers_mlebins, this calls relevant function
+
+
 })
