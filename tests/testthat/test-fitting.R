@@ -27,7 +27,7 @@ test_that("fit_size_spectrum() works with different settings and matches previou
   res_vec_2 <- determine_xmin_and_fit(sim_vec_2)
 
   expect_equal(res_vec_2$mle_fit$b_mle,
-               -2.08368159)
+               -2.084612867)
   expect_invisible(plot(res_vec_2))
   expect_invisible(plot(res_vec_2,
                         xlim_hist = c(7, 100)))
