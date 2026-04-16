@@ -31,12 +31,17 @@ function `fit_size_spectrum()`. The function automatically selects the
 method to use based on the class of the data, as described by Table 2 in our
 [MEPS paper](https://www.int-res.com/abstracts/meps/v636/p19-33/).
 
+If you have data that are not simply declining (when plotted as a histogram),
+which is assumed for a size spectrum fit, you can have the $x_{min}$
+value determined based on the data. You do have 
+to specify the explicit method that you want used (see below). TODO
+
 TODO For README file. Let's have a simple vector of real measurements, and do
 the fitting and plotting functions, without extra explanation. This will show
 the simplicity, and refer to vignette for more details. Can use the MLEbins
 vignette maybe (when it's done).
 
-## Measurements of individual body sizes -- MLE method
+# Measurements of individual body sizes -- MLE method
 
 The simplest data is just a vector of measurements, such as body masses or
 body lengths. We fit the size spectrum by calculating the maximum likelihood estimate
@@ -147,7 +152,54 @@ plot(res,
 
 TODO add in GoF once done.
 
-## Measurements that are already binned -- MLEbin method
+
+## Determine $x_{min}$ when the data are not simply declining
+
+A simple histogram of your data may not look like a declining function; in
+fisheries examples this can be due to selectivity, with the fishing gear not
+catching all the smaller organisms. If you have a similar type of justification
+for this happening and still want to fit a declining PLB distribution to a
+vector of values, we have
+the built in function `determine_xmin_and_fit()` to determine a value of
+$x_{min}$ to use and then fit using the MLE method. 
+
+Let's make up a mock dataset, with some uniformly distributed values between 0.1
+and 10, and then a PLB distribution for values $\geq 10$:
+```{r, mockdata}
+set.seed(42)
+mock_data <- c(runif(100, 0.1, 10),
+               rPLB(1000, -2, xmin = 10))
+hist(mock_data)
+```
+So even a rudimentarly histogram shows a unimodal distribution. To fit this:
+
+```{r, mockfit}
+res_mock <- determine_xmin_and_fit(mock_data)
+```
+
+We can plot and then print the results:
+```{r, mockplot, fig.height = 8}
+plot(res_mock)
+```
+
+The red bars in the histogram show the values that are used to fit the PLB
+distribution, with $x_{min}$ being the lowest value in the lowest red bin. 
+
+```{r, mockres}
+res_mock
+```
+
+The `res_mock` object is list of two objects:
+
+- `$mle_fit`: contains the MLE results as in the simpler example above
+- `$h`: the histogram results as used for calculating $x_{min}$ and for plotting.
+
+The object is of class `determine_xmin_and_fit`, and so the plotting function
+`plot.determine_xmin_and_fit()` is automatically used by `plot(res_mock)` to
+give the above plot.
+
+
+# Measurements that are already binned -- MLEbin method
 
 Often, data are only available in binned form, motivating our MLEbin and MLEbins
 methods (see our MEPS paper for details).
