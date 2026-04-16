@@ -29,7 +29,8 @@ test_that("MLEbins fitting and plotting works and matches original results", {
   # sum(dat_needed$bin_count)
    #   [1] 1085.234   doesn't seem to match figure
 
-  res_cephsmall_fg <- determine_xmin_and_fit_mlebins(dat_needed)
+  res_cephsmall_fg <- determine_xmin_and_fit_mlebins(dat_needed)  # seems to
+  # take a few minutes, surprisingly since small dataset
 
   expect_equal(fit_size_spectrum_mlebins(dat_needed,
                                          x_min = NULL,
@@ -62,7 +63,23 @@ test_that("MLEbins fitting and plotting works and matches original results", {
                c(-3.16269213,
                  -2.83629213))
 
-  expect_equal(remove_outliers(res_cephsmall_fg$mlebins_fit)$bin_count_removed,
-               7.151)
+  # Testing detect_outliers and remove_outliers. You detect first then look at
+  # results to judge what to remove (it's not automatic, you assing
+  # remove_outliers(number = **) value.
+  # We didn't remove outliers for cephsmall_fg, so this is not replicating our
+  # actual analysis, just an example to test the code.
+
+  res_detect <- detect_outliers(res_cephsmall_fg)   # gave error when
+  # printing, if not done library(  dplyr or tibble?), see note in READpbs..
+
+  # plot(res_detect$gap_ratio)  # shows wouldn't remove, but let's do 2
+  # to just test the results. You give it the number, it's not automatic based
+  # on gap_ratio.
+
+  res_remove <- remove_outliers(res_cephsmall_fg,
+                                number = 2)
+
+  expect_equal(res_remove$bin_count_removed,
+               14.463)
 
 })

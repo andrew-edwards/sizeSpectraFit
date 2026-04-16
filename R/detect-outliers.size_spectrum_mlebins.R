@@ -8,7 +8,7 @@ detect_outliers.size_spectrum_mlebins <- function(res){
                                 bin_min,
                                 bin_max,
                                 bin_count) %>%
-    dplyr::mutate(gap = bin_min - lag(bin_min))
+    dplyr::mutate(gap = bin_min - dplyr::lag(bin_min))   # stats::lag is for ts
 
   gap_second_largest <- sort(dat_appended$gap,
                              decreasing = TRUE)[2]
