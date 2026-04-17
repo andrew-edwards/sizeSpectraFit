@@ -26,11 +26,11 @@ plot.determine_xmin_and_fit_mlebins <- function(res,
 
   # Going to use this same function for MLEbin output, so just need to extract
   # the desired components that explicitly have MLEbins here, to generalise it:
-  if(class(res) == "determine_xmin_and_fit_mlebins"){
+  if("determine_xmin_and_fit_mlebins" %in% class(res)){
     res_fit <- res$mlebins_fit
   }
 
-  if(class(res) == "determine_xmin_and_fit_mlebin"){
+  if("determine_xmin_and_fit_mlebin" %in% class(res)){
     res_fit <- res$mlebin_fit
   }
 
@@ -52,11 +52,16 @@ plot.determine_xmin_and_fit_mlebins <- function(res,
 #  make_hist_full <- make_hist(res[[i]]$counts_per_bin,
 #                                bin_width = res[[i]]$bin_width)
 
+  # TODO mlebin example in test it
 
   # Want it red for the bin with x_min in it (though not all values in the bin
   # will get fitted) and all those above. So for all bins with max bin break > x_min
-  col_hist <- ifelse(res$h$breaks[-1] < res_fit$x_min,  # take out first
-                                        # breakpoint
+  col_hist <- ifelse(res$h$breaks[-1] <= res_fit$x_min,  # take out first
+                                        # breakpoint since bars correspond to
+                                        # mids; but need <= because if x_min is
+                                        # a bin break we don't want the bin
+                                        # below to be read TODO double check
+                                        # MLEbins plots (that's a little convoluted)
                      "grey",
                      "red")
 

@@ -308,6 +308,9 @@ Now use the explicit fitting function:
 res_binned_2 <- determine_xmin_and_fit_mlebin(sim_vec_binned_2)
 ```
 
+HERE currently that plot is not correct
+
+
 HERE need to set up plotting function I think. See plot.determine...mlebins, has
 some explicit mlebins lines in there, prob just adapt them for mlebin TODO HERE HER
 We can plot and then print the results:

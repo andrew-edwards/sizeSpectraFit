@@ -35,7 +35,6 @@ fit_size_spectrum_mlebin <- function(dat,
   stopifnot("Need x_min < x_max (if not NULL)" =
               x_min < x_max)
 
-
   # To match equations, especially for internal tricky computations, but stick
   # with bin_min and bin_max for user code. TODO though I replace wmin and wmax
   # maybe with bin_min and bin_max, but not sure if the former was actually a
@@ -81,9 +80,9 @@ fit_size_spectrum_mlebin <- function(dat,
   #  added manually (below)_ Picking the y-axis to go down to 0_75 of the
   #  minimum value of CountGTEwmin_
   for(iii in 1:length(count_gte_bin_min)){
-    count_gte_bin_min[iii] <- sum( (dat$bin_min >= dat$bin_min[iii]) * dat$bin_count)
-    low_count[iii] <- sum( (dat$bin_min >= dat$bin_max[iii]) * dat$bin_count)
-    high_count[iii] <- sum( (dat$bin_max > dat$bin_min[iii]) * dat$bin_count)
+    count_gte_bin_min[iii] <- sum( (df$bin_min >= df$bin_min[iii]) * df$bin_count)
+    low_count[iii] <- sum( (df$bin_min >= df$bin_max[iii]) * df$bin_count)
+    high_count[iii] <- sum( (df$bin_max > df$bin_min[iii]) * df$bin_count)
     # TODO understand high_count again
   }
 

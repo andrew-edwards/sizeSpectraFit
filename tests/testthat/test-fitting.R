@@ -60,4 +60,12 @@ test_that("fit_size_spectrum() works with different settings and matches previou
   sim_vec_binned_zero <- sim_vec_binned
   sim_vec_binned_zero[1, "bin_count"] <- 0
   expect_error(fit_size_spectrum(sim_vec_binned_zero))
+
+  # MLEbin determine xmin:
+  sim_vec_binned_2 <- sim_vec_binned
+  sim_vec_binned_2[1, "bin_count"] <- 100  # lower count for first bin
+
+  res_binned_2 <- determine_xmin_and_fit_mlebin(sim_vec_binned_2)
+
+  expect_invisible(plot(res_binned_2))
 })
