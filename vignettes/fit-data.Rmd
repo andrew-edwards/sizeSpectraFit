@@ -225,6 +225,7 @@ res_mlebin
 ```
 
 So `res_mlebin` is a list object that contains objects:
+
 - `b_mle`: the MLE of the exponent $b$ as calculated using the MLEbin method,
 - `b_conf`: the 95% confidence interval of $b$,
 - `data`: the original data as used for the fit, plus some extra calculations
@@ -282,13 +283,56 @@ structure).
 
 All the plots are customisable, for example to add extra tick labels to pretty
 up a final plot:
+
 ```{r, MLEbinplot2)
 plot(res_mlebin,
      x_small_ticks_labels = c(5, 50, 500))
 ```
-See `?plot.size_spectrum_numeric` for details.
-TODO and _MLEbin? Don't expect so as help should  link them.
+See `?plot.size_spectrum_mlebin` for details.
 
+## Determine $x_{min}$ for MLEbin method when the data are not simply declining
+
+Similar to the example above for a vector of values, we can determine a value of
+$x_{min}$ to use for the MLEbin method if the data look non-decreasing.
+
+For a mock dataset we can just use the above `sim_vec_binned` but with a lower
+count for the first bin:
+```{r, mockbin}
+sim_vec_binned_2 <- sim_vec_binned
+sim_vec_binned_2[1, "bin_count"] <- 100
+sim_vec_binned_2
+```
+
+HERE - function not written yet; need to figure out if can make it generic
+```{r, mockfit2}
+res_binned_2 <- determine_xmin_and_fit_mlebin(sim_vec_binned_2)
+```
+
+We can plot and then print the results:
+```{r, mockplot, fig.height = 8}
+plot(res_mock)
+```
+
+The red bars in the histogram show the values that are used to fit the PLB
+distribution, with $x_{min}$ being the lowest value in the lowest red bin. 
+
+```{r, mockres}
+res_mock
+```
+
+The `res_mock` object is list of two objects:
+
+- `$mle_fit`: contains the MLE results as in the simpler example above
+- `$h`: the histogram results as used for calculating $x_{min}$ and for plotting.
+
+The object is of class `determine_xmin_and_fit`, and so the plotting function
+`plot.determine_xmin_and_fit()` is automatically used by `plot(res_mock)` to
+give the above plot.
+
+
+
+
+TODO
 
 HERE
 
