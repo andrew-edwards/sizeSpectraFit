@@ -4,7 +4,7 @@
 \alias{determine_xmin_and_fit_mlebins}
 \title{Given data for MLEbins calculation, with species-specific weight bins,
 determine a common binning and use that to calculate \code{x_min} and then fit
-using MLEbins. TODO might also work for just MLEbin, need to test.}
+using MLEbins.}
 \usage{
 determine_xmin_and_fit_mlebins(
   dat_for_mlebins,
@@ -25,7 +25,7 @@ see \code{\link[=determine_xmin_and_fit]{determine_xmin_and_fit()}} also
 \description{
 Given data for MLEbins calculation, with species-specific weight bins,
 determine a common binning and use that to calculate \code{x_min} and then fit
-using MLEbins. TODO might also work for just MLEbin, need to test.
+using MLEbins.
 }
 \examples{
 \dontrun{

@@ -1,5 +1,5 @@
 ##' Plot results from determining xmin by mode method and then fitting use
-##' MLEbins method
+##' MLEbin or MLEbins method  TODO combine help, do all in plot.determine_xmin_and_fit
 ##'
 ##' @param res list of class `determine_xmin_for_mlebins_and_fit` as output from `determine_xmin_for_mlebins_and_fit()`
 ##' @param xlim_hist numeric vector of two values representing `xlim` for histogram plot; default is the full range
@@ -24,6 +24,16 @@ plot.determine_xmin_and_fit_mlebins <- function(res,
                                                 seg_col = "green",
                                                 ...){
 
+  # Going to use this same function for MLEbin output, so just need to extract
+  # the desired components that explicitly have MLEbins here, to generalise it:
+  if(class(res) == "determine_xmin_and_fit_mlebins"){
+    res_fit <- res$mlebins_fit
+  }
+
+  if(class(res) == "determine_xmin_and_fit_mlebin"){
+    res_fit <- res$mlebin_fit
+  }
+
   # Global xlim, might want to add functionality at some point
   #xlim_global <- c(min(unlist(lapply(res, '[[',
   #                                   "xmin"))[years_indices]),
@@ -45,7 +55,7 @@ plot.determine_xmin_and_fit_mlebins <- function(res,
 
   # Want it red for the bin with x_min in it (though not all values in the bin
   # will get fitted) and all those above. So for all bins with max bin break > x_min
-  col_hist <- ifelse(res$h$breaks[-1] < res$mlebins_fit$x_min,  # take out first
+  col_hist <- ifelse(res$h$breaks[-1] < res_fit$x_min,  # take out first
                                         # breakpoint
                      "grey",
                      "red")
@@ -85,7 +95,8 @@ plot.determine_xmin_and_fit_mlebins <- function(res,
 
   dots_parser(plot.size_spectrum_mlebin,
               # This should be
-              # plot.size_spectrum_mlebins but the
+              # plot.size_spectrum_mlebins (which is almost
+              # plot.size_spectrum_mlebin() anyway) but the
               # dots_parser doesn't pass on style (TODO had thought seg_col was
               # the issue)
               # because formals(FUN) I think does not
@@ -99,13 +110,13 @@ plot.determine_xmin_and_fit_mlebins <- function(res,
               # think it will. Don't see what's special about seg_col now - yes,
               # want it to switch the default to green as for mlebins plots,
               # since now calling plot...mlebin.
-              res_mlebin = res$mlebins_fit,
+              res_mlebin = res_fit,
               style = "linear_y_axis",
               seg_col = seg_col,
               ...)
 
   dots_parser(plot.size_spectrum_mlebin,
-              res_mlebin = res$mlebins_fit,
+              res_mlebin = res_fit,
               style = "log_y_axis",
               seg_col = seg_col,
               ...)

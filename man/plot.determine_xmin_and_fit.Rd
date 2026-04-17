@@ -22,7 +22,7 @@ figure in current device
 }
 \description{
 TODO check if want features from plot.determine_xmin_and_fit_mlebins(),
-which was adapted and improved from this.
+which was adapted and improved from this. TODO combine help files.
 }
 \examples{
 \dontrun{

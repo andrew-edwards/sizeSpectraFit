@@ -2,16 +2,16 @@
 % Please edit documentation in R/determine-xmin-and-fit.R
 \name{determine_xmin_and_fit}
 \alias{determine_xmin_and_fit}
-\title{Determine x_min as the mode and then fit it. TODO only on a numeric vector
-for now}
+\title{Determine x_min as the mode and then fit it for a vector of values. TODO can't make a generic function because for mlebins we don't
+have a class of input.  Seems better to explicitly specify the method to be
+used, either mle, mlebin or mlebins.
+TODO going to see if mlebins code will work for mlebin}
 \usage{
-determine_xmin_and_fit(x, bin_width = 1, bin_start = NULL, ...)
+determine_xmin_and_fit(dat, bin_width = 1, bin_start = NULL, ...)
 }
 \arguments{
-\item{x}{\code{numeric} vector of values (such as individual body masses or lengths), which uses
-the MLE method (via the function \code{\link[=fit_size_spectrum.numeric]{fit_size_spectrum.numeric()}} TODO could
-make \code{dat} for consistency with fit_size_spectrum() if going to make this
-more general. TODO join help files together}
+\item{dat}{\code{numeric} vector of values (such as individual body masses or lengths), which uses
+the MLE method.}
 
 \item{...}{arguments to pass onto fit....}
 }
@@ -31,18 +31,21 @@ peak}
 }
 }
 \description{
-Determine x_min as the mode and then fit it. TODO only on a numeric vector
-for now
+The \code{x_min} value is determined by constructing a histogram of bin width
+\code{bin_width}, starting from \code{bin_start} (for the \code{NULL} default see
+\code{\link[=make_hist]{make_hist()}}), and selecting the bin with the highest count. \code{x_min} is
+then calculated as the lowest value of the data within this bin (i.e. the
+first value above the min of this bin). This is then used to fit the size
+spectrum to the data using \code{\link[=fit_size_spectrum.numeric]{fit_size_spectrum.numeric()}}.
 }
 \examples{
 \dontrun{
-# see .Rmd file
-HERE:
-res <- determine_xmin_and_fit(sim_vec)
+# Make data that needs xmin determined
+data <- c(runif(100, 0.1, 10),
+          rPLB(1000, -2, xmin = 10))     #a few values then a PLB
+res <- determine_xmin_and_fit(data)
 plot(res)
 
-TODO  res_all_strata <- fit_all_years(raw_simp_prop,
-                    bin_width_each_year = bin_width_each_year)
 }
 }
 \author{

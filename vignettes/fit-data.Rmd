@@ -303,11 +303,13 @@ sim_vec_binned_2[1, "bin_count"] <- 100
 sim_vec_binned_2
 ```
 
-HERE - function not written yet; need to figure out if can make it generic
+Now use the explicit fitting function:
 ```{r, mockfit2}
 res_binned_2 <- determine_xmin_and_fit_mlebin(sim_vec_binned_2)
 ```
 
+HERE need to set up plotting function I think. See plot.determine...mlebins, has
+some explicit mlebins lines in there, prob just adapt them for mlebin TODO HERE HER
 We can plot and then print the results:
 ```{r, mockplot, fig.height = 8}
 plot(res_mock)

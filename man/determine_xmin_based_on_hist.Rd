@@ -7,7 +7,7 @@
 determine_xmin_based_on_hist(h)
 }
 \arguments{
-\item{h}{histogram object, e.g. from running \code{make_hist()} on a vector}
+\item{h}{histogram object, e.g. from running \code{\link[=make_hist]{make_hist()}} or \code{\link[=make_hist_for_binned_counts]{make_hist_for_binned_counts()}} on a vector}
 }
 \value{
 x_min to use to fit ISD, and to plot the histogram to show the full

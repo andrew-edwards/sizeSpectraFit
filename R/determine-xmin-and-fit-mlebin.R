@@ -1,10 +1,9 @@
-##' Given data for MLEbins calculation, with species-specific weight bins,
-##' determine a common binning and use that to calculate `x_min` and then fit
-##' using MLEbins.
+##' Given data for MLEbin calculation, determine a common binning and use that
+##' to calculate `x_min` and then fit using MLEbin.
 ##'
-##' @param dat_for_mlebins tibble of data in the format required for fitting
-##'   using MLEbins method. TODO
-##' @return list of class `determine_xmin_and_fit_mlebins` for plotting, containing TODO
+##' @param dat tibble of data in the format required for fitting
+##'   using MLEbin method; see [fit_size_spectrum()].
+##' @return list of class `determine_xmin_and_fit_mlebin` for plotting, containing TODO
 ##'   see [determine_xmin_and_fit()] also
 ##' @export
 ##' @author Andrew Edwards
@@ -12,24 +11,14 @@
 ##' \dontrun{
 ##'  TODO
 ##' }
-determine_xmin_and_fit_mlebins <- function(dat_for_mlebins,
+determine_xmin_and_fit_mlebin <- function(dat,
                                            bin_width = 1,
                                            bin_start = 0,
                                            x_min = NULL,
                                            ...){
 
-  # TODO need to amalgamate repeated combinations of bin_min, bin_max, and then
-  # sum the bin_counts. Have done this somewhere maybe a vignette, so need to check where and
-  # ensure it gets done for all fitting, and recommend to do early in the
-  # analyses (would save a little computation time, but more important
-  # here). Prob best to do in fit_size_spectrum_mlebins() than here.
-
-  # Need to be pragmatic, since have overlapping bins. Since assuming a power
-  # law, kind of expect counts to be shifted to the low end of the bin. Use this
-  # though to just create simple histograms of counts based on bin_min values.
-
   # Can't just treat the bin_min values as components of a single vector
-  hh <- make_hist_for_binned_counts(dat_for_mlebins,
+  hh <- make_hist_for_binned_counts(dat,
                                     bin_width = bin_width,
                                     bin_start = bin_start)
 
@@ -39,22 +28,22 @@ determine_xmin_and_fit_mlebins <- function(dat_for_mlebins,
     # Now set x_min to be the minimum value that is above x_min_based_on_hist,
     #  because the latter is based on histograms bin breaks (which are somewhat
     #  arbitrary, though likely integers). This will also work for the case
-    #  where x_min_based_on_hist comes outt as 0.
-    x_min = min(dplyr::filter(dat_for_mlebins,
+    #  where x_min_based_on_hist comes out as 0.
+    x_min = min(dplyr::filter(dat,
                               bin_min >= x_min_based_on_hist)$bin_min)
   }
 
   # Not determining x_max separately here so no need to mention it, it gets
   #  passed on in ...
 
-  mlebins_fit <- fit_size_spectrum_mlebins(dat_for_mlebins,
-                                           x_min = x_min,
-                                           ...)
+  mlebin_fit <- fit_size_spectrum_mlebin(dat,
+                                         x_min = x_min,
+                                         ...)
 
-  res <- list(mlebins_fit = mlebins_fit,
+  res <- list(mlebin_fit = mlebin_fit,
               h = hh)
 
-  class(res) <- c("determine_xmin_and_fit_mlebins",
+  class(res) <- c("determine_xmin_and_fit_mlebin",
                   class(res))
   return(res)
 }

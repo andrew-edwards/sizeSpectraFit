@@ -1,7 +1,7 @@
 ##' Plot results from determining xmin by mode method and then fitting use MLE hake spectra results
 ##'
 ##' TODO check if want features from plot.determine_xmin_and_fit_mlebins(),
-##' which was adapted and improved from this.
+##' which was adapted and improved from this. TODO combine help files.
 ##'
 ##' @param res list of class `determine_xmin_and_fit` as output from `determine_xmin_and_fit()`
 ##' @param xlim_hist numeric vector of two values representing `xlim` for histogram plot; default is the full range

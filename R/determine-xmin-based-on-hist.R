@@ -1,6 +1,6 @@
 ##' Given histogram object of counts and bins, determine the mode and return min of that bin as xmin
 ##'
-##' @param h histogram object, e.g. from running `make_hist()` on a vector
+##' @param h histogram object, e.g. from running [make_hist()] or [make_hist_for_binned_counts()] on a vector
 ##' @return x_min to use to fit ISD, and to plot the histogram to show the full
 ##'   data and the mode.
 ##' @export
@@ -11,12 +11,14 @@
 ##' }
 determine_xmin_based_on_hist <- function(h){
   # changed function name to determine_xmin_based_on_hist, since adapting in the
-  # various calls to have xmin not be the bin break.
+  # various calls to have xmin not be the bin break.  TODO remove that?
   stopifnot("h needs to be a histogram object" =
               class(h) == "histogram")
 
   max_ind <- which.max(h$counts)    # returns the first one if they are ties
 
+  # TODO I'd commented this out, I guess because it might still fit, but the
+  # resulting plots should clearly show the issue. Make a test to see if still fits.
   # if(max_ind == length(h$counts)){
   #   stop("The maximum count is in the final bin, so a descending PLB is not appropriate.")
   # }     # Also the fitting code will likely break.
