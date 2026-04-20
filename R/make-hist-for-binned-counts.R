@@ -1,19 +1,18 @@
 ##' Take a tibble with `bin_min`, `bin_max`, and `bin_count` and assign counts
 ##' to new equal bins based on `bin_min`, summing the original counts (which can
-##' be non-integer). TODO but only really valid for MLEbins; for MLEbin with
-##' nonoverlapping bins need to use those predefined bins. HERE.
+##' be non-integer).
 ##'
-##' Called from [determine_xmin_and_fit_mlebin()] and
-##' [determine_xmin_and_fit_mlebins()] to determine xmin for MLEbin and MLEbins
-##' methods. Adapting from `sizeSpectraFit::make_hist()` and the old
-##' sizeSpectraHake::make_hist()`.
+##' Called from
+##' [determine_xmin_and_fit_mlebins()] to determine xmin for MLEbins
+##' method. Adapting from `sizeSpectraFit::make_hist()` and the old
+##' sizeSpectraHake::make_hist()`. TODO can delete that sentence once satisfied
 ##'
 ##' Gives values as a histogram list object and creates 0 counts for missing bins.
 ##' Can then use `plot()` which calls `plot.histogram()`. Without the 0 counts for missing bins
 ##' `plot.histogram()` does not plot counts because bins appear to have unequal widths.
 ##'
 ##' @param dat tibble of data in the format required for fitting
-##'   using MLEbin or MLEbins methods; i.e. at a minimum has to include the columns:
+##'   using MLEbins methods; i.e. at a minimum has to include the columns:
 ##'     * `bin_min`
 ##'     * `bin_max`
 ##'     * `bin_count`.
@@ -78,10 +77,11 @@ make_hist_for_binned_counts <- function(dat,
                      by = "hist_bin_min") %>%
     tidyr::replace_na(list(total_count = 0))
 
-  # TODO may need to think about this for MLEbin, do some tests
+  # TODO may need to think about this for MLEbin, do some tests. Keep all this
+  # thinking in case we find an edge case for MLEbins; see -mlebin.R also.
   # From sizeSpectra::fitting() to do with LBNbiom method.
   # Don't think need this, but might for MLEbin  if the function needs
-  # adapting. Think it was almost like a resonance effect. TODO
+  # adapting. Think it was almost like a resonance effect.
   #                      eps = 0.0000001){
 
   # Check the bin widths are compatible with (i.e. multiples of) bin_width

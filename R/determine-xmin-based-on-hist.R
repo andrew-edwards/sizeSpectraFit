@@ -1,6 +1,9 @@
-##' Given histogram object of counts and bins, determine the mode and return min of that bin as xmin
+##' Given histogram object of counts and bins (and maybe density) , determine the mode and return min of that bin as xmin
 ##'
-##' @param h histogram object, e.g. from running [make_hist()] or [make_hist_for_binned_counts()] on a vector
+##' @param h histogram object, e.g. from running [make_hist()] on a vector, or
+##' [make_hist_for_binned_counts()] or
+##' [make_hist_for_binned_counts_mlebin()] on a data.frame for MLEbins or MLEbin
+##' method, respectively.
 ##' @return x_min to use to fit ISD, and to plot the histogram to show the full
 ##'   data and the mode.
 ##' @export
@@ -15,7 +18,9 @@ determine_xmin_based_on_hist <- function(h){
   stopifnot("h needs to be a histogram object" =
               class(h) == "histogram")
 
-  max_ind <- which.max(h$counts)    # returns the first one if they are ties
+  max_ind <- ifelse(h$equidist,
+                    which.max(h$counts),  # returns the first one if they are ties
+                    which.max(h$density)) # for unequal bin widths
 
   # TODO I'd commented this out, I guess because it might still fit, but the
   # resulting plots should clearly show the issue. Make a test to see if still fits.
