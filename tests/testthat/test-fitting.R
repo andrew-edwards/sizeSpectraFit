@@ -67,5 +67,8 @@ test_that("fit_size_spectrum() works with different settings and matches previou
 
   res_binned_2 <- determine_xmin_and_fit_mlebin(sim_vec_binned_2)
 
+  expect_equal(res_binned_2$mlebin_fit$b_mle,
+               -1.98307875)
+
   expect_invisible(plot(res_binned_2))
 })

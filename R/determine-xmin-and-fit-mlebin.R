@@ -12,12 +12,22 @@
 ##'  TODO
 ##' }
 determine_xmin_and_fit_mlebin <- function(dat,
-                                           bin_width = 1,
-                                           bin_start = 0,
                                            x_min = NULL,
                                            ...){
 
-  # Can't just treat the bin_min values as components of a single vector
+  if(dat$bin_min[-1] != dat$bin_max[-nrow(dat)]){
+    stop("The tibble `dat` needs to have consecutive bins; you may need to add some zero counts for any intermediate bins. Given there are many choices of binning, it is hard for sizeSpectraFit to automatically fill in intermediate bins with counts of zero.")
+
+
+
+1. Check bins are consecutive, if not return an error and say to insert
+  0's in intermediate bins (bit hard to automate as need to know the specified bin breaks)
+2. Need to make this hist like in make_hist_for_binned_counts, but shouldn't
+  really need to calculate anything, so make a new shorter function. Including
+  normalised counts that will matter when bin widths are not constant.
+
+
+# TODO think we need a new function for this:
   hh <- make_hist_for_binned_counts(dat,
                                     bin_width = bin_width,
                                     bin_start = bin_start)
