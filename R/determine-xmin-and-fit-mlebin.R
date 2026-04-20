@@ -25,9 +25,11 @@ determine_xmin_and_fit_mlebin <- function(dat,
   hh <- make_hist_for_binned_counts_mlebin(dat)
 
   if(is.null(x_min)){
-    x_min_based_on_hist <- determine_xmin_based_on_hist(hh)
+    x_min <- determine_xmin_based_on_hist(hh)
 
-    # This will automatically be an original bin break, so no need to make it anything slightly higher like for MLE or MLEbins
+    # This will automatically be an original bin break, so no need to make it
+    # anything slightly higher like for MLE or MLEbins
+
   }
 
   # Not determining x_max separately here so no need to mention it, it gets

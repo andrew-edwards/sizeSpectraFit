@@ -163,13 +163,13 @@ vector of values, we have
 the built in function `determine_xmin_and_fit()` to determine a value of
 $x_{min}$ to use and then fit using the MLE method. 
 
-Let's make up a mock dataset, with some uniformly distributed values between 0.1
-and 10, and then a PLB distribution for values $\geq 10$:
+Let's make up a mock dataset, with some uniformly distributed values between 0.25
+and 10, and then a PLB distribution for values $\geq 8$:
 ```{r, mockdata}
 set.seed(42)
-mock_data <- c(runif(100, 0.1, 10),
-               rPLB(1000, -2, xmin = 10))
-hist(mock_data)
+mock_data <- c(runif(100, 0.25, 2),
+               rPLB(1000, -2, xmin = 2, xmax = 100))
+hist(mock_data, breaks = 40)
 ```
 So even a rudimentarly histogram shows a unimodal distribution. To fit this:
 
@@ -198,6 +198,7 @@ The object is of class `determine_xmin_and_fit`, and so the plotting function
 `plot.determine_xmin_and_fit()` is automatically used by `plot(res_mock)` to
 give the above plot.
 
+TODO mention the true value falls within the conf interval
 
 # Measurements that are already binned -- MLEbin method
 
@@ -295,32 +296,37 @@ See `?plot.size_spectrum_mlebin` for details.
 Similar to the example above for a vector of values, we can determine a value of
 $x_{min}$ to use for the MLEbin method if the data look non-decreasing.
 
-For a mock dataset we can just use the above `sim_vec_binned` but with a lower
-count for the first bin:
+For a mock dataset we can just use the above `mock_data` and then bin the values
+with bin widths that double in size, using the `bin_data` function:
 ```{r, mockbin}
-sim_vec_binned_2 <- sim_vec_binned
-sim_vec_binned_2[1, "bin_count"] <- 100
-sim_vec_binned_2
+mock_binned <- bin_data(mock_data,
+                        bin_width = "2k")$bin_vals %>%
+                 dplyr::select(bin_min,
+                               bin_max,
+                               bin_count)
+mock_binned
 ```
 
 Now use the explicit fitting function:
 ```{r, mockbinfit}
-res_binned_2 <- determine_xmin_and_fit_mlebin(sim_vec_binned_2)
+res_mock_binned <- determine_xmin_and_fit_mlebin(mock_binned)
 ```
 
 ```{r, mockbinplot, fig.height = 8}
-plot(res_binned_2)
+plot(res_mock_binned)
 ```
 
 The red bars in the histogram show the values that are used to fit the PLB
 distribution, with $x_{min}$ being the lowest bin break of the lowest red bin;
-note the single grey bin (the lowest bin) that is not used for the fitting.
+note the three grey bins that are not used for the fitting. This histogram shows
+the density in each bin, not the counts, because the bin widths are not equal;
+density is the count in a bin divided by the bin width.
 
 ```{r, mockbinres}
-res_binned_2
+res_mock_binned
 ```
 
-The `res_binned_2` object is list of two objects:
+The `res_mock_binned` object is list of two objects:
 
 - `$mlebin_fit`: contains the MLEbin results as in the simpler example above
   TODO check
@@ -332,6 +338,8 @@ give the above plot.
 
 
 HERE
+
+these may be old ideas dumped here:
 
  D make a general `calc_mle_conf` function based on previous `calcLike` (see
    `fit-size-spectrum.numeric.R` also, and move some ideas from that into
