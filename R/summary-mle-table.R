@@ -1,4 +1,6 @@
-##' TODO Print a Markdown summary table of main results from...  adapting from HDIanalysis
+##' TODO Print a Markdown summary table of main results from...  adapting from
+##' HDIanalysis. First make a generic one from ....and-fit.R, and just keep
+##' calling that, extracting the correct mle results from each type of object
 ##'
 ##' TODO Works on MLE/MLEbin output applied to either a vector or a data
 ##' frame, creating an appropriate table that renders in an R Markdown
