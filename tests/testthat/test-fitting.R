@@ -33,4 +33,4 @@ test_that("fit_size_spectrum() works with different settings and matches previou
                         xlim_hist = c(7, 100)))
   expect_error(determine_xmin_and_fit("hello"))
 
-
+})
