@@ -1,5 +1,5 @@
-# Test plotting functions with different options, some plotting is in fitting
-#  code to save repeating calculations here
+# Test plotting functions with different options, some MLEbin  and MLEbins
+#  plotting is in fitting code to save repeating calculations here
 
 test_that("plot.size_spectrum_numeric() works", {
   res_vec <- fit_size_spectrum(sim_vec)

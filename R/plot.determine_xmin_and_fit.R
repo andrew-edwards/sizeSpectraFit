@@ -38,7 +38,7 @@ plot.determine_xmin_and_fit <- function(res,
 #  par(mai = mai_orig)     # TODO (from sizeSpectraHake): think about Since gets reset by ISD_bin_plot(). Should clean
                           # up that function in sizeSpectra. TODO
 
-  # Don't think needed now, this was specific for hake:
+m  # Don't think needed now, this was specific for hake:
   # Have to make the full histogram (with 0 counts here) to get the colours
   #  right, but ISD plot (I think) requires no 0 counts (maybe they get ignored).
 #  make_hist_full <- make_hist(res[[i]]$counts_per_bin,
