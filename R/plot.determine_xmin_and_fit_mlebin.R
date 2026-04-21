@@ -2,6 +2,7 @@
 ##' @export
 plot.determine_xmin_and_fit_mlebin <- function(res,
                                                seg_col = "black",
+                                               main_hist = "",
                                                ...
                                                ){
 
@@ -9,6 +10,7 @@ plot.determine_xmin_and_fit_mlebin <- function(res,
 
   plot.determine_xmin_and_fit_mlebins(res,
                                       seg_col = seg_col,
+                                      main_hist = main_hist,
                                       ...)
 }
 

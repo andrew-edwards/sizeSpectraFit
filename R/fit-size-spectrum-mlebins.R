@@ -20,8 +20,7 @@ fit_size_spectrum_mlebins <- function(dat,
   df <- tibble::as_tibble(dat)     # df is tibble to be fitted, can get
                                    # restricted in next lines
 
-  # TODO here combine repeated ones and arrange; do in mlebin function also.
-
+  # TODO here combine repeated ones and arrange
 
   df <- dplyr::arrange(df,
                        bin_min)
@@ -31,8 +30,7 @@ fit_size_spectrum_mlebins <- function(dat,
 
 
   # TODO might have to take out 0 counts in end bins. Check here or reduce the
-  # bins. And add to help. SEe also mlebin. Though don't think will have any 0
-  # counts
+  # bins. And add to help.
 
   if(!is.null(x_min)){
     df <- dplyr::filter(df,

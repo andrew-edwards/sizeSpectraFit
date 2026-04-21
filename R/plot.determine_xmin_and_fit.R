@@ -19,6 +19,7 @@
 ##' }
 plot.determine_xmin_and_fit <- function(res,
                                         xlim_hist = NULL,
+                                        main_hist = "",
                                         ...){
 
   # Global xlim, might want to add functionality at some point
@@ -27,11 +28,15 @@ plot.determine_xmin_and_fit <- function(res,
   #                 max(unlist(lapply(res, '[[',
   #                                 "xmax"))[years_indices]))
 
+  par_orig <- par(no.readonly = TRUE)
+  on.exit(par(par_orig))
+
   mai_orig <- par("mai")
   par(mfrow = c(2,1))
 
-  par(mai = mai_orig)     # TODO (from sizeSpectraHake): think about Since gets reset by ISD_bin_plot(). Should clean
-                          # up that function in sizeSpectra.
+  # Don't see that this was doing anything
+#  par(mai = mai_orig)     # TODO (from sizeSpectraHake): think about Since gets reset by ISD_bin_plot(). Should clean
+                          # up that function in sizeSpectra. TODO
 
   # Don't think needed now, this was specific for hake:
   # Have to make the full histogram (with 0 counts here) to get the colours
@@ -57,16 +62,16 @@ plot.determine_xmin_and_fit <- function(res,
          # xlim = xlim_global,
          col = col_hist,
          border = border_col,
+         main = main_hist,
          ...)} else {
     plot(res$h,
          # xlim = xlim_global,
          col = col_hist,
          border = border_col,
          xlim = xlim_hist,
+         main = main_hist,
          ...)
  }
 
   plot(res$mle_fit)
-
-  par(mfrow = c(1,1))  # TODO
 }

@@ -85,5 +85,10 @@ test_that("MLEbins fitting and plotting works and matches original results", {
   res_remove_2 <- detect_outliers(res_remove)   # class(res_remove) is
   # remove_outliers_mlebins, this calls relevant function
 
-
+  # for testing make_hist_for_binned_counts, it will determine first bin based
+  # on data (default is 0), results are the same as above, just extra bins in histogram
+  expect_equal(determine_xmin_and_fit_mlebins(
+      dat_needed,
+      bin_start = NULL)$mlebins_fit$b_mle,
+    -2.99753213)
 })

@@ -5,6 +5,7 @@
 ##' @param xlim_hist numeric vector of two values representing `xlim` for histogram plot; default is the full range
 ##'   of breaks (which might be too large for a clear figure, especially given
 ##'   the linear axis).
+##' @param main_hist title for histogram; useful if doing strata
 ##' @param ... arguments to passed onto [hist()] or [plot.size_spectrum_mlebins()]
 ##' @inheritParams plot.size_spectrum_numeric
 ##' @inheritParams plot_isd_binned
@@ -22,7 +23,11 @@ plot.determine_xmin_and_fit_mlebins <- function(res,
                                                 par_mai = c(0.4, 0.5, 0.05, 0.3),
                                                 par_cex = 0.7,
                                                 seg_col = "green",
+                                                main_hist = "",
                                                 ...){
+
+  par_orig <- par(no.readonly = TRUE)
+  on.exit(par(par_orig))
 
   # Going to use this same function for MLEbin output, so just need to extract
   # the desired components that explicitly have MLEbins here, to generalise it:
@@ -40,7 +45,6 @@ plot.determine_xmin_and_fit_mlebins <- function(res,
   #                 max(unlist(lapply(res, '[[',
   #                                 "xmax"))[years_indices]))
 
-  mai_orig <- par("mai")
   par(mfrow = c(3,1))
 
   # par(mai = mai_orig)     # TODO (from sizeSpectraHake): think about Since gets reset by ISD_bin_plot(). Should clean
@@ -85,6 +89,7 @@ plot.determine_xmin_and_fit_mlebins <- function(res,
                 # xlim = xlim_global,
                 col = col_hist,
                 border = border_col,
+                main = main_hist,
                 ...)} else {
     dots_parser(graphics:::plot.histogram,
                 x = res$h,
@@ -92,6 +97,7 @@ plot.determine_xmin_and_fit_mlebins <- function(res,
                 col = col_hist,
                 border = border_col,
                 xlim = xlim_hist,
+                main = main_hist,
                 ...)
   }
 
@@ -125,6 +131,4 @@ plot.determine_xmin_and_fit_mlebins <- function(res,
               style = "log_y_axis",
               seg_col = seg_col,
               ...)
-
-  # par(mfrow = c(1,1))  # TODO
 }

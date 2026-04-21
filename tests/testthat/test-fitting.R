@@ -71,4 +71,6 @@ test_that("fit_size_spectrum() works with different settings and matches previou
                -1.98307875)
 
   expect_invisible(plot(res_binned_2))
+
+  expect_error(determine_xmin_and_fit_mlebin(sim_vec_binned[-4, ]))
 })
