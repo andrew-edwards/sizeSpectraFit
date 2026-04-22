@@ -1,8 +1,11 @@
 ##' Do an aggregated plot of several PLB fits, each to a separate (but related)
-##' group of individuals.
+##' group of individuals, and return aggregated plot
 ##'
 ##' Given a list of MLE results (TODO check how many different types), combine
-##' the data and show an aggregated distribtuion, as well as the individual fits.
+##' the data and show an aggregated distribtuion, as well as the individual
+##' fits. Return the x and y values of the aggregated plot. The calculations use
+##' the ranges of the axes, which is why calculations and plotting is combined
+##' here in the same function.
 ##'
 ##' @param res_list list of results, with each component a list object of a
 ##'   given type TODO first doing for `size_spectrum_numeric`, might be somewhat

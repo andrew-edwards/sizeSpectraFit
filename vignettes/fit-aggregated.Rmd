@@ -34,6 +34,9 @@ knitr::opts_chunk$set(
 We demonstrate the normalised aggregated size spectrum here, as introduced in
 TODO -- see TODO for details.
 
+TODO check exopontnes in later examples make sense; have to first fix the
+legends in basic plots.
+
 The idea is that we can fit size spectra to different parts of the community,
 but it is in appropriate to fit a single size spectrum to the full community
 because of differences in sampling protocols between different species
@@ -116,7 +119,8 @@ for(s in 1:S){
 
 ## Aggregating distributions
 
-So we have `r S` fitted distributions that we want to aggregate.
+So we have `r S` fitted distributions that we want to aggregate, which we can do
+and plot with a single function:
 
 ```{r plotagg, fig.cap = "The four fitted PLB's from above are shown on the sames axes using the same colour coding as above. Black circles are the full aggregated data set, and the thick magenta curve is the aggregated PLB distribution, the distribution obtained from aggregating the four fitted PLB's together. The black circles are mostly hidden behind the magenta curve for low values of $x$, and at high values are overlaid by the light blue circles because those represent the only data for high $x$. The fits are very good because the data are simulated from PLB's, and likelihood was used to estimated the $b$ exponents."}
 orig_agg_fit <- plot_aggregate(res_list)
@@ -125,33 +129,19 @@ orig_agg_fit <- plot_aggregate(res_list)
 ## Simulate disproportionate removal of larger individuals
 
 To show the functionality of using different strata, we take the above data and
-disproportionately remove larger fish within each species group, removing 20% of
-each species group.
+disproportionately remove larger fish within each species group. Just removing
+10% of the smallest half of the sizes and 50% of the largest half, within each
+species group. So not technically removing just big individuals, but this is
+just an example to demonstrate plotting.
 
 ```{r, removeinds}
 res_fished_list <- list()
 set.seed(42)    # for reproducibility
 for(s in 1:S){
   ind_sizes <- sort(res_list[[s]]$x)
-  
-  # This didn't seem to work:
-  # Proportionately remove the large ones by making the probability of removal
-  # increase as values are larger
-  # ind_sizes_sum <- sum(ind_sizes^3)
 
-  # prob_removal <- ind_sizes^3  / ind_sizes_sum
-
-  # Sample 80% of data, weighting against high values
-  #  x_values <- sample(ind_sizes,
-  #                   size = length(ind_sizes) * 0.8,
-  #                   replace = FALSE,
-  #                   prob = 1 - prob_removal)
-
-  # Try my original idea. Remove more large ones than small; I was thinking of
-  # each one in proportion to it's index. Actually, just remove 10% of small
-  # fish and 50% of large.
-
-  num_sizes <- length(ind_sizes)   # Assume even
+  # Rremove 10% of small fish and 50% of large within the group.
+  num_sizes <- length(ind_sizes)   # Assuming this is even
   indices_to_keep <- c(sample(1:(num_sizes/2),
                               size = 0.90 * num_sizes/2),
                        sample( (num_sizes/2 +1):num_sizes,
@@ -161,14 +151,10 @@ for(s in 1:S){
   res_fished_list[[s]] <- fit_size_spectrum(x_values)    # x_values get included in
     # MLE_res[[s]]
 }
-
-fished_agg_fit <- plot_aggregate(res_fished_list)
 ```
 
-HERE - do the above, prob rerun all first. Almost there I think
-
 Here are the four data sets with the four individually fit PLB distributions
-```{r plotting2}
+```{r plotting2, fig.height = 8}
 par(mfrow = c(min(S, 4), 1),
     mai = c(0.6, 0.5, 0.05, 0.3))
 
@@ -181,7 +167,7 @@ for(s in 1:S){
 
 And here is the normalised aggregated size spectrum in magenta:
 ```{r, fishedagg}
-plot_aggregate(res_fished_list)
+fished_agg_fit <- plot_aggregate(res_fished_list)
 ```
 
 To compare the original and the `fished' normalised aggregated size spectra,
@@ -195,43 +181,131 @@ strata <- c("unfished",
 We can then simply use the `plot_aggregate_fits()` function to plot the results
 for the two strata on the same graph:
 
-```{r combinedplotnormfunct, fig.cap = "The two aggregated plots restricted to a common range of body masses and then normalised, to properly compare them.", fig.height = 6, echo = FALSE}
+```{r combinedplotnormfunct, fig.cap = "The two aggregated plots restricted to a common range of body masses and then normalised, to properly compare them.", fig.height = 6}
 plot_aggregate_fits(agg_list,
                     strata_names = strata,
                     ylim = c(10^(-4), 1))
 ```
-HERE - need to have x_plb or something saved I think, ah from doing the plots?
-See med-summary4.Rmd
-
 
 Since there is no simple size-spectrum exponent for such aggregated fits, and
 they have different $x_{min}$ values and sample sizes, we restrict the fits to
-values above a common value (namely the maximum of the three aggregated
-$x_{min}$ values), and then normalise each aggregated fit by it's resulting
+values above a common value (namely the maximum of the two aggregated
+$x_{min}$ values), and then normalise each aggregated fit by its resulting
 sample size, such that each starts at the same point (same body-mass on the
-x-axis and at 1 on the y-axis, which now represents the proportion of values
+x-axis and at 1 on the y-axis, which now represents the proportion (not number) of values
 above each body-mass).
 
 This clearly shows a `steepening' of the size spectrum for the fishing grounds
 compared to the baseline -- the counts are dropping off faster under
-fishing. The no-take reserve shows some improvement from the baseline, with the
-aggregated normalised fit above that for the baseline. Note the logarithmic
-y-axis, such that apparently minor differences are actually quite large, and the
-appearance of large organisms in the no-take reserve.
+the `fished' scenario. Note the logarithmic
+y-axis, such that apparently minor differences are actually quite large. To
+further understanding, we also plot the same figure but with a linear y-axis:
 
-
-```{r combinedplotnormlinear, fig.cap = "As previous figure but with a linear y-axis.",fig.height = 6, eval = TRUE, echo = FALSE}
+```{r combinedplotnormlinear, fig.height = 6}
 plot_aggregate_fits(agg_list,
                     strata_names = strata,
                     log_axes = "x")
 ```
 
+Again, this shows the fished strata size spectrum declining faster than that of
+the unfished strata. Note that both curves have to start at the same point, and
+reach 0 on the y-axis; minor changes that we see here are therefore indeed of
+importance (because the differences can only be so big).
 
+## More extreme removal example
 
+To further illustrate the NASS idea, we repeat the above simulation experiment
+but simply remove 50% of all 
+individuals > 100 g. The code is largely the same as above, with changes to the
+removal of individuals.
+
+```{r, removeinds2}
+res_fished_list_2 <- list()
+set.seed(42)    # for reproducibility
+for(s in 1:S){
+  indiv_sizes <- sort(res_list[[s]]$x)
+
+  # Remove 50% of any individuals > 100 g
+  num_sizes <- length(indiv_sizes) 
+  indiv_sizes_over_100 <- indiv_sizes[indiv_sizes > 100]
+  
+  x_values <- c(indiv_sizes[indiv_sizes <= 100],
+                sample(indiv_sizes_over_100,
+                       size = floor(0.5 * length(indiv_sizes_over_100))))
+                
+  
+#  indices_to_keep <- c(whichindiv_sizessample(1:(num_sizes/2),
+#                              size = 0.90 * num_sizes/2),
+#                       sample( (num_sizes/2 +1):num_sizes,
+#                              size = 0.50 * num_sizes/2))
+#  x_values <- indiv_sizes[indices_to_keep]
+  
+  res_fished_list_2[[s]] <- fit_size_spectrum(x_values)    # x_values get included in
+    # MLE_res[[s]]
+}
+```
+
+Here are the four data sets with the four individually fit PLB distributions
+```{r plotting3, fig.height = 8}
+par(mfrow = c(min(S, 4), 1),
+    mai = c(0.6, 0.5, 0.05, 0.3))
+
+for(s in 1:S){
+  plot(res_fished_list_2[[s]],
+       xlim = xlim_global,
+       fit_col = col_vec[s])
+}
+```
+
+And here is the normalised aggregated size spectrum in magenta:
+```{r, fishedagg2}
+fished_agg_fit_2 <- plot_aggregate(res_fished_list_2)
+```
+
+To compare the original and the `fished' normalised aggregated size spectra,
+first combine in a list.
+```{r, fishedagglist2}
+agg_list_2 <- list(orig_agg_fit,
+                 fished_agg_fit_2)
+strata <- c("unfished",
+            "fished")
+```
+We can then simply use the `plot_aggregate_fits()` function to plot the results
+for the two strata on the same graph:
+
+```{r combinedplotnormfunct2, fig.cap = "The two aggregated plots restricted to a common range of body masses and then normalised, to properly compare them.", fig.height = 6}
+plot_aggregate_fits(agg_list_2,
+                    strata_names = strata,
+                    ylim = c(10^(-4), 1))
+```
+
+Since there is no simple size-spectrum exponent for such aggregated fits, and
+they have different $x_{min}$ values and sample sizes, we restrict the fits to
+values above a common value (namely the maximum of the two aggregated
+$x_{min}$ values), and then normalise each aggregated fit by its resulting
+sample size, such that each starts at the same point (same body-mass on the
+x-axis and at 1 on the y-axis, which now represents the proportion (not number) of values
+above each body-mass).
+
+This clearly shows a `steepening' of the size spectrum for the fishing grounds
+compared to the baseline -- the counts are dropping off faster under
+the `fished' scenario. Note the logarithmic
+y-axis, such that apparently minor differences are actually quite large. To
+further understanding, we also plot the same figure but with a linear y-axis:
+
+```{r combinedplotnormlinear2, fig.height = 6}
+plot_aggregate_fits(agg_list_2,
+                    strata_names = strata,
+                    log_axes = "x")
+```
+
+Again, this shows the fished strata size spectrum declining faster than that of
+the unfished strata. Note that both curves have to start at the same point, and
+reach 0 on the y-axis; minor changes that we see here are therefore indeed of
+importance (because the differences can only be so big).
 
 
 ## Session information
-
 
 ```{r sessioninfo}
 sessionInfo()

@@ -1,8 +1,8 @@
 ##' Plot the aggregate fits for several strata
 ##'
 ##' Uses the results from [plot_aggregate_mlebin()] to plot aggregated size
-##' spectra for several strata on a single plot. Has options for normalising and
-##' restricting x range to give justifiable comparisons.
+##' spectra for several strata on a single rank/frequency styl plot. Has options
+##' for normalising and restricting x range to give justifiable comparisons.
 ##'
 ##' @param agg_list list of aggregated fits, with each component corresponding
 ##'   to the list object resulting from [plot_aggregate_mlebin()] for a
@@ -25,9 +25,11 @@
 ##'   xmin values, but the
 ##'   default axis will go way too low (it is hard to automate this, so just
 ##'   refine `ylim` to celarly show the aymptotes).
-##' @return list with two objects, `x_plb_agg` and `y_plb_agg`, which are the
-##'   fitted x and y values for the aggregated size spectrum (which does not
-##'   have a simple exponent). To then use for plotting multiple strata in [plot_aggregate_fits()].
+##' @param inset_text passed onto [legend()]
+##' @param legend_text_second_row_multiplier numeric multiplier of the second
+##'   row of legend text to space it out, especially for smaller panel plots.
+##'
+##' @return NULL
 ##' @export
 ##' @author Andrew Edwards
 ##' @examples
@@ -45,7 +47,9 @@ plot_aggregate_fits <- function(agg_list,
                                                "red"),
                                 lty_strata = c(1, 4, 5),
                                 xlim = NULL,
-                                ylim = NULL, #
+                                ylim = NULL,
+                                inset_text = c(0, 0.04),
+                                legend_text_second_row_multiplier = 2,
                                 ...){    # passed onto plot(...)
 
    # TODO check works for agg_list of just length 1
@@ -121,7 +125,16 @@ plot_aggregate_fits <- function(agg_list,
     ifelse(normalise,
            agg_fit_y_norm[[i]] <- agg_fit_y[[i]] / max(agg_fit_y[[i]]),
            agg_fit_y_norm[[i]] <- agg_fit_y[[i]])  # so not normalised, but rest
-                                        # of code will work
+                                                   # of code will work
+    # The final agg_fit_ynorm[[]]] value will always be 0 (I think) since
+    #  corresponds to x_max for that strata, but then gives warning when
+    #  plotting on log axes, so just tweak it
+    #  to be 1/10 of the next largest value (which should be the penultimate
+    #  one, but might not be if xmax for that strata is much smaller).
+    if(agg_fit_y_norm[[i]][length(agg_fit_y_norm[[i]])] == 0){
+      agg_fit_y_norm[[i]][ agg_fit_y_norm[[i]] == 0 ] <-
+        min(agg_fit_y_norm[[i]][agg_fit_y_norm[[i]] > 0]) / 10
+    }
   }
 
   if(is.null(ylim)){
@@ -173,14 +186,14 @@ plot_aggregate_fits <- function(agg_list,
   }
 
 
-legend(x = "topright",
-       legend = strata_names,
-       col = col_strata,
-       lty = lty_strata,
-       lwd = 2)
-       # pch = pch_strata,
-       # pt.cex = pch_cex,
-       # inset = legend_inset,
-       # bty = legend_bty)
-
+  legend(x = "topright",
+         legend = strata_names,
+         col = col_strata,
+         lty = lty_strata,
+         lwd = 2,
+         inset = legend_text_second_row_multiplier * inset_text)
+         # pch = pch_strata,
+         # pt.cex = pch_cex,
+         # inset = legend_inset,
+         # bty = legend_bty)
 }
