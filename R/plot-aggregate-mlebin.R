@@ -18,6 +18,7 @@
 ##' @param res_list list of results, with each component a list object of a
 ##'   given type TODO share help with plot-aggregate.
 ##' @param col_vec vector of colours to assign for each group
+##' @param return_agg_x_y logical, whether to return the aggregated x and y for plotting
 ##' @return list with two objects, `x_plb_agg` and `y_plb_agg`, which are the
 ##'   fitted x and y values for the aggregated size spectrum (which does not
 ##'   have a simple exponent). To then use for plotting multiple strata in [plot_aggregate_fits()].
@@ -35,6 +36,7 @@ plot_aggregate_mlebin <- function(res_list,
                                   xlim_global = NULL,
                                   ylim_global = NULL,
                                   y_scaling = 0.25,
+                                  return_agg_x_y = TRUE,
                                   ...){
 
   # Basing this on plot_aggregate() for size_spectrum_numeric results and using
@@ -284,6 +286,9 @@ plot_aggregate_mlebin <- function(res_list,
                     xmax = xmax_vec[s])) * n_vec[s],
           col = col_vec[s])
   }
-  return(list(x_plb_agg = x_plb_agg,
-              y_plb_agg = y_plb_agg))  # TODO add option
+
+  if(return_agg_x_y){
+    return(list(x_plb_agg = x_plb_agg,
+                y_plb_agg = y_plb_agg))
+  }
 }

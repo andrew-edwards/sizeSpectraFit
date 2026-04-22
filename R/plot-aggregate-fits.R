@@ -60,12 +60,12 @@ plot_aggregate_fits <- function(agg_list,
     stop("Need agg_list and strata_names to be the same length, one name corresponding to each component of agg_list.")
   }
 
-  if(length(col_strata) != num_strata){
+  if(length(col_strata) < num_strata){
     stop(paste("Need col_strata to have", num_strata,
                "colours, one for each strata."))
   }
 
-  if(length(lty_strata) != num_strata){
+  if(length(lty_strata) < num_strata){
     stop(paste("Need lty_strata to have", num_strata,
                "values, one for each strata."))
   }

@@ -11,6 +11,11 @@
 ##'   user outfacing function, or also make plot_aggregate_numeric and just call
 ##'   the right one. Some of the details could be shared here maybe.
 ##' @param col_vec vector of colours to assign for each group
+##' @param col_agg
+##' @param xlim_global
+##' @param ylim_global
+##' @param return_agg_x_y logical, whether to return the aggregated x and y for plotting
+##' values of the aggregated fit
 ##' @return nothing TODO, should this return something?
 ##' @export
 ##' @author Andrew Edwards
@@ -21,9 +26,11 @@
 ##'
 plot_aggregate <- function(res_list,
                            col_vec = c("orange", "lightblue", "green",
-                                       "magenta"),
+                                       "darkblue", "darkgreen"),
+                           col_agg = "magenta",
                            xlim_global = NULL,
-                           ylim_global = NULL){
+                           ylim_global = NULL,
+                           return_agg_x_y = TRUE){
 
   if(length(res_list) > length(col_vec)){
     stop("Need to add more colours to col_vec to have one for each results component in res_list.")
@@ -105,7 +112,7 @@ plot_aggregate <- function(res_list,
                             xmax = xmax_vec)) * sum(n_vec)
   lines(x_plb_agg,
         y_plb_agg,
-        col = "yellow",
+        col = col_agg,
         lwd = 4)
 
   # Now do remaining groups, just add them manually here
@@ -133,6 +140,11 @@ plot_aggregate <- function(res_list,
                     xmin = xmin_vec[s],
                     xmax = xmax_vec[s])) * n_vec[s],
           col = col_vec[s])
+  }
+
+  if(return_agg_x_y){
+    return(list(x_plb_agg = x_plb_agg,
+                y_plb_agg = y_plb_agg))
   }
 
 }
