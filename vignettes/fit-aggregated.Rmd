@@ -71,7 +71,7 @@ range of body sizes, prescribed as vectors:
 ```{r simulations}
 set.seed(42)
 
-S = 4
+S <- 4
 
 # For each sample, prescribe the sample size, exponent b, xmin and xmax.
 n_vec <- c(6000, 6000, 1600, 2000)

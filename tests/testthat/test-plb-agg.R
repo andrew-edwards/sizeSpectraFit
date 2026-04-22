@@ -1,6 +1,6 @@
-# Test dPLB_agg() etc.with different options
+# Test dPLB_agg() etc. and plotting with different options
 
-test_that("dPLB_agg() etc. functions work with different settings", {
+test_that("dPLB_agg() and plotting functions work with different settings", {
 
   x <- 1:2000
 
@@ -50,6 +50,60 @@ test_that("dPLB_agg() etc. functions work with different settings", {
                     b = -1.5,
                     xmin = 0.3,
                     xmax = 80))
+
+  # Examples for plotting, taken from fit-aggregated.Rmd vignette (smaller
+  # sample sizes take longer, presumably to do with conf intervals, so using the same)
+  set.seed(42)
+  S <- 4
+
+  # For each sample, prescribe the sample size, exponent b, xmin and xmax.
+  n_vec <- c(6000, 6000, 1600, 2000)
+  b_vec_known <- c(-1.09, -2, -3, -4)
+  xmin_known <- c(0.3, 10, 100, 300)
+  xmax_known <- c(80, 4000, 1000, 1500)
+
+  res_list <- list()                      # To save results
+
+  for(s in 1:S){
+    x_values <- rPLB(n_vec[s],
+                     b = b_vec_known[s],
+                     xmin = xmin_known[s],
+                     xmax = xmax_known[s])
+
+    res_list[[s]] <- fit_size_spectrum(x_values)    # x_values get included in
+    # MLE_res[[s]]
+  }
+
+  expect_invisible(orig_agg_fit <- plot_aggregate(res_list))
+  expect_equal(orig_agg_fit$x_plb_agg[15],
+               0.342922352)
+
+  # Remove some individuals, repeat, to use plot_aggregate_fits()
+  res_fished_list_2 <- list()
+  set.seed(42)
+  for(s in 1:S){
+    indiv_sizes <- sort(res_list[[s]]$x)
+
+    # Remove 50% of any individuals > 100 g
+    num_sizes <- length(indiv_sizes)
+    indiv_sizes_over_100 <- indiv_sizes[indiv_sizes > 100]
+
+    x_values <- c(indiv_sizes[indiv_sizes <= 100],
+                  sample(indiv_sizes_over_100,
+                         size = floor(0.5 * length(indiv_sizes_over_100))))
+    res_fished_list_2[[s]] <- fit_size_spectrum(x_values)
+  }
+
+  expect_invisible(fished_agg_fit_2 <- plot_aggregate(res_fished_list_2))
+
+  agg_list_2 <- list(orig_agg_fit,
+                     fished_agg_fit_2)
+  strata <- c("unfished",
+              "fished")
+  expect_invisible(plot_aggregate_fits(agg_list_2,
+                                       strata_names = strata,
+                                       ylim = c(10^(-4), 1)))
+
 })
 
 
