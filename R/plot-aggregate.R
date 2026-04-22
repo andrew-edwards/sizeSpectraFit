@@ -24,7 +24,7 @@
 ##' @author Andrew Edwards
 ##' @examples
 ##' \dontrun{
-##' # See aggregating-size-spectra.Rmd TODO copy something to here maybe
+##' # See fit-aggregated.Rmd vignette
 ##' }
 ##'
 plot_aggregate <- function(res_list,

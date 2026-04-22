@@ -1,7 +1,7 @@
 ##' Plot the aggregate fits for several strata
 ##'
 ##' Uses the results from [plot_aggregate_mlebin()] to plot aggregated size
-##' spectra for several strata on a single rank/frequency styl plot. Has options
+##' spectra for several strata on a single rank/frequency style plot. Has options
 ##' for normalising and restricting x range to give justifiable comparisons.
 ##'
 ##' @param agg_list list of aggregated fits, with each component corresponding

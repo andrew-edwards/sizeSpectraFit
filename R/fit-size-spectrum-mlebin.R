@@ -23,6 +23,9 @@ fit_size_spectrum_mlebin <- function(dat,
                         bin_min >= x_min)
   } else {
     x_min <- min(df$bin_min)
+    if(x_min == 0){
+      stop("In `fit_size_spectrum_mlebin()`, `x_min` is being calculated as the minimum  `bin_min` in your data.frame which is 0. But `x_min` cannot be zero for a PLB; see Edwards et al. 2017. So you either need to prescribe `x_min`, in which case the lowest bin used will be the first that has `bin_min >= xmin`, or change your lowest `bin_min` to be just above zero, and then `x_min` will automatically be assigned to the value. You may need to test sensitivity to the exact choice when doing the latter.")
+    }
   }
 
   if(!is.null(x_max)){

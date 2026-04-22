@@ -2,7 +2,9 @@
 ##' group of individuals.
 ##'
 ##' TODO forcussing on MLEbins first, but should be general enough but need
-##' testing for MLEbin. This is copying [plot_aggregate] and then editing.
+##' testing for MLEbin. This is copying [plot_aggregate] and then
+##' editing. Worked for Med data, so do test for simulated MLEbin data (which
+##' isn't easy).
 ##'
 ##' TODO Am making plot_aggregate_mlebin() and maybe
 ##'   plot_aggregate_mlebins(), though prob best to make the latter the same,
@@ -55,8 +57,9 @@ plot_aggregate_mlebin <- function(res_list,
 
   # TODO could generalise this in the master wrapper function; may want mlebin
   # here also
-  if(!("size_spectrum_mlebins" %in% class(res_list[[1]]))){
-    stop("res_list need to be a list of size_spectrum_mlebinsTODO results.")
+  if(!("size_spectrum_mlebin" %in% class(res_list[[1]]) |
+       "size_spectrum_mlebins" %in% class(res_list[[1]]))){
+    stop("res_list need to be a list of size_spectrum_mlebin or size_spectrum_mlebins results.")
   }
 
   S <- length(res_list)                     # Number of species groups
@@ -87,9 +90,9 @@ plot_aggregate_mlebin <- function(res_list,
   # for aggregated data set compared to values in each group (these get ignored
   # once we do the summarise, so no need to filter out).
 
-  aggregated_data <- dplyr::summarise(group_by(aggregated_data_temp,
-                                               bin_min,
-                                               bin_max),
+  aggregated_data <- dplyr::summarise(dplyr::group_by(aggregated_data_temp,
+                                                      bin_min,
+                                                      bin_max),
                                       bin_count = sum(bin_count)) %>%
     dplyr::ungroup() %>%
     dplyr::arrange(bin_min)

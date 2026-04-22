@@ -304,6 +304,261 @@ the unfished strata. Note that both curves have to start at the same point, and
 reach 0 on the y-axis; minor changes that we see here are therefore indeed of
 importance (because the differences can only be so big).
 
+## MLEbin method
+
+The same analyses can be done for data that are only available in binned
+form. See TODO (Juliana's) for an example using the MLEbins method, for which we
+have lengths that are converted to weights using species-specific length-weight
+relationships.
+
+Here we simulate the same data as above and then bin it, to then fit using the
+MLEbin method and consequent plotting.
+
+HERE copied the above to here and then adapting and making shorter
+
+But first need to addapt `fit_size_spectrum_mlebin()` to deal with what happens
+when lowest bin is 0, such that xmin becomes zero.
+```{r simulationsmlebin}
+set.seed(42)
+
+res_mlebin_list <- list()                      # To save results
+
+for(s in 1:S){
+  x_values <- rPLB(n_vec[s],
+                   b = b_vec_known[s],
+                   xmin = xmin_known[s],
+                   xmax = xmax_known[s])
+
+  x_values_binned <- bin_data(x_values,
+                              bin_width = 20)$bin_vals
+
+  # Without this x_min would get set to zero, as detailed in error message in
+  #  fit_size_spectrum_mlebin
+  if(min(x_values_binned$bin_min) == 0){
+    x_values_binned[which(x_values_binned$bin_min == 0), "bin_min"] <- 0.00001
+  }
+  
+  res_mlebin_list[[s]] <- fit_size_spectrum(x_values_binned)
+                 # binned data get included in res_mlebin_list[[s]]
+}
+
+
+# Plot each figure with same global x-axis:
+xlim_global_mlebin <- c(min(res_mlebin_list[[1]]$data$bin_min),
+                        max(res_mlebin_list[[1]]$data$bin_max))
+for(s in 2:S){
+  xlim_global_mlebin <- range(xlim_global_mlebin,
+                              min(res_mlebin_list[[s]]$data$bin_min),
+                              max(res_mlebin_list[[s]]$data$bin_max))
+}
+xlim_global_mlebin
+```
+
+Here are the four data sets with the four individually fit PLB distributions as
+calculated using the MLEbin method:
+```{r plotting2, fig.height = 8}
+par(mfrow = c(min(S, 4), 1),
+    mai = c(0.6, 0.5, 0.05, 0.3))
+
+for(s in 1:S){
+  plot(res_mlebin_list[[s]],
+       xlim = xlim_global,
+       fit_col = col_vec[s])
+}
+```
+
+## Aggregating distributions
+
+Aggregate as before:
+
+```{r plotagg, fig.cap = "The four fitted PLB's from above, calculated using the MLEbin method,  are shown on the sames axes using the same colour coding as above. TODOBlack circles are the full aggregated data set, and the thick magenta curve is the aggregated PLB distribution, the distribution obtained from aggregating the four fitted PLB's together. The black circles are mostly hidden behind the magenta curve for low values of $x$, and at high values are overlaid by the light blue circles because those represent the only data for high $x$. The fits are very good because the data are simulated from PLB's, and likelihood was used to estimated the $b$ exponents."}
+orig_agg_fit_mlebin <- plot_aggregate_mlebin(res_mlebin_list)
+```
+
+HERE got to here, need to tweak colours in above function
+
+## Simulate disproportionate removal of larger individuals
+
+To show the functionality of using different strata, we take the above data and
+disproportionately remove larger fish within each species group. Just removing
+10% of the smallest half of the sizes and 50% of the largest half, within each
+species group. So not technically removing just big individuals, but this is
+just an example to demonstrate plotting.
+
+```{r, removeinds}
+res_mlebinfished_list <- list()
+set.seed(42)    # for reproducibility
+for(s in 1:S){
+  ind_sizes <- sort(res_mlebin_list[[s]]$x)
+
+  # Rremove 10% of small fish and 50% of large within the group.
+  num_sizes <- length(ind_sizes)   # Assuming this is even
+  indices_to_keep <- c(sample(1:(num_sizes/2),
+                              size = 0.90 * num_sizes/2),
+                       sample( (num_sizes/2 +1):num_sizes,
+                              size = 0.50 * num_sizes/2))
+  x_values <- ind_sizes[indices_to_keep]
+  
+  res_mlebinfished_list[[s]] <- fit_size_spectrum(x_values)    # x_values get included in
+    # MLE_res[[s]]
+}
+```
+
+Here are the four data sets with the four individually fit PLB distributions
+```{r plotting2, fig.height = 8}
+par(mfrow = c(min(S, 4), 1),
+    mai = c(0.6, 0.5, 0.05, 0.3))
+
+for(s in 1:S){
+  plot(res_mlebinfished_list[[s]],
+       xlim = xlim_global,
+       fit_col = col_vec[s])
+}
+```
+
+And here is the normalised aggregated size spectrum in magenta:
+```{r, fishedagg}
+fished_agg_fit <- plot_aggregate(res_mlebinfished_list)
+```
+
+To compare the original and the `fished' normalised aggregated size spectra,
+first combine in a list.
+```{r, fishedagglist}
+agg_list <- list(orig_agg_fit,
+                 fished_agg_fit)
+strata <- c("unfished",
+            "fished")
+```
+We can then simply use the `plot_aggregate_fits()` function to plot the results
+for the two strata on the same graph:
+
+```{r combinedplotnormfunct, fig.cap = "The two aggregated plots restricted to a common range of body masses and then normalised, to properly compare them.", fig.height = 6}
+plot_aggregate_fits(agg_list,
+                    strata_names = strata,
+                    ylim = c(10^(-4), 1))
+```
+
+Since there is no simple size-spectrum exponent for such aggregated fits, and
+they have different $x_{min}$ values and sample sizes, we restrict the fits to
+values above a common value (namely the maximum of the two aggregated
+$x_{min}$ values), and then normalise each aggregated fit by its resulting
+sample size, such that each starts at the same point (same body-mass on the
+x-axis and at 1 on the y-axis, which now represents the proportion (not number) of values
+above each body-mass).
+
+This clearly shows a `steepening' of the size spectrum for the fishing grounds
+compared to the baseline -- the counts are dropping off faster under
+the `fished' scenario. Note the logarithmic
+y-axis, such that apparently minor differences are actually quite large. To
+further understanding, we also plot the same figure but with a linear y-axis:
+
+```{r combinedplotnormlinear, fig.height = 6}
+plot_aggregate_fits(agg_list,
+                    strata_names = strata,
+                    log_axes = "x")
+```
+
+Again, this shows the fished strata size spectrum declining faster than that of
+the unfished strata. Note that both curves have to start at the same point, and
+reach 0 on the y-axis; minor changes that we see here are therefore indeed of
+importance (because the differences can only be so big).
+
+## More extreme removal example
+
+To further illustrate the NASS idea, we repeat the above simulation experiment
+but simply remove 50% of all 
+individuals > 100 g. The code is largely the same as above, with changes to the
+removal of individuals.
+
+```{r, removeinds2}
+res_mlebinfished_list_2 <- list()
+set.seed(42)    # for reproducibility
+for(s in 1:S){
+  indiv_sizes <- sort(res_mlebin_list[[s]]$x)
+
+  # Remove 50% of any individuals > 100 g
+  num_sizes <- length(indiv_sizes) 
+  indiv_sizes_over_100 <- indiv_sizes[indiv_sizes > 100]
+  
+  x_values <- c(indiv_sizes[indiv_sizes <= 100],
+                sample(indiv_sizes_over_100,
+                       size = floor(0.5 * length(indiv_sizes_over_100))))
+                
+  
+#  indices_to_keep <- c(whichindiv_sizessample(1:(num_sizes/2),
+#                              size = 0.90 * num_sizes/2),
+#                       sample( (num_sizes/2 +1):num_sizes,
+#                              size = 0.50 * num_sizes/2))
+#  x_values <- indiv_sizes[indices_to_keep]
+  
+  res_mlebinfished_list_2[[s]] <- fit_size_spectrum(x_values)    # x_values get included in
+    # MLE_res[[s]]
+}
+```
+
+Here are the four data sets with the four individually fit PLB distributions
+```{r plotting3, fig.height = 8}
+par(mfrow = c(min(S, 4), 1),
+    mai = c(0.6, 0.5, 0.05, 0.3))
+
+for(s in 1:S){
+  plot(res_mlebinfished_list_2[[s]],
+       xlim = xlim_global,
+       fit_col = col_vec[s])
+}
+```
+
+And here is the normalised aggregated size spectrum in magenta:
+```{r, fishedagg2}
+fished_agg_fit_2 <- plot_aggregate(res_mlebinfished_list_2)
+```
+
+To compare the original and the `fished' normalised aggregated size spectra,
+first combine in a list.
+```{r, fishedagglist2}
+agg_list_2 <- list(orig_agg_fit,
+                 fished_agg_fit_2)
+strata <- c("unfished",
+            "fished")
+```
+We can then simply use the `plot_aggregate_fits()` function to plot the results
+for the two strata on the same graph:
+
+```{r combinedplotnormfunct2, fig.cap = "The two aggregated plots restricted to a common range of body masses and then normalised, to properly compare them.", fig.height = 6}
+plot_aggregate_fits(agg_list_2,
+                    strata_names = strata,
+                    ylim = c(10^(-4), 1))
+```
+
+Since there is no simple size-spectrum exponent for such aggregated fits, and
+they have different $x_{min}$ values and sample sizes, we restrict the fits to
+values above a common value (namely the maximum of the two aggregated
+$x_{min}$ values), and then normalise each aggregated fit by its resulting
+sample size, such that each starts at the same point (same body-mass on the
+x-axis and at 1 on the y-axis, which now represents the proportion (not number) of values
+above each body-mass).
+
+This clearly shows a `steepening' of the size spectrum for the fishing grounds
+compared to the baseline -- the counts are dropping off faster under
+the `fished' scenario. Note the logarithmic
+y-axis, such that apparently minor differences are actually quite large. To
+further understanding, we also plot the same figure but with a linear y-axis:
+
+```{r combinedplotnormlinear2, fig.height = 6}
+plot_aggregate_fits(agg_list_2,
+                    strata_names = strata,
+                    log_axes = "x")
+```
+
+Again, this shows the fished strata size spectrum declining faster than that of
+the unfished strata. Note that both curves have to start at the same point, and
+reach 0 on the y-axis; minor changes that we see here are therefore indeed of
+importance (because the differences can only be so big).
+
+
+
+
+
 
 ## Session information
 
