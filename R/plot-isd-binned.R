@@ -22,7 +22,8 @@
 ##' @param par_mai vector of values to use for `par(mai)`
 ##' @param par_cex numeric value to use for `par(cex)` (font size)
 ##' @param seg_col colour to use for the segments (top line of each box; green
-##'   in Fig. 7 of MEPS paper).
+##'   in Fig. 7 of MEPS paper); default in `plot.size_spectrum_mlebin()` is NULL
+##'   which gets converted to `black` in that function.
 ##' @param rect_shading_col colour to use for the shading of the boxes
 ##' @param rect_border_col colour to use for the borders of the boxes; can be
 ##' `NA` to omit (see `border` arg of [rect()]).
