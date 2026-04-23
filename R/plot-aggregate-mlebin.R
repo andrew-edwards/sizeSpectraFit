@@ -1,6 +1,12 @@
 ##' Do an aggregated MLEbin plot of several PLB fits, each to a separate (but related)
 ##' group of individuals.
 ##'
+##' TODO Users may need to play with the colour settings to get an instructive
+##' plot; it is hard to automate all of them, see the arguments available.
+##'
+##' TODO note for me: this creates the first plot using plot... then makes the
+##' subsequent rectangles and lines here.
+##'
 ##' TODO forcussing on MLEbins first, but should be general enough but need
 ##' testing for MLEbin. This is copying [plot_aggregate] and then
 ##' editing. Worked for Med data, so do test for simulated MLEbin data (which
@@ -19,7 +25,15 @@
 ##'
 ##' @param res_list list of results, with each component a list object of a
 ##'   given type TODO share help with plot-aggregate.
-##' @param col_vec vector of colours to assign for each group
+##' @param col_vec vector of colours to assign for each group, used for the
+##' border of the rectangles and the fitted curve.
+##' @param rect_shading_equal_col_vec logical, if TRUE then shade in the
+##' rectangles with the colour for that group, else if FALSE stick with grey. Will depend
+##' how the figure looks (sometimes you cannot see the fitted curve if the
+##' rectangles are large and the curve blends in); hard to fully automate.
+##' @param rect_border_equal_col_vec logical, if TRUE then colour the borders of the
+##' rectangles with the colour for that group, else stick with black. Will depend
+##' how the figure looks; hard to fully automate.
 ##' @param return_agg_x_y logical, whether to return the aggregated x and y for plotting
 ##' @return list with two objects, `x_plb_agg` and `y_plb_agg`, which are the
 ##'   fitted x and y values for the aggregated size spectrum (which does not
@@ -35,6 +49,8 @@ plot_aggregate_mlebin <- function(res_list,
                                   col_vec = c("orange", "lightblue", "green",
                                               "darkblue", "darkgreen"),
                                   col_agg = "magenta",
+                                  rect_shading_equal_col_vec = FALSE,
+                                  rect_border_equal_col_vec = TRUE,
                                   xlim_global = NULL,
                                   ylim_global = NULL,
                                   y_scaling = 0.25,
@@ -148,11 +164,30 @@ plot_aggregate_mlebin <- function(res_list,
                    xmax_agg))    # TODO take out once have run it.
   }
 
-  # col = col_vec[s])     need to decide on colurs of everything
-  rect_col_vec = col_vec    # TODO just do that for now then tweak when working
-  seg_col_vec = col_vec     # TODO tidy up also, may want vec for borders of rect?
-  # Plot first one to automatically set up axes etc.
+  if(rect_shading_equal_col_vec){
+    rect_shading_col_vec <- col_vec
+    agg_shading_col <- col_agg
+  } else {
+    rect_shading_col_vec <- rep("grey", length(col_vec))
+    agg_shading_col <- "grey"
+  }
 
+  if(rect_border_equal_col_vec){
+    rect_border_col_vec <- col_vec
+    agg_border_col <- col_agg
+  } else {
+    rect_border_col_vec <- rep("black", length(col_vec))
+    agg_border_col <- "black"
+  }
+
+  # col = col_vec[s])     need to decide on colurs of everything
+  # TODO may need
+  seg_col_vec = col_vec     # TODO tidy up also, may want vec for borders of rect?
+                           # TODO may want for MLEbins if want green still in
+                           # there, bit doubtful though as would get too busy I
+                           # expect
+
+  # Plot first one to automatically set up axes etc.
   plot(res_list[[1]],    # Call depends on class of res_list[[1]]
        xlim = xlim_global,
        ylim = ylim_global,
@@ -160,22 +195,25 @@ plot_aggregate_mlebin <- function(res_list,
        fit_col = col_vec[1],
        legend_text_a = NA,
        legend_text_a_n = NA,
-       seg_col = seg_col_vec[1]    # make an argument? TODO  NEED arg for rect, colours are off
-       # rect_border_col = rect_col_vec[1]    # think need this, once above line is
-       # working TODO
+       seg_col = seg_col_vec[1],    # make an argument? TODO  NEED arg for rect,
+       # colours are off
+       rect_shading_col = rect_shading_col_vec[1],
+       rect_border_col = rect_border_col_vec[1]
        )   # want ... I think xlab etc
 
-  # Full data, taking from plot_isd_binned():
+  # Full aggregated data, taking from plot_isd_binned():
     rect(xleft = aggregated_data$bin_min,
        ybottom = aggregated_data$low_count,
        xright = aggregated_data$bin_max,
        ytop = aggregated_data$high_count,
-       col = "black")  #rect_col_vec[1])   # TODO add option, default prob grey
+       col = agg_shading_col,
+       border = agg_border_col)
+
   segments(x0 = aggregated_data$bin_min,
            y0 = aggregated_data$count_gte_bin_min,
            x1 = aggregated_data$bin_max,
            y1 = aggregated_data$count_gte_bin_min,
-           col = "black")  # seg_col_vec[1])  # TODO even need these?
+           col = agg_border_col)
 
   # if(log == "xy")    # Not including any other option yet, TODO see if decide to
 
@@ -190,13 +228,14 @@ plot_aggregate_mlebin <- function(res_list,
                      nrow(extra_rect)),
        xright = extra_rect$bin_max,
        ytop = extra_rect$high_count,
-       col = "black")  # TODO argument
+       col = agg_shading_col,
+       border = agg_border_col)
 
   segments(x0 = aggregated_data$bin_min,
            y0 = aggregated_data$count_gte_bin_min,
            x1 = aggregated_data$bin_max,
            y1 = aggregated_data$count_gte_bin_min,
-           col = "black")  # TODO
+           col = agg_border_col)
   # }
 
   # x values at which to calculate PLB's and PLB_agg; may have to do each one
@@ -242,8 +281,8 @@ plot_aggregate_mlebin <- function(res_list,
          ybottom = this_group_data$low_count,
          xright = this_group_data$bin_max,
          ytop = this_group_data$high_count,
-         col = rect_col_vec[s],
-         border = rect_col_vec[s])
+         col = rect_shading_col_vec[s],
+         border = rect_border_col_vec[s])
     segments(x0 = this_group_data$bin_min,
              y0 = this_group_data$count_gte_bin_min,
              x1 = this_group_data$bin_max,
@@ -262,8 +301,8 @@ plot_aggregate_mlebin <- function(res_list,
                        nrow(extra_rect)),
          xright = extra_rect$bin_max,
          ytop = extra_rect$high_count,
-         col = rect_col_vec[s],
-         border = rect_col_vec[s])
+         col = rect_shading_col_vec[s],
+         border = rect_border_col_vec[s])
 
     segments(x0 = this_group_data$bin_min,
              y0 = this_group_data$count_gte_bin_min,
