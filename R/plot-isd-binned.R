@@ -2,6 +2,8 @@
 ##' or used directly from `plot.size_spectrum_numeric()` to make an LBN-style
 ##' plot of individual values and MLE plot.
 ##'
+##' TODO, define boxes if used extensively below
+##'
 ##' @inheritParams plot.size_spectrum_numeric
 ##' @inheritParams plot.size_spectrum_mlebin
 ##' @param x_plb vector of values to use to plot the fitted PLB curve; if NA then
@@ -19,8 +21,11 @@
 ##' @param plot_conf_ints logical whether to plot confidence intervals or not
 ##' @param par_mai vector of values to use for `par(mai)`
 ##' @param par_cex numeric value to use for `par(cex)` (font size)
-##' @param seg_col colour to use for the segments (green in Fig. 7 of
-##'   MEPS paper).
+##' @param seg_col colour to use for the segments (top line of each box; green
+##'   in Fig. 7 of MEPS paper).
+##' @param rect_shading_col colour to use for the shading of the boxes
+##' @param rect_border_col colour to use for the borders of the boxes; can be
+##' `NA` to omit (see `border` arg of [rect()]).
 ##' @param fit_col colour to use for fitted curves
 ##' @param fit_lwd line thickness to use for fitted curves
 ##' @param conf_lty line type to use for confidence intervals
@@ -76,7 +81,13 @@ plot_isd_binned <- function(res_mlebin,
                             seg_col = "green",   # want these parsed along if
                                         # they're changed by users in original
                                         # call - useArgs or something? TODO
-                            rect_col = "grey",
+                                        # think might be automatic, these next
+                                        # two seem to work with
+                                        # plot(res_mlebin_list[[1]],
+                                        # rect_border_col = "yellow") from
+                                        # aggregated vignette
+                            rect_shading_col = "grey",
+                            rect_border_col = "black",
                             fit_col = "red",
                             fit_lwd = 2,
                             conf_lty = 2,
@@ -153,7 +164,8 @@ plot_isd_binned <- function(res_mlebin,
        ybottom = dat$low_count,
        xright = dat$bin_max,
        ytop = dat$high_count,
-       col = rect_col)
+       col = rect_shading_col,
+       border = rect_border_col)
   segments(x0 = dat$bin_min,
            y0 = dat$count_gte_bin_min,
            x1 = dat$bin_max,
@@ -172,7 +184,8 @@ plot_isd_binned <- function(res_mlebin,
                        nrow(extra_rect)),
          xright = extra_rect$bin_max,
          ytop = extra_rect$high_count,
-         col = rect_col)
+         col = rect_shading_col,
+         border = rect_border_col)
 
   segments(x0 = dat$bin_min,
            y0 = dat$count_gte_bin_min,

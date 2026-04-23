@@ -39,7 +39,7 @@ plot_aggregate_mlebin <- function(res_list,
                                   ylim_global = NULL,
                                   y_scaling = 0.25,
                                   return_agg_x_y = TRUE,
-                                  ...){
+                                  ...){   # TODO not actually used yet, but search below
 
   # Basing this on plot_aggregate() for size_spectrum_numeric results and using
   # code from plot.size_spectrum_mlebin(). Also moving in calculations that were
@@ -148,20 +148,21 @@ plot_aggregate_mlebin <- function(res_list,
                    xmax_agg))    # TODO take out once have run it.
   }
 
-
   # col = col_vec[s])     need to decide on colurs of everything
-  rect_col = col_vec    # TODO just do that for now then tweak when working
-  seg_col = col_vec     # TODO tidy up also, may want vec for borders of rect?
+  rect_col_vec = col_vec    # TODO just do that for now then tweak when working
+  seg_col_vec = col_vec     # TODO tidy up also, may want vec for borders of rect?
   # Plot first one to automatically set up axes etc.
-  plot(res_list[[1]],
+
+  plot(res_list[[1]],    # Call depends on class of res_list[[1]]
        xlim = xlim_global,
        ylim = ylim_global,
        # col = col_vec[1],
        fit_col = col_vec[1],
        legend_text_a = NA,
        legend_text_a_n = NA,
-       seg_col = rect_col[1],    # make an argument? TODO  NEED arg for rect, colours
-                            # are off
+       seg_col = seg_col_vec[1]    # make an argument? TODO  NEED arg for rect, colours are off
+       # rect_border_col = rect_col_vec[1]    # think need this, once above line is
+       # working TODO
        )   # want ... I think xlab etc
 
   # Full data, taking from plot_isd_binned():
@@ -169,12 +170,12 @@ plot_aggregate_mlebin <- function(res_list,
        ybottom = aggregated_data$low_count,
        xright = aggregated_data$bin_max,
        ytop = aggregated_data$high_count,
-       col = "black")  #rect_col[1])
+       col = "black")  #rect_col_vec[1])   # TODO add option, default prob grey
   segments(x0 = aggregated_data$bin_min,
            y0 = aggregated_data$count_gte_bin_min,
            x1 = aggregated_data$bin_max,
            y1 = aggregated_data$count_gte_bin_min,
-           col = "black")  # seg_col[1])  # TODO even need these?
+           col = "black")  # seg_col_vec[1])  # TODO even need these?
 
   # if(log == "xy")    # Not including any other option yet, TODO see if decide to
 
@@ -241,13 +242,13 @@ plot_aggregate_mlebin <- function(res_list,
          ybottom = this_group_data$low_count,
          xright = this_group_data$bin_max,
          ytop = this_group_data$high_count,
-         col = rect_col[s],
-         border = rect_col[s])
+         col = rect_col_vec[s],
+         border = rect_col_vec[s])
     segments(x0 = this_group_data$bin_min,
              y0 = this_group_data$count_gte_bin_min,
              x1 = this_group_data$bin_max,
              y1 = this_group_data$count_gte_bin_min,
-             col = seg_col[s])
+             col = seg_col_vec[s])
 
   # if(log == "xy")    # Not including any other option yet, TODO see if decide to
 
@@ -261,14 +262,14 @@ plot_aggregate_mlebin <- function(res_list,
                        nrow(extra_rect)),
          xright = extra_rect$bin_max,
          ytop = extra_rect$high_count,
-         col = rect_col[s],
-         border = rect_col[s])
+         col = rect_col_vec[s],
+         border = rect_col_vec[s])
 
     segments(x0 = this_group_data$bin_min,
              y0 = this_group_data$count_gte_bin_min,
              x1 = this_group_data$bin_max,
              y1 = this_group_data$count_gte_bin_min,
-             col = seg_col[s])
+             col = seg_col_vec[s])
 
     x_plb <- 10^seq(log10(xmin_vec[s]),
                     log10(xmax_vec[s]),

@@ -69,11 +69,12 @@ plot.size_spectrum_mlebin <- function(res_mlebin,
                                                                round(sum(res_mlebin$data$bin_count))),
                                       legend_text_b = NULL,
                                       legend_text_b_n = NULL,
-                                      seg_col = "black",
+                                      # seg_col = "black",
                                       par_mai = c(0.4, 0.5, 0.05, 0.3),
                                       par_cex = 0.7,   # only for two panel
                                          # plots, use par() as usual for single plots
-
+                                      seg_col = NULL,         # define to be
+                                      # NULL here, but switch to black if not overridden
                                       ...
                                       ){   # TODO decide if want ... yes, just
                                         # make sure help files link to all functions
@@ -84,6 +85,18 @@ plot.size_spectrum_mlebin <- function(res_mlebin,
               style %in% c("log_y_axis", "linear_y_axis", "both_y_axes",
                            "biomass", "biomass_and_log"))
   par_orig <- par(no.readonly = TRUE)
+
+  # if seg_col is not defined (so remains NULL) but rect_border_col is, then set the former to the
+  # latter, but it won't do this for mlebins because we set seg_col = "green" there
+  if(!hasArg(seg_col)){
+    if(hasArg(rect_border_col)){
+      seg_col <- eval.parent(match.call()[["rect_border_col"]])
+    } else {
+      seg_col <- "black"           # rect() defaults to black anyway, as
+    }                              # used for the rectangles, so no need to define
+  }                                # Else just stick with seg_col
+
+
 
   # Work out calculations needed for both types of plot and then pass them on to
   # plot_isd_binned():
@@ -133,7 +146,7 @@ plot.size_spectrum_mlebin <- function(res_mlebin,
     log_axes <- ifelse(style == "log_y_axis",
                        "xy",
                        "x")    # TODO test this
-
+browser()
     plot_isd_binned(res_mlebin = res_mlebin,
                     log = log_axes,
                     xlim = xlim,
