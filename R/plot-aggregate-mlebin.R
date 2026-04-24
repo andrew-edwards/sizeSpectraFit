@@ -1,7 +1,7 @@
-##' Do an aggregated MLEbin plot of several PLB fits, each to a separate (but related)
+##' Do an aggregated MLEbin or MLEbins plot of several PLB fits, each to a separate (but related)
 ##' group of individuals.
 ##'
-##' TODO Users may need to play with the colour settings to get an instructive
+##' Users may need to play with the colour settings to get an instructive
 ##' plot; it is hard to automate all of them, see the arguments available.
 ##'
 ##' TODO note for me: this creates the first plot using plot... then makes the
@@ -9,7 +9,7 @@
 ##'
 ##' TODO forcussing on MLEbins first, but should be general enough but need
 ##' testing for MLEbin. This is copying [plot_aggregate] and then
-##' editing. Worked for Med data, so do test for simulated MLEbin data (which
+##' editing. Worked for Med data, so do test for simulated MLEbin data.
 ##' isn't easy).
 ##'
 ##' TODO Am making plot_aggregate_mlebin() and maybe

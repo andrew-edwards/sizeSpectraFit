@@ -63,6 +63,7 @@ test_that("dPLB_agg() and plotting functions work with different settings", {
   xmax_known <- c(80, 4000, 1000, 1500)
 
   res_list <- list()                      # To save results
+  res_mlebin_list <- list()                      # To save results
 
   for(s in 1:S){
     x_values <- rPLB(n_vec[s],
