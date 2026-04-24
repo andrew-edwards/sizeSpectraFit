@@ -14,6 +14,8 @@ plot_aggregate_fits(
   lty_strata = c(1, 4, 5),
   xlim = NULL,
   ylim = NULL,
+  inset_text = c(0, 0.04),
+  legend_text_second_row_multiplier = 2,
   ...
 )
 }
@@ -45,17 +47,17 @@ xmin values, but the
 default axis will go way too low (it is hard to automate this, so just
 refine \code{ylim} to celarly show the aymptotes).}
 
+\item{inset_text}{passed onto \code{\link[=legend]{legend()}}}
+
+\item{legend_text_second_row_multiplier}{numeric multiplier of the second
+row of legend text to space it out, especially for smaller panel plots.}
+
 \item{...}{additional arguments passed onto \code{\link[=plot]{plot()}}}
-}
-\value{
-list with two objects, \code{x_plb_agg} and \code{y_plb_agg}, which are the
-fitted x and y values for the aggregated size spectrum (which does not
-have a simple exponent). To then use for plotting multiple strata in \code{\link[=plot_aggregate_fits]{plot_aggregate_fits()}}.
 }
 \description{
 Uses the results from \code{\link[=plot_aggregate_mlebin]{plot_aggregate_mlebin()}} to plot aggregated size
-spectra for several strata on a single plot. Has options for normalising and
-restricting x range to give justifiable comparisons.
+spectra for several strata on a single rank/frequency style plot. Has options
+for normalising and restricting x range to give justifiable comparisons.
 }
 \examples{
 \dontrun{

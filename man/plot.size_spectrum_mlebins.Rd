@@ -7,8 +7,9 @@
 \method{plot}{size_spectrum_mlebins}(res_mlebins, seg_col = "green", ...)
 }
 \arguments{
-\item{seg_col}{colour to use for the segments (green in Fig. 7 of
-MEPS paper).}
+\item{seg_col}{colour to use for the segments (top line of each box; green
+in Fig. 7 of MEPS paper); default in \code{plot.size_spectrum_mlebin()} is NULL
+which gets converted to \code{black} in that function.}
 
 \item{...}{Further arguments for \code{plot_isd()} and then \code{plot()}, except
 cannot have \code{log} as that gets overridden. TODO check}

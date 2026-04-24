@@ -2,16 +2,19 @@
 % Please edit documentation in R/plot-aggregate-mlebin.R
 \name{plot_aggregate_mlebin}
 \alias{plot_aggregate_mlebin}
-\title{Do an aggregated MLEbin plot of several PLB fits, each to a separate (but related)
+\title{Do an aggregated MLEbin or MLEbins plot of several PLB fits, each to a separate (but related)
 group of individuals.}
 \usage{
 plot_aggregate_mlebin(
   res_list,
   col_vec = c("orange", "lightblue", "green", "darkblue", "darkgreen"),
   col_agg = "magenta",
+  rect_shading_equal_col_vec = FALSE,
+  rect_border_equal_col_vec = TRUE,
   xlim_global = NULL,
   ylim_global = NULL,
   y_scaling = 0.25,
+  return_agg_x_y = TRUE,
   ...
 )
 }
@@ -19,7 +22,19 @@ plot_aggregate_mlebin(
 \item{res_list}{list of results, with each component a list object of a
 given type TODO share help with plot-aggregate.}
 
-\item{col_vec}{vector of colours to assign for each group}
+\item{col_vec}{vector of colours to assign for each group, used for the
+border of the rectangles and the fitted curve.}
+
+\item{rect_shading_equal_col_vec}{logical, if TRUE then shade in the
+rectangles with the colour for that group, else if FALSE stick with grey. Will depend
+how the figure looks (sometimes you cannot see the fitted curve if the
+rectangles are large and the curve blends in); hard to fully automate.}
+
+\item{rect_border_equal_col_vec}{logical, if TRUE then colour the borders of the
+rectangles with the colour for that group, else stick with black. Will depend
+how the figure looks; hard to fully automate.}
+
+\item{return_agg_x_y}{logical, whether to return the aggregated x and y for plotting}
 }
 \value{
 list with two objects, \code{x_plb_agg} and \code{y_plb_agg}, which are the
@@ -27,10 +42,18 @@ fitted x and y values for the aggregated size spectrum (which does not
 have a simple exponent). To then use for plotting multiple strata in \code{\link[=plot_aggregate_fits]{plot_aggregate_fits()}}.
 }
 \description{
-TODO forcussing on MLEbins first, but should be general enough but need
-testing for MLEbin. This is copying \link{plot_aggregate} and then editing.
+Users may need to play with the colour settings to get an instructive
+plot; it is hard to automate all of them, see the arguments available.
 }
 \details{
+TODO note for me: this creates the first plot using plot... then makes the
+subsequent rectangles and lines here.
+
+TODO forcussing on MLEbins first, but should be general enough but need
+testing for MLEbin. This is copying \link{plot_aggregate} and then
+editing. Worked for Med data, so do test for simulated MLEbin data.
+isn't easy).
+
 TODO Am making plot_aggregate_mlebin() and maybe
 plot_aggregate_mlebins(), though prob best to make the latter the same,
 and don't want the green lines as a bit too confusing maybe.; could check

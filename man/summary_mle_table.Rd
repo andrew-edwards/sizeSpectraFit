@@ -4,7 +4,9 @@
 \name{summary_mle_table}
 \alias{summary_mle_table}
 \alias{summary_mle_table.determine_xmin_and_fit}
-\title{TODO Print a Markdown summary table of main results from...  adapting from HDIanalysis}
+\title{TODO Print a Markdown summary table of main results from...  adapting from
+HDIanalysis. First make a generic one from ....and-fit.R, and just keep
+calling that, extracting the correct mle results from each type of object}
 \usage{
 summary_mle_table(obj, ...)
 

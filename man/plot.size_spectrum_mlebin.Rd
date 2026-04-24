@@ -22,9 +22,9 @@ bins).}
   legend_text_a_n = paste0("n=", round(sum(res_mlebin$data$bin_count))),
   legend_text_b = NULL,
   legend_text_b_n = NULL,
-  seg_col = "black",
   par_mai = c(0.4, 0.5, 0.05, 0.3),
   par_cex = 0.7,
+  seg_col = NULL,
   ...
 )
 }
@@ -76,12 +76,13 @@ of MEPS paper, or the only panel for a one-panel plot (\code{log_y_axis = "yes"}
 \item{legend_text_b}{text to include in the legend for panel
 b for two-panel plot (\code{log_y_axis = "both"}); ignored for one-panel plot}
 
-\item{seg_col}{colour to use for the segments (green in Fig. 7 of
-MEPS paper).}
-
 \item{par_mai}{vector of values to use for \code{par(mai)}}
 
 \item{par_cex}{numeric value to use for \code{par(cex)} (font size)}
+
+\item{seg_col}{colour to use for the segments (top line of each box; green
+in Fig. 7 of MEPS paper); default in \code{plot.size_spectrum_mlebin()} is NULL
+which gets converted to \code{black} in that function.}
 
 \item{...}{Further arguments for \code{plot_isd()} and then \code{plot()}, except
 cannot have \code{log} as that gets overridden. TODO check}

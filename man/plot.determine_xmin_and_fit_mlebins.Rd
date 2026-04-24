@@ -7,7 +7,7 @@
 \title{Plot results from determining xmin by mode method and then fitting use
 MLEbin or MLEbins method  TODO combine help, do all in plot.determine_xmin_and_fit}
 \usage{
-\method{plot}{determine_xmin_and_fit_mlebin}(res, ...)
+\method{plot}{determine_xmin_and_fit_mlebin}(res, seg_col = "black", main_hist = "", ...)
 
 \method{plot}{determine_xmin_and_fit_mlebins}(
   res,
@@ -15,11 +15,18 @@ MLEbin or MLEbins method  TODO combine help, do all in plot.determine_xmin_and_f
   par_mai = c(0.4, 0.5, 0.05, 0.3),
   par_cex = 0.7,
   seg_col = "green",
+  main_hist = "",
   ...
 )
 }
 \arguments{
 \item{res}{list of class \code{determine_xmin_for_mlebins_and_fit} as output from \code{determine_xmin_for_mlebins_and_fit()}}
+
+\item{seg_col}{colour to use for the segments (top line of each box; green
+in Fig. 7 of MEPS paper); default in \code{plot.size_spectrum_mlebin()} is NULL
+which gets converted to \code{black} in that function.}
+
+\item{main_hist}{title for histogram; useful if doing strata}
 
 \item{...}{arguments to passed onto \code{\link[=hist]{hist()}} or \code{\link[=plot.size_spectrum_mlebins]{plot.size_spectrum_mlebins()}}}
 
@@ -30,9 +37,6 @@ the linear axis).}
 \item{par_mai}{vector of values to use for \code{par(mai)}}
 
 \item{par_cex}{numeric value to use for \code{par(cex)} (font size)}
-
-\item{seg_col}{colour to use for the segments (green in Fig. 7 of
-MEPS paper).}
 }
 \value{
 figure in current device  TODO inheritParams

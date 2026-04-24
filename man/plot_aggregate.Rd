@@ -3,13 +3,15 @@
 \name{plot_aggregate}
 \alias{plot_aggregate}
 \title{Do an aggregated plot of several PLB fits, each to a separate (but related)
-group of individuals.}
+group of individuals, and return aggregated plot}
 \usage{
 plot_aggregate(
   res_list,
-  col_vec = c("orange", "lightblue", "green", "magenta"),
+  col_vec = c("orange", "lightblue", "green", "darkblue", "darkgreen"),
+  col_agg = "magenta",
   xlim_global = NULL,
-  ylim_global = NULL
+  ylim_global = NULL,
+  return_agg_x_y = TRUE
 )
 }
 \arguments{
@@ -21,17 +23,23 @@ user outfacing function, or also make plot_aggregate_numeric and just call
 the right one. Some of the details could be shared here maybe.}
 
 \item{col_vec}{vector of colours to assign for each group}
+
+\item{return_agg_x_y}{logical, whether to return the aggregated x and y for plotting
+values of the aggregated fit}
 }
 \value{
 nothing TODO, should this return something?
 }
 \description{
 Given a list of MLE results (TODO check how many different types), combine
-the data and show an aggregated distribtuion, as well as the individual fits.
+the data and show an aggregated distribtuion, as well as the individual
+fits. Return the x and y values of the aggregated plot. The calculations use
+the ranges of the axes, which is why calculations and plotting is combined
+here in the same function.
 }
 \examples{
 \dontrun{
-# See aggregating-size-spectra.Rmd TODO copy something to here maybe
+# See fit-aggregated.Rmd vignette
 }
 
 }

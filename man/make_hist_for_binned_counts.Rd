@@ -4,13 +4,13 @@
 \alias{make_hist_for_binned_counts}
 \title{Take a tibble with \code{bin_min}, \code{bin_max}, and \code{bin_count} and assign counts
 to new equal bins based on \code{bin_min}, summing the original counts (which can
-be non-integer)}
+be non-integer).}
 \usage{
 make_hist_for_binned_counts(dat, bin_width = 1, bin_start = NULL)
 }
 \arguments{
 \item{dat}{tibble of data in the format required for fitting
-using MLEbin or MLEbins methods; i.e. at a minimum has to include the columns:
+using MLEbins methods; i.e. at a minimum has to include the columns:
 * \code{bin_min}
 * \code{bin_max}
 * \code{bin_count}.}
@@ -31,10 +31,10 @@ a histogram list object with components (see \code{?hist}):
 }
 }
 \description{
-Called from \code{\link[=determine_xmin_and_fit_mlebin]{determine_xmin_and_fit_mlebin()}} and
-\code{\link[=determine_xmin_and_fit_mlebins]{determine_xmin_and_fit_mlebins()}} to determine xmin for MLEbin and MLEbins
-methods. Adapting from \code{sizeSpectraFit::make_hist()} and the old
-sizeSpectraHake::make_hist()`.
+Called from
+\code{\link[=determine_xmin_and_fit_mlebins]{determine_xmin_and_fit_mlebins()}} to determine xmin for MLEbins
+method. Adapting from \code{sizeSpectraFit::make_hist()} and the old
+sizeSpectraHake::make_hist()`. TODO can delete that sentence once satisfied
 }
 \details{
 Gives values as a histogram list object and creates 0 counts for missing bins.

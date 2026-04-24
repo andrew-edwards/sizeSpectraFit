@@ -39,7 +39,8 @@ plot_isd_binned(
   y_small_ticks_labels = NULL,
   y_scaling = 0.75,
   seg_col = "green",
-  rect_col = "grey",
+  rect_shading_col = "grey",
+  rect_border_col = "black",
   fit_col = "red",
   fit_lwd = 2,
   conf_lty = 2,
@@ -76,8 +77,14 @@ log-log plot, but goes to the proportion \code{y_scaling} (<1)
 of the minimum value of counts greater than the highest \code{bin_min} value. Do
 such that can see the right-most bin in all plots.}
 
-\item{seg_col}{colour to use for the segments (green in Fig. 7 of
-MEPS paper).}
+\item{seg_col}{colour to use for the segments (top line of each box; green
+in Fig. 7 of MEPS paper); default in \code{plot.size_spectrum_mlebin()} is NULL
+which gets converted to \code{black} in that function.}
+
+\item{rect_shading_col}{colour to use for the shading of the boxes}
+
+\item{rect_border_col}{colour to use for the borders of the boxes; can be
+\code{NA} to omit (see \code{border} arg of \code{\link[=rect]{rect()}}).}
 
 \item{fit_col}{colour to use for fitted curves}
 
@@ -102,9 +109,7 @@ single panel plot of the ISD with data in binned form like in
 Fig. 7a or 7b of MEPS paper, but with nonoverlapping bins; returns nothing.
 }
 \description{
-Plot a single binned ISD plot, as called from \code{plot.size_spectrum_mlebin()},
-or used directly from \code{plot.size_spectrum_numeric()} to make an LBN-style
-plot of individual values and MLE plot.
+TODO, define boxes if used extensively below
 }
 \examples{
 \dontrun{

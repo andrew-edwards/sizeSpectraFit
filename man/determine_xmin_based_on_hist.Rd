@@ -2,19 +2,22 @@
 % Please edit documentation in R/determine-xmin-based-on-hist.R
 \name{determine_xmin_based_on_hist}
 \alias{determine_xmin_based_on_hist}
-\title{Given histogram object of counts and bins, determine the mode and return min of that bin as xmin}
+\title{Given histogram object of counts and bins (and maybe density) , determine the mode and return min of that bin as xmin}
 \usage{
 determine_xmin_based_on_hist(h)
 }
 \arguments{
-\item{h}{histogram object, e.g. from running \code{\link[=make_hist]{make_hist()}} or \code{\link[=make_hist_for_binned_counts]{make_hist_for_binned_counts()}} on a vector}
+\item{h}{histogram object, e.g. from running \code{\link[=make_hist]{make_hist()}} on a vector, or
+\code{\link[=make_hist_for_binned_counts]{make_hist_for_binned_counts()}} or
+\code{\link[=make_hist_for_binned_counts_mlebin]{make_hist_for_binned_counts_mlebin()}} on a data.frame for MLEbins or MLEbin
+method, respectively.}
 }
 \value{
 x_min to use to fit ISD, and to plot the histogram to show the full
 data and the mode.
 }
 \description{
-Given histogram object of counts and bins, determine the mode and return min of that bin as xmin
+Given histogram object of counts and bins (and maybe density) , determine the mode and return min of that bin as xmin
 }
 \examples{
 \dontrun{

@@ -5,13 +5,7 @@
 \title{Given data for MLEbin calculation, determine a common binning and use that
 to calculate \code{x_min} and then fit using MLEbin.}
 \usage{
-determine_xmin_and_fit_mlebin(
-  dat,
-  bin_width = 1,
-  bin_start = 0,
-  x_min = NULL,
-  ...
-)
+determine_xmin_and_fit_mlebin(dat, x_min = NULL, ...)
 }
 \arguments{
 \item{dat}{tibble of data in the format required for fitting
