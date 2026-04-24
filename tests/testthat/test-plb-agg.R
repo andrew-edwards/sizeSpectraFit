@@ -72,6 +72,19 @@ test_that("dPLB_agg() and plotting functions work with different settings", {
 
     res_list[[s]] <- fit_size_spectrum(x_values)    # x_values get included in
     # MLE_res[[s]]
+
+    # Binned values for later
+    x_values_binned <- bin_data(x_values,
+                                bin_width = 20)$bin_vals
+
+    # Without this x_min would get set to zero, as detailed in error message in
+    #  fit_size_spectrum_mlebin
+    if(min(x_values_binned$bin_min) == 0){
+      x_values_binned[which(x_values_binned$bin_min == 0), "bin_min"] <- 0.00001
+    }
+
+    res_mlebin_list[[s]] <- fit_size_spectrum(x_values_binned)
+                 # binned data get included in res_mlebin_list[[s]]
   }
 
   expect_invisible(orig_agg_fit <- plot_aggregate(res_list))
@@ -103,6 +116,9 @@ test_that("dPLB_agg() and plotting functions work with different settings", {
   expect_invisible(plot_aggregate_fits(agg_list_2,
                                        strata_names = strata,
                                        ylim = c(10^(-4), 1)))
+
+  # MLEbin plots
+  expect_invisible(mlebin_agg_fit <- plot_aggregate_mlebin(res_mlebin_list))
 
 })
 
