@@ -26,19 +26,11 @@ knitr::opts_chunk$set(
 )
 ```
 
-1. Take from report/aggregated example and med-summary-4.Rmd, as the latter will
-   have automated some plotting etc.
-
-2. Don't need to explain details too much as refer to Supp Mat.
-
 We demonstrate the normalised aggregated size spectrum here, as introduced in
 TODO -- see TODO for details.
 
-TODO check exopontnes in later examples make sense; have to first fix the
-legends in basic plots.
-
 The idea is that we can fit size spectra to different parts of the community,
-but it is in appropriate to fit a single size spectrum to the full community
+but it is inappropriate to fit a single size spectrum to the full community
 because of differences in sampling protocols between different species
 groups. For example, the sampling of zooplankton (e.g. using bongo nets) and
 pelagic fish (e.g. using a midwater trawl net) is quite different, and we cannot
@@ -50,13 +42,8 @@ reserve that was protected from fishing, and fishing grounds), showing TODO copy
 page 30 text and Figure B.23 here if accepted.
 
 Here we simulate some data to show the code needed to fit a normalised
-aggregated size spectrum (NASS).
-
-TODO
-
-This is from aggregating-size-spectra.Rmd, which then got superceded by the
-proper analysis. So use this to simulate data, then switch to functionalised
-format I had for actual data:
+aggregated size spectrum (NASS). We first use individual body sizes, and then do
+the same for data that are only available in binned form.
 
 ## Generate simulated data
 
@@ -67,6 +54,8 @@ understanding).
 
 Each sample has a different sample sizes, exponent, and
 range of body sizes, prescribed as vectors:
+
+TODO could maybe redo if I do the strata idea, or the fitting of lists.
 
 ```{r simulations}
 set.seed(42)
@@ -117,7 +106,7 @@ for(s in 1:S){
 }
 ```
 
-## Aggregating distributions
+### Aggregating distributions
 
 So we have `r S` fitted distributions that we want to aggregate, which we can do
 and plot with a single function:
@@ -126,7 +115,7 @@ and plot with a single function:
 orig_agg_fit <- plot_aggregate(res_list)
 ```
 
-## Simulate disproportionate removal of larger individuals
+### Simulate disproportionate removal of larger individuals
 
 To show the functionality of using different strata, we take the above data and
 disproportionately remove larger fish within each species group. Just removing
@@ -212,11 +201,11 @@ the unfished strata. Note that both curves have to start at the same point, and
 reach 0 on the y-axis; minor changes that we see here are therefore indeed of
 importance (because the differences can only be so big).
 
-## More extreme removal example
+### More extreme removal example
 
 To further illustrate the NASS idea, we repeat the above simulation experiment
 but simply remove 50% of all 
-individuals $\geq$100 g. The code is largely the same as above, with changes to the
+individuals $\geq$ 100 g. The code is largely the same as above, with changes to the
 removal of individuals.
 
 ```{r, removeinds2}
@@ -304,7 +293,7 @@ the unfished strata. Note that both curves have to start at the same point, and
 reach 0 on the y-axis; minor changes that we see here are therefore indeed of
 importance (because the differences can only be so big).
 
-## MLEbin method
+## Doing the above but for binned data
 
 The same analyses can be done for data that are only available in binned
 form. See TODO (Juliana's) for an example using the MLEbins method, for which we
@@ -314,10 +303,6 @@ relationships.
 Here we simulate the same data as above and then bin it, to then fit using the
 MLEbin method and consequent plotting.
 
-HERE copied the above to here and then adapting and making shorter
-
-But first need to addapt `fit_size_spectrum_mlebin()` to deal with what happens
-when lowest bin is 0, such that xmin becomes zero.
 ```{r simulationsmlebin}
 set.seed(42)
 
@@ -368,7 +353,7 @@ for(s in 1:S){
 }
 ```
 
-## Aggregating distributions
+### Aggregating distributions
 
 Aggregate as before:
 
@@ -376,10 +361,10 @@ Aggregate as before:
 orig_agg_fit_mlebin <- plot_aggregate_mlebin(res_mlebin_list)
 ```
 
-## Simulate disproportionate removal of larger individuals
+### Simulate disproportionate removal of larger individuals
 
-We repeat the above `More extreme removal example' here, using the same idea
-(simply removing 50% of all individuals > 100 g, based on `bin_min`),
+We repeat the above `More extreme removal example` here, using the same idea
+(simply removing 50% of all individuals $\geq$ 100 g, based on `bin_min`),
 but binning the data and then fitting it using the MLEbin method.
 
 ```{r, removeinds2mlebin}
@@ -432,20 +417,7 @@ plot_aggregate_fits(agg_list_mlebin,
                     ylim = c(10^(-4), 1))
 ```
 
-TODO shorten text
-Since there is no simple size-spectrum exponent for such aggregated fits, and
-they have different $x_{min}$ values and sample sizes, we restrict the fits to
-values above a common value (namely the maximum of the two aggregated
-$x_{min}$ values), and then normalise each aggregated fit by its resulting
-sample size, such that each starts at the same point (same body-mass on the
-x-axis and at 1 on the y-axis, which now represents the proportion (not number) of values
-above each body-mass).
-
-This clearly shows a `steepening' of the size spectrum for the fishing grounds
-compared to the baseline -- the counts are dropping off faster under
-the `fished' scenario. Note the logarithmic
-y-axis, such that apparently minor differences are actually quite large. To
-further understanding, we also plot the same figure but with a linear y-axis:
+And again with a linear y-axis:
 
 ```{r combinedplotnormlinear4, fig.height = 6}
 plot_aggregate_fits(agg_list_mlebin,
@@ -453,15 +425,8 @@ plot_aggregate_fits(agg_list_mlebin,
                     log_axes = "x")
 ```
 
-TODO Again, this shows the fished strata size spectrum declining faster than that of
-the unfished strata. Note that both curves have to start at the same point, and
-reach 0 on the y-axis; minor changes that we see here are therefore indeed of
-importance (because the differences can only be so big).
-
-
-
-
-
+Again, this shows the fished strata size spectrum declining faster than that of
+the unfished strata. 
 
 ## Session information
 

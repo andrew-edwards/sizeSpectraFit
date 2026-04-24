@@ -180,12 +180,10 @@ plot_aggregate_mlebin <- function(res_list,
     agg_border_col <- "black"
   }
 
-  # col = col_vec[s])     need to decide on colurs of everything
-  # TODO may need
-  seg_col_vec = col_vec     # TODO tidy up also, may want vec for borders of rect?
-                           # TODO may want for MLEbins if want green still in
+  seg_col_vec = rect_border_col_vec
+                           # May want different for MLEbins if want green still in
                            # there, bit doubtful though as would get too busy I
-                           # expect
+                           # expect, and didn't for Med paper.
 
   # Plot first one to automatically set up axes etc.
   plot(res_list[[1]],    # Call depends on class of res_list[[1]]
@@ -195,11 +193,10 @@ plot_aggregate_mlebin <- function(res_list,
        fit_col = col_vec[1],
        legend_text_a = NA,
        legend_text_a_n = NA,
-       seg_col = seg_col_vec[1],    # make an argument? TODO  NEED arg for rect,
-       # colours are off
+       seg_col = seg_col_vec[1],
        rect_shading_col = rect_shading_col_vec[1],
        rect_border_col = rect_border_col_vec[1]
-       )   # want ... I think xlab etc
+       )   # want ... I think xlab etc  TODO
 
   # Full aggregated data, taking from plot_isd_binned():
     rect(xleft = aggregated_data$bin_min,

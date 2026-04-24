@@ -98,11 +98,11 @@ test_that("dPLB_agg() and plotting functions work with different settings", {
   for(s in 1:S){
     indiv_sizes <- sort(res_list[[s]]$x)
 
-    # Remove 50% of any individuals > 100 g
+    # Remove 50% of any individuals >= 100 g
     num_sizes <- length(indiv_sizes)
-    indiv_sizes_over_100 <- indiv_sizes[indiv_sizes > 100]
+    indiv_sizes_over_100 <- indiv_sizes[indiv_sizes >= 100]
 
-    x_values <- c(indiv_sizes[indiv_sizes <= 100],
+    x_values <- c(indiv_sizes[indiv_sizes < 100],
                   sample(indiv_sizes_over_100,
                          size = floor(0.5 * length(indiv_sizes_over_100))))
     res_fished_list_2[[s]] <- fit_size_spectrum(x_values)
@@ -120,7 +120,14 @@ test_that("dPLB_agg() and plotting functions work with different settings", {
 
   # MLEbin plots
   expect_invisible(mlebin_agg_fit <- plot_aggregate_mlebin(res_mlebin_list))
+  expect_invisible(mlebin_agg_fit <- plot_aggregate_mlebin(res_mlebin_list,
+                                       rect_shading_equal_col_vec= TRUE,
+                                       rect_border_equal_col_vec = FALSE))
 
+  expect_error(plot_aggregate_mlebin(res_mlebin_list,
+                                     col_vec = "pink"))
+  expect_error(plot_aggregate_mlebin(1:10))
+  expect_error(plot_aggregate_mlebin(list(a = 3)))
 })
 
 
