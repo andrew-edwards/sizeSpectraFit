@@ -102,7 +102,7 @@ TODO need xlab here and called functions
 }
 \details{
 Plots one- or two-panel plot of the ISD with data in binned form like in
-Fig. 7, 7a or 7b (depending on settings) of MEPS paper, but with
+Fig. 7a or 7b (depending on settings) of MEPS paper, but with
 nonoverlapping bins. See \code{log_y_axis} to specify exact plot(s).
 
 Also directly called from \code{plot.size_spectrum_mlebins()} with no

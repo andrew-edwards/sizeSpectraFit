@@ -26,12 +26,19 @@ knitr::opts_chunk$set(
 )
 ```
 
-In our [MEPS paper](https://www.int-res.com/abstracts/meps/v636/p19-33/) we
-introduced the MLEbins method. This calculates the maximum likelihood estimate
+This vignette for the [sizeSpectraFit R
+package](https://github.com/andrew-edwards/sizeSpectraFit?tab=readme-ov-file#sizespectrafit)
+is for the MLEbins method, which we introduced in our [MEPS
+paper](https://www.int-res.com/abstracts/meps/v636/p19-33/).
+We use an example data set from the Mediterranean from our new 
+[Global Ecology and Conservation](https://www.sciencedirect.com/science/article/pii/S2351989426001769).
+
+The MLEbins method calculates the maximum likelihood estimate
 of the size-spectrum exponent, $b$, when the data are collected as lengths and
 we have species-specific length-weight coefficients. So individual body-masses
 are not available; if they were we could use the MLE or MLEbin method in the
-`fit-data.Rmd` vignette.
+[fit-data.html](http://htmlpreview.github.io/?https://github.com/andrew-edwards/sizeSpectraFit/blob/main/vignettes/fit-data.html)
+vignette.
 
 The lengths may already be binned, for example a length bin could be 10-11
 cm. And even when measured more accurately, the resolution of the measurements
@@ -52,6 +59,11 @@ available in sizeSpectraFit as simply
 ```{r meddata}
 mediterranean_data
 ```
+and here we analyse the subset of data
+
+HERE - copy from Mediterranean results data-raw, as simplified down. Or README
+Or look at med-summary-4.Rmd
+
 and are being analysed using sizeSpectraFit as part of a separate manuscript
 (see `?mediterranean_data` for more details). Here we demonstrate the code on a
 subset of the data.
@@ -88,6 +100,8 @@ in the 'true' length of individuals (which obviously is small for the 0.01 mm
 bins, but is needed for the MLEbins method), and progresses the uncertainties
 through to the likelihood calculations.
 
+TODO see README.Rmd, which I'm copying from test. This wasn't updated below
+for 7 months, so is out of date.
 The bin breaks are calculated as:
 ```{r binbreaks}
 # TODO convert this all into calc_max_of_bin():
@@ -123,13 +137,13 @@ We now use these for each species, to generate body-mass bins:
 
 New function:
 D check results agree
-TODO: change name to dat_joined
+
 ```{r convert}
-dat_joined_3 <- length_bins_to_body_mass_bins(dat_all,
+dat_joined <- length_bins_to_body_mass_bins(dat_all,
                                               mediterranean_length_weight_coefficients,
                                               length_data_unit = "mm")
-dat_joined_3
-summary(dat_joined_3)
+dat_joined
+summary(dat_joined)
 ```
 
 TODO revise: It is useful for users to retain see all the columns above, but here we just
@@ -147,8 +161,8 @@ maybe just do the next and explain what is done.
 
 Those steps have been combined into a single function:
 ```{r, mlebins}
-res_3 <- determine_xmin_and_fit_mlebins(dat_joined_3)
-res_3
+res <- determine_xmin_and_fit_mlebins(dat_joined)
+res
 
 ```
 
@@ -178,7 +192,7 @@ TODO explain
 
 
 ```{r, fig}
-plot(res_3)
+plot(res)
 ```
 
 
@@ -188,12 +202,12 @@ these might work:
 ```{r, figlinear}
 # class(res_2)
 # [1] "determine_xmin_and_fit_mlebins" "list"
-plot(res_3$mlebins_fit,
+plot(res$mlebins_fit,
        style = "linear_y_axis")
 ```
 
 ```{r, figlog}
-plot(res_3$mlebins_fit,
+plot(res$mlebins_fit,
        style = "log_y_axis")
 ```
 
@@ -260,245 +274,6 @@ need those in the `select` chunk above. Think this might be okay now.
 knitr::knit_exit()
 ```
 
-
-MLE and MLEbin vignette:
-
-Fitting a size spectrum to a data set using likelihood is done using the
-function `fit_size_spectrum()`. The function automatically selects the
-method to use based on the class of the data, as described by Table 2 in our
-[MEPS paper](https://www.int-res.com/abstracts/meps/v636/p19-33/).
-
-TODO For README file. Let's have a simple vector of real measurements, and do
-the fitting and plotting functions, without extra explanation. This will show
-the simplicity, and refer to vignette for more details. Can use the MLEbins
-vignette maybe (when it's done).
-
-## Measurements of individual body sizes -- MLE method
-
-The simplest data is just a vector of measurements, such as body masses or
-body lengths. We fit the size spectrum by calculating the maximum likelihood estimate
-(the MLE method) of the size-spectrum exponent, along with its 95% confidence intervals.
-
-As an example we use the simulated data from a bounded power-law distribution as used for Figures 1 and 2 of
-our [MEE
-paper](http://onlinelibrary.wiley.com/doi/10.1111/2041-210X.12641/full). The
-values are included in sizeSpectraFit as the data object `sim_vec` (which stands
-for simulated vector), and we assume they are individual body masses measured in
-grammes. Note that the fit will be great
-because the data are sampled from the expected power-law distribution.
-
-First, verify that there are 1000 values and print the first 20 values to take a
-look:
-```{r, MLE1}
-length(sim_vec)
-sim_vec[1:20]
-```
-
-The main fitting function is `fit_size_spectrum()`, which will automatically use
-the MLE method here because the data are a vector of individual values:
-```{r, MLE2}
-res <- fit_size_spectrum(sim_vec)
-res
-```
-The resulting `res` is a list that contains:
-
-- `b_mle`: the MLE of the exponent $b$,
-- `b_conf`: the 95% confidence interval of $b$,
-- `x`: the original data (the printing here is set up to only show the
- first 10 values),
-- `x_min` and `x_max`: the MLEs of $x_{min}$ and $x_{max}$, which are simply the minimum and
- maximum of the data,
-- `method`: tells us that the MLE method was used.
-
-The list `res` also has class `size_spectrum_numeric` which helps with our
-plotting and printing functions.
-
-To plot the PLB fit and the original data as an Individual Size
-Distribution (ISD):
-```{r, MLE4}
-plot(res)
-```
-as recommended in Figure 6b of
-our [MEE paper](http://onlinelibrary.wiley.com/doi/10.1111/2041-210X.12641/full).
-Each individual body mass is shown as a point (note the log scales), the solid
-red line is the maximum likelihood estimate (MLE) of the size-spectrum exponent
-$b$, and the dashed lines are the fits from using the low and high values of the
-95% confidence interval of $b$. The MLE for $b$ and the sample size $n$ are
-also explicitly given. The default x-axis label assumes the body masses are in
-g, but this can easily be changed (see later).
-
-The `style` argument gives other styles of plotting, for example:
-```{r, MLElinearplot}
-plot(res,
-     style = "linear_y_axis")
-```
-gives the same plot but with a linear y-axis.
-
-To show both the above plots together, with panels automatically labelled as (a)
-and (b):
-```{r, MLEbothplot}
-plot(res,
-     style = "both_y_axes")
-```
-which is similar to Figure 7 of our
-[MEPS paper](https://www.int-res.com/abstracts/meps/v636/p19-33/)
-but for nonbinned data.
-
-The fourth option is only suitable when the data represent body masses. It
-shows the normalised biomass:
-```{r, MLEbiomassplot}
-plot(res,
-     style = "biomass")
-```
-
-The black horizontal lines indicate the normalised biomass within each
-bin on the y-axis, and the span on the x-axis shows the range of the bin. We use
-bars, rather than the usual points (e.g. Figure 6(f) of our MEE
-paper) to emphasise that the actual values of body size in each bin span a
-range; the points somewhat imply that the midpoint of the bin is more
-relevant.
-
-Successive bins double in size, such that they appear of equal width on the log
-scale (e.g. Platt and Denman probably TODO). The normalised biomass within each
-one is calcluated as the sum of the biomass in the bin divided by the bin width;
-there is no uncertainty in this calculation here because we know the individual
-body sizes (this is not so if the data are already binned, see later). The
-horizontal red lines show the estimated normalised biomass in each bin based on
-the MLE of the exponent $b$, and the pink boxes span the normalised biomass
-estimated for all values within the 95% confidence interval of $b$. The straight
-lines are also shown for the MLE of $b$ (solid line) and the 95% confidency
-interval estimates (dashed lines). Note that the straight lines fit the PLB
-distribution, whose definition includes the $x_{min}$ and $x_{max}$ bounds (see
-MEE paper equation 1) so the lines are bounded, but the top bin here goes beyond $x_{max}$, even though
-there are no actual body masses there (the bin happens to extend out further).
-
-The fit here is clearly very good, but remember this is expected as the data are
-simulated from a known PLB distribution and are not noisy, unlike real data.
-
-To show the biomass plot and the ISD plot, which is an improved version of the
-suggested plot in Figure 6 of our MEE paper:
-```{r, MLEbiomassisdplot}
-plot(res,
-     style = "biomass_and_isd")
-```
-
-TODO add in GoF once done.
-
-## Measurements that are already binned -- MLEbin method
-
-Often, data are only available in binned form, motivating our MLEbin and MLEbins
-methods (see our MEPS paper for details).
-
-Saved in sizeSpectraFit is a binned version of the simulated data set used above:
-```{r}
-sim_vec_binned
-```
-which has information on counts within each body-mass bin, rather than values of
-individual
-body masses. For example, the first row represent the first bin, which ranges
-from 1-2 g (`bin_min` to `bin_max`), and body masses in
-this range were observed for 528 individuals (`bin_count`). The bins here progressively double
-in width.
-
-To fit the PLB distribution, we again just use the `fit_size_spectrum()`
-function (which automatically detects that we want to use the MLEbin method
-because our data are a data frame rather than a simple vector of individual body
-masses):
-```{r}
-res_mlebin <- fit_size_spectrum(sim_vec_binned)
-res_mlebin
-```
-
-So `res_mlebin` is a list object that contains objects:
-- `b_mle`: the MLE of the exponent $b$ as calculated using the MLEbin method,
-- `b_conf`: the 95% confidence interval of $b$,
-- `data`: the original data as used for the fit, plus some extra calculations
- (TODO define somewhere)
-- `x_min` and `x_max`: the MLEs of $x_{min}$ and $x_{max}$, which are simply the
-minimum of the lowest bin and maximum of the maximum bin,
-- `method`: tells us that the MLEbin method was used.
-- `attr(,"class")` tells us the list is also of class `size_spectrum_mlebin`,
-which helps with our automated plotting and printing functions.
-
-Our default plot for results from the MLEbin method is simply:
-```{r, MLEbinplot}
-plot(res_mlebin)
-```
-
-As for the MLE results above, the `style` argument changes the style of plot:
-```{r, MLEbinlinearplot}
-plot(res_mlebin,
-     style = "linear_y_axis")
-```
-gives the same plot but with a linear y-axis.
-
-To show both the above plots together:
-```{r, MLEbinbothplot}
-plot(res_mlebin,
-     style = "both_y_axes")
-```
-which is similar to, but simpler than, Figure 7 of our
-[MEPS paper](https://www.int-res.com/abstracts/meps/v636/p19-33/)
-because here we do not have species-specific overlapping body-mass bins.
-
-The fourth option is only suitable when the data represent body masses. It
-shows the normalised biomass:
-```{r, MLEbinbiomassplot}
-plot(res_mlebin,
-     style = "biomass")
-```
-and is interpreted the same way as the earlier plot for the MLE method (but here
-the bins are already predefined, because that is how the data are provided).
-
-And to show this plot and the first one as two panels:
-```{r, MLEbinbiomassandlogplot}
-plot(res_mlebin,
-     style = "biomass_and_log")
-```
-The y-axes happen to have the same numbers (though they mean different things) for this simulated data set, though
-this will not generally be the case.
-
-Both figures show that the PLB distribution is an excellent fit for these data
-the red curves go through the top-left and bottom-right corners of the grey
-boxes. Of course, the data are simulated from a PLB distribution and so should
-be a good fit, but these figures show the benefit of the plotting approach
-(which may not have been so obvious in our MEPS Figure 7 for data with a complex bin
-structure).
-
-All the plots are customisable, for example to add extra tick labels to pretty
-up a final plot:
-```{r, MLEbinplot2)
-plot(res_mlebin,
-     x_small_ticks_labels = c(5, 50, 500))
-```
-See `?plot.size_spectrum_numeric` for details.
-TODO and _MLEbin? Don't expect so as help should  link them.
-
-
- D make a general `calc_mle_conf` function based on previous `calcLike` (see
-   `fit-size-spectrum.numeric.R` also, and move some ideas from that into
-   `calc_mle_conf()`, plus replace that code with `calc_mle_conf()`.). Need to make `prof_like()`.
-
- D use that in `fit-size-spectrum.numeric.R` instead of current
-
-
- - back to `fit-size-spectrum.data.frame.R` to carry on. See HERE. Doing an
-   MLEbins vignette now, since already done code and functions in report/.
- - Add/fix tests
- - carry on tidying up help; getting there
- - Change any negll -> neg_ll.
- - see `summary_mle_table()`
- - Check results with paper.
- - Fix TODO's in each plotting function.
-
-And then also consider that we want to also allow for a tibble that has year or
-another heading (maybe allow it to be called strata, or let user add that as an
-option - yes, strata = year as the default, or maybe strata = NULL is the default).
-
-
-our [MEE paper](http://onlinelibrary.wiley.com/doi/10.1111/2041-210X.12641/full)
-
-our [MEPS paper](https://www.int-res.com/abstracts/meps/v636/p19-33/)
 
 
 ## Session information

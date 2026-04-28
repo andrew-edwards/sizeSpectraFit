@@ -1,5 +1,7 @@
 ---
-output: github_document
+output: 
+  github_document:
+    math_method: "default"
 ---
 
 <!-- README.md is generated from README.Rmd. Please edit that file. -->
@@ -39,18 +41,36 @@ library(badger)
 
 A streamlined R package for fitting size spectra to ecological data
 
-**Under development **
+**Under development, but usable**
 
-All functions should work (they just might change slightly before the formal
-release of version 1.0.0). I need to write the vignettes and tests so that users
-know what can be done.
+Monday 27th April 2026
 
-For code associated with our manuscript 'No-take
-reserve improves size spectra and community structure of demersal
-megafauna in the Northwestern Mediterranean Sea', see the
+Our paper 'No-take reserve improves size spectra and community structure of
+demersal megafauna in the Northwestern Mediterranean Sea' has just been accepted
+by *Global Ecology and Conservation*, and the pre-proof version is
+[available
+online](https://www.sciencedirect.com/science/article/pii/S2351989426001769) today!
+
+I have been working a lot on this package recently. Since people may want to
+start using it with the release of the above paper, today I am finalising the
+vignettes to post published .html version of them. All the help files and some
+automated tests are still being done.
+
+If you can't wait, then all functions are working and are mostly tested, so feel free
+to download and use the package. But please check back and redownload when there is no 'under
+development' badge or warning above. Note that some functions here may be
+improved by then (and so you may have to update any code you have written); once
+no longer 'under development' I will ensure back compatibility. 
+
+The actual code associated with the above paper is in the
 [report/mediterranean](https://github.com/andrew-edwards/sizeSpectraFit/tree/main/report/mediterranean)
-folder and it's README file 
-[READmediterranean.txt](https://github.com/andrew-edwards/sizeSpectraFit/tree/main/report/mediterranean/READmediterranean.txt).
+folder as documented in its README file 
+[READmediterranean.txt](https://github.com/andrew-edwards/sizeSpectraFit/tree/main/report/mediterranean/READmediterranean.txt). 
+
+Below is some background on size spectra plus simple examples of fitting size spectra to
+different types of data using the package. For more details see the vignettes, that are rendered
+as .html on this GitHub site and listed below in the [vignettes
+section](https://github.com/pbs-assess/sizeSpectraFit?tab=readme-ov-file#vignettes).
 
 ## Background
 
@@ -66,7 +86,14 @@ paper](http://onlinelibrary.wiley.com/doi/10.1111/2041-210X.12641/full) [1] we
 tested eight such methods and
 recommended the use of maximum likelihood. In our [*Marine Ecology Progress
 Series* paper](https://www.int-res.com/abstracts/meps/v636/p19-33/) [2] we extended the likelihood
-method to properly account for the bin structure of data. 
+method to properly account for the bin structure of data. In our new [*Global
+Ecology and
+Conservation* accepted paper](https://www.sciencedirect.com/science/article/pii/S2351989426001769)
+[3], we developed a general theory for aggregating size spectra
+together from different species groups that have differing catchabilities,
+culminating in the new normalised aggregated size spectrum. The methods in [1]
+and [2] have been widely used in applications around the worldwide (I will add
+some examples here). 
 
 This package provides code for fitting size spectra to ecological data using maximum
 likelihood methods. This is a new user-friendly package written from the ground up rather than
@@ -74,40 +101,161 @@ adapting old code into a package, and with a
 focus on applying methods to users' data rather than reproducing results from
 our earlier papers. This overcomes some shortcomings of the earlier
 [sizeSpectra](https://github.com/andrew-edwards/sizeSpectra) package.
-The methods used are described and fully simulation tested
-in [1] and [2]. The papers should be read
-to properly understand the package (we aim not to repeat too much from the
-papers in the package).
+The methods used are described in detail
+in [1]-[3]. The papers should be read
+to properly understand the package (rather than have technical mathematical
+details repeated too much here).
 
+## Quick start to show ease of use
 
-## Fit a vector of values
+The core function is `fit_size_spectrum()`, which automatically detects what
+kind of data you have, and uses the MLE (maximum likelihood estimate) or MLEbin
+(maximum likelihood estimate for binned data) appropriately.
 
-For a vector of numerical numbers, `x`, representing body sizes (e.g. body
-masses of fish), you can simply use the new `fit_size_spectrum()` function. To
-demonstrate, we will set `x` to be the simulated values used in [1] (which is
+### Individual body sizes
+
+For a vector of numerical numbers representing body sizes (e.g. body
+masses of fish), for demonstration we use the simulated values from [1] (which are
 saved in the package as `sim_vec`):
 ```{r, vecfit}
-x <- sim_vec             # replace this with your own data
-res <- fit_size_spectrum(x)
+res <- fit_size_spectrum(sim_vec)
 
 plot(res)
 ```
 
-This matches the recommended Figure 2a of [1].
-
-To fit the data over a restricted range, say between 5 and 200:
-```{r, vecfit2}
-res_restricted <- fit_size_spectrum(x,
-                                    x_min = 5,
-                                    x_max = 200)
-
-plot(res_restricted)
+This matches the recommended Figure 2a of [1], showing the total counts of
+individuals $\geq$ each body mass on the x-axis as points, with the red curve
+being the fitted power-law distribution and the dashed curves the distribution
+using the 95% confidence limits of the exponent $b$. The list `res` contains
+full details for the results (objects should be self-explanatory if you are
+familiar with the method):
+```{r, resshow}
+res
 ```
 
-For more details see the vignettes (not submitted rendered versions yet, so stay
-tuned).
+### Body sizes that are binned
 
-<!-- ## Fit a dataframe of values representing binned data -->
+Often data are already binned, and only available to a certain resolution
+(e.g. 1-2 g, 2-3 g, 3-4 g, etc.). We have the example `sim_vec_binned` saved as
+a dataframe (actually a tibble) in the package. We can simply use the same `fit_size_spectrum()`
+function as above (the MLEbin method gets used because `sim_vec_binned` is a
+dataframe with the correct columns):
+
+```{r, binfit}
+sim_vec_binned
+
+res_mlebin <- fit_size_spectrum(sim_vec_binned)
+
+plot(res_mlebin)
+```
+
+Each rectangle represents a bin, with the horizontal span indicating the range
+of body masses for that bin, and the vertical span showing the possible range of
+the number of individuals with body mass ≥ the body mass of individuals in that
+bin (the uncertainty arises because individuals in a bin could really be of any
+body mass within the bin).
+
+Again, the full results are saved as a list:
+```{r, binres}
+res_mlebin
+```
+
+### Body sizes calculated from length data
+
+In [[2]](https://www.int-res.com/abstracts/meps/v636/p19-33/) we introduced the MLEbins method for fitting size spectra while
+accounting for species-specific body-mass bins. Unlike the above example, the
+bins can overlap. Here we demonstrate our fitting and plotting code for an example data set from
+[[3]](https://www.sciencedirect.com/science/article/pii/S2351989426001769). See the paper and the
+[fit-data-mlebins.html](http://htmlpreview.github.io/?https://github.com/andrew-edwards/sizeSpectraFit/blob/main/vignettes/fit-data-mlebins.html) 
+vignette for full details.
+
+The full raw data from [[3]](https://www.sciencedirect.com/science/article/pii/S2351989426001769) are available in the package as
+```{r, fulldata}
+mediterranean_data
+```
+for which each row has `strata` (baseline, the no-take
+reserve four years after its implementation, or the fishing grounds four years
+after the reserve's implementation), species group given as `group`, `species`, `number` of
+individuals measured of length `length`. We also have the species-specific
+length-weight coefficients
+```{r, lengthweight}
+mediterranean_length_weight_coefficients
+```
+for each species.
+
+The above shows what kind of data are needed to implement the MLEbins data. 
+Specifically we fit the size spectrum for the small cephalopoda species group in the
+fishing grounds strata (reproducing Fig. B.14 of [[3]](https://www.sciencedirect.com/science/article/pii/S2351989426001769)). For brevity the
+wrangling for that (see the
+[fit-data-mlebins.html](http://htmlpreview.github.io/?https://github.com/andrew-edwards/sizeSpectraFit/blob/main/vignettes/fit-data-mlebins.html) 
+vignette) has already been done and the required dataset saved in the 
+package as a tibble of data where each row represents a species-bin combination, including
+the count for that bin:
+```{r, dataceph}
+data_cephsmall_fg
+```
+Bins represent body mass. Note the overlapping bins in rows 7 and 8, and also in
+rows 8 and 9, because
+they correspond to different species which have different length-weight
+coefficients (see [[3]](https://www.sciencedirect.com/science/article/pii/S2351989426001769)).
+
+The minimum body size to
+fit, $x_{min}$, is determined using a method described in [[3]](https://www.sciencedirect.com/science/article/pii/S2351989426001769); this is
+incorporated into the function `determine_xmin_and_fit_mlebins()`. 
+```{r, resceph, eval = FALSE}
+res_cephsmall_fg <- determine_xmin_and_fit_mlebins(data_cephsmall_fg)  # takes a few minutes
+```
+
+We can then plot the results: 
+```{r, plotceph, fig.height = 10}
+plot(res_cephsmall_fg)
+```
+
+The top panel is a histogram of total counts of minimum body sizes, using 1-g
+body-size bins, used to determine $x_{min}$. The left-most red bin
+is the modal bin, and $x_{xmin}$ for this group-strata combination is the minimum
+value within that 1-g bin.
+
+Middle and bottom panels (as suggested in Figure 7 of [[2]](https://www.int-res.com/abstracts/meps/v636/p19-33/)) are the fit of the
+bounded power-law distribution using the MLEbins method with linear
+and logarithmic y-axes, respectively. For each body-mass bin, the green
+horizontal line show the range of body sizes, with its value on the
+y-axis corresponding to the total number of individuals in bins whose
+minima are $\geq$ the bin's minimum; the green lines help to
+distinguish each bin when bins are overlapping. The vertical span of
+each grey rectangle shows the possible range of number of individuals
+with body masses $\geq$ body mass of individuals in that bin
+(horizontal span matches the green line); rectangles are easier to see
+in the later figures. Red curves are fits of the MLE, with dashed lines
+showing 95\% confidence intervals (can be hard to see). MLE of exponent
+$b$ and the sample size $n$ are also given.
+
+For full explanations see the vignettes; note that the above fits are very good
+because the data have been simulated from a bounded power-law distribution. 
+
+## Vignettes
+
+Three vignettes for sizeSpectraFit go into more details than shown above. Also
+see the help files for the functions for more details. The vignettes are
+rendered and viewable on GitHub at (TODO will be done in another day or so!):
+
+* [fit-data.html](http://htmlpreview.github.io/?https://github.com/andrew-edwards/sizeSpectraFit/blob/main/vignettes/fit-data.html)
+  -- the MLE and MLEbin methods in more detail than shown above, plus with extra
+  plotting ideas
+* [fit-data-mlebins.html](http://htmlpreview.github.io/?https://github.com/andrew-edwards/sizeSpectraFit/blob/main/vignettes/fit-data-mlebins.html)
+  -- the MLEbins method including further results, calculations, explanations, and figure options.
+* [fit-aggregate.html](http://htmlpreview.github.io/?https://github.com/andrew-edwards/sizeSpectraFit/blob/main/vignettes/fit-aggregate.html)
+  -- our new normalised aggregated size spectrum, as described in
+  [[3]](https://www.sciencedirect.com/science/article/pii/S2351989426001769) 
+
+To run and adapt the code yourself, simply download the raw R Markdown files
+from
+[fit-data.Rmd](https://github.com/andrew-edwards/sizeSpectraFit/blob/main/vignettes/fit-data.Rmd),
+[fit-data-mlebins.Rmd](https://github.com/andrew-edwards/sizeSpectraFit/blob/main/vignettes/fit-data-mlebins),
+or
+[fit-aggregate.Rmd](https://github.com/andrew-edwards/sizeSpectraFit/blob/main/vignettes/fit-aggregate.Rmd).
+
+Run the file locally, and then adapt it for your own data.
 
 ## Installation
 
@@ -131,11 +279,24 @@ options(timeout = 1200)
 and then try and install again. If you get a different error then post an Issue
 or contact <a href="mailto:andrew.edwards@dfo-mpo.gc.ca">Andy</a> for help.
 
-### References
+## Problems/issues
+
+Post an Issue on Github or email <a href="mailto:andrew.edwards@dfo-mpo.gc.ca">Andrew Edwards</a> for help.
+
+
+## References
 
 [1] **Testing and recommending methods for fitting size spectra to data** by Andrew M. Edwards, James P. W. Robinson, Michael J. Plank, Julia K. Baum and Julia L. Blanchard. ***Methods in Ecology and Evolution*** (2017, 8:57-67). Freely available at <http://onlinelibrary.wiley.com/doi/10.1111/2041-210X.12641/full>.
 
 [2] **Accounting for the bin structure of data removes bias when fitting size spectra** by Andrew M. Edwards, James P. W. Robinson, Julia L. Blanchard, Julia K. Baum and Michael J. Plank. ***Marine Ecology Progress Series*** (2020, 636:19-33). Freely available at <https://www.int-res.com/abstracts/meps/v636/p19-33/>.
+
+[3] **No-take reserve improves size spectra and community structure of demersal
+megafauna in the Northwestern Mediterranean Sea** by 
+Juliana Quevedo, Nixon Bahamon, Andrew M. Edwards, Maria Vigo, Pablo Couve,
+Jacopo Aguzzi, Jorge Paramo, and Joan B. Company. ***Global Ecology and
+Conservation*** [In press](https://www.sciencedirect.com/science/article/pii/S2351989426001769).
+
+
 
 <!-- 
 ### Might still want to copy these dieas from hdiAnalysis:
