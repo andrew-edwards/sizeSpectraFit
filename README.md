@@ -36,8 +36,8 @@ today!
 
 I have been working a lot on this package recently. Since people may
 want to start using it with the release of the above paper, today I am
-finalising the vignettes to post published .html version of them. All
-the help files and some automated tests are still being done.
+finalising the vignettes to (soon) post published .html version of them.
+All the help files and some automated tests are still being done.
 
 If you can’t wait, then all functions are working and are mostly tested,
 so feel free to download and use the package. But please check back and
@@ -55,7 +55,7 @@ Below is some background on size spectra plus simple examples of fitting
 size spectra to different types of data using the package. For more
 details see the vignettes, that are rendered as .html on this GitHub
 site and listed below in the [vignettes
-section](https://github.com/pbs-assess/sizeSpectraFit?tab=readme-ov-file#vignettes).
+section](https://github.com/andrew-edwards/sizeSpectraFit/tree/main#vignettes).
 
 ## Background
 
@@ -355,8 +355,8 @@ distribution.
 
 Three vignettes for sizeSpectraFit go into more details than shown
 above. Also see the help files for the functions for more details. The
-vignettes are rendered and viewable on GitHub at (TODO will be done in
-another day or so!):
+vignettes are rendered and viewable on GitHub at (TODO please wait for
+another day or two!):
 
 - [fit-data.html](http://htmlpreview.github.io/?https://github.com/andrew-edwards/sizeSpectraFit/blob/main/vignettes/fit-data.html)
   – the MLE and MLEbin methods in more detail than shown above, plus
