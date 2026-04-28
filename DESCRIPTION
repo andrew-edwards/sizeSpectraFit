@@ -9,7 +9,7 @@ Authors@R: c(
 URL: https://github.com/andrew-edwards/sizeSpectraFit
 BugReports: https://github.com/andrew-edwards/sizeSpectraFit/issues
 Maintainer: Andrew Edwards <andrew.edwards@dfo-mpo.gc.ca>
-Date: 2024-09-11
+Date: 2026-04-28
 Description: Provides code for fitting size spectra to ecological data using maximum likelihood methods. This is aimed to be a user-friendly version written from scratch with a focus on users applying methods to their data. The methods used are described and simulation tested in [1] Edwards et al. (Testing and recommending methods for fitting size spectra to data, Methods in Ecology and Evolution, 2017, 8:57-67) and [2] Edwards et al. (Accounting for the bin structure of data removes bias when fitting size spectra, Marine Ecology Progress Series, 2020, 636:19-33). See the GitHub site for more details, including rendered versions of the vignettes.
 License: MIT + file LICENSE
 Encoding: UTF-8
@@ -17,7 +17,7 @@ LazyData: true
 LazyDataCompression: xz
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.3
-Remotes: github::pbs-assess/pacea
+Remotes: github::andrew-edwards/sizeSpectraFit
 Imports:
     dplyr (>= 1.0.2),
     tidyr

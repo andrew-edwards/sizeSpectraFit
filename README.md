@@ -1,6 +1,10 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file. -->
 
+<!-- meth_method default looks to render fine on GitHub, but equations aren't -->
+
+<!-- perfect when locally building and viewing the .html -->
+
 <!-- which builds the .html that can be viewed locally (but isn't pushed to GitHub;
 GitHub uses README.md to make the page you see on GitHub). See pacea if want to
 save figures.
@@ -23,9 +27,13 @@ coverage](https://codecov.io/gh/andrew-edwards/sizeSpectraFit/branch/main/graph/
 
 A streamlined R package for fitting size spectra to ecological data
 
-**Under development, but usable**
+**Under development, but feel free to start using**
 
 Monday 27th April 2026
+
+Want to fit a size spectrum to your data? This package provides a single
+function for fitting, and has standardised `plot()` functions to easily
+display results. Plus there is a lot more.
 
 Our paper ‘No-take reserve improves size spectra and community structure
 of demersal megafauna in the Northwestern Mediterranean Sea’ has just
@@ -116,9 +124,13 @@ This matches the recommended Figure 2a of \[1\], showing the total
 counts of individuals $\geq$ each body mass on the x-axis as points,
 with the red curve being the fitted power-law distribution and the
 dashed curves the distribution using the 95% confidence limits of the
-exponent $b$. The list `res` contains full details for the results
-(objects should be self-explanatory if you are familiar with the
-method):
+size spectra exponent $b$; the MLE of $b$ and the sample size $n$ are
+shown in the top-right corner. The list `res` contains full details for
+the results, where `b_mle` is the maximum likelihood estimate of $b$,
+`b_conf` is the 95% confidence interval, `x` is the original data used
+(i.e. `sim_vec` above; only the first 10 values are printed for
+brevity), `x_min` and `x_max` are the minimum and maximum possible
+values of body mass, and `method` gives the method used for fitting:
 
 ``` r
 res
@@ -148,8 +160,11 @@ Often data are already binned, and only available to a certain
 resolution (e.g. 1-2 g, 2-3 g, 3-4 g, etc.). We have the example
 `sim_vec_binned` saved as a dataframe (actually a tibble) in the
 package. We can simply use the same `fit_size_spectrum()` function as
-above (the MLEbin method gets used because `sim_vec_binned` is a
-dataframe with the correct columns):
+above. The MLEbin method gets used because `sim_vec_binned` is a
+dataframe with the correctly defined columns (namely `bin_min`,
+`bin_max`, and `bin_count`, representing the minimum and maximum
+endpoints of each bin and the count of individuals in that bin, with one
+row for each bin):
 
 ``` r
 sim_vec_binned
@@ -179,7 +194,8 @@ possible range of the number of individuals with body mass ≥ the body
 mass of individuals in that bin (the uncertainty arises because
 individuals in a bin could really be of any body mass within the bin).
 
-Again, the full results are saved as a list:
+Again, the full results are saved as a list, with `data` representing
+the original data:
 
 ``` r
 res_mlebin
@@ -216,7 +232,7 @@ res_mlebin
 #> [1] "size_spectrum_mlebin" "list"
 ```
 
-### Body sizes calculated from length data
+### Body masses calculated from length data
 
 In [\[2\]](https://www.int-res.com/abstracts/meps/v636/p19-33/) we
 introduced the MLEbins method for fitting size spectra while accounting
@@ -228,57 +244,8 @@ See the paper and the
 [fit-data-mlebins.html](http://htmlpreview.github.io/?https://github.com/andrew-edwards/sizeSpectraFit/blob/main/vignettes/fit-data-mlebins.html)
 vignette for full details.
 
-The full raw data from
-[\[3\]](https://www.sciencedirect.com/science/article/pii/S2351989426001769)
-are available in the package as
-
-``` r
-mediterranean_data
-#> # A tibble: 17,850 × 5
-#>    strata   group          species                   length number
-#>    <fct>    <fct>          <fct>                      <dbl>  <dbl>
-#>  1 baseline Actinopterygii Phycis blennoides          124    30.3 
-#>  2 baseline Crustacea      Nephrops norvegicus         31.0  15.2 
-#>  3 baseline Crustacea      Nephrops norvegicus         30.4   7.58
-#>  4 baseline Actinopterygii Phycis blennoides          122    30.3 
-#>  5 baseline Actinopterygii Helicolenus dactylopterus  140     7.58
-#>  6 baseline Crustacea      Nephrops norvegicus         31.0  15.2 
-#>  7 baseline Actinopterygii Phycis blennoides          128    30.3 
-#>  8 baseline Crustacea      Nephrops norvegicus         38.1   7.58
-#>  9 baseline Actinopterygii Phycis blennoides          148    30.3 
-#> 10 baseline Actinopterygii Phycis blennoides          127    30.3 
-#> # ℹ 17,840 more rows
-```
-
-for which each row has `strata` (baseline, the no-take reserve four
-years after its implementation, or the fishing grounds four years after
-the reserve’s implementation), species group given as `group`,
-`species`, `number` of individuals measured of length `length`. We also
-have the species-specific length-weight coefficients
-
-``` r
-mediterranean_length_weight_coefficients
-#> # A tibble: 53 × 3
-#>    species                      alpha  beta
-#>    <fct>                        <dbl> <dbl>
-#>  1 Abralia veranyi             0.689   1.42
-#>  2 Aegaeon lacazei             0.0275  2.44
-#>  3 Argentina sphyraena         0.0047  3.05
-#>  4 Arnoglossus rueppelii       0.0051  3.01
-#>  5 Bathypolypus sponsalis      0.562   2.56
-#>  6 Capros aper                 0.0138  3.11
-#>  7 Chlorotocus crassicornis    0.585   2.43
-#>  8 Conger conger               0.0006  3.21
-#>  9 Eusergestes arcticus        0.287   2.31
-#> 10 Gaidropsarus macrophthalmus 0.0075  2.85
-#> # ℹ 43 more rows
-```
-
-for each species.
-
-The above shows what kind of data are needed to implement the MLEbins
-data. Specifically we fit the size spectrum for the small cephalopoda
-species group in the fishing grounds strata (reproducing Fig. B.14 of
+Specifically we fit the size spectrum for the small cephalopoda species
+group in the fishing grounds strata (reproducing Fig. B.14 of
 [\[3\]](https://www.sciencedirect.com/science/article/pii/S2351989426001769)).
 For brevity the wrangling for that (see the
 [fit-data-mlebins.html](http://htmlpreview.github.io/?https://github.com/andrew-edwards/sizeSpectraFit/blob/main/vignettes/fit-data-mlebins.html)
@@ -305,19 +272,25 @@ data_cephsmall_fg
 ```
 
 Bins represent body mass. Note the overlapping bins in rows 7 and 8, and
-also in rows 8 and 9, because they correspond to different species which
-have different length-weight coefficients (see
+also in rows 8 and 9, because the bins correspond to different species
+which have different length-weight coefficients (see
 [\[3\]](https://www.sciencedirect.com/science/article/pii/S2351989426001769)).
 
 The minimum body size to fit, $x_{min}$, is determined using a method
 described in
-[\[3\]](https://www.sciencedirect.com/science/article/pii/S2351989426001769);
-this is incorporated into the function
-`determine_xmin_and_fit_mlebins()`.
+[\[3\]](https://www.sciencedirect.com/science/article/pii/S2351989426001769).
+Basically, since the size spectrum is a decreasing distribution, if we
+have no *a priori* reason for setting $x_{min}$ then we determine it
+from the data based on the peak of a simple histogram. This is
+incorporated into the function `determine_xmin_and_fit_mlebins()`.
 
 ``` r
 res_cephsmall_fg <- determine_xmin_and_fit_mlebins(data_cephsmall_fg)  # takes a few minutes
 ```
+
+<!-- `res_cephsmall_fg` is actually saved as a data object in the package so -->
+
+<!-- this file renders quickly; hence the `eval=FALSE` in the above chunk -->
 
 We can then plot the results:
 
@@ -342,10 +315,8 @@ whose minima are $\geq$ the bin’s minimum; the green lines help to
 distinguish each bin when bins are overlapping. The vertical span of
 each grey rectangle shows the possible range of number of individuals
 with body masses $\geq$ body mass of individuals in that bin (horizontal
-span matches the green line); rectangles are easier to see in the later
-figures. Red curves are fits of the MLE, with dashed lines showing 95%
-confidence intervals (can be hard to see). MLE of exponent $b$ and the
-sample size $n$ are also given.
+span matches the green line). Red curves are fits of the MLE, with
+dashed lines showing 95% confidence intervals.
 
 For full explanations see the vignettes; note that the above fits are
 very good because the data have been simulated from a bounded power-law
@@ -398,11 +369,26 @@ and then try and install again. If you get a different error then post
 an Issue or contact
 <a href="mailto:andrew.edwards@dfo-mpo.gc.ca">Andy</a> for help.
 
-## Problems/issues
+## Citation and troubleshooting
 
-Post an Issue on Github or email
-<a href="mailto:andrew.edwards@dfo-mpo.gc.ca">Andrew Edwards</a> for
-help.
+If you use `sizeSpectra` in your work then please cite it, currently as
+the following (I hope to write a short manuscript about it soon):
+
+Edwards, A. M. (2026). sizeSpectraFit: A streamlined R package for
+fitting size spectra to ecological data. R package version 1.0.0,
+<https://github.com/andrew-edwards/sizeSpectraFit>.
+
+I do plan to improve, extend, and maintain the package in the future;
+knowing it’s being used gives extra motivation.
+
+If you want a citation for LaTeX and R Markdown bibliographies then
+after installation type `citation("sizeSpectraFit")` which also gives
+the GitHub commit from when you installed the package (TODO coming soon.
+
+Please report any bugs or suggestions as [an
+Issue](https://github.com/andrew-edwards/sizeSpectraFit/issues), or
+email <a href="mailto:andrew.edwards@dfo-mpo.gc.ca">Andrew Edwards</a>
+for help.
 
 ## References
 

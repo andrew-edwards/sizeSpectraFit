@@ -61,6 +61,28 @@ mediterranean_data
 ```
 and here we analyse the subset of data
 
+HERE - this is what I had in README.Rmd but now removing. Need to adapt this
+whole file anyway, this is prob worth using:
+
+The full raw data from [[3]](https://www.sciencedirect.com/science/article/pii/S2351989426001769) are available in the package as
+```{r, fulldata}
+mediterranean_data
+```
+for which each row has `strata` (baseline, the no-take
+reserve four years after its implementation, or the fishing grounds four years
+after the reserve's implementation), species group given as `group`, `species`, `number` of
+individuals measured of length `length`. We also have the species-specific
+length-weight coefficients
+```{r, lengthweight}
+mediterranean_length_weight_coefficients
+```
+for each species.
+
+The above shows what kind of data are needed to implement the MLEbins data. 
+
+
+
+
 HERE - copy from Mediterranean results data-raw, as simplified down. Or README
 Or look at med-summary-4.Rmd
 
