@@ -59,9 +59,9 @@ be non-integer.
 }
 \description{
 For each species $s$, the length-weight relationship is
-$w = \alpha_s l^{\beta_s}$
+\eqn{w = \alpha_s l^{\beta_s}}
 where $w$ is the estimated body mass (g) of an individual, $l$ is the known
-body length (cm), and $alpha_s$ and $\beta_s$ are species-specific
+body length (cm), and \eqn{\alpha_s} and \eqn{\beta_s} are species-specific
 parameters; this is equation (1) in our \href{https://www.int-res.com/abstracts/meps/v636/p19-33/}{MEPS paper}.
 }
 \details{

@@ -20,11 +20,10 @@
 ##' it consistent with the latter, but seemed better to make a new function).
 ##'
 ##' @param res results of class `size_spectrum_numeric` or
-##' `size_spectrum_mlebin`
-##'   ignore I think: TODO but if called
+##' `size_spectrum_mlebin`   ignore I think: TODO but if called
 ##'   from `plot.size_spectrum_numeric()` then the results are from the MLE
-##'   method and do not have all the columns that would have from MLEbin method.
-##' TODO onwards:
+##'   method and do not have all the columns that would have from MLEbin
+##'   method. TODO onwards:
 ##' @param binValsTibble tibble of binned data with each row representing a bin
 ##'   and with columns `binMin` and `binMmax` (min and max break of each bin)
 ##'   and `binCount` (count in that bin), as in the `binVals` component of the
@@ -33,12 +32,12 @@
 ##' @param binBreaks vector of bin breaks
 ##' @param binCounts vector of bin counts
 ##' @param b.MLE maximum likelihood estimate of *b* (ideally from the MLEbin method)
-##' @param b.confMin lower 95\% confidence limits of *b*
-##' @param b.confMax upper 95\% confidence limits of *b*
+##' @param b.confMin lower 95% confidence limits of *b*
+##' @param b.confMax upper 95% confidence limits of *b*
 ##' @param plot.binned.fitted if TRUE then also plot the estimated normalised
 ##'   biomass in each bin for the MLE of *b* and it's confidence limits
-##' @param log.xy Which axes to log, for `plot(..., log = log.xy)`. So "xy" for
-##'   log-log axes, "x" for only x-axis logged, "" for both axes unlogged.
+##' @param log.xy Which axes to log, for `plot(..., log = log.xy)`. So `"xy"` for
+##'   log-log axes, `"x"` for only x-axis logged, `""` for both axes unlogged.
 ##' @param leg.pos position of legend, from "bottomright"', '"bottom"',
 ##'   '"bottomleft"', '"left"', '"topleft"', '"top"', '"topright"', '"right"'
 ##'   and '"center"'.
@@ -47,6 +46,7 @@
 ##' @param ... further arguments to be passed to `plot()` and
 ##'   `plot_binned_fitted()`
 ##' @return TODO should return a tibble of results
+##'
 ##' @export
 ##' @author Andrew Edwards
 ##' @examples

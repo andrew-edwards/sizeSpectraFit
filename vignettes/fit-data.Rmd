@@ -16,7 +16,8 @@ rmarkdown::render("fit-data.Rmd")
 ```
 
 ```{r, load, include = FALSE}
-load_all()   # TODO replace with library(sizeSpectraFit)
+# load_all()
+library(sizeSpectraFit)
 
 knitr::opts_chunk$set(
   collapse = TRUE,

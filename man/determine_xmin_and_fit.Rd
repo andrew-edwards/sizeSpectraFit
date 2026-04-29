@@ -2,10 +2,7 @@
 % Please edit documentation in R/determine-xmin-and-fit.R
 \name{determine_xmin_and_fit}
 \alias{determine_xmin_and_fit}
-\title{Determine x_min as the mode and then fit it for a vector of values. TODO can't make a generic function because for mlebins we don't
-have a class of input.  Seems better to explicitly specify the method to be
-used, either mle, mlebin or mlebins.
-TODO going to see if mlebins code will work for mlebin}
+\title{Determine x_min as the mode and then fit it for a vector of values.}
 \usage{
 determine_xmin_and_fit(dat, bin_width = 1, bin_start = NULL, ...)
 }
@@ -16,21 +13,28 @@ the MLE method.}
 \item{...}{arguments to pass onto fit....}
 }
 \value{
-list of class \code{determine_xmin_and_fit} for plotting, containing TODO
+list of class \code{determine_xmin_and_fit} for plotting, containing (see
+above for details) TODO
 \describe{
-\item{bin_width}
-\item{xmin}
-\item{xmax}
-\item{n}
-\item{counts_per_bin}
+\item{bin_width}{argument of function}
+\item{x_min}{as determined}
+\item{x_max}{TODO}
+\item{n}{sample size (length) of \code{dat}}
+\item{counts_per_bin}{TODO}
 \item{counts_per_bin_desc}{counts in the descending limb, including the
 peak}
-\item{b_l}
-\item{b_l_confMin}
-\item{b_l_confMax}
+\item{b_l}{TODO}
+\item{b_l_confMin}{TODO}
+\item{b_l_confMax}{TODO}
 }
 }
 \description{
+TODO can't make a generic function because for mlebins we don't
+have a class of input.  Seems better to explicitly specify the method to be
+used, either mle, mlebin or mlebins.
+TODO going to see if mlebins code will work for mlebin
+}
+\details{
 The \code{x_min} value is determined by constructing a histogram of bin width
 \code{bin_width}, starting from \code{bin_start} (for the \code{NULL} default see
 \code{\link[=make_hist]{make_hist()}}), and selecting the bin with the highest count. \code{x_min} is

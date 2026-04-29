@@ -44,11 +44,10 @@ plot_lbn_style(
 }
 \arguments{
 \item{res}{results of class \code{size_spectrum_numeric} or
-\code{size_spectrum_mlebin}
-ignore I think: TODO but if called
+\code{size_spectrum_mlebin}   ignore I think: TODO but if called
 from \code{plot.size_spectrum_numeric()} then the results are from the MLE
-method and do not have all the columns that would have from MLEbin method.
-TODO onwards:}
+method and do not have all the columns that would have from MLEbin
+method. TODO onwards:}
 
 \item{inset_label}{inset distance vector for legend}
 
@@ -69,15 +68,15 @@ output of \code{binData}. \code{wmin} and \code{wmax} can also be used instead o
 
 \item{b.MLE}{maximum likelihood estimate of \emph{b} (ideally from the MLEbin method)}
 
-\item{b.confMin}{lower 95\\% confidence limits of \emph{b}}
+\item{b.confMin}{lower 95\% confidence limits of \emph{b}}
 
-\item{b.confMax}{upper 95\\% confidence limits of \emph{b}}
+\item{b.confMax}{upper 95\% confidence limits of \emph{b}}
 
 \item{plot.binned.fitted}{if TRUE then also plot the estimated normalised
 biomass in each bin for the MLE of \emph{b} and it's confidence limits}
 
-\item{log.xy}{Which axes to log, for \code{plot(..., log = log.xy)}. So "xy" for
-log-log axes, "x" for only x-axis logged, "" for both axes unlogged.}
+\item{log.xy}{Which axes to log, for \code{plot(..., log = log.xy)}. So \code{"xy"} for
+log-log axes, \code{"x"} for only x-axis logged, \code{""} for both axes unlogged.}
 
 \item{leg.pos}{position of legend, from "bottomright"', '"bottom"',
 '"bottomleft"', '"left"', '"topleft"', '"top"', '"topright"', '"right"'

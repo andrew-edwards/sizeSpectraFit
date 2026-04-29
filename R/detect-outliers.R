@@ -3,10 +3,11 @@
 ##'
 ##' If already run through remove_outliers.size_spectrum_mlebins then it wil
 ##' use `detect_outliers.remove_outliers.mlebins()` and can keep iterating that.
+##'
+##' TODO:
+##'
 ##' @param res One of:
 ##' * `sizespectrum_mlebins` object.
-##' ##' @return tibble
-##'
 ##' `gap_ratio` is gap divided by second largest gapTODO list containing two tibbles plus two numerics. Each tibble contains just the data values needed for
 ##' calculations, which are `species`, `bin_min`, `bin_max`, and
 ##' `bin_count`. `count_gte_bin_min` etc. will be recalculated in the new

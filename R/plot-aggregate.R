@@ -14,9 +14,9 @@
 ##'   user outfacing function, or also make plot_aggregate_numeric and just call
 ##'   the right one. Some of the details could be shared here maybe.
 ##' @param col_vec vector of colours to assign for each group
-##' @param col_agg
-##' @param xlim_global
-##' @param ylim_global
+##' @param col_agg TODO
+##' @param xlim_global TODO
+##' @param ylim_global TODO
 ##' @param return_agg_x_y logical, whether to return the aggregated x and y for plotting
 ##' values of the aggregated fit
 ##' @return nothing TODO, should this return something?

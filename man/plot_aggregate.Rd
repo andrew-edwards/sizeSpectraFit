@@ -24,6 +24,12 @@ the right one. Some of the details could be shared here maybe.}
 
 \item{col_vec}{vector of colours to assign for each group}
 
+\item{col_agg}{TODO}
+
+\item{xlim_global}{TODO}
+
+\item{ylim_global}{TODO}
+
 \item{return_agg_x_y}{logical, whether to return the aggregated x and y for plotting
 values of the aggregated fit}
 }

@@ -1,4 +1,6 @@
-##' Determine x_min as the mode and then fit it for a vector of values. TODO can't make a generic function because for mlebins we don't
+##' Determine x_min as the mode and then fit it for a vector of values.
+##'
+##' TODO can't make a generic function because for mlebins we don't
 ##' have a class of input.  Seems better to explicitly specify the method to be
 ##' used, either mle, mlebin or mlebins.
 ##' TODO going to see if mlebins code will work for mlebin
@@ -13,18 +15,19 @@
 ##' @param dat `numeric` vector of values (such as individual body masses or lengths), which uses
 ##'   the MLE method.
 ##' @param ... arguments to pass onto fit....
-##' @return list of class `determine_xmin_and_fit` for plotting, containing TODO
+##' @return list of class `determine_xmin_and_fit` for plotting, containing (see
+##' above for details) TODO
 ##' \describe{
-##' \item{bin_width}
-##' \item{xmin}
-##' \item{xmax}
-##' \item{n}
-##' \item{counts_per_bin}
+##' \item{bin_width}{argument of function}
+##' \item{x_min}{as determined}
+##' \item{x_max}{TODO}
+##' \item{n}{sample size (length) of `dat`}
+##' \item{counts_per_bin}{TODO}
 ##' \item{counts_per_bin_desc}{counts in the descending limb, including the
 ##'   peak}
-##' \item{b_l}
-##' \item{b_l_confMin}
-##' \item{b_l_confMax}
+##' \item{b_l}{TODO}
+##' \item{b_l_confMin}{TODO}
+##' \item{b_l_confMax}{TODO}
 ##' }
 ##' @export
 ##' @author Andrew Edwards

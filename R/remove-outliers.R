@@ -1,6 +1,8 @@
 ##' Remove outliers (large values with gaps from remaining continuous values)
 ##' from MLEbins (TODO others to come) results object
 ##'
+##' TODO
+##'
 ##' @param res One of:
 ##' * `sizespectrum_mlebins` object.
 ##' @param number numeric value for how many of the top measurements to remove;

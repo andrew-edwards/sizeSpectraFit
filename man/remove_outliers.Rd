@@ -31,8 +31,7 @@ removed (total counts removed divided by total counts in original data set).
 }
 }
 \description{
-Remove outliers (large values with gaps from remaining continuous values)
-from MLEbins (TODO others to come) results object
+TODO
 }
 \examples{
 \dontrun{
