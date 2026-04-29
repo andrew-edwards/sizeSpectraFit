@@ -57,7 +57,7 @@ nothing. TODO could return invisible biomass calcs
 }
 \description{
 Plots one- or two-panel plot of the ISD and data, with maximum likelihood
-fits shown, as calcualted using the MLE method.. Two-panel plot is either
+fits shown, as calculated using the MLE method. Two-panel plot is either
 the ISD style (individual points and fitted distribution) with (a) linear
 y-axis and (b) logarithimc y-axis (so like Fig 7 of MEPS paper but for
 unbinned data), or, only for when

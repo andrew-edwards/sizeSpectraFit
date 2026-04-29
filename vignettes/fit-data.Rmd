@@ -33,17 +33,11 @@ method to use based on the class of the data, as described by Table 2 in our
 
 If you have data that are not simply declining (when plotted as a histogram),
 which is assumed for a size spectrum fit, you can have the $x_{min}$
-value determined based on the data. You do have 
-to specify the explicit method that you want used (see below). TODO
+value determined based on the data.
 
-TODO For README file. Let's have a simple vector of real measurements, and do
-the fitting and plotting functions, without extra explanation. This will show
-the simplicity, and refer to vignette for more details. Can use the MLEbins
-vignette maybe (when it's done).
+## Measurements of individual body sizes -- MLE method
 
-# Measurements of individual body sizes -- MLE method
-
-The simplest data is just a vector of measurements, such as body masses or
+The simplest data consists of just a vector of measurements, such as body masses or
 body lengths. We fit the size spectrum by calculating the maximum likelihood estimate
 (the MLE method) of the size-spectrum exponent, along with its 95% confidence intervals.
 
@@ -93,7 +87,15 @@ red line is the maximum likelihood estimate (MLE) of the size-spectrum exponent
 $b$, and the dashed lines are the fits from using the low and high values of the
 95% confidence interval of $b$. The MLE for $b$ and the sample size $n$ are
 also explicitly given. The default x-axis label assumes the body masses are in
-g, but this can easily be changed (see later).
+g, but this can easily be changed. 
+
+The plotting is very customisable as
+described in the help function. Since the `res` object has:
+```{r, resclass}
+class(res)
+```
+the `plot(res)` command uses our custom function
+`plot.size_spectrum_numeric()`; this is an R feature. Thus, the help function needed is `?plot.size_spectrum_numeric()`.
 
 The `style` argument gives other styles of plotting, for example:
 ```{r, MLElinearplot}
@@ -127,7 +129,7 @@ range; the points somewhat imply that the midpoint of the bin is more
 relevant.
 
 Successive bins double in size, such that they appear of equal width on the log
-scale (e.g. Platt and Denman probably TODO). The normalised biomass within each
+scale. The normalised biomass within each
 one is calcluated as the sum of the biomass in the bin divided by the bin width;
 there is no uncertainty in this calculation here because we know the individual
 body sizes (this is not so if the data are already binned, see later). The
@@ -150,10 +152,7 @@ plot(res,
      style = "biomass_and_isd")
 ```
 
-TODO add in GoF once done.
-
-
-## Determine $x_{min}$ when the data are not simply declining
+### Determine $x_{min}$ when the data are not simply declining
 
 A simple histogram of your data may not look like a declining function; in
 fisheries examples this can be due to selectivity, with the fishing gear not
@@ -161,7 +160,8 @@ catching all the smaller organisms. If you have a similar type of justification
 for this happening and still want to fit a declining PLB distribution to a
 vector of values, we have
 the built in function `determine_xmin_and_fit()` to determine a value of
-$x_{min}$ to use and then fit using the MLE method. 
+$x_{min}$ to use and then fit using the MLE method. This is the nonbinned
+version of the approach described in [Quevedo et al. (2026)](https://www.sciencedirect.com/science/article/pii/S2351989426001769).
 
 Let's make up a mock dataset, with some uniformly distributed values between 0.25
 and 10, and then a PLB distribution for values $\geq 8$:
@@ -178,7 +178,7 @@ res_mock <- determine_xmin_and_fit(mock_data)
 ```
 
 We can plot and then print the results:
-```{r, mockplot, fig.height = 8}
+```{r, mockplot, fig.height = 10}
 plot(res_mock)
 ```
 
@@ -198,9 +198,9 @@ The object is of class `determine_xmin_and_fit`, and so the plotting function
 `plot.determine_xmin_and_fit()` is automatically used by `plot(res_mock)` to
 give the above plot.
 
-TODO mention the true value falls within the conf interval
+Note that the true value of $b = -2$ falls within the confidence interval.
 
-# Measurements that are already binned -- MLEbin method
+## Measurements that are already binned -- MLEbin method
 
 Often, data are only available in binned form, motivating our MLEbin and MLEbins
 methods (see our MEPS paper for details).
@@ -289,9 +289,10 @@ up a final plot:
 plot(res_mlebin,
      x_small_ticks_labels = c(5, 50, 500))
 ```
+
 See `?plot.size_spectrum_mlebin` for details.
 
-## Determine $x_{min}$ for MLEbin method when the data are not simply declining
+### Determine $x_{min}$ for MLEbin method when the data are not simply declining
 
 Similar to the example above for a vector of values, we can determine a value of
 $x_{min}$ to use for the MLEbin method if the data look non-decreasing.
@@ -329,45 +330,19 @@ res_mock_binned
 The `res_mock_binned` object is list of two objects:
 
 - `$mlebin_fit`: contains the MLEbin results as in the simpler example above
-  TODO check
 - `$h`: the histogram results as used for calculating $x_{min}$ and for plotting.
 
 The object is of class `determine_xmin_and_fit_mlebin`, and so the plotting function
-`plot.determine_xmin_and_fit_mlebin()` is automatically used by `plot(res_binned_2)` to
+`plot.determine_xmin_and_fit_mlebin()` is automatically used by `plot(res_mock_binned)` to
 give the above plot.
-
-
-HERE
-
-these may be old ideas dumped here:
-
- D make a general `calc_mle_conf` function based on previous `calcLike` (see
-   `fit-size-spectrum.numeric.R` also, and move some ideas from that into
-   `calc_mle_conf()`, plus replace that code with `calc_mle_conf()`.). Need to make `prof_like()`.
-
- D use that in `fit-size-spectrum.numeric.R` instead of current
-
-HERE- see mlebins vignette now, and actually the zabala-4 analsysis first.
-Need to ensure zabala stuff running, make sure
-it still works; think it needs a bit of tweaking.
- - Add/fix tests
- - back to `fit-size-spectrum.data.frame.R` to carry on. See HERE. Doing an
-   MLEbins vignette now, since already done code and functions in report/.
-
- - carry on tidying up help; getting there
- - Change any negll -> neg_ll.
- - see `summary_mle_table()`
- - Check results with paper.
- - Fix TODO's in each plotting function.
 
 And then also consider that we want to also allow for a tibble that has year or
 another heading (maybe allow it to be called strata, or let user add that as an
 option - yes, strata = year as the default, or maybe strata = NULL is the default).
 
+Our [MEE paper](http://onlinelibrary.wiley.com/doi/10.1111/2041-210X.12641/full)
 
-our [MEE paper](http://onlinelibrary.wiley.com/doi/10.1111/2041-210X.12641/full)
-
-our [MEPS paper](https://www.int-res.com/abstracts/meps/v636/p19-33/)
+Our [MEPS paper](https://www.int-res.com/abstracts/meps/v636/p19-33/)
 
 
 ## Session information
