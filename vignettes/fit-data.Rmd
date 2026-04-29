@@ -285,7 +285,7 @@ structure).
 All the plots are customisable, for example to add extra tick labels to pretty
 up a final plot:
 
-```{r, MLEbinplot2)
+```{r, MLEbinplot2}
 plot(res_mlebin,
      x_small_ticks_labels = c(5, 50, 500))
 ```
