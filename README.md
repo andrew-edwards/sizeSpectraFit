@@ -27,37 +27,28 @@ coverage](https://codecov.io/gh/andrew-edwards/sizeSpectraFit/branch/main/graph/
 
 A streamlined R package for fitting size spectra to ecological data
 
-**Under development, but feel free to start using**
+**Under development, though functions are all working**
 
-Monday 27th April 2026
+Friday 8th May 2026
 
 Want to fit a size spectrum to your data? This package provides a single
-function for fitting, and has standardised `plot()` functions to easily
-display results. Plus there is a lot more.
+function for fitting, conveniently called `fit_size_spectrum()`. There
+are standardised `plot()` functions to easily display results. And a lot
+more. Please read on.
 
-Our paper ‘No-take reserve improves size spectra and community structure
-of demersal megafauna in the Northwestern Mediterranean Sea’ has just
-been accepted by *Global Ecology and Conservation*, and the pre-proof
-version is [available
-online](https://www.sciencedirect.com/science/article/pii/S2351989426001769)
-today!
+The first use of sizeSpectraFit is in our new paper ‘No-take reserve
+improves size spectra and community structure of demersal megafauna in
+the Northwestern Mediterranean Sea’ in *Global Ecology and Conservation*
+[\[3\]](https://www.sciencedirect.com/science/article/pii/S2351989426001769).
 
-I have been working a lot on this package recently. Since people may
-want to start using it with the release of the above paper, today I am
-finalising the vignettes to (soon) post published .html version of them.
-All the help files and some automated tests are still being done.
-
-If you can’t wait, then all functions are working and are mostly tested,
-so feel free to download and use the package. But please check back and
+The package is usable, though I am still writing some of the help files
+and completing the automating testing. The functions are all working, so
+feel free to download and use sizeSpectraFit. But please check back and
 redownload when there is no ‘under development’ badge or warning above.
 Note that some functions here may be improved by then (and so you may
 have to update any code you have written); once no longer ‘under
-development’ I will ensure back compatibility.
-
-The actual code associated with the above paper is in the
-[report/mediterranean](https://github.com/andrew-edwards/sizeSpectraFit/tree/main/report/mediterranean)
-folder as documented in its README file
-[READmediterranean.txt](https://github.com/andrew-edwards/sizeSpectraFit/tree/main/report/mediterranean/READmediterranean.txt).
+development’ I will ensure full back compatibility and will document
+changes in the NEWS file.
 
 Below is some background on size spectra plus simple examples of fitting
 size spectra to different types of data using the package. For more
@@ -109,8 +100,8 @@ appropriately.
 ### Individual body sizes
 
 For a vector of numerical numbers representing body sizes (e.g. body
-masses of fish), for demonstration we use the simulated values from
-\[1\] (which are saved in the package as `sim_vec`):
+masses of fish), for demonstration we use the simulated vector of values
+from \[1\] (which are saved in the package as `sim_vec`):
 
 ``` r
 res <- fit_size_spectrum(sim_vec)
@@ -326,8 +317,7 @@ distribution.
 
 Three vignettes for sizeSpectraFit go into more details than shown
 above. Also see the help files for the functions for more details. The
-vignettes are rendered and viewable on GitHub at (TODO please wait for
-another day or two!):
+vignettes are rendered and viewable on GitHub at:
 
 - [fit-data.html](http://htmlpreview.github.io/?https://github.com/andrew-edwards/sizeSpectraFit/blob/main/vignettes/fit-data.html)
   – the MLE and MLEbin methods in more detail than shown above, plus
@@ -382,8 +372,7 @@ I do plan to improve, extend, and maintain the package in the future;
 knowing it’s being used gives extra motivation.
 
 If you want a citation for LaTeX and R Markdown bibliographies then
-after installation type `citation("sizeSpectraFit")` which also gives
-the GitHub commit from when you installed the package (TODO coming soon.
+after installation type `citation("sizeSpectraFit")` .
 
 Please report any bugs or suggestions as [an
 Issue](https://github.com/andrew-edwards/sizeSpectraFit/issues), or
@@ -408,8 +397,13 @@ Progress Series*** (2020, 636:19-33). Freely available at
 demersal megafauna in the Northwestern Mediterranean Sea** by Juliana
 Quevedo, Nixon Bahamon, Andrew M. Edwards, Maria Vigo, Pablo Couve,
 Jacopo Aguzzi, Jorge Paramo, and Joan B. Company. ***Global Ecology and
-Conservation*** [In
-press](https://www.sciencedirect.com/science/article/pii/S2351989426001769).
+Conservation*** (2026, 68:e04227). Freely available at
+<https://www.sciencedirect.com/science/article/pii/S2351989426001769?via%3Dihub>.
+
+The actual code associated with \[3\] is in the
+[report/mediterranean](https://github.com/andrew-edwards/sizeSpectraFit/tree/main/report/mediterranean)
+folder as documented in its README file
+[READmediterranean.txt](https://github.com/andrew-edwards/sizeSpectraFit/tree/main/report/mediterranean/READmediterranean.txt).
 
 <!-- 
 ### Might still want to copy these dieas from hdiAnalysis:
