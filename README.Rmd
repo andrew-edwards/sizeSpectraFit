@@ -314,9 +314,8 @@ email <a href="mailto:andrew.edwards@dfo-mpo.gc.ca">Andrew Edwards</a> for help.
 megafauna in the Northwestern Mediterranean Sea** by 
 Juliana Quevedo, Nixon Bahamon, Andrew M. Edwards, Maria Vigo, Pablo Couve,
 Jacopo Aguzzi, Jorge Paramo, and Joan B. Company. ***Global Ecology and
-Conservation*** [In press](https://www.sciencedirect.com/science/article/pii/S2351989426001769).
-
-
+Conservation*** (2026, 68:e04227). Freely available at 
+<https://www.sciencedirect.com/science/article/pii/S2351989426001769?via%3Dihub>.
 
 <!-- 
 ### Might still want to copy these dieas from hdiAnalysis:

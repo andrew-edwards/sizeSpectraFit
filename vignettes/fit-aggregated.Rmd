@@ -16,7 +16,8 @@ rmarkdown::render("fit-aggregated.Rmd")
 ```
 
 ```{r, load, include = FALSE}
-load_all()   # TODO replace with library(sizeSpectraFit)
+# load_all()
+library(sizeSpectraFit)
 
 knitr::opts_chunk$set(
   collapse = TRUE,
@@ -129,10 +130,12 @@ Here are the four data sets with the four individually fit PLB distributions (th
 # Use the first S of the default colours from plot_aggregate(), for consistency
 #  with later plots:
 col_vec <- eval(formals(plot_aggregate)$col_vec)[1:S]
-  
+
+# Refine plotting settings
 par(mfrow = c(S, 1),
     mai = c(0.6, 0.5, 0.05, 0.3),
     mar = c(4.1, 4.1, 2.1, 2.1))
+par_settings <- par(no.readonly = TRUE)           # to use for all plots
 
 for(s in 1:S){
   plot(res_list[[s]],
@@ -188,9 +191,7 @@ for(s in 1:S){
 
 Here are the four data sets with the four individually fit PLB distributions
 ```{r plotting2, fig.height = 8}
-par(mfrow = c(S, 1),
-    mai = c(0.6, 0.5, 0.05, 0.3),
-    mar = c(4.1, 4.1, 2.1, 2.1))
+par(par_settings)
 
 for(s in 1:S){
   plot(res_fished_list[[s]],
@@ -290,9 +291,7 @@ for(s in 1:S){
 
 Here are the four data sets with the four individually fit PLB distributions
 ```{r plotting3, fig.height = 8}
-par(mfrow = c(S, 1),
-    mai = c(0.6, 0.5, 0.05, 0.3),
-    mar = c(4.1, 4.1, 2.1, 2.1))
+par(par_settings)
 
 for(s in 1:S){
   plot(res_fished_list_2[[s]],
@@ -333,12 +332,12 @@ plot_aggregate_fits(agg_list_2,
 
 ## Doing the above but for binned data
 
-HERE
-
 The same analyses can be done for data that are only available in binned
-form. See TODO (Juliana's) for an example using the MLEbins method, for which we
+form. See [Quevedo et
+al. (2026)](https://www.sciencedirect.com/science/article/pii/S2351989426001769)
+for examples using the MLEbins method, for which we
 have lengths that are converted to weights using species-specific length-weight
-relationships.
+relationships. For code from that analysis see [here](https://github.com/andrew-edwards/sizeSpectraFit/tree/main/report/mediterranean).
 
 Here we simulate the same data as above and then bin it, to then fit using the
 MLEbin method and consequent plotting.
@@ -382,8 +381,7 @@ xlim_global_mlebin
 Here are the four data sets with the four individually fit PLB distributions as
 calculated using the MLEbin method:
 ```{r plotting4, fig.height = 8}
-par(mfrow = c(min(S, 4), 1),
-    mai = c(0.6, 0.5, 0.05, 0.3))
+par(par_settings)
 
 for(s in 1:S){
   plot(res_mlebin_list[[s]],
@@ -403,9 +401,9 @@ orig_agg_fit_mlebin <- plot_aggregate_mlebin(res_mlebin_list)
 
 ### Simulate disproportionate removal of larger individuals
 
-We repeat the above `More extreme removal example` here, using the same idea
+We repeat the above 'More extreme removal example' here, using the same idea
 (simply removing 50% of all individuals $\geq$ 100 g, based on `bin_min`),
-but binning the data and then fitting it using the MLEbin method.
+and then fitting using the MLEbin method:
 
 ```{r, removeinds2mlebin}
 res_mlebin_fished_list <- list()
@@ -424,8 +422,7 @@ for(s in 1:S){
 
 Here are the four data sets with the four individually fit PLB distributions
 ```{r plotting5, fig.height = 8}
-par(mfrow = c(min(S, 4), 1),
-    mai = c(0.6, 0.5, 0.05, 0.3))
+par(par_settings)
 
 for(s in 1:S){
   plot(res_mlebin_fished_list[[s]],
@@ -468,8 +465,18 @@ plot_aggregate_fits(agg_list_mlebin,
 Again, this shows the fished strata size spectrum declining faster than that of
 the unfished strata. 
 
+Quevedo, J., N. Bahamon, A.M. Edwards, M. Vigo, P. Couve, J. Aguzzi, J. Paramo,
+and J.B. Company (2026). No-take reserve improves size spectra and community
+structure of demersal megafauna in the Northwestern Mediterranean Sea.
+*Global Ecology and Conservation*.
+68:e04227. 
+https://www.sciencedirect.com/science/article/pii/S2351989426001769?via%3Dihub 
+
+
 ## Session information
 
 ```{r sessioninfo}
 sessionInfo()
 ```
+
+
