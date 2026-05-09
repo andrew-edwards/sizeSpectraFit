@@ -16,7 +16,8 @@ rmarkdown::render("fit-data-mlebins.Rmd")
 ```
 
 ```{r, load, include = FALSE}
-load_all()   # TODO replace with library(sizeSpectraFit)
+# load_all()
+library(sizeSpectraFit)
 
 knitr::opts_chunk$set(
   collapse = TRUE,
@@ -28,67 +29,67 @@ knitr::opts_chunk$set(
 
 This vignette for the [sizeSpectraFit R
 package](https://github.com/andrew-edwards/sizeSpectraFit?tab=readme-ov-file#sizespectrafit)
-is for the MLEbins method, which we introduced in our [MEPS
+is for the MLEbins method, which we introduced in our [*MEPS*
 paper](https://www.int-res.com/abstracts/meps/v636/p19-33/).
 We use an example data set from the Mediterranean from our new 
-[Global Ecology and Conservation](https://www.sciencedirect.com/science/article/pii/S2351989426001769).
+[*Global Ecology and
+Conservation* paper](https://www.sciencedirect.com/science/article/pii/S2351989426001769).
 
 The MLEbins method calculates the maximum likelihood estimate
 of the size-spectrum exponent, $b$, when the data are collected as lengths and
-we have species-specific length-weight coefficients. So individual body-masses
-are not available; if they were we could use the MLE or MLEbin method in the
+we have species-specific length-weight coefficients. So individual body masses
+are not available; if they were we could use the MLE method in the
 [fit-data.html](http://htmlpreview.github.io/?https://github.com/andrew-edwards/sizeSpectraFit/blob/main/vignettes/fit-data.html)
-vignette.
+vignette. If you have binned body masses but the bins overlap, then you also
+need to use MLEbins.
 
-The lengths may already be binned, for example a length bin could be 10-11
+The lengths may already be binned, for example a length bin could be 10-15
 cm. And even when measured more accurately, the resolution of the measurements
 essentially adds uncertainty to a length. For example, a fish of length 15 cm
 measured to the nearest cm has a true length in the range 14.5-15.5 cm, which
 then gets converted into a body-mass bin using that species specific
 length-weight coefficients. The resulting body-mass bins can overlap each other
 (unlike for the MLEbin method), because the length bins of differently shaped
-species get converted to different body-mass bins. See the MEPS paper for
+species get converted to different body-mass bins. See the [*MEPS*
+paper](https://www.int-res.com/abstracts/meps/v636/p19-33/) paper for
 further explanation (rather than it being repeated here, where we focus on
 applying the method).
+
+## The raw data
 
 We use real data of measured lengths from experimental trawl surveys conducted in
 the Northwestern Mediterranean Sea, as part of the research projects RESNEP and
 BITER by the Instituto de Ciencias del Mar (ICM-CSIC), Spain; data courtesy of
-Juliana Quevedo, Joan B. Company, Nixon Bahamon, and Jordi Ribera Altimir. The full data are
-available in sizeSpectraFit as simply
-```{r meddata}
-mediterranean_data
-```
-and here we analyse the subset of data
+Juliana Quevedo, Joan B. Company, Nixon Bahamon, and Jordi Ribera Altimir, as
+used in
+[Quevedo et al. (2026)](https://www.sciencedirect.com/science/article/pii/S2351989426001769). 
 
-HERE - this is what I had in README.Rmd but now removing. Need to adapt this
-whole file anyway, this is prob worth using:
-
-The full raw data from [[3]](https://www.sciencedirect.com/science/article/pii/S2351989426001769) are available in the package as
+The full raw data are available in sizeSpectraFit as
 ```{r, fulldata}
 mediterranean_data
 ```
-for which each row has `strata` (baseline, the no-take
-reserve four years after its implementation, or the fishing grounds four years
+for which each row has `strata` (baseline, ntr: the no-take
+reserve four years after its implementation, or fg:the fishing grounds four years
 after the reserve's implementation), species group given as `group`, `species`, `number` of
-individuals measured of length `length`. We also have the species-specific
-length-weight coefficients
+individuals of that species that were measured as length `length` (mm). 
+Values of `number` can be non-integer because they
+are standardised by the area trawled in each tow; the MLEbins method can explicitly
+deal with this.
+
+A summary of the data is
+```{r, summaryfulldata}
+summary(mediterranean_data)
+```
+
+We also have the species-specific
+length-weight coefficients $\alpha$ and $\beta$ for each species:
 ```{r, lengthweight}
 mediterranean_length_weight_coefficients
 ```
-for each species.
+where the coefficients are for the equation $w = \alpha_s l^{\beta_s}$
+relating weights (g) to lengths (mm) for each species $s$.
 
-The above shows what kind of data are needed to implement the MLEbins data. 
-
-
-
-
-HERE - copy from Mediterranean results data-raw, as simplified down. Or README
-Or look at med-summary-4.Rmd
-
-and are being analysed using sizeSpectraFit as part of a separate manuscript
-(see `?mediterranean_data` for more details). Here we demonstrate the code on a
-subset of the data.
+The above shows what kind of data are needed to implement the MLEbins method.
 
 ## Wrangling the data
 
@@ -96,207 +97,123 @@ We first wrangle the data into the format required for using the MLEbins
 method. Similar wrangling would need to be done for users' data to get the
 required inputs for the likelihood calculations.
 
-We will fit the size spectrum for
-just one species group (crustacea) and for one strata, the fishing grounds that
-are close to a no-take marine reserve. So we first filter to obtain just those values:
+For demonstration purposes we will fit the size spectrum for
+just one species group (Cephalopoda) and for one strata, the fishing grounds (fg). So we first filter to obtain just those values:
 ```{r fgcrustacea}
 dat <- dplyr::filter(mediterranean_data,
                      strata == "fg",
-                     group == "Crustacea")
+                     group == "Cephalopoda")
 dat
 summary(dat)
 ```
 Thus, `dat` contains data for just one `strata` and one `group`, but multiple
-`species`. The `number` column is the number of individuals of species `species` that were
-measured as length `length`. Values of `number` can be non-integer because they
-are standardised by the area trawled in each tow; the MLEbins method can explicitly
-deal with this.
+`species`. 
 
 The
 lengths are in mm, with integer values measured to nearest mm using standard
-lab metric tape, and values
-with decimals are assumed to be measured to 0.01 mm (measured using vernier
-calipers). We convert these length values to minima and maxima of bins, with the
+lab metric tape.
+We convert these length values to minima and maxima of bins, with the
 measured lengths representing the midpoints. This keeps track of the uncertainty
-in the 'true' length of individuals (which obviously is small for the 0.01 mm
-bins, but is needed for the MLEbins method), and progresses the uncertainties
-through to the likelihood calculations.
+in the 'true' length of individuals and is needed for the MLEbins method, which
+also allows for other species groups having different resolution.
 
-TODO see README.Rmd, which I'm copying from test. This wasn't updated below
-for 7 months, so is out of date.
-The bin breaks are calculated as:
-```{r binbreaks}
-# TODO convert this all into calc_max_of_bin():
-dat_bin_breaks <- calc_max_of_bin(dat$length,
-                                  bin_widths = 0.1)
+This conversion is done using `calc_bin_breaks()`, which takes a tibble that
+contains a column of measurements and appends minimum and maximum values for
+each bin (see `?calc_bin_breaks`):
 
-dat_bin_breaks
-
-dat_all <- cbind(dat,
-                 dat_bin_breaks) %>%
-  tibble::as_tibble() %>%
-  dplyr::rename(bin_count = number,
-                length_bin_min = bin_min,
-                length_bin_max = bin_max)
-dat_all
+```{r, binbreaks}
+dat_with_breaks <- calc_bin_breaks(dat,
+                                   bin_width = 1) %>%
+  dplyr::rename(bin_count = number)
+dat_with_breaks
 ```
 
-using our `calc_max_of_bin()` function, where the argument `bin_widths`
-specifies the possible widths of bins (see its help file for details). Assuming
-all integer lenghts were measured to the nearest mm will mis-specify about 1% of
-measurements (those that were measured to 0.01 mm accuracy but turned out to be
-integers), a minor amount.
-So we now have minima and maxima of the length bins for each row, defined as
-`length_bin_min` and `length_bin_max`, respectively.
-
-In the package we also provide the species-specific length-weight coefficients:
-```{r lwcoeffs}
-mediterranean_length_weight_coefficients
-```
-which assume units of cm (not mm) and grammes.
-
-We now use these for each species, to generate body-mass bins:
-
-New function:
-D check results agree
-
-```{r convert}
-dat_joined <- length_bins_to_body_mass_bins(dat_all,
-                                              mediterranean_length_weight_coefficients,
-                                              length_data_unit = "mm")
+We then convert data of counts of species in length bins to counts in body-mass bins
+calculated using the species-specific length-weight coefficients. This is done
+using `length_bins_to_body_mass_bins()`
+```{r, binbreaksmass}
+dat_joined <-
+  length_bins_to_body_mass_bins(dat_with_breaks,
+                                mediterranean_length_weight_coefficients,
+                                length_data_unit = "mm")
 dat_joined
-summary(dat_joined)
 ```
 
-TODO revise: It is useful for users to retain see all the columns above, but here we just
-simplify it down (and rename two columns) to what is needed for the fitting,
-namely `bin_count`, `bin_min` and `bin_max` (assumed to represent body masses);
-users should do the same for their own data.
-looking like:
+We then retain just the columns needed to fit using the MLEbins method for input
+into `determine_xmin_and_fit_mlebins()`
+and also sum the counts for the same combinations of species and weight bins, which is
+done in `mediterranean_for_mlebins()`. That function should work for similarly
+structured data (requires `group` and `strata`, but the function can be easily
+adapted if needed). Since we repeated the same types of analysis for multiple
+species groups and strata combinations, it made sense to write a function.
+As an extra step here we also are going to look at only small cephalopods below
+20.9 g; see
+page 8 of Appendix B of [[Quevedo et
+al. (2026)]](https://www.sciencedirect.com/science/article/pii/S2351989426001769)
+for details.
 
-
-## Fit using MLEbins
-
-Now fit the data using the MLEbins method. First need to determine $x_{min}$....
-
-maybe just do the next and explain what is done.
-
-Those steps have been combined into a single function:
-```{r, mlebins}
-res <- determine_xmin_and_fit_mlebins(dat_joined)
-res
-
+```{r, combine}
+data_cephsmall_fg <- mediterranean_for_mlebins(dat_joined) %>%
+  dplyr::filter(bin_min < 20.9) %>%
+  dplyr::arrange(bin_min)
+data_cephsmall_fg
 ```
+Note the overlapping bins in rows 7 and 8, and also in rows 8 and 9, because the
+bins correspond to different species which have different length-weight
+coefficients. Hence the need for the MLEbins method.
 
-Results when used the 0.01 and 1 bins, compare before deleting
-```{r oldres, eval = FALSE
-#dat_bin_breaks <- calc_max_of_bin(dat$length,
-#                                  bin_widths = c(0.01, 1))
+We are now ready to fit the data. The `determine_xmin_and_fit_mlebins()`
+function calculates a histogram to find the peak from which to start the bounded
+power-law fit [(Quevedo et
+al.,
+2026)](https://www.sciencedirect.com/science/article/pii/S2351989426001769). It
+then fits the size spectrum. This can take a few minutes, so I have saved
+`res_cephsmall_fg` as a data object in sizeSpectraFit (this next chunk is not
+actually run, don't tell anyone...; so do make sure to take out `eval = FALSE` if you use this
+code as a template):
 
-$mlebins_fit
- $b_mle
- [1] -1.92739
-
-$b_conf
- [1] -1.93558 -1.91921
-
-$x_min
-[1] 2.00599
-
-$x_max
-[1] 63.67162
-
+```{r, mlebinsfit, eval = FALSE}
+res_cephsmall_fg <- determine_xmin_and_fit_mlebins(data_cephsmall_fg)
 ```
-
-
-TODO explain
-
-
-
-```{r, fig}
-plot(res)
+The results are
+```{r, results}
+res_cephsmall_fg
 ```
+This is a list of two objects (each is a list): `$mlebins_fit` contains the
+details of the maximum likelihood fitting similar to the other methods, and $h$ is an object of class
+`histogram` that contains details of the
+histogram used to determine $x_{min}$.
 
-
-
-these might work:
-
-```{r, figlinear}
-# class(res_2)
-# [1] "determine_xmin_and_fit_mlebins" "list"
-plot(res$mlebins_fit,
-       style = "linear_y_axis")
+The object has the class `size_spectrum_mlebins` such that our customised
+`plot.size_spectrum_mlebins()` automatically gets used: 
+```{r, plotmlebins, fig.height = 12}
+plot(res_cephsmall_fg)
 ```
+The top panel is a histogram of total counts of minimum body sizes, using 1-g
+body-size bins, used to determine $x_{min}$. The left-most red bin
+is the modal bin, and $x_{xmin}$ for this group-strata combination is the minimum
+value within that 1-g bin.
 
-```{r, figlog}
-plot(res$mlebins_fit,
-       style = "log_y_axis")
-```
+Middle and bottom panels (as suggested in Figure 7 of [[2]](https://www.int-res.com/abstracts/meps/v636/p19-33/)) are the fit of the
+bounded power-law distribution using the MLEbins method with linear
+and logarithmic y-axes, respectively. For each body-mass bin, the green
+horizontal line show the range of body sizes, with its value on the
+y-axis corresponding to the total number of individuals in bins whose
+minima are $\geq$ the bin's minimum; the green lines help to
+distinguish each bin when bins are overlapping. The vertical span of
+each grey rectangle shows the possible range of number of individuals
+with body masses $\geq$ body mass of individuals in that bin
+(horizontal span matches the green line). Red curves are fits of the MLE, with dashed lines
+showing 95\% confidence intervals.
 
+These figure are admittedly a little complex, but retain the full uncertainty
+arising from binned data and conversions through species-specific length-weight
+relationships. As can be seen, some of the resulting rectangles are quite large,
+and simply using a single point for each would suggest higher accuracy than is
+warranted.
 
-With the 0.1 mm bins (instead of 0.01 and 1) we now get lots and lots of tiny
-bins.
-
-So prob better off picking another data set that was non crustacea, for which
-all bins are 1 mm.
-
-Acti baseline maybe?  HERE Maybe redo the zabala results with correct length
-resolutions, and then use one as an example. Quick attempt here on Thurs pm:
-
-Quick try, then do big zabala results file: TODO had not taken out big
-organisms, so go back to Zabala pdf, tidy that up (simplify function as
-described above), then come back here and use just one example. Looks too fine
-to use as an example. HERE. Doing that in desktop 3. Need to carry on with them,
-the full community ones took quite a while. THen copy an example to here.
-
-```{r actibaseline}
-dat_acti <- dplyr::filter(mediterranean_data,
-                          strata == "baseline",
-                          group == "Actinopterygii")
-dat_acti
-summary(dat_acti)
-
-dat_acti_bin_breaks <- calc_max_of_bin(dat_acti$length,
-                                       bin_widths = 1)
-
-dat_acti_bin_breaks   # looks funny because of rounding
-
-dat_acti_all <- cbind(dat_acti,
-                 dat_acti_bin_breaks) %>%
-  tibble::as_tibble() %>%
-  dplyr::rename(bin_count = number,
-                length_bin_min = bin_min,
-                length_bin_max = bin_max)
-dat_acti_all
-
-dat_acti_joined_3 <- length_bins_to_body_mass_bins(dat_acti_all,
-                                              mediterranean_length_weight_coefficients,
-                                              length_data_unit = "mm")
-dat_acti_joined_3
-summary(dat_acti_joined_3)
-
-res_acti <- determine_xmin_and_fit_mlebins(dat_acti_joined_3)
-res_acti
-
-plot(res_acti)
-
-```
-
-
-
-
-
-TODO put check of column names in `determine_xmin_and_fit_mlebins` or similar;
-need those in the `select` chunk above. Think this might be okay now.
-
-
-
-
-```{r, exit}
-knitr::knit_exit()
-```
-
-
+Do see the help files for relevant functions, and feel free to email me (or make
+an issue) with any questions.
 
 ## Session information
 

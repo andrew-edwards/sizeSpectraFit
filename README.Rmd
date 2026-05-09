@@ -225,7 +225,7 @@ with body masses $\geq$ body mass of individuals in that bin
 (horizontal span matches the green line). Red curves are fits of the MLE, with dashed lines
 showing 95\% confidence intervals.
 
-For full explanations see the vignettes; note that the above fits are very good
+For full explanations see the vignettes; note that some of the above fits are very good
 because the data have been simulated from a bounded power-law distribution. 
 
 ## Vignettes

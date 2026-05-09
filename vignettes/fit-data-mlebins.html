@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+<meta name="author" content="Andrew Edwards" />
+
+
+<title>Fitting length data and related species-specific body-mass relationships – MLEbins method</title>
+
+<script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
+// be compatible with the behavior of Pandoc < 2.8).
+document.addEventListener('DOMContentLoaded', function(e) {
+  var hs = document.querySelectorAll("div.section[class*='level'] > :first-child");
+  var i, h, a;
+  for (i = 0; i < hs.length; i++) {
+    h = hs[i];
+    if (!/^h[1-6]$/i.test(h.tagName)) continue;  // it should be a header h1-h6
+    a = h.attributes;
+    while (a.length > 0) h.removeAttribute(a[0].name);
+  }
+});
+</script>
+
+<style type="text/css">
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+span.underline{text-decoration: underline;}
+div.column{display: inline-block; vertical-align: top; width: 50%;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+</style>
+
+
+
+<style type="text/css">
+code {
+white-space: pre;
+}
+.sourceCode {
+overflow: visible;
+}
+</style>
+<style type="text/css" data-origin="pandoc">
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+{ counter-reset: source-line 0; }
+pre.numberSource code > span
+{ position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+{ content: counter(source-line);
+position: relative; left: -1em; text-align: right; vertical-align: baseline;
+border: none; display: inline-block;
+-webkit-touch-callout: none; -webkit-user-select: none;
+-khtml-user-select: none; -moz-user-select: none;
+-ms-user-select: none; user-select: none;
+padding: 0 4px; width: 4em;
+color: #aaaaaa;
+}
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa; padding-left: 4px; }
+div.sourceCode
+{ }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } 
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.at { color: #7d9029; } 
+code span.bn { color: #40a070; } 
+code span.bu { color: #008000; } 
+code span.cf { color: #007020; font-weight: bold; } 
+code span.ch { color: #4070a0; } 
+code span.cn { color: #880000; } 
+code span.co { color: #60a0b0; font-style: italic; } 
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.do { color: #ba2121; font-style: italic; } 
+code span.dt { color: #902000; } 
+code span.dv { color: #40a070; } 
+code span.er { color: #ff0000; font-weight: bold; } 
+code span.ex { } 
+code span.fl { color: #40a070; } 
+code span.fu { color: #06287e; } 
+code span.im { color: #008000; font-weight: bold; } 
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.kw { color: #007020; font-weight: bold; } 
+code span.op { color: #666666; } 
+code span.ot { color: #007020; } 
+code span.pp { color: #bc7a00; } 
+code span.sc { color: #4070a0; } 
+code span.ss { color: #bb6688; } 
+code span.st { color: #4070a0; } 
+code span.va { color: #19177c; } 
+code span.vs { color: #4070a0; } 
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } 
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    var j = 0;
+    while (j < rules.length) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") {
+        j++;
+        continue;
+      }
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') {
+        j++;
+        continue;
+      }
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+
+
+
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
+}
+pre {
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: #f7f7f7;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
+}
+p > code, li > code {
+padding: 2px 0px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
+</style>
+
+
+
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">Fitting length data and related
+species-specific body-mass relationships – MLEbins method</h1>
+<h4 class="author">Andrew Edwards</h4>
+<h4 class="date">Last rendered on 08 May, 2026</h4>
+
+
+
+<p>This vignette for the <a href="https://github.com/andrew-edwards/sizeSpectraFit?tab=readme-ov-file#sizespectrafit">sizeSpectraFit
+R package</a> is for the MLEbins method, which we introduced in our <a href="https://www.int-res.com/abstracts/meps/v636/p19-33/"><em>MEPS</em>
+paper</a>. We use an example data set from the Mediterranean from our
+new <a href="https://www.sciencedirect.com/science/article/pii/S2351989426001769"><em>Global
+Ecology and Conservation</em> paper</a>.</p>
+<p>The MLEbins method calculates the maximum likelihood estimate of the
+size-spectrum exponent, <span class="math inline">\(b\)</span>, when the
+data are collected as lengths and we have species-specific length-weight
+coefficients. So individual body masses are not available; if they were
+we could use the MLE method in the <a href="http://htmlpreview.github.io/?https://github.com/andrew-edwards/sizeSpectraFit/blob/main/vignettes/fit-data.html">fit-data.html</a>
+vignette. If you have binned body masses but the bins overlap, then you
+also need to use MLEbins.</p>
+<p>The lengths may already be binned, for example a length bin could be
+10-15 cm. And even when measured more accurately, the resolution of the
+measurements essentially adds uncertainty to a length. For example, a
+fish of length 15 cm measured to the nearest cm has a true length in the
+range 14.5-15.5 cm, which then gets converted into a body-mass bin using
+that species specific length-weight coefficients. The resulting
+body-mass bins can overlap each other (unlike for the MLEbin method),
+because the length bins of differently shaped species get converted to
+different body-mass bins. See the <a href="https://www.int-res.com/abstracts/meps/v636/p19-33/"><em>MEPS</em>
+paper</a> paper for further explanation (rather than it being repeated
+here, where we focus on applying the method).</p>
+<div id="the-raw-data" class="section level2">
+<h2>The raw data</h2>
+<p>We use real data of measured lengths from experimental trawl surveys
+conducted in the Northwestern Mediterranean Sea, as part of the research
+projects RESNEP and BITER by the Instituto de Ciencias del Mar
+(ICM-CSIC), Spain; data courtesy of Juliana Quevedo, Joan B. Company,
+Nixon Bahamon, and Jordi Ribera Altimir, as used in <a href="https://www.sciencedirect.com/science/article/pii/S2351989426001769">Quevedo
+et al. (2026)</a>.</p>
+<p>The full raw data are available in sizeSpectraFit as</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a>mediterranean_data</span>
+<span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a>  <span class="co"># A tibble: 17,850 × 5</span></span>
+<span id="cb1-3"><a href="#cb1-3" tabindex="-1"></a>     strata   group          species                   length number</span>
+<span id="cb1-4"><a href="#cb1-4" tabindex="-1"></a>     <span class="sc">&lt;</span>fct<span class="sc">&gt;</span>    <span class="er">&lt;</span>fct<span class="sc">&gt;</span>          <span class="er">&lt;</span>fct<span class="sc">&gt;</span>                      <span class="er">&lt;</span>dbl<span class="sc">&gt;</span>  <span class="er">&lt;</span>dbl<span class="sc">&gt;</span></span>
+<span id="cb1-5"><a href="#cb1-5" tabindex="-1"></a>   <span class="dv">1</span> baseline Actinopterygii Phycis blennoides          <span class="dv">124</span>    <span class="fl">30.3</span> </span>
+<span id="cb1-6"><a href="#cb1-6" tabindex="-1"></a>   <span class="dv">2</span> baseline Crustacea      Nephrops norvegicus         <span class="fl">31.0</span>  <span class="fl">15.2</span> </span>
+<span id="cb1-7"><a href="#cb1-7" tabindex="-1"></a>   <span class="dv">3</span> baseline Crustacea      Nephrops norvegicus         <span class="fl">30.4</span>   <span class="fl">7.58</span></span>
+<span id="cb1-8"><a href="#cb1-8" tabindex="-1"></a>   <span class="dv">4</span> baseline Actinopterygii Phycis blennoides          <span class="dv">122</span>    <span class="fl">30.3</span> </span>
+<span id="cb1-9"><a href="#cb1-9" tabindex="-1"></a>   <span class="dv">5</span> baseline Actinopterygii Helicolenus dactylopterus  <span class="dv">140</span>     <span class="fl">7.58</span></span>
+<span id="cb1-10"><a href="#cb1-10" tabindex="-1"></a>   <span class="dv">6</span> baseline Crustacea      Nephrops norvegicus         <span class="fl">31.0</span>  <span class="fl">15.2</span> </span>
+<span id="cb1-11"><a href="#cb1-11" tabindex="-1"></a>   <span class="dv">7</span> baseline Actinopterygii Phycis blennoides          <span class="dv">128</span>    <span class="fl">30.3</span> </span>
+<span id="cb1-12"><a href="#cb1-12" tabindex="-1"></a>   <span class="dv">8</span> baseline Crustacea      Nephrops norvegicus         <span class="fl">38.1</span>   <span class="fl">7.58</span></span>
+<span id="cb1-13"><a href="#cb1-13" tabindex="-1"></a>   <span class="dv">9</span> baseline Actinopterygii Phycis blennoides          <span class="dv">148</span>    <span class="fl">30.3</span> </span>
+<span id="cb1-14"><a href="#cb1-14" tabindex="-1"></a>  <span class="dv">10</span> baseline Actinopterygii Phycis blennoides          <span class="dv">127</span>    <span class="fl">30.3</span> </span>
+<span id="cb1-15"><a href="#cb1-15" tabindex="-1"></a>  <span class="co"># ℹ 17,840 more rows</span></span></code></pre></div>
+<p>for which each row has <code>strata</code> (baseline, ntr: the
+no-take reserve four years after its implementation, or fg:the fishing
+grounds four years after the reserve’s implementation), species group
+given as <code>group</code>, <code>species</code>, <code>number</code>
+of individuals of that species that were measured as length
+<code>length</code> (mm). Values of <code>number</code> can be
+non-integer because they are standardised by the area trawled in each
+tow; the MLEbins method can explicitly deal with this.</p>
+<p>A summary of the data is</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a><span class="fu">summary</span>(mediterranean_data)</span>
+<span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a>        strata                group                          species    </span>
+<span id="cb2-3"><a href="#cb2-3" tabindex="-1"></a>   fg      <span class="sc">:</span><span class="dv">6270</span>   Actinopterygii<span class="sc">:</span><span class="dv">7228</span>   Parapenaeus longirostris<span class="sc">:</span><span class="dv">2986</span>  </span>
+<span id="cb2-4"><a href="#cb2-4" tabindex="-1"></a>   ntr     <span class="sc">:</span><span class="dv">7550</span>   Cephalopoda   <span class="sc">:</span> <span class="dv">607</span>   Nephrops norvegicus     <span class="sc">:</span><span class="dv">2550</span>  </span>
+<span id="cb2-5"><a href="#cb2-5" tabindex="-1"></a>   baseline<span class="sc">:</span><span class="dv">4030</span>   Chondrichthyes<span class="sc">:</span><span class="dv">1310</span>   Plesionika heterocarpus <span class="sc">:</span><span class="dv">2023</span>  </span>
+<span id="cb2-6"><a href="#cb2-6" tabindex="-1"></a>                   Crustacea     <span class="sc">:</span><span class="dv">8705</span>   Phycis blennoides       <span class="sc">:</span><span class="dv">1930</span>  </span>
+<span id="cb2-7"><a href="#cb2-7" tabindex="-1"></a>                                         Scyliorhinus canicula   <span class="sc">:</span><span class="dv">1307</span>  </span>
+<span id="cb2-8"><a href="#cb2-8" tabindex="-1"></a>                                         Trigla lyra             <span class="sc">:</span> <span class="dv">806</span>  </span>
+<span id="cb2-9"><a href="#cb2-9" tabindex="-1"></a>                                         (Other)                 <span class="sc">:</span><span class="dv">6248</span>  </span>
+<span id="cb2-10"><a href="#cb2-10" tabindex="-1"></a>       length            number       </span>
+<span id="cb2-11"><a href="#cb2-11" tabindex="-1"></a>   Min.   <span class="sc">:</span>  <span class="fl">12.10</span>   Min.   <span class="sc">:</span>  <span class="fl">6.006</span>  </span>
+<span id="cb2-12"><a href="#cb2-12" tabindex="-1"></a>   <span class="dv">1</span>st Qu.<span class="sc">:</span>  <span class="fl">27.05</span>   <span class="dv">1</span>st Qu.<span class="sc">:</span>  <span class="fl">7.353</span>  </span>
+<span id="cb2-13"><a href="#cb2-13" tabindex="-1"></a>   Median <span class="sc">:</span>  <span class="fl">40.00</span>   Median <span class="sc">:</span> <span class="fl">14.706</span>  </span>
+<span id="cb2-14"><a href="#cb2-14" tabindex="-1"></a>   Mean   <span class="sc">:</span> <span class="fl">102.20</span>   Mean   <span class="sc">:</span> <span class="fl">24.301</span>  </span>
+<span id="cb2-15"><a href="#cb2-15" tabindex="-1"></a>   <span class="dv">3</span>rd Qu.<span class="sc">:</span> <span class="fl">164.00</span>   <span class="dv">3</span>rd Qu.<span class="sc">:</span> <span class="fl">29.594</span>  </span>
+<span id="cb2-16"><a href="#cb2-16" tabindex="-1"></a>   Max.   <span class="sc">:</span><span class="fl">1000.00</span>   Max.   <span class="sc">:</span><span class="fl">170.374</span>  </span>
+<span id="cb2-17"><a href="#cb2-17" tabindex="-1"></a>  </span></code></pre></div>
+<p>We also have the species-specific length-weight coefficients <span class="math inline">\(\alpha\)</span> and <span class="math inline">\(\beta\)</span> for each species:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a>mediterranean_length_weight_coefficients</span>
+<span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a>  <span class="co"># A tibble: 53 × 3</span></span>
+<span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a>     species                      alpha  beta</span>
+<span id="cb3-4"><a href="#cb3-4" tabindex="-1"></a>     <span class="sc">&lt;</span>fct<span class="sc">&gt;</span>                        <span class="er">&lt;</span>dbl<span class="sc">&gt;</span> <span class="er">&lt;</span>dbl<span class="sc">&gt;</span></span>
+<span id="cb3-5"><a href="#cb3-5" tabindex="-1"></a>   <span class="dv">1</span> Abralia veranyi             <span class="fl">0.689</span>   <span class="fl">1.42</span></span>
+<span id="cb3-6"><a href="#cb3-6" tabindex="-1"></a>   <span class="dv">2</span> Aegaeon lacazei             <span class="fl">0.0275</span>  <span class="fl">2.44</span></span>
+<span id="cb3-7"><a href="#cb3-7" tabindex="-1"></a>   <span class="dv">3</span> Argentina sphyraena         <span class="fl">0.0047</span>  <span class="fl">3.05</span></span>
+<span id="cb3-8"><a href="#cb3-8" tabindex="-1"></a>   <span class="dv">4</span> Arnoglossus rueppelii       <span class="fl">0.0051</span>  <span class="fl">3.01</span></span>
+<span id="cb3-9"><a href="#cb3-9" tabindex="-1"></a>   <span class="dv">5</span> Bathypolypus sponsalis      <span class="fl">0.562</span>   <span class="fl">2.56</span></span>
+<span id="cb3-10"><a href="#cb3-10" tabindex="-1"></a>   <span class="dv">6</span> Capros aper                 <span class="fl">0.0138</span>  <span class="fl">3.11</span></span>
+<span id="cb3-11"><a href="#cb3-11" tabindex="-1"></a>   <span class="dv">7</span> Chlorotocus crassicornis    <span class="fl">0.585</span>   <span class="fl">2.43</span></span>
+<span id="cb3-12"><a href="#cb3-12" tabindex="-1"></a>   <span class="dv">8</span> Conger conger               <span class="fl">0.0006</span>  <span class="fl">3.21</span></span>
+<span id="cb3-13"><a href="#cb3-13" tabindex="-1"></a>   <span class="dv">9</span> Eusergestes arcticus        <span class="fl">0.287</span>   <span class="fl">2.31</span></span>
+<span id="cb3-14"><a href="#cb3-14" tabindex="-1"></a>  <span class="dv">10</span> Gaidropsarus macrophthalmus <span class="fl">0.0075</span>  <span class="fl">2.85</span></span>
+<span id="cb3-15"><a href="#cb3-15" tabindex="-1"></a>  <span class="co"># ℹ 43 more rows</span></span></code></pre></div>
+<p>where the coefficients are for the equation <span class="math inline">\(w = \alpha_s l^{\beta_s}\)</span> relating weights
+(g) to lengths (mm) for each species <span class="math inline">\(s\)</span>.</p>
+<p>The above shows what kind of data are needed to implement the MLEbins
+method.</p>
+</div>
+<div id="wrangling-the-data" class="section level2">
+<h2>Wrangling the data</h2>
+<p>We first wrangle the data into the format required for using the
+MLEbins method. Similar wrangling would need to be done for users’ data
+to get the required inputs for the likelihood calculations.</p>
+<p>For demonstration purposes we will fit the size spectrum for just one
+species group (Cephalopoda) and for one strata, the fishing grounds
+(fg). So we first filter to obtain just those values:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a>dat <span class="ot">&lt;-</span> dplyr<span class="sc">::</span><span class="fu">filter</span>(mediterranean_data,</span>
+<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a>                     strata <span class="sc">==</span> <span class="st">&quot;fg&quot;</span>,</span>
+<span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a>                     group <span class="sc">==</span> <span class="st">&quot;Cephalopoda&quot;</span>)</span>
+<span id="cb4-4"><a href="#cb4-4" tabindex="-1"></a>dat</span>
+<span id="cb4-5"><a href="#cb4-5" tabindex="-1"></a>  <span class="co"># A tibble: 157 × 5</span></span>
+<span id="cb4-6"><a href="#cb4-6" tabindex="-1"></a>     strata group       species              length number</span>
+<span id="cb4-7"><a href="#cb4-7" tabindex="-1"></a>     <span class="sc">&lt;</span>fct<span class="sc">&gt;</span>  <span class="er">&lt;</span>fct<span class="sc">&gt;</span>       <span class="er">&lt;</span>fct<span class="sc">&gt;</span>                 <span class="er">&lt;</span>dbl<span class="sc">&gt;</span>  <span class="er">&lt;</span>dbl<span class="sc">&gt;</span></span>
+<span id="cb4-8"><a href="#cb4-8" tabindex="-1"></a>   <span class="dv">1</span> fg     Cephalopoda Abralia veranyi          <span class="dv">42</span>  <span class="fl">58.8</span> </span>
+<span id="cb4-9"><a href="#cb4-9" tabindex="-1"></a>   <span class="dv">2</span> fg     Cephalopoda Todarodes sagittatus    <span class="dv">294</span>   <span class="fl">7.35</span></span>
+<span id="cb4-10"><a href="#cb4-10" tabindex="-1"></a>   <span class="dv">3</span> fg     Cephalopoda Todarodes sagittatus    <span class="dv">185</span>   <span class="fl">7.35</span></span>
+<span id="cb4-11"><a href="#cb4-11" tabindex="-1"></a>   <span class="dv">4</span> fg     Cephalopoda Todarodes sagittatus    <span class="dv">269</span>   <span class="fl">7.35</span></span>
+<span id="cb4-12"><a href="#cb4-12" tabindex="-1"></a>   <span class="dv">5</span> fg     Cephalopoda Todaropsis eblanae      <span class="dv">116</span>   <span class="fl">7.35</span></span>
+<span id="cb4-13"><a href="#cb4-13" tabindex="-1"></a>   <span class="dv">6</span> fg     Cephalopoda Todaropsis eblanae      <span class="dv">126</span>   <span class="fl">7.35</span></span>
+<span id="cb4-14"><a href="#cb4-14" tabindex="-1"></a>   <span class="dv">7</span> fg     Cephalopoda Todaropsis eblanae       <span class="dv">87</span>   <span class="fl">7.35</span></span>
+<span id="cb4-15"><a href="#cb4-15" tabindex="-1"></a>   <span class="dv">8</span> fg     Cephalopoda Todaropsis eblanae      <span class="dv">130</span>   <span class="fl">7.35</span></span>
+<span id="cb4-16"><a href="#cb4-16" tabindex="-1"></a>   <span class="dv">9</span> fg     Cephalopoda Todaropsis eblanae       <span class="dv">94</span>   <span class="fl">7.35</span></span>
+<span id="cb4-17"><a href="#cb4-17" tabindex="-1"></a>  <span class="dv">10</span> fg     Cephalopoda Todaropsis eblanae      <span class="dv">120</span>   <span class="fl">7.35</span></span>
+<span id="cb4-18"><a href="#cb4-18" tabindex="-1"></a>  <span class="co"># ℹ 147 more rows</span></span>
+<span id="cb4-19"><a href="#cb4-19" tabindex="-1"></a><span class="fu">summary</span>(dat)</span>
+<span id="cb4-20"><a href="#cb4-20" tabindex="-1"></a>        strata               group                     species       length      </span>
+<span id="cb4-21"><a href="#cb4-21" tabindex="-1"></a>   fg      <span class="sc">:</span><span class="dv">157</span>   Actinopterygii<span class="sc">:</span>  <span class="dv">0</span>   Illex coindetii     <span class="sc">:</span><span class="dv">53</span>   Min.   <span class="sc">:</span> <span class="fl">17.00</span>  </span>
+<span id="cb4-22"><a href="#cb4-22" tabindex="-1"></a>   ntr     <span class="sc">:</span>  <span class="dv">0</span>   Cephalopoda   <span class="sc">:</span><span class="dv">157</span>   Todaropsis eblanae  <span class="sc">:</span><span class="dv">38</span>   <span class="dv">1</span>st Qu.<span class="sc">:</span> <span class="fl">46.00</span>  </span>
+<span id="cb4-23"><a href="#cb4-23" tabindex="-1"></a>   baseline<span class="sc">:</span>  <span class="dv">0</span>   Chondrichthyes<span class="sc">:</span>  <span class="dv">0</span>   Abralia veranyi     <span class="sc">:</span><span class="dv">37</span>   Median <span class="sc">:</span> <span class="fl">95.00</span>  </span>
+<span id="cb4-24"><a href="#cb4-24" tabindex="-1"></a>                  Crustacea     <span class="sc">:</span>  <span class="dv">0</span>   Rossia macrosoma    <span class="sc">:</span><span class="dv">11</span>   Mean   <span class="sc">:</span> <span class="fl">90.62</span>  </span>
+<span id="cb4-25"><a href="#cb4-25" tabindex="-1"></a>                                       Todarodes sagittatus<span class="sc">:</span> <span class="dv">9</span>   <span class="dv">3</span>rd Qu.<span class="sc">:</span><span class="fl">115.00</span>  </span>
+<span id="cb4-26"><a href="#cb4-26" tabindex="-1"></a>                                       Sepia orbignyana    <span class="sc">:</span> <span class="dv">7</span>   Max.   <span class="sc">:</span><span class="fl">335.00</span>  </span>
+<span id="cb4-27"><a href="#cb4-27" tabindex="-1"></a>                                       (Other)             <span class="sc">:</span> <span class="dv">2</span>                   </span>
+<span id="cb4-28"><a href="#cb4-28" tabindex="-1"></a>       number      </span>
+<span id="cb4-29"><a href="#cb4-29" tabindex="-1"></a>   Min.   <span class="sc">:</span> <span class="fl">7.151</span>  </span>
+<span id="cb4-30"><a href="#cb4-30" tabindex="-1"></a>   <span class="dv">1</span>st Qu.<span class="sc">:</span> <span class="fl">7.204</span>  </span>
+<span id="cb4-31"><a href="#cb4-31" tabindex="-1"></a>   Median <span class="sc">:</span> <span class="fl">7.353</span>  </span>
+<span id="cb4-32"><a href="#cb4-32" tabindex="-1"></a>   Mean   <span class="sc">:</span><span class="fl">12.505</span>  </span>
+<span id="cb4-33"><a href="#cb4-33" tabindex="-1"></a>   <span class="dv">3</span>rd Qu.<span class="sc">:</span> <span class="fl">7.435</span>  </span>
+<span id="cb4-34"><a href="#cb4-34" tabindex="-1"></a>   Max.   <span class="sc">:</span><span class="fl">61.345</span>  </span>
+<span id="cb4-35"><a href="#cb4-35" tabindex="-1"></a>  </span></code></pre></div>
+<p>Thus, <code>dat</code> contains data for just one <code>strata</code>
+and one <code>group</code>, but multiple <code>species</code>.</p>
+<p>The lengths are in mm, with integer values measured to nearest mm
+using standard lab metric tape. We convert these length values to minima
+and maxima of bins, with the measured lengths representing the
+midpoints. This keeps track of the uncertainty in the ‘true’ length of
+individuals and is needed for the MLEbins method, which also allows for
+other species groups having different resolution.</p>
+<p>This conversion is done using <code>calc_bin_breaks()</code>, which
+takes a tibble that contains a column of measurements and appends
+minimum and maximum values for each bin (see
+<code>?calc_bin_breaks</code>):</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a>dat_with_breaks <span class="ot">&lt;-</span> <span class="fu">calc_bin_breaks</span>(dat,</span>
+<span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a>                                   <span class="at">bin_width =</span> <span class="dv">1</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">rename</span>(<span class="at">bin_count =</span> number)</span>
+<span id="cb5-4"><a href="#cb5-4" tabindex="-1"></a>dat_with_breaks</span>
+<span id="cb5-5"><a href="#cb5-5" tabindex="-1"></a>  <span class="co"># A tibble: 157 × 7</span></span>
+<span id="cb5-6"><a href="#cb5-6" tabindex="-1"></a>     strata group       species         length bin_count length_bin_min length_bin_max</span>
+<span id="cb5-7"><a href="#cb5-7" tabindex="-1"></a>     <span class="sc">&lt;</span>fct<span class="sc">&gt;</span>  <span class="er">&lt;</span>fct<span class="sc">&gt;</span>       <span class="er">&lt;</span>fct<span class="sc">&gt;</span>            <span class="er">&lt;</span>dbl<span class="sc">&gt;</span>     <span class="er">&lt;</span>dbl<span class="sc">&gt;</span>          <span class="er">&lt;</span>dbl<span class="sc">&gt;</span>          <span class="er">&lt;</span>dbl<span class="sc">&gt;</span></span>
+<span id="cb5-8"><a href="#cb5-8" tabindex="-1"></a>   <span class="dv">1</span> fg     Cephalopoda Abralia veranyi     <span class="dv">42</span>     <span class="fl">58.8</span>            <span class="fl">41.5</span>           <span class="fl">42.5</span></span>
+<span id="cb5-9"><a href="#cb5-9" tabindex="-1"></a>   <span class="dv">2</span> fg     Cephalopoda Todarodes sagi…    <span class="dv">294</span>      <span class="fl">7.35</span>          <span class="fl">294.</span>           <span class="fl">294.</span> </span>
+<span id="cb5-10"><a href="#cb5-10" tabindex="-1"></a>   <span class="dv">3</span> fg     Cephalopoda Todarodes sagi…    <span class="dv">185</span>      <span class="fl">7.35</span>          <span class="fl">184.</span>           <span class="fl">186.</span> </span>
+<span id="cb5-11"><a href="#cb5-11" tabindex="-1"></a>   <span class="dv">4</span> fg     Cephalopoda Todarodes sagi…    <span class="dv">269</span>      <span class="fl">7.35</span>          <span class="fl">268.</span>           <span class="fl">270.</span> </span>
+<span id="cb5-12"><a href="#cb5-12" tabindex="-1"></a>   <span class="dv">5</span> fg     Cephalopoda Todaropsis ebl…    <span class="dv">116</span>      <span class="fl">7.35</span>          <span class="fl">116.</span>           <span class="fl">116.</span> </span>
+<span id="cb5-13"><a href="#cb5-13" tabindex="-1"></a>   <span class="dv">6</span> fg     Cephalopoda Todaropsis ebl…    <span class="dv">126</span>      <span class="fl">7.35</span>          <span class="fl">126.</span>           <span class="fl">126.</span> </span>
+<span id="cb5-14"><a href="#cb5-14" tabindex="-1"></a>   <span class="dv">7</span> fg     Cephalopoda Todaropsis ebl…     <span class="dv">87</span>      <span class="fl">7.35</span>           <span class="fl">86.5</span>           <span class="fl">87.5</span></span>
+<span id="cb5-15"><a href="#cb5-15" tabindex="-1"></a>   <span class="dv">8</span> fg     Cephalopoda Todaropsis ebl…    <span class="dv">130</span>      <span class="fl">7.35</span>          <span class="fl">130.</span>           <span class="fl">130.</span> </span>
+<span id="cb5-16"><a href="#cb5-16" tabindex="-1"></a>   <span class="dv">9</span> fg     Cephalopoda Todaropsis ebl…     <span class="dv">94</span>      <span class="fl">7.35</span>           <span class="fl">93.5</span>           <span class="fl">94.5</span></span>
+<span id="cb5-17"><a href="#cb5-17" tabindex="-1"></a>  <span class="dv">10</span> fg     Cephalopoda Todaropsis ebl…    <span class="dv">120</span>      <span class="fl">7.35</span>          <span class="fl">120.</span>           <span class="fl">120.</span> </span>
+<span id="cb5-18"><a href="#cb5-18" tabindex="-1"></a>  <span class="co"># ℹ 147 more rows</span></span></code></pre></div>
+<p>We then convert data of counts of species in length bins to counts in
+body-mass bins calculated using the species-specific length-weight
+coefficients. This is done using
+<code>length_bins_to_body_mass_bins()</code></p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a>dat_joined <span class="ot">&lt;-</span></span>
+<span id="cb6-2"><a href="#cb6-2" tabindex="-1"></a>  <span class="fu">length_bins_to_body_mass_bins</span>(dat_with_breaks,</span>
+<span id="cb6-3"><a href="#cb6-3" tabindex="-1"></a>                                mediterranean_length_weight_coefficients,</span>
+<span id="cb6-4"><a href="#cb6-4" tabindex="-1"></a>                                <span class="at">length_data_unit =</span> <span class="st">&quot;mm&quot;</span>)</span>
+<span id="cb6-5"><a href="#cb6-5" tabindex="-1"></a>dat_joined</span>
+<span id="cb6-6"><a href="#cb6-6" tabindex="-1"></a>  <span class="co"># A tibble: 157 × 11</span></span>
+<span id="cb6-7"><a href="#cb6-7" tabindex="-1"></a>     strata group  species length bin_count length_bin_min length_bin_max  alpha  beta</span>
+<span id="cb6-8"><a href="#cb6-8" tabindex="-1"></a>     <span class="sc">&lt;</span>fct<span class="sc">&gt;</span>  <span class="er">&lt;</span>fct<span class="sc">&gt;</span>  <span class="er">&lt;</span>fct<span class="sc">&gt;</span>    <span class="er">&lt;</span>dbl<span class="sc">&gt;</span>     <span class="er">&lt;</span>dbl<span class="sc">&gt;</span>          <span class="er">&lt;</span>dbl<span class="sc">&gt;</span>          <span class="er">&lt;</span>dbl<span class="sc">&gt;</span>  <span class="er">&lt;</span>dbl<span class="sc">&gt;</span> <span class="er">&lt;</span>dbl<span class="sc">&gt;</span></span>
+<span id="cb6-9"><a href="#cb6-9" tabindex="-1"></a>   <span class="dv">1</span> fg     Cepha… Abrali…     <span class="dv">42</span>     <span class="fl">58.8</span>            <span class="fl">4.15</span>           <span class="fl">4.25</span> <span class="fl">0.689</span>   <span class="fl">1.42</span></span>
+<span id="cb6-10"><a href="#cb6-10" tabindex="-1"></a>   <span class="dv">2</span> fg     Cepha… Todaro…    <span class="dv">294</span>      <span class="fl">7.35</span>          <span class="fl">29.4</span>           <span class="fl">29.4</span>  <span class="fl">0.0102</span>  <span class="fl">3.31</span></span>
+<span id="cb6-11"><a href="#cb6-11" tabindex="-1"></a>   <span class="dv">3</span> fg     Cepha… Todaro…    <span class="dv">185</span>      <span class="fl">7.35</span>          <span class="fl">18.4</span>           <span class="fl">18.6</span>  <span class="fl">0.0102</span>  <span class="fl">3.31</span></span>
+<span id="cb6-12"><a href="#cb6-12" tabindex="-1"></a>   <span class="dv">4</span> fg     Cepha… Todaro…    <span class="dv">269</span>      <span class="fl">7.35</span>          <span class="fl">26.8</span>           <span class="fl">27.0</span>  <span class="fl">0.0102</span>  <span class="fl">3.31</span></span>
+<span id="cb6-13"><a href="#cb6-13" tabindex="-1"></a>   <span class="dv">5</span> fg     Cepha… Todaro…    <span class="dv">116</span>      <span class="fl">7.35</span>          <span class="fl">11.6</span>           <span class="fl">11.6</span>  <span class="fl">0.0996</span>  <span class="fl">2.79</span></span>
+<span id="cb6-14"><a href="#cb6-14" tabindex="-1"></a>   <span class="dv">6</span> fg     Cepha… Todaro…    <span class="dv">126</span>      <span class="fl">7.35</span>          <span class="fl">12.6</span>           <span class="fl">12.6</span>  <span class="fl">0.0996</span>  <span class="fl">2.79</span></span>
+<span id="cb6-15"><a href="#cb6-15" tabindex="-1"></a>   <span class="dv">7</span> fg     Cepha… Todaro…     <span class="dv">87</span>      <span class="fl">7.35</span>           <span class="fl">8.65</span>           <span class="fl">8.75</span> <span class="fl">0.0996</span>  <span class="fl">2.79</span></span>
+<span id="cb6-16"><a href="#cb6-16" tabindex="-1"></a>   <span class="dv">8</span> fg     Cepha… Todaro…    <span class="dv">130</span>      <span class="fl">7.35</span>          <span class="fl">13.0</span>           <span class="fl">13.0</span>  <span class="fl">0.0996</span>  <span class="fl">2.79</span></span>
+<span id="cb6-17"><a href="#cb6-17" tabindex="-1"></a>   <span class="dv">9</span> fg     Cepha… Todaro…     <span class="dv">94</span>      <span class="fl">7.35</span>           <span class="fl">9.35</span>           <span class="fl">9.45</span> <span class="fl">0.0996</span>  <span class="fl">2.79</span></span>
+<span id="cb6-18"><a href="#cb6-18" tabindex="-1"></a>  <span class="dv">10</span> fg     Cepha… Todaro…    <span class="dv">120</span>      <span class="fl">7.35</span>          <span class="fl">12.0</span>           <span class="fl">12.0</span>  <span class="fl">0.0996</span>  <span class="fl">2.79</span></span>
+<span id="cb6-19"><a href="#cb6-19" tabindex="-1"></a>  <span class="co"># ℹ 147 more rows</span></span>
+<span id="cb6-20"><a href="#cb6-20" tabindex="-1"></a>  <span class="co"># ℹ 2 more variables: weight_bin_min &lt;dbl&gt;, weight_bin_max &lt;dbl&gt;</span></span></code></pre></div>
+<p>We then retain just the columns needed to fit using the MLEbins
+method for input into <code>determine_xmin_and_fit_mlebins()</code> and
+also sum the counts for the same combinations of species and weight
+bins, which is done in <code>mediterranean_for_mlebins()</code>. That
+function should work for similarly structured data (requires
+<code>group</code> and <code>strata</code>, but the function can be
+easily adapted if needed). Since we repeated the same types of analysis
+for multiple species groups and strata combinations, it made sense to
+write a function. As an extra step here we also are going to look at
+only small cephalopods below 20.9 g; see page 8 of Appendix B of <a href="https://www.sciencedirect.com/science/article/pii/S2351989426001769">[Quevedo
+et al. (2026)]</a> for details.</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a>data_cephsmall_fg <span class="ot">&lt;-</span> <span class="fu">mediterranean_for_mlebins</span>(dat_joined) <span class="sc">%&gt;%</span></span>
+<span id="cb7-2"><a href="#cb7-2" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">filter</span>(bin_min <span class="sc">&lt;</span> <span class="fl">20.9</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb7-3"><a href="#cb7-3" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">arrange</span>(bin_min)</span>
+<span id="cb7-4"><a href="#cb7-4" tabindex="-1"></a>data_cephsmall_fg</span>
+<span id="cb7-5"><a href="#cb7-5" tabindex="-1"></a>  <span class="co"># A tibble: 29 × 4</span></span>
+<span id="cb7-6"><a href="#cb7-6" tabindex="-1"></a>     species         bin_min bin_max bin_count</span>
+<span id="cb7-7"><a href="#cb7-7" tabindex="-1"></a>     <span class="sc">&lt;</span>fct<span class="sc">&gt;</span>             <span class="er">&lt;</span>dbl<span class="sc">&gt;</span>   <span class="er">&lt;</span>dbl<span class="sc">&gt;</span>     <span class="er">&lt;</span>dbl<span class="sc">&gt;</span></span>
+<span id="cb7-8"><a href="#cb7-8" tabindex="-1"></a>   <span class="dv">1</span> Abralia veranyi    <span class="fl">2.46</span>    <span class="fl">2.60</span>     <span class="fl">61.3</span> </span>
+<span id="cb7-9"><a href="#cb7-9" tabindex="-1"></a>   <span class="dv">2</span> Abralia veranyi    <span class="fl">2.60</span>    <span class="fl">2.75</span>     <span class="fl">64.6</span> </span>
+<span id="cb7-10"><a href="#cb7-10" tabindex="-1"></a>   <span class="dv">3</span> Abralia veranyi    <span class="fl">2.89</span>    <span class="fl">3.05</span>      <span class="fl">7.35</span></span>
+<span id="cb7-11"><a href="#cb7-11" tabindex="-1"></a>   <span class="dv">4</span> Illex coindetii    <span class="fl">3.14</span>    <span class="fl">3.35</span>     <span class="fl">43.9</span> </span>
+<span id="cb7-12"><a href="#cb7-12" tabindex="-1"></a>   <span class="dv">5</span> Abralia veranyi    <span class="fl">3.35</span>    <span class="fl">3.51</span>     <span class="fl">14.8</span> </span>
+<span id="cb7-13"><a href="#cb7-13" tabindex="-1"></a>   <span class="dv">6</span> Abralia veranyi    <span class="fl">3.51</span>    <span class="fl">3.67</span>     <span class="fl">64.8</span> </span>
+<span id="cb7-14"><a href="#cb7-14" tabindex="-1"></a>   <span class="dv">7</span> Abralia veranyi    <span class="fl">3.67</span>    <span class="fl">3.83</span>     <span class="fl">79.4</span> </span>
+<span id="cb7-15"><a href="#cb7-15" tabindex="-1"></a>   <span class="dv">8</span> Illex coindetii    <span class="fl">3.79</span>    <span class="fl">4.03</span>     <span class="fl">43.2</span> </span>
+<span id="cb7-16"><a href="#cb7-16" tabindex="-1"></a>   <span class="dv">9</span> Abralia veranyi    <span class="fl">3.83</span>    <span class="fl">3.99</span>     <span class="fl">58.4</span> </span>
+<span id="cb7-17"><a href="#cb7-17" tabindex="-1"></a>  <span class="dv">10</span> Abralia veranyi    <span class="fl">3.99</span>    <span class="fl">4.16</span>     <span class="fl">29.4</span> </span>
+<span id="cb7-18"><a href="#cb7-18" tabindex="-1"></a>  <span class="co"># ℹ 19 more rows</span></span></code></pre></div>
+<p>Note the overlapping bins in rows 7 and 8, and also in rows 8 and 9,
+because the bins correspond to different species which have different
+length-weight coefficients. Hence the need for the MLEbins method.</p>
+<p>We are now ready to fit the data. The
+<code>determine_xmin_and_fit_mlebins()</code> function calculates a
+histogram to find the peak from which to start the bounded power-law fit
+<a href="https://www.sciencedirect.com/science/article/pii/S2351989426001769">(Quevedo
+et al., 2026)</a>. It then fits the size spectrum. This can take a few
+minutes, so I have saved <code>res_cephsmall_fg</code> as a data object
+in sizeSpectraFit (this next chunk is not actually run, don’t tell
+anyone…; so do make sure to take out <code>eval = FALSE</code> if you
+use this code as a template):</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" tabindex="-1"></a>res_cephsmall_fg <span class="ot">&lt;-</span> <span class="fu">determine_xmin_and_fit_mlebins</span>(data_cephsmall_fg)</span></code></pre></div>
+<p>The results are</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" tabindex="-1"></a>res_cephsmall_fg</span>
+<span id="cb9-2"><a href="#cb9-2" tabindex="-1"></a>  <span class="sc">$</span>mlebins_fit</span>
+<span id="cb9-3"><a href="#cb9-3" tabindex="-1"></a>  <span class="sc">$</span>b_mle</span>
+<span id="cb9-4"><a href="#cb9-4" tabindex="-1"></a>  [<span class="dv">1</span>] <span class="sc">-</span><span class="fl">2.997532</span></span>
+<span id="cb9-5"><a href="#cb9-5" tabindex="-1"></a>  </span>
+<span id="cb9-6"><a href="#cb9-6" tabindex="-1"></a>  <span class="sc">$</span>b_conf</span>
+<span id="cb9-7"><a href="#cb9-7" tabindex="-1"></a>  [<span class="dv">1</span>] <span class="sc">-</span><span class="fl">3.162692</span> <span class="sc">-</span><span class="fl">2.836292</span></span>
+<span id="cb9-8"><a href="#cb9-8" tabindex="-1"></a>  </span>
+<span id="cb9-9"><a href="#cb9-9" tabindex="-1"></a>  <span class="sc">$</span>data</span>
+<span id="cb9-10"><a href="#cb9-10" tabindex="-1"></a>  <span class="co"># A tibble: 25 × 7</span></span>
+<span id="cb9-11"><a href="#cb9-11" tabindex="-1"></a>     species         bin_min bin_max bin_count count_gte_bin_min low_count high_count</span>
+<span id="cb9-12"><a href="#cb9-12" tabindex="-1"></a>     <span class="sc">&lt;</span>fct<span class="sc">&gt;</span>             <span class="er">&lt;</span>dbl<span class="sc">&gt;</span>   <span class="er">&lt;</span>dbl<span class="sc">&gt;</span>     <span class="er">&lt;</span>dbl<span class="sc">&gt;</span>             <span class="er">&lt;</span>dbl<span class="sc">&gt;</span>     <span class="er">&lt;</span>dbl<span class="sc">&gt;</span>      <span class="er">&lt;</span>dbl<span class="sc">&gt;</span></span>
+<span id="cb9-13"><a href="#cb9-13" tabindex="-1"></a>   <span class="dv">1</span> Illex coindetii    <span class="fl">3.14</span>    <span class="fl">3.35</span>     <span class="fl">43.9</span>               <span class="fl">952.</span>      <span class="fl">908.</span>       <span class="fl">952.</span></span>
+<span id="cb9-14"><a href="#cb9-14" tabindex="-1"></a>   <span class="dv">2</span> Abralia veranyi    <span class="fl">3.35</span>    <span class="fl">3.51</span>     <span class="fl">14.8</span>               <span class="fl">908.</span>      <span class="fl">893.</span>       <span class="fl">908.</span></span>
+<span id="cb9-15"><a href="#cb9-15" tabindex="-1"></a>   <span class="dv">3</span> Abralia veranyi    <span class="fl">3.51</span>    <span class="fl">3.67</span>     <span class="fl">64.8</span>               <span class="fl">893.</span>      <span class="fl">829.</span>       <span class="fl">893.</span></span>
+<span id="cb9-16"><a href="#cb9-16" tabindex="-1"></a>   <span class="dv">4</span> Abralia veranyi    <span class="fl">3.67</span>    <span class="fl">3.83</span>     <span class="fl">79.4</span>               <span class="fl">829.</span>      <span class="fl">706.</span>       <span class="fl">829.</span></span>
+<span id="cb9-17"><a href="#cb9-17" tabindex="-1"></a>   <span class="dv">5</span> Illex coindetii    <span class="fl">3.79</span>    <span class="fl">4.03</span>     <span class="fl">43.2</span>               <span class="fl">749.</span>      <span class="fl">618.</span>       <span class="fl">829.</span></span>
+<span id="cb9-18"><a href="#cb9-18" tabindex="-1"></a>   <span class="dv">6</span> Abralia veranyi    <span class="fl">3.83</span>    <span class="fl">3.99</span>     <span class="fl">58.4</span>               <span class="fl">706.</span>      <span class="fl">648.</span>       <span class="fl">749.</span></span>
+<span id="cb9-19"><a href="#cb9-19" tabindex="-1"></a>   <span class="dv">7</span> Abralia veranyi    <span class="fl">3.99</span>    <span class="fl">4.16</span>     <span class="fl">29.4</span>               <span class="fl">648.</span>      <span class="fl">618.</span>       <span class="fl">691.</span></span>
+<span id="cb9-20"><a href="#cb9-20" tabindex="-1"></a>   <span class="dv">8</span> Abralia veranyi    <span class="fl">4.16</span>    <span class="fl">4.33</span>     <span class="fl">75.9</span>               <span class="fl">618.</span>      <span class="fl">542.</span>       <span class="fl">618.</span></span>
+<span id="cb9-21"><a href="#cb9-21" tabindex="-1"></a>   <span class="dv">9</span> Abralia veranyi    <span class="fl">4.33</span>    <span class="fl">4.49</span>      <span class="fl">7.44</span>              <span class="fl">542.</span>      <span class="fl">535.</span>       <span class="fl">542.</span></span>
+<span id="cb9-22"><a href="#cb9-22" tabindex="-1"></a>  <span class="dv">10</span> Abralia veranyi    <span class="fl">4.49</span>    <span class="fl">4.67</span>     <span class="fl">14.7</span>               <span class="fl">535.</span>      <span class="fl">520.</span>       <span class="fl">535.</span></span>
+<span id="cb9-23"><a href="#cb9-23" tabindex="-1"></a>  <span class="co"># ℹ 15 more rows</span></span>
+<span id="cb9-24"><a href="#cb9-24" tabindex="-1"></a>  </span>
+<span id="cb9-25"><a href="#cb9-25" tabindex="-1"></a>  <span class="sc">$</span>x_min</span>
+<span id="cb9-26"><a href="#cb9-26" tabindex="-1"></a>  [<span class="dv">1</span>] <span class="fl">3.139746</span></span>
+<span id="cb9-27"><a href="#cb9-27" tabindex="-1"></a>  </span>
+<span id="cb9-28"><a href="#cb9-28" tabindex="-1"></a>  <span class="sc">$</span>x_max</span>
+<span id="cb9-29"><a href="#cb9-29" tabindex="-1"></a>  [<span class="dv">1</span>] <span class="fl">18.04885</span></span>
+<span id="cb9-30"><a href="#cb9-30" tabindex="-1"></a>  </span>
+<span id="cb9-31"><a href="#cb9-31" tabindex="-1"></a>  <span class="sc">$</span>method</span>
+<span id="cb9-32"><a href="#cb9-32" tabindex="-1"></a>  [<span class="dv">1</span>] <span class="st">&quot;MLEbins&quot;</span></span>
+<span id="cb9-33"><a href="#cb9-33" tabindex="-1"></a>  </span>
+<span id="cb9-34"><a href="#cb9-34" tabindex="-1"></a>  <span class="fu">attr</span>(,<span class="st">&quot;class&quot;</span>)</span>
+<span id="cb9-35"><a href="#cb9-35" tabindex="-1"></a>  [<span class="dv">1</span>] <span class="st">&quot;size_spectrum_mlebins&quot;</span> <span class="st">&quot;list&quot;</span>                 </span>
+<span id="cb9-36"><a href="#cb9-36" tabindex="-1"></a>  </span>
+<span id="cb9-37"><a href="#cb9-37" tabindex="-1"></a>  <span class="sc">$</span>h</span>
+<span id="cb9-38"><a href="#cb9-38" tabindex="-1"></a>  <span class="sc">$</span>breaks</span>
+<span id="cb9-39"><a href="#cb9-39" tabindex="-1"></a>   [<span class="dv">1</span>]  <span class="dv">0</span>  <span class="dv">1</span>  <span class="dv">2</span>  <span class="dv">3</span>  <span class="dv">4</span>  <span class="dv">5</span>  <span class="dv">6</span>  <span class="dv">7</span>  <span class="dv">8</span>  <span class="dv">9</span> <span class="dv">10</span> <span class="dv">11</span> <span class="dv">12</span> <span class="dv">13</span> <span class="dv">14</span> <span class="dv">15</span> <span class="dv">16</span> <span class="dv">17</span> <span class="dv">18</span></span>
+<span id="cb9-40"><a href="#cb9-40" tabindex="-1"></a>  </span>
+<span id="cb9-41"><a href="#cb9-41" tabindex="-1"></a>  <span class="sc">$</span>mids</span>
+<span id="cb9-42"><a href="#cb9-42" tabindex="-1"></a>   [<span class="dv">1</span>]  <span class="fl">0.5</span>  <span class="fl">1.5</span>  <span class="fl">2.5</span>  <span class="fl">3.5</span>  <span class="fl">4.5</span>  <span class="fl">5.5</span>  <span class="fl">6.5</span>  <span class="fl">7.5</span>  <span class="fl">8.5</span>  <span class="fl">9.5</span> <span class="fl">10.5</span> <span class="fl">11.5</span> <span class="fl">12.5</span> <span class="fl">13.5</span> <span class="fl">14.5</span> <span class="fl">15.5</span></span>
+<span id="cb9-43"><a href="#cb9-43" tabindex="-1"></a>  [<span class="dv">17</span>] <span class="fl">16.5</span> <span class="fl">17.5</span></span>
+<span id="cb9-44"><a href="#cb9-44" tabindex="-1"></a>  </span>
+<span id="cb9-45"><a href="#cb9-45" tabindex="-1"></a>  <span class="sc">$</span>counts</span>
+<span id="cb9-46"><a href="#cb9-46" tabindex="-1"></a>   [<span class="dv">1</span>]   <span class="fl">0.000</span>   <span class="fl">0.000</span> <span class="fl">133.257</span> <span class="fl">333.841</span> <span class="fl">289.859</span> <span class="fl">175.430</span>  <span class="fl">58.278</span>   <span class="fl">0.000</span>  <span class="fl">65.590</span>   <span class="fl">7.312</span></span>
+<span id="cb9-47"><a href="#cb9-47" tabindex="-1"></a>  [<span class="dv">11</span>]   <span class="fl">0.000</span>   <span class="fl">0.000</span>   <span class="fl">0.000</span>   <span class="fl">0.000</span>   <span class="fl">7.204</span>   <span class="fl">0.000</span>   <span class="fl">7.312</span>   <span class="fl">7.151</span></span>
+<span id="cb9-48"><a href="#cb9-48" tabindex="-1"></a>  </span>
+<span id="cb9-49"><a href="#cb9-49" tabindex="-1"></a>  <span class="sc">$</span>xname</span>
+<span id="cb9-50"><a href="#cb9-50" tabindex="-1"></a>  [<span class="dv">1</span>] <span class="st">&quot;Total counts in each bin&quot;</span></span>
+<span id="cb9-51"><a href="#cb9-51" tabindex="-1"></a>  </span>
+<span id="cb9-52"><a href="#cb9-52" tabindex="-1"></a>  <span class="sc">$</span>equidist</span>
+<span id="cb9-53"><a href="#cb9-53" tabindex="-1"></a>  [<span class="dv">1</span>] <span class="cn">TRUE</span></span>
+<span id="cb9-54"><a href="#cb9-54" tabindex="-1"></a>  </span>
+<span id="cb9-55"><a href="#cb9-55" tabindex="-1"></a>  <span class="fu">attr</span>(,<span class="st">&quot;class&quot;</span>)</span>
+<span id="cb9-56"><a href="#cb9-56" tabindex="-1"></a>  [<span class="dv">1</span>] <span class="st">&quot;histogram&quot;</span></span>
+<span id="cb9-57"><a href="#cb9-57" tabindex="-1"></a>  </span>
+<span id="cb9-58"><a href="#cb9-58" tabindex="-1"></a>  <span class="fu">attr</span>(,<span class="st">&quot;class&quot;</span>)</span>
+<span id="cb9-59"><a href="#cb9-59" tabindex="-1"></a>  [<span class="dv">1</span>] <span class="st">&quot;determine_xmin_and_fit_mlebins&quot;</span> <span class="st">&quot;list&quot;</span></span></code></pre></div>
+<p>This is a list of two objects (each is a list):
+<code>$mlebins_fit</code> contains the details of the maximum likelihood
+fitting similar to the other methods, and <span class="math inline">\(h\)</span> is an object of class
+<code>histogram</code> that contains details of the histogram used to
+determine <span class="math inline">\(x_{min}\)</span>.</p>
+<p>The object has the class <code>size_spectrum_mlebins</code> such that
+our customised <code>plot.size_spectrum_mlebins()</code> automatically
+gets used:</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" tabindex="-1"></a><span class="fu">plot</span>(res_cephsmall_fg)</span></code></pre></div>
+<p><img role="img" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAqAAAASACAMAAAAXng/7AAAAzFBMVEUAAAAAADoAAGYAOjoAOmYAOpAAZmYAZrYA/wA6AAA6ADo6AGY6OgA6OmY6OpA6ZmY6ZrY6kLY6kNtmAABmADpmAGZmOgBmOjpmOmZmOpBmZgBmZjpmZrZmkJBmkNtmtttmtv+QOgCQOjqQOmaQZpCQkDqQkLaQkNuQtpCQ27aQ29uQ2/+2ZgC2Zjq2Zma22/+2/7a2//++vr7bkDrbkGbbkJDbtmbbtrbb25Db/7bb/9vb////AAD/tmb/trb/25D/29v//7b//9v////J4i3nAAAACXBIWXMAAA7DAAAOwwHHb6hkAAAgAElEQVR4nO2dDXvjxnVwIcUKV95640q7TtwPh9ptm7eV0prLNrUjsAyF//+fXnwSA2DwMcAAuIM551lTEkVAkHh879yLwSCIAAQTrH0AAF0gKIgGQUE0CAqiQVAQDYKCaBAURIOgIBoEBdEgKIgGQUE0CAqiQVAQDYKCaBAURIOgIBoEBdEgKIgGQUE0CAqiQVAQDYKCaBAURIOgIBoEBdEgKIgGQUE0CAqiQVAQDYKCaBAURIOgIBoEBdEgKIgGQUE0CAqiQVAQDYKCaBAURIOgIBoEBdEgKIgGQUE0CAqiQVAQDYKCaBAURIOgIBoEBdEgKIgGQUE0CAqiQVAQDYKCaBAURIOgIBoEBdEgKIgGQUE0CAqicUPQoIe1jw9mw433Ngg7ceOXgDG48d4iqLe48d4iqLe48d4iqLe48d4iqLe48d4iqLe48d4iqLe48d4iqLe48d4iqLe48d4iqLe48d4iqLe48d4iqLe48d4iqLe48d4iqLe48d4iqLe48d4iqLd0v7endDrwzfNCB9MKgnpL53v79rRPPpw/vC5zMK0gqLd0vreXTwflw4ogqLcMiqDvERRWovu9Pd8zBoVVceO9RVBvoYoH0VDFg2jMqvi11klAUG8ZU8UjKCzGmCoeQWExxry3CAqL0VfF3/y/++C21qdHUFiM7jHo5+fz/b5RxSMoLEZfFf/25dA4F4+gsBhDqvjLj0RQWImeKv7buIA/ya/iWd52s2yjiie+bhYEBdEgKIgGQUE0CAqiQVAQDYKCaBAURIOgIBoEBdEgKIgGQUE0CAqiQVAQDYKCaBAURIOgIBoEBdEgKIgGQUE0CAqiGbM+KILCYoxZHxRBYTHG3OUDQWExtrE+KIJulm2sD4qgm4UqHkTTOwY9BsFd7R4KCAqL0SfoaUcVDyvSJ+jxwYW7fCDoZukW9PHul59cWB8UQTdLz7t3vr95ThcJNdhmBhDUW6jiQTS9fdAdZ5JgRXrPJJ1uDwgKq9F/Lv7y6WcEhbXou09S/Hj5PefiYS36xqDJbJHTLYLCSlDFg2gQFESDoCAaBAXRICiIBkFBNAgKokFQEA2CgmgQFESDoCAaBAXRICiIBkFBNAgKokFQEA2CgmgQFESDoCAaBAXRcBMFEA03UQDRcBMFEA03UQDRcBMFEA1VPIiGKh5Ek717l8cH3Tep4mFtinfvGARNRxtVPDdRgIVR3r3Y0X31m1TxsDbFu3dKImi94UkVD2tTjEF3xtssCYJ6CzdRANHk797p7rVxOyRuogDrk7176WL09W4SN1GA9cnHoJmJtRKJmyjA6uQRNOknneq33eYmCrA6+bt3eQyC23oA7dlmQRDUW5gsAqLJ371j0pAfGkIRFBYjL5I+NlpMvdssCYJ6i1LFG26zJAjqLfm797LvfplumwVBUG8pzsUzBgWRUMWDaMo+6B8/Dy2UEBQW43om6WXfPBffuc2STBO0h8V/GzDgWsW/7AeX8q4J2rPx4r8NGKBEUM25+K5tlgRBvcWHc/EI6jA+VPEI6jA+9EER1GGUt+ekXbyhe5uFQFBvUd4eqniQh/L21NdnGLLNQiCot6hjUFI8iIMqHkFFo0bQZh2/jeUXEdRhiks+4vR+aix/s5HlFxHUYTqvi9/ITRQQ1GE6r4vfyPKLCOowyrl4zVyRbSy/iKAOQxWPoKLpnFGfDD6PzdCKoLAYnTPqY0GT0p4qHlajc0Z9/EzSf3L9JgoI6jCdM+ovj3e//BR/+JEICivRM6P+fH/z3Fh6GUFhMXxY+gZBHQZBEVQ0PqzNhKAO03lNUsskJwSFxeh+e/TrhiIoLEbP26NdzAFBYTGSt8esREJQWJBC0KNBlYSgsBgIiqCiESJo3xKJCOorqaAtl8x1bWP7ML52gqDeImTCMoKCHgRFUNEgKIKKBkERVDQIiqCiQVAEFQ2CIqhoEBRBRYOgCCoaBEVQ0SAogooGQRFUNAiKoKJBUAQVDYIiqGi6357FbqKAoKCn8+1Z7iYKCAp6Ot+e5W6igKCgZ1AEnf8mCggKerrfnsVuooCgoIcqHkFFQxWPoKKhikdQ0ZhV8bPdRAFBQQ9VPIKKhioeQUVDFY+gokFQBBUNgiKoaLqr+MVuooCgoEfITRQQFPQIuYkCgoIexqAIKhoERVDRICiCigZBEVQ0CIqgokFQBBUNgiKoaBAUQUWDoAgqGgRFUNEgKIKKBkERVDQIiqCiQVAEFQ2CIqhoEBRBRYOgk36boBtbfx6PQdBpgs63a0hBUAQVDYIiqGgQFEFFg6AIKhoEnVSII+jcsMLyJMcQdG5YYRlBRWO2wvKAbUYeBoKCFlZYRlDRsMIygorG7G+4yZsoTHEMQeemdwx6DIL6CncIWh73lI1hAH2CnnZU8V3HPWVjGECfoMcHqviu456yMQygZwnwu19+ij/8SARtO+4pG8MAev6G5/ub5/O3VPGtxz1lYxgA5+IRVDQIiqCiQVAEFQ2CIqhoEBRBRYOgCCoaBEVQ0SAogooGQRFUNAiKoKJBUAQVDYIiqGgQFEFFg6AIKhoERVDRICiCigZBEVQ0CIqgokFQBBUNgiKoaBAUQUWDoAgqGgRFUNEgKIKKBkERVDQIiqCiQdA5BZV6K89pdzaZhPGhjvn1RmzTt8ttCtrzk+3/HQfi0O+MoA69WdZw6Hfu3oD7JIl6s6zh0O/cuQH3SZL1ZlnDod+5c4PGfZK6BrrTxs7gCVYFbblPEsBidButv08SwGLQSwbRICiIBkFBNAgKokFQEA2CgmgQFERjT9C1T1GANaw5YQGLglrbk2U4MENEHReCrofUAxN1XAi6HlIPTNRxIeh6SD0wUceFoOsh9cBEHReCrofUAxN1XKIOBqAOgoJoEBREg6AgGgQF0SAoiAZBQTQICqJBUBCNLUFPQbC3tCu7vATBrcB1J9LVWgT+0dLjkvQ3syTo5eOzzPVH3j6LXHXi8hgbIPCPlh6XqL+ZJUHPH15F/VpXpBmQ8fbl5zhSyfuj5ccl6W9mSdDTLk4M0tJVwuk398Fu7YPQkKRSiX+09Lgk/c22Lmj0t9foKPDAJAsq6m+29RSfcHxY+wiaXESm+HKpTTF/s60XSUmUEhMNFBIRJP7Risgu5m/mQ5tJSjBQkd5mEvM3o1EPokFQEA2CgmgQFESDoCAaBAXRICiIBkFBNAgKokFQEA2CgmgQFESDoCAaBAXRICiIBkFBNAgKokHQXs73yc2tbrKLhy4/vubPfnht3+T6qr4XXr+ZfdL5Wj9B0CGUl5DVjGphsGjDduczCDqEVNBjEDy8PQV3r/EnuyLk3SeLxCTfya/RPP/uMdglr/rrU35hz/nDL8lz6X5OyZZRun226fm7H7JvZZ+or4UUBB1CIuj5/SG5DPPDa/zv8umQCho/ER131+8kgsafp9887fJLeGPp0ueiLEy+7LPt802/fc6/db9/e9orr4UMBB1CImi2zELiWBz7bp5TQbMwev1OImjxeC5W54ilK65/PyWD2Qdl+/LS+OT64+OD8lrIQNAhVAQ93eYBsyFoGUfTb96nFxWrgqbKKtsjaC8IOoRKio81O+URMMnTp7tfsu+8P8QJ+yroMbE2GYQq0sXfj/N4tn2+6fVbRYpH0CoIOoSiSNpHl8e7Xx+D3z7ua0XSPlnu4Jvf54LGr3p9CeJ6KqoImhVJl3T7vEi6CloUSQhaBUFBNAgKokFQEA2CgmgQFESDoCAaBAXRICiIBkFBNAgKokFQEA2CgmgQFESDoCAaBAXRICiIBkFBNAgKokFQEA2CgmiMBQ0ALGNXUNMNALpBUBANgoJoEBREg6AgGgQF0SAoiAZBQTQICqKxKGhf2x/AHCIoiAZBQTQLCBqG7zSY7hr8ZBFBw68NiLUwCAQF0SwxBtUZiqAwiCXaTAgKo1kiggYaQxEUBoGgIJpFBP3aNBRBYRAICqJZRtCmoQgKg0BQEM0SbaZY0IahCAqDWCiCIih0kN0dWuElvUV0wlKC1g1FUCipC3raRZdPh/RTBIX1OX/3Q7CrPrWooCmxocqKO8y+g5Lz/f7taX9KxMgz+3HJFJ8RC6q+kqIerpzfH6LjQ/W5l8zQBa9JqhiKoFCSCZpF0Lg+SrN9LuyCl3wgKLSQpfjy67hImiGC9m6gGlpbBJIRqdc0iqQ4jOYZfy1B6xsST0HLold1thuKoKBnaUFbDEVQ0LPsdfEICoYsu/RNawhFUNCz8MoiCApmICgIIZvBFD/eHt6egqLttPTaTC2GIqj3nO5e3z4/x//iz4+7qGjcryCozlAE9ZLz7x6vDfrk1ObxITnpWX4drbC6nd5QBPWSWMfLp0N2Dj6JoE8Pp9/cZ8ouOd2uAoLClfOH1yynJ7wEN//4EP3tNTrGyf3yMX962TZTAoJCQSZoOQ80myASJ/fzt4W2i0dQvaEI6iVqBD3tkoyfzGM67suR6EqCNgxFUC+ppfi8zfSQPBTTmRAURLOCoDpDERT0ICiIZvkqPtKVSQgKetaIoJoYiqCgB0FBNOsI2jAUQUHPeoJWN+y4xrN2ASj2esVKgnZd4VmLp7Ur6AmvfjFJ0PQkanDzfH3CQJ72C+gQFEqmCJrPKS3WzjNLvwgKQ5giaD5lr5i517+BSthhKIJCgY0IOnDqSQ0iKAxg0hj0fD9+DNqV4xEUCtaq4qOuJI+gULBaFR8NXcYBQb3GYhXfv0GN1hCKoFBgqYofdZaHCAq9rFfFR+2GIigUrFfFJ7QkeQSFghWr+AQEhW4mRtCbf38Mbq8ZflQEjXouQkZQr5k0Bv1ySBaAuPw4soqPiKDQx8QqPqngr6vojJirqR+EIigUWIigo/ugKTpFERQKJp5JmjgGTdAYiqBQsHIVr6+TEBQKVhe0dxkHBPUaGYLWYiiCQsH6gmZTlxEUtKyy9E2dep2EoFAgJIJWQyiCQoEUQUnxoEWCoI06CUGhQISg9SRfOvlOw8ifAU4iQ9BamieCQoEgQSMEhQYi2kz1OglBoUBMBFVjKIJCgRhBszopMxRBoUCKoJE6DEVQKJAlKBEUasgRVKmTEBQKhFTxCWWdhKBQICeCKnUSgkKBIEGjvE4KERSuyBI0X3YZQaFAlKBFnYSgUCBK0KJOCtvv6oWgniFM0MoJpagWS4mgHiKozZSRJnkEhRxZETShcvkHgvqONEHzJK+d14SgHiJN0LxO6hKU+x77hDxBi0o+26FGUGKpT4gTNKpcQoegviNRUKVOQlDfEddmuib55rwmBPUQiRE0jPTzmhDUQ0QKWoTQEEG9R6KgCfkwFEF9R7CgjEFBqqBlkkdQzxFYxSd0GIqgXiEzgl4r+QBBPUeqoFFWJzEG9R25gqYxNLaxHkMR1CuECxrWBGUpW98QLKjWUCKoZ8gVNEqLeAT1HKFtpoKw2WdCUK8QHEGVYWiIoL4iXNAgC6EI6i2iBY3C4GsjhCKoV7ggaHUYiqBeMUnQU3pt5c3z4A2MSRr1tSyPoF4xRdC3p33y4fzhdeAG5gRpfkdQf5ki6OXTQfkwS5spSBYSC7OHoA6nlTzARgR9fxi4wRjyE0pR5X7d+U+rDE3t/2gQwKQx6Pl+7jFoRv123cVPQ9DtI7uKL8gErVuKoB4gvIpPyGbWp4ZWv4GgHiC8ik8JiyRfC6EI6gGWqvhZ15srQ2jt8BB0+4iv4gtyQ1VNEdQDnKjiU5qFEoJ6gCtV/LXXhKB+YSjo5Z/ih7cveU4/f/scF/K3h44NLFEaiqB+YRpBTzexk/vs87fPz0kFP3sVn5Cld6p47zBO8W9Pu+LTuHw/f1+ei+/b23Rqw1AE9QBTQc/3+9O1KvrzcxxEo0TS9NXz3tZAGYZqbys/44+G9TAdg/74qoxB354SKe9eOzawR7NQQlAPcKOKT2kMQxHUAxwSVDW0ubotgm4TU0Evf4r/+8Oh+Y3+vVlBHYYiqAeYCvrf/3xQy3aTvVmgWighqAeYFkk/xSF0VUGV2csI6gGGgv7PIf7XIugSd89UC6UQQT3ATNBkBHr+03oRNCuOikIJQT3ATND/+6/44X//+i+vmhf37s0ehaEIun1cajOlKMNQBPUA5wRVDCXFe4CDgl4NDdRFxRB0mxhPt9tdHovpdvVXL1DFX0kFVdcbYZWRbWIo6Nvn5+NOmQBqsjd71M95pj+adL9JTBv1nw4vDyu2mTKq/fr8R7cs2rTMEcFcmEbQLz9/fF4/gqqGdl+PTDB1HOMxaHD368fn5vMD9maRol/fuBI5PwwE3QzuVfElrYYi6HYwH4NGK04WKQnVs/KNw0DQzWAkaHaJR+UiD/XVS7aZKmflG6uKtSxyW1sAd7mDhdGMiaAj92aXsDJvRB9Jo1r36WsFBHUB0zHoMQk9t+un+JyOUj4DQR3HNIK2V/C9e7OOrh1aB0Edx9kUH9XaoZpuUwKCOo5pin/Rn4cfsjf7VNuhWkMR1HFMI+ijpDFoHjq7DEVQx7HYqF+tc9M1DkVQx3E6gtaaTX33UkJQBxkTQU8Po/Y2C1VDm5EUQR1njKASTnVeqRRKTUMR1HHGCKrcNcFkb3PSOgxFUMcZNQYVlOKjegytjUMR1HE2UMWHXVkeQR3HeHW7x44ifqUU32UogjqO6SUfyb27Tvrpdn17mxvtOBRBHcfVCcs1WsehCOo4G4mgrVkeQR1nC2PQhDZDEdRxXL5oTkNjHIqgjmN82fHd6/lb/aTltS/z0Y5Dr1K+a7LakcJwzJe+iaLVF27QU518l2d5IqjjbKSKTwh1hiKo42ykik8pcrs6DkVQx9lKFa+ijkMR1HG2VcU3szyCOs62BNUYiqBus4HZTBXq41AiqOMYCZrNBpV0TVIrhaHB1xBBXWZjKT6qZ3n1RgsI6iCOr82ko2JoLOXVUAR1EPO1mV72p92ovS2GOg5lDOo45meSjuVNFE7piPTmuWODNUkMzaTMgiiCOoj5ufjTrhA0Pa1UnpoXUcVnKFn+a2kogjqI+Wymvz4VV3Xmoiqn5sW8501DEdRNplTxRQR9L09QdRzaOgZlJXAHmDSb6XwvegyaoGb5uqAEUgcwErT7Jgp9e1uYvFFfG4ciqGOMiaBXZFfx10a9Og5FUMeYMt2uVsX37W1x8gnLV0ODqqMI6gJTJiwrVbzYgiP4mhmaV/FqmkdQF5hSJEmu4jPKRn1iZlAdiCKoC0y65EN+FV8WSPFnVPEOssVLPlSKgFme9vwaIqhDTJ5ul16IbLLBslyjZrPdhKAuMEXQ5vxleW92OR9UOakUIqgzmM2or10Qf75/cCCCagxFUGeYJGgUHW/+4yqo3DaTkuWVNI+gLjD1mqS3pxvpEfSa1IOqoQjqAhMjqMneViE/gRCX8EHw7t27xNB04bCvCOoGWxe0QDMQDUIElc/2rupsoeg3lYYG+YUgax8ZdOGRoPUYmnegBB8zbG9lkVaqDVHlChDBxwxeRdByokg5dySZZ7/2kUEXPglaoswdab/VPEjAM0HVNF+0SNc+MujCM0EbA9F0DIqjcvFN0PKij8LQQHOXeRCDd4LWBqJZFY+hYvGozVSKeW3Up7XS2kcGXfgYQYvcng1E82MmiMrER0Fzigs+8xfobuYNq+OroGWjHi9F46mg7/JZd9kEvKuiyCoOTwVV1hILMFQy3gqqTBZRgyiCCsPDNtNVUKVRr45EcVQSXkfQcj4oaV4q/giqI79SqaiV3mUvxVBBeCNoG9dJTTScRIKgldkjdO2l4b2gLYaS54XgTRXfilI9BaR5cRBBlYuVqi1RgqgEEDSfM6JriRJP1wdB1RSffE05LwoELZccyecu184rIeuqIKiyBnNx+IxE5YCgyrUg18OvGrrOcUEKbabKGFStj8jzEiCCVgXFUGEgaLWKr0hJnl8fBK23mRSIouuDoA1BQ/K8IBBUE0HJ83JA0I4Un1A7sUQUXRjaTHpB24Iohi4MEVS5AuRdSVTvOJHn1wFBFYK2ZB8SRdcCQRXqgnbkeRRdCARVaETQsFVRWAgEVWhN8Snk+TWgilfQCkqeXxUiqII+gpLn1wRBFbpTfAZRdFkQVKFd0HoQZSi6FAiq0BFBG3le9RJH5wNBFYak+JRGFEXRuZgk6Ck9QXjzPHgD4fQI2lEtIehcTBH07WmffDh/eM1evc02k0p1XhN5fgGmCHr5dFA+DNhAOoNTfAZ5fgFsRND3PgnaVS1hqH0mjUHP9xsbg5Zcn6tMwUtp5PlKokdSu1DF99Bydqn8rDHlHkVtQhXfw8DTn1g5Exar+P4NXKRtXFrN60TRubBUxTeGbpuh8+yS8iknQOeBKr6Hrsq+mehpjNqGKr4Hg94oJ0BngCq+hz5B64PPiqJzH5wHTI2guy2dSdLRH0FD6qUZmToGPd0efBc0oaN3j6GTmFzFXz79nAvqXRWvoEn0nF+ywqQI+jkpjy6/97aKV6kqSKa3xcQxaNJnirP80A0cxKyKr3yBlRagiu/BaAqepl6qdkrtH9/WQdAeDOeIauol5uNNAUF7MBe0M4wyGjUEQXswFlRfL9F3GglL3/QwQtCoN4wi6WCIoD2ME7SuIJl+LAjag+4ykCvvGlS+3RNGqZkGgKBTUNa310ZZbaan8WQCgk6hT9CUnjBKHO0EQacQ1NGl/EZ9xHDUAAS1Sj2kti2hw7zRodBmskq7oAxHx0EEtUpXBK0PPYmjQ0BQq/SleOKoKQhqlf4xKHHUDAS1yqAiiThqAIJaZZigxNHhUMVbZaigCcTRIRBBrWIi6LA46rukCGoVM0ET9HGUQFqAoFYxF7Q1jjLvKQVBrTJG0AT9+fryOX/jKIJaZaygUSNI6gKpj5IiqFUmCBo146QukFo6UGegzWSVaYImtAVSX8smIqhVpgsaaW4R5nMfH0Gt0pjBPGFfYahMfNaWTT54iqByiQ1Uo7Em23tQNyGoXIJcS2W40JR063EUQeUSFJGzOp4NtZZuVVMElUtQS+/Kt5qSpuftN2gpbSa51FoCQeuJ+y3neyKoXJqCNoPk5vM9gspFJ2hCcypJ3dIN5XsElUuboDlVTcOmpZtQFEHl0iNo1IyUWkvd9hRB5dIvaErdwKalLkdTqni5DBQ0paMPFeZPRE6OS4mgcjERNKfqaajR1DVFEVQuIwTNabU0vD5j/WhnAkHlMl7QZkZvauqIpwgqlymCZmQGdmoqva+PoHKZLmhGWPM0rHuaRVuZmiKoXHpWbzbdXUedn2kqss6nzeQMdgJqVz8q+U59VLA2RFBnsJXxMzoaUuUQVYCnCOoMdgXNqakoz1MEdYZZBC0oVFQ6UDI8RVBn6LxgdGIBdaXwVGnpa4upxUDQbRDYjq6Fp22i1mqt2UDQbWDvcvwmSorvEdVOFK9AmwmGch2nthLYHyMTQWEcYbev7cHKLMwiKEyjP67WxqpmYRZBwSa5kF22LijoKR2Q3zwP3gA8oyuupvSm+ymCvj3tkw/nD68DNwDP6ZZVu8kUQS+fDsWHWdobsHHmFrSIoO8PAzcAMGXSGPR8zxgU5oUqHkSDoCAaBAXRICiIhskiIBoiKIgGQUE0CAqisSpo4z5rAFOxKejU7Rbb9fi9GP8/a/eVE6enbQ0Enbwlgs4Jgk7eEkHnxKtfdiN49Z559ctuBK/eM69+2Y3g1Xvm1S+7Ebx6z7z6ZcE9EBREg6AgGgR1i/Qy21MQ7Nc+kKVAUKe4PN4eosvHZ+Uy242DoC7x9uXnOIKeP7y+fX7uf/UmQFC3SFL8aRdFL77keAR1CwQF0VxI8SCZRFCKJBALbSYASSAoiAZBQTQICqJBUFPSFVOVGiVf49eM40P28fLja/cLvQdBTUnW6798LNuQYwQ9f198dnqwc1SbBUFNSQWNA98xCGK5jsE3P+xf4k+S0zvR+bsfgr9/ip+Pv7mL1U1ekj3m/Pk5Ov2UfohOwe2/7qO3L740NEeCoKakKX6XLNufNczP9/v4MYuj52+fk38ffvnwevl0iJ29PhYbf/+XxO+s2355jLc5etPRHAeCmpKn+OyEeDKWfNnHdmY36okf83/3wc1z/LBLhd6VW798c8h2kfyXnFA/kuM7QVBTUhVf9qqgcX7PPCsE/cvtIR2mxnLui8eUyw93rwhqAoKacs5y9DXFJ4n68vG7Q/69TNBddLp5PiYOP2SP2bZvn/+YpHQ1xXszLWkkCGpK0WY65o83f5d8yLJ4Ieivj8FvY/tegiAOmOljNgx9icejfzhci6R/oEjqBUFtMGD223+qImZtpmQr2kw9IKgFTmoZpOft3ypfHh8uj0n3iUZ9HwgKokFQEA2CgmgQFESDoCAaBAXRICiIBkFBNAgKoukT9JTeCuzGl3UsQBo9gubXM2SzHbMNACwzQdB8Lng5JZwxAdhmiqBFBH2PoDAXk24mm85+VMegCAqW4X7xIJpJgjaqeAQFy9gYgypVvI1DAiihigfRUMWDaKjiQTSWqvghbX8Ac6jiQTSLVPGh6VEB5CxRxYcx7+oYHyl4yRJVfJjxVYXBAAxiiSo++Pq1oSiCwiAsnotvreLTUioPo0W5T8aHQSw5WSRTNH9lFXQFPcvOZgpVRysbMkAFLZOq+Mcs/N2anOrUO4qgoGdSBFVvuDJogxSdoggKeqal+NNddQXLgWaFDUe7RqQmV1HB1lhrRn3raDTdTSWcfv1KePWX9S756FAUQaFgiT5oG81MX+wJQSFn7Yvm+mt6BN0+ynyjjJfrLXnXFlQbRhHUM+qCKneIXF3QhEZNj6B+kdxnt3YvFFGC1sNo6WRjlh7nQbfI+T65pWk6/z3P7EcxKT4nVB0lgnpGMmOzfl/S/DaQUgRNuDqKoJ6RCZpF0Jcgy/a5sBIFLSflNU8rIegWyVJ8+XV2t+j00zX7oFraRqNlBOWk5+ZoFEkvya0gUyRF0JQyjCaS6gQl2fuEOEETRcswiqC+I1DQhDKMIqjfCCm051AAABCRSURBVBW0zVA6or4hVdAUraREUK9wQ1BVUQT1CtGCxoqW1ytXu6PNDqntHw0Lk81gekmucXt7Coq2k3BBo0oYrU3Lq55wmuFHw4Kc7l7fPj/H/+LPj7ti2Rp5jXoNat9JdRRBXef8u8drgz45tXl8KNdREniqs4swasZRBHWdWMfLp0N2Dj6JoE8Pp9/cZ8rKmm7XT6iG0eKnIajjnD+8Zjk94SW4+ceH6G+v0XGvXNHuiqBRlt3bz4MiqINkgpbzQLMJInFyP39baOuQoJE6GkXQLaBG0NMuyfjJPKbjfuh9OcQJGmWFUmZoyHqOrlNL8Xmb6SF5KKYzOSZoilIwtTRFFzkMWAInBa30nTTrOeLqdnBR0Lwb2ta/rwxOyfyO46agUb3vVLuuviXzswqZezgraC5l4agmjmZHpJ0HRXB1BhdOdXYQVi5i6lm6GUEdxOEImhD2hVEEdRzHBY2qBVMzhiKo47gvaFQZjWYflSNCULfZhKC1TB8h6HbYhqAplYKpCKNXKVmFzE22JGgtjDbWISOCOsiGBC1Su9p3ChHUcTYlaFTETSWMaq8HRVBn2JqgUVhVNJEyRFB32ZygKYqjX7N7gSOoo2xU0EoYJcU7zDYFvbZCw0YYVQRlUpMDbFXQKA+jwVfF0ZqgBFIHcHw2UzdFkZQrGqSfIqhTbDiCpgSZkOVgtDEklXfMoLB9Qa9ilgVTpaiXd8ygsHlByzFnqIbREEHdYPOCpoTpBcrv3uWOprezKWomeccMClsXtKAYelbDaIig0vFF0Ci41keFoqR4F/BJ0K9hRdFrGF370KADrwTVFkwBgkrGO0HD+mg0OWbCqFi8E7Rs1Re3Z0i/jaFC8VDQQtLyLGj+EiQViKeCvsu6oe+urdH0NWR6eXgqqHqqM6yEUd36ObAePguat0OjctGHKCKMCsMfQbWExQKNlUy/8qGCgjeCtlJrOxVPYqkMNj1heRBBOYm5qui6hwUZRNDKeuHVgglJ1wdBg/IEU1kvkemlgKDlOdBiYlO17UTNtCoIqqb4MrdXwyiOrgaCVgRV+vUhYkoAQas3VVKUrNVL2LoKCNq461fVSuWrVQ7PdxBUc1s6tUKqnqcnjC4NgrbcN7FlMIqhC4Og+vsmRo16ib7TKiCoQlCJpaqHFExrgaAKQT3Z03ZaHQRVaAiqqZcIo8uCoAoaQRPaBqMIugAIqtAmaGvbib7T7CCoQougunqJvtNCIKhCq6CRpl5ST4oucnR+gqAKXYJWY2XjBBOOzgSCKnQLmtA6GIWZQFCFAYK2tp2ol+YBQRX6Be2slxiLzgCCKiin5a/Pae4v39F2oqi3DYL2oI2q7fUSmd4yCNrDgN5oo+1ErrcHCzf00C4oYXQJiKA9dBROFQmpl+YBQXsY27wnjNoBQXvoaT1pEr2a6Wc/vM2DoD2Y9UY19RKSTgJBexgkKJl+NhC0hyGCdtdLMAUE7WGYoJGuXqpm/pmOb+sgaA+DBe2ul+g7jQRBexguaB3qJRsgaA9mgtaNpF6aCoL2YBpBw756CUeNQNAexqT47sEoYdQEBO1h1BiUeskaCNrD+CJJgXppNAjaw2hBqZesgKA96C4DufKugfpd6iULIOgUGneo7Zwzqkn0KNoHgk5hgKCaRE+9ZACCTqFx92RNyq9ldcKoGQhqlXpIzf4gPYNRDO0AQa2iF7QeJamXhoOgVmkRtAGJfigIapUOQfuiKIJqQVCrdEbQelZvJHqiaBMEtUpviu88vYSiTQwFvfxT/PD25TBmbz7QPwbtaYxG5PoqphH0dPN8Cvaj9uYDQ4ukEhqj3Rin+Len3ci9+cAwQamXhmMq6Pl+HwfRUXvzgeFtptqXDEZbMB2D/vjKGLQDkxTfd3oJRROo4q1iJGjv6SVAUMuYFUk1HXVR1HtjTQW9/Cn+7w+k+BaMq/i+KIqght/8738+RJdPuaCndIqZUjMh6Jg2U+3LRl/Ua0lNi6Sf4hBaCPr2lDZEzx9eB+3NB8wFbaCr6D1W1FDQ/znE/wpB84/XgIqgIwWlXGrHTNBkBHr+Uz2CvkfQgrERdEBf1FNjzQT9v/+KH/73r/+S5/TzPWPQKlNSfF+55KehtJmsMknQ/kTvoaOTBKWKrzOtSOrri/qY6KcIShXfYHIVT1+0hvF0u93lsZhup1Tx7Ytv+MX0NhN90SqGgr59fj7uipBJFd/AQh+0jueJ3rRR/+nw8nBtfFLF17EjaG/TySNMI+iXnz8+K4NOk735gKUI2szq3kZR4zFocPfrRyYst9FYC2fKztQldLzti9IHlUrsYyUYe9oXNR+Dliff43o+5ZYiaRZqhgZeJnojQd+eMiPv8jHopZLsaTNZJhnQhpXxrId90TERtOR0Vy2XENQmQZbYKwWXd31R0zHosZrTTfYGhmQtgaqg3lX0phG0vYLv3RsYcu1ZZVH0+sf1qi86LcUb7Q0MKZuqaaKvrpTnSxQ1TfEvrcve9O4NDKl1/Wsr5XkyFDWNoI+MQRejKmijB+pHnrfYqKfNZJl6BO1VdIvGEkHl0pXiU3w4/zkmgp4eRu0NDNEI2j+LZGu9+zGCtpfyCGoTbQTV5vkNJ/oxgiozlE32Boa0pvjeuXjLHN8ijBqDkuIXoV1QXaKPak8tcYQLwHQ7uXQUSXX9ttsWNV7d7rGjiEdQq3RX8b09p7kPbxlML/lIrpOrz2EqXk0f1C49gvYX9FuIolMmLBvuDQzp64Nq8/zWCnqLEbRvb2BIb6Peh+s/GYPKZYCg+rZo5yscgypeLkMEHVDQux1TjS87vns9f8tlx4swTNCov3HvMuZL31RWCzPZGxgyXNAN3xeMKl4ugwXdcuOeKl4uBoJG/Y17R7FYxdOot4yhoNtcz4kqXi5mgm40zyOoXEwFjfSN+3kObikQVC4jBO1v3LtmrJGgzdXCTPYGhowRdNAJelsHuAREULmMEjTaWJ5nbSa5jBV0SJ63coBLYL4208v+tBu1NzBktKBbyvPmZ5KOD5xJWobxgkbbyfPm5+JPOwRdhkmCbiXPm89m+usTV3UuwzRBNzIPj7WZ5DJR0GgTeZ7ZTHKZLugG8ryRoPWbKJjtDQyxIKj7eX5MBB25NzDEhqCR63mei+bkYknQfkMlC8uEZbnYEnRInh+977mhSJKLNUGjuoKNM0ubEZQIuiA2BR2Q5yftfjYYg8rFqqC9eV5o6cR0O7nU7uz9rob5DnuCKILCFGycWHIvz5vNqO/ugiLorMzQt3egnEdQZ7DVt69+1RiJjj6+eeCaJGewdmKp2XGycHRzYTGCMptpXubq28sOoqR4Z7Dat698IbnhRBXvDPOdWJKc5xHUGRY9sSRGVwR1BrsnlupITfMI6gy2Be0p5xEUzLAfQV1oOCGoM8yb4hMkNpwQ1BlmEbQnza9vKII6wzwRVDMSVb+080MmgKDOMH+KT5DWcEJQZ5hPUMlpHkGdYUZBu9P8qoYiqDPMmeLlnvlEUGeYeQwqNIgiqDPMLahMQxHUGeau4jtboggKfSzTZroiZCBqUVBm1M/LAoJ2pfmVdCWCOsMSEbQx566q6Bw/sgcEdYbaOg7Vv/XkRR20CEjzCLoNAnvRVda5eQTdBjYFbaR59aspex4Dgm4Di4J2nptf3FAE3QZWBa2y7kAUQbeBZUHlpHkE3QbWI6gUQxF0G8yY4hPWO++JoNtgDkE7evbLgaDbYBZBa2c6VynmEXQbzJPi23v2ixmKoNtg5jFoStXQWX5EEwTdBnMJ2lHMLwOCboPZImhjIKp8Ye+ntIOg22CJFB+tYSiCboNZBW0r5hEUhjKvoK3tpvlB0G3QNZl5Oq2lUs3VGSZNIyiY0m5oYD+KIygMoq2YR1CQQWu7SQFBYT0GjENlC8p18R6hN1S2oGM2AJfoHYciKKxK3zgUQWFdesahCAqro56LrxuKoLA6YYuhyQOCwvq0GJqAoCCLWgxFUBBBW5ZHUBCBPsuHIYKCDFrGoQgK8lAMDUIEBSHoYmgQhggKMqhm+eyT4GtpKILCumgMZQwKMgk51QkCUU7Fp4YmghZJHkFhdcKaoWkEzQ1FUFifmqFZikdQEEhiKGNQEEclhubrRoRd16eZre6AoDCNSpZvPKfBLMwiKExEa2jH6xEUViIcZCiCwtKUqX3AyncICktTb9hXnquDoLA4JsNQBIXF0cxsak32CAorUiZ5BAVBhIMLJQSFNVANLT7TvhBBYRWahZKNVW4RFGzTMwxFUFiJxjAUQUESmmGoBgSFtWgaqhEVQWF1yiTfNBRBYUWuBXxrCF1Q0FM6ffrmefAGsHnqSX5NQd+e9smH84fXgRvA9il7oG2F0nKCXj4dlA8DNgAP6K2Tlo+g7xEUmrTVSQuOQc/3jEGhQT3Jryeo8sp57lMOLhLWKnkJgo7dALZI3dAqCApC0Cf5Bav4xyyv31IkgZaVBY0uH5+rTyAopHQNQ5dM8ae718rXCAoZ1xbTuoJWX00VD1fa6ySKJJCDpk5CUBBBW5JHUBBBNcmPvR0dgsJMtNVJCAoyaKmTEBREIUZQ2kxQo5Lky/slEkFBBoWZlVEogoIYqiE0ew5BQQwICi5QqZMQFATRjKEICoKo1EkICuJQQ2h2z26F/tsi0geFedHVSVf6oykRFBZh7GrLCApzU+nWV0FQWB/1TKfxNfIICrOjhFDjiSMICrPT6DRdQVAQQx5CK88hKIggy+5jFrNFUFiAtkIeQUEEYRlCK5YuKihnkqAVtZBXniaCgiAQFGSDoCCVUFvIIyhIAUFBNGUIVSxFUBBFvUxCUJAFgoJYyhx/fQpBQQ6aMglBQRDNCaGc6gRBNOt4IihIo1ImIShIo1ImIShIIkvvCApSqZdJCAqiqHeaEBREUe/VIyjIQ2k0LSxoAGAbm4JO3W6xXY/fi/H/s3Zf2f8ir5IYgk7eEkHnBEEnb4mgc+LVL7sRvHrPvPplN4JX75lXv+xG8Oo98+qX3QhevWde/bLgHggKokFQEA2CusXl0yGKTkGwX/tAlgJBneLyeHuILh+fz+8Pax/KQiCoS7x9+TmOoOcPr2+fn9c+loVAULdIUvxpF0UvvuR4BHULBAXRXEjxIJlEUIokEAttJgBJICiIBkFBNAgKokFQU873QaVGeXsaUbAcH7KPlx9f7RzVZkFQU84fXpNGz/XrMYKevy8+Oz3YOarNgqCmpILGge8YBLFcx+CbH/Yv8SfJ6Z3o/N0Pwd8/xc/H39zF6iYvyR5z/vwcnX5KP0Sn4PZf99HbF18amiNBUFPSFL+Lzu8PWcP8fL+PH7M4ev72Ofn34ZcPr5dPh9jZ62Ox8fd/SfzOuu2Xx3ibozcdzXEgqCl5is9OiCdjyZd9bGfybPq9/N99cPMcP+xSoXfl1i/fHLJdJP8lJ9SP5PhOENSUVMWXvSponN8zzwpB/3J7SIepsZz74jHl8sPdK4KagKCmnLMcfU3xSaK+fPzukH8vE3QXnW6ej4nDD9ljtu3b5z8mKV1N8d5MSxoJgppStJmO+ePN3yUfsixeCPrrY/Db2L6XIIgDZvqYDUNf4vHoHw7XIukfKJJ6QVAbDJj99p+qiFmbKdmKNlMPCGqBk1oG6Xn7t8qXx4fLY9J9olHfB4KCaBAURIOgIBoEBdEgKIgGQUE0/x9CwvUZhubNOAAAAABJRU5ErkJggg==" /><!-- -->
+The top panel is a histogram of total counts of minimum body sizes,
+using 1-g body-size bins, used to determine <span class="math inline">\(x_{min}\)</span>. The left-most red bin is the
+modal bin, and <span class="math inline">\(x_{xmin}\)</span> for this
+group-strata combination is the minimum value within that 1-g bin.</p>
+<p>Middle and bottom panels (as suggested in Figure 7 of <a href="https://www.int-res.com/abstracts/meps/v636/p19-33/">[2]</a>) are
+the fit of the bounded power-law distribution using the MLEbins method
+with linear and logarithmic y-axes, respectively. For each body-mass
+bin, the green horizontal line show the range of body sizes, with its
+value on the y-axis corresponding to the total number of individuals in
+bins whose minima are <span class="math inline">\(\geq\)</span> the
+bin’s minimum; the green lines help to distinguish each bin when bins
+are overlapping. The vertical span of each grey rectangle shows the
+possible range of number of individuals with body masses <span class="math inline">\(\geq\)</span> body mass of individuals in that bin
+(horizontal span matches the green line). Red curves are fits of the
+MLE, with dashed lines showing 95% confidence intervals.</p>
+<p>These figure are admittedly a little complex, but retain the full
+uncertainty arising from binned data and conversions through
+species-specific length-weight relationships. As can be seen, some of
+the resulting rectangles are quite large, and simply using a single
+point for each would suggest higher accuracy than is warranted.</p>
+<p>Do see the help files for relevant functions, and feel free to email
+me (or make an issue) with any questions.</p>
+</div>
+<div id="session-information" class="section level2">
+<h2>Session information</h2>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" tabindex="-1"></a><span class="fu">sessionInfo</span>()</span>
+<span id="cb11-2"><a href="#cb11-2" tabindex="-1"></a>  R version <span class="dv">4</span>.<span class="fl">5.1</span> (<span class="dv">2025-06-13</span> ucrt)</span>
+<span id="cb11-3"><a href="#cb11-3" tabindex="-1"></a>  Platform<span class="sc">:</span> x86_64<span class="sc">-</span>w64<span class="sc">-</span>mingw32<span class="sc">/</span>x64</span>
+<span id="cb11-4"><a href="#cb11-4" tabindex="-1"></a>  Running under<span class="sc">:</span> Windows <span class="dv">11</span> <span class="fu">x64</span> (build <span class="dv">22631</span>)</span>
+<span id="cb11-5"><a href="#cb11-5" tabindex="-1"></a>  </span>
+<span id="cb11-6"><a href="#cb11-6" tabindex="-1"></a>  Matrix products<span class="sc">:</span> default</span>
+<span id="cb11-7"><a href="#cb11-7" tabindex="-1"></a>    LAPACK version <span class="dv">3</span>.<span class="fl">12.1</span></span>
+<span id="cb11-8"><a href="#cb11-8" tabindex="-1"></a>  </span>
+<span id="cb11-9"><a href="#cb11-9" tabindex="-1"></a>  locale<span class="sc">:</span></span>
+<span id="cb11-10"><a href="#cb11-10" tabindex="-1"></a>  [<span class="dv">1</span>] LC_COLLATE<span class="ot">=</span>English_United States.utf8  LC_CTYPE<span class="ot">=</span>English_United States.utf8   </span>
+<span id="cb11-11"><a href="#cb11-11" tabindex="-1"></a>  [<span class="dv">3</span>] LC_MONETARY<span class="ot">=</span>English_United States.utf8 LC_NUMERIC<span class="ot">=</span>C                          </span>
+<span id="cb11-12"><a href="#cb11-12" tabindex="-1"></a>  [<span class="dv">5</span>] LC_TIME<span class="ot">=</span>English_United States.utf8    </span>
+<span id="cb11-13"><a href="#cb11-13" tabindex="-1"></a>  </span>
+<span id="cb11-14"><a href="#cb11-14" tabindex="-1"></a>  time zone<span class="sc">:</span> America<span class="sc">/</span>Vancouver</span>
+<span id="cb11-15"><a href="#cb11-15" tabindex="-1"></a>  tzcode source<span class="sc">:</span> internal</span>
+<span id="cb11-16"><a href="#cb11-16" tabindex="-1"></a>  </span>
+<span id="cb11-17"><a href="#cb11-17" tabindex="-1"></a>  attached base packages<span class="sc">:</span></span>
+<span id="cb11-18"><a href="#cb11-18" tabindex="-1"></a>  [<span class="dv">1</span>] stats     graphics  grDevices utils     datasets  methods   base     </span>
+<span id="cb11-19"><a href="#cb11-19" tabindex="-1"></a>  </span>
+<span id="cb11-20"><a href="#cb11-20" tabindex="-1"></a>  other attached packages<span class="sc">:</span></span>
+<span id="cb11-21"><a href="#cb11-21" tabindex="-1"></a>  [<span class="dv">1</span>] sizeSpectraFit_0.<span class="fl">0.99</span> testthat_3.<span class="fl">2.3</span>        devtools_2.<span class="fl">4.5</span>       </span>
+<span id="cb11-22"><a href="#cb11-22" tabindex="-1"></a>  [<span class="dv">4</span>] usethis_3.<span class="fl">2.1</span>        </span>
+<span id="cb11-23"><a href="#cb11-23" tabindex="-1"></a>  </span>
+<span id="cb11-24"><a href="#cb11-24" tabindex="-1"></a>  loaded via a <span class="fu">namespace</span> (and not attached)<span class="sc">:</span></span>
+<span id="cb11-25"><a href="#cb11-25" tabindex="-1"></a>   [<span class="dv">1</span>] utf8_1.<span class="fl">2.6</span>        tidyr_1.<span class="fl">3.2</span>       sass_0.<span class="fl">4.10</span>       generics_0.<span class="fl">1.4</span>   </span>
+<span id="cb11-26"><a href="#cb11-26" tabindex="-1"></a>   [<span class="dv">5</span>] digest_0.<span class="fl">6.39</span>     magrittr_2.<span class="fl">0.4</span>    evaluate_1.<span class="fl">0.5</span>    pkgload_1.<span class="fl">4.1</span>    </span>
+<span id="cb11-27"><a href="#cb11-27" tabindex="-1"></a>   [<span class="dv">9</span>] fastmap_1.<span class="fl">2.0</span>     rprojroot_2.<span class="fl">1.1</span>   jsonlite_2.<span class="fl">0.0</span>    pkgbuild_1.<span class="fl">4.8</span>   </span>
+<span id="cb11-28"><a href="#cb11-28" tabindex="-1"></a>  [<span class="dv">13</span>] sessioninfo_1.<span class="fl">2.3</span> brio_1.<span class="fl">1.5</span>        urlchecker_1.<span class="fl">0.1</span>  promises_1.<span class="fl">5.0</span>   </span>
+<span id="cb11-29"><a href="#cb11-29" tabindex="-1"></a>  [<span class="dv">17</span>] purrr_1.<span class="fl">2.0</span>       jquerylib_0.<span class="fl">1.4</span>   cli_3.<span class="fl">6.5</span>         shiny_1.<span class="fl">12.1</span>     </span>
+<span id="cb11-30"><a href="#cb11-30" tabindex="-1"></a>  [<span class="dv">21</span>] rlang_1.<span class="fl">1.6</span>       ellipsis_0.<span class="fl">3.2</span>    withr_3.<span class="fl">0.2</span>       remotes_2.<span class="fl">5.0</span>    </span>
+<span id="cb11-31"><a href="#cb11-31" tabindex="-1"></a>  [<span class="dv">25</span>] cachem_1.<span class="fl">1.0</span>      yaml_2.<span class="fl">3.12</span>       otel_0.<span class="fl">2.0</span>        tools_4.<span class="fl">5.1</span>      </span>
+<span id="cb11-32"><a href="#cb11-32" tabindex="-1"></a>  [<span class="dv">29</span>] memoise_2.<span class="fl">0.1</span>     dplyr_1.<span class="fl">1.4</span>       httpuv_1.<span class="fl">6.16</span>     vctrs_0.<span class="fl">6.5</span>      </span>
+<span id="cb11-33"><a href="#cb11-33" tabindex="-1"></a>  [<span class="dv">33</span>] R6_2.<span class="fl">6.1</span>          mime_0<span class="fl">.13</span>         lifecycle_1.<span class="fl">0.4</span>   fs_1.<span class="fl">6.6</span>         </span>
+<span id="cb11-34"><a href="#cb11-34" tabindex="-1"></a>  [<span class="dv">37</span>] htmlwidgets_1.<span class="fl">6.4</span> miniUI_0.<span class="fl">1.2</span>      pkgconfig_2.<span class="fl">0.3</span>   desc_1.<span class="fl">4.3</span>       </span>
+<span id="cb11-35"><a href="#cb11-35" tabindex="-1"></a>  [<span class="dv">41</span>] bslib_0.<span class="fl">9.0</span>       pillar_1.<span class="fl">11.1</span>     later_1.<span class="fl">4.4</span>       glue_1.<span class="fl">8.0</span>       </span>
+<span id="cb11-36"><a href="#cb11-36" tabindex="-1"></a>  [<span class="dv">45</span>] profvis_0.<span class="fl">4.0</span>     Rcpp_1.<span class="fl">1.0</span>        tidyselect_1.<span class="fl">2.1</span>  xfun_0<span class="fl">.55</span>        </span>
+<span id="cb11-37"><a href="#cb11-37" tabindex="-1"></a>  [<span class="dv">49</span>] tibble_3.<span class="fl">3.0</span>      rstudioapi_0.<span class="fl">17.1</span> knitr_1<span class="fl">.51</span>        xtable_1<span class="fl">.8</span><span class="dv">-4</span>     </span>
+<span id="cb11-38"><a href="#cb11-38" tabindex="-1"></a>  [<span class="dv">53</span>] htmltools_0.<span class="fl">5.9</span>   rmarkdown_2<span class="fl">.30</span>    compiler_4.<span class="fl">5.1</span></span></code></pre></div>
+</div>
+
+
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

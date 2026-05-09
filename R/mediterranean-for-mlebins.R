@@ -2,7 +2,8 @@
 ##'  a given strata and group
 ##'
 ##' See `zabala-data-analysis.Rmd`. This is specific to this data set, but can
-##'   easily be adapted/generalised for others
+##'   easily be adapted/generalised for others TODO mention that sums rows that
+##' are the same
 ##' @param dat tibble of data already with certain columns TODO
 ##' @param group_name group to analyse, if not specified then use all  TODO
 ##'   think if can be vector, is.null might not work
