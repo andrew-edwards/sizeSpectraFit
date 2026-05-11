@@ -22,11 +22,8 @@ test_that("plot.size_spectrum_numeric() works", {
                         style = "log_y_axis",
                         x_small_ticks = c(5, 50, 500)))
   expect_invisible(plot(res_vec,
-                        style = "log_y_axis",
-                        x_small_ticks_by = 25))
-  expect_invisible(plot(res_vec,
-                        style = "log_y_axis",
-                        x_small_ticks_by = NA))
+                        style = "linear_y_axis",
+                        y_small_ticks_by = 25))
   expect_error(plot(res_vec,
                     log = "xy"))
 
