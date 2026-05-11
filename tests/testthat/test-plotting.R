@@ -49,4 +49,7 @@ test_that("plot.size_spectrum_numeric() works", {
   expect_error(plot(res_vec,
                     y_small_ticks_by = 57))   # not allowed for log axis
 
+  expect_invisible(plot(res_vec,
+                        x_small_ticks_labels = c(3, 7, 60, 80)))
+
 })
