@@ -118,6 +118,19 @@ test_that("dPLB_agg() and plotting functions work with different settings", {
                                        strata_names = strata,
                                        ylim = c(10^(-4), 1)))
 
+  expect_error(plot_aggregate_fits(1:10))
+
+  expect_error(plot_aggregate_fits(agg_list_2,
+                                       strata_names = "need_a_bigger_boat"))
+  expect_error(plot_aggregate_fits(agg_list_2,
+                                       col_strata = "blue"))
+  expect_error(plot_aggregate_fits(agg_list_2,
+                                       lty_strata = 1))
+
+  expect_invisible(plot_aggregate_fits(agg_list_2,
+                                       strata_names = strata,
+                                       restrict = FALSE))
+
   # MLEbin plots
   expect_invisible(mlebin_agg_fit <- plot_aggregate_mlebin(res_mlebin_list))
   expect_invisible(mlebin_agg_fit <- plot_aggregate_mlebin(res_mlebin_list,
