@@ -2,7 +2,7 @@
 % Please edit documentation in R/plot-aggregate-fits.R
 \name{plot_aggregate_fits}
 \alias{plot_aggregate_fits}
-\title{Plot the aggregate fits for several strata}
+\title{Plot the aggregate fits for several strata (sampling scenarios)}
 \usage{
 plot_aggregate_fits(
   agg_list,

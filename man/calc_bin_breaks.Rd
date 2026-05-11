@@ -20,9 +20,7 @@ use to generate names for the new columns}
 
 \item{bin_width}{numeric value of assumed bin width. If multiple bin widths
 are needed then split the data up and apply the function each time, then
-combine together. If multiple bin widths might have been used for one type
-of data but we can't filter those easily, then see \code{\link[=calc_max_of_bin]{calc_max_of_bin()}}
-TODO check.}
+combine together.}
 
 \item{represents}{character describing what the \code{measurement} column
 is assumed to be: either the \code{min} (minimum), \code{midpoint}, or \code{max} (maximum) of the bins.}

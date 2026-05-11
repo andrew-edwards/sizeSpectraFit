@@ -31,7 +31,8 @@ column so it uses MLEbins method TODO double check that flow through
 }
 \description{
 See \code{zabala-data-analysis.Rmd}. This is specific to this data set, but can
-easily be adapted/generalised for others
+easily be adapted/generalised for others TODO mention that sums rows that
+are the same
 }
 \examples{
 \dontrun{

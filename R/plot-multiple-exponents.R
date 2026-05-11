@@ -63,6 +63,7 @@
 ##' #Figure B.20:
 ##' plot_multiple_exponents(quevedo_table_b1,
 ##'                         shade_first = TRUE)
+##' }
 plot_multiple_exponents = function(res_tib,
                                    col_strata = c("blue",
                                                   "darkgreen",

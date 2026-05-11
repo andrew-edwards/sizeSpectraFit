@@ -84,7 +84,8 @@ desired plot in current device
 }
 \description{
 A somewhat specific plot for the Mediterranean analyses of five species
-groups fitted for three strata, but applicable to other sets of results.
+groups fitted for three strata (Figure B.20 of Quevedo et al., 2026), but
+applicable to other sets of results, likely with some tweaking.
 For each group there will be three strata (to do with fishing being
 allowed), and we want to see how \emph{b} changes within each group under the
 changes in fishing. Bascially plotting out the results saved in
@@ -94,6 +95,18 @@ fits were not great.
 }
 \details{
 For doing time series probably best to adapt and make a new function.
+}
+\examples{
+\dontrun{
+quevedo_table_b1    # results from Table B.1 of Quevedo et al. (2026), saved as
+                 #  a data object in sizeSpectraFit
+# As used for Table B.1 (2 decimal places):
+knitr::kable(quevedo_table_b1,
+             digits = 2)
+#Figure B.20:
+plot_multiple_exponents(quevedo_table_b1,
+                        shade_first = TRUE)
+}
 }
 \author{
 Andrew Edwards, adapted from \code{timeSerPlot()}

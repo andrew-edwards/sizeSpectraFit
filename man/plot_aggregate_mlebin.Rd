@@ -3,7 +3,7 @@
 \name{plot_aggregate_mlebin}
 \alias{plot_aggregate_mlebin}
 \title{Do an aggregated MLEbin or MLEbins plot of several PLB fits, each to a separate (but related)
-group of individuals.}
+group of individuals; returns the fitted values.}
 \usage{
 plot_aggregate_mlebin(
   res_list,
