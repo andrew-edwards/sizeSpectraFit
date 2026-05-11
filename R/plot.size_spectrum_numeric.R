@@ -29,7 +29,7 @@
 ##'   is bins of normalized biomass (but improved here by showing bins in the top
 ##'   panel rather than points) and the `"log_y_axis"` plot described above.
 ##' TODO prob have to make that consistent in other plotting function
-##'
+##'  Note that the x-axis is always logarithmic.
 ##' @param ... Further arguments for `plot_isd()` and then `plot()`, except
 ##'   cannot have `log` as that gets overridden. TODO check
 ##' @return One- or two-panel plot of raw data and PLB distribution (and fits of

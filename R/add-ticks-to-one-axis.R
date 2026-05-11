@@ -101,7 +101,8 @@ add_ticks_to_one_axis <- function(log_scale,
       axis(axis_to_do,
            mgp = mgp_val)
       if(axis_to_do == 1){
-        axp <- "xaxp"
+        # axp <- "xaxp"      # not implemented yet in plot.size_spectrum_numeric().
+                             # next lines will break if this does get called
       } else {
         axp <- "yaxp"
       }
