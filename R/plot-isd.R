@@ -28,9 +28,10 @@
 ##'   NULL then gets done automatically, so if that does not  look good then
 ##'   define explicitly here.
 ##' @param x_small_ticks_by, y_small_ticks_by  numeric vector of increment to
-##'   use to generate small tick marks on x-axis/y-axis. Will conincide with the
+##'   use to generate small tick marks on x-axis/y-axis; only relevant for
+##'   linear axes. Will coincide with the
 ##'   big tick marks and extend beyond them. Can only define `x_small_ticks` or
-##'   `x_small_ticks_by` (same for `y_...`). Only relevant for linear axes. Set
+##'   `x_small_ticks_by` (same for `y_...`). Set
 ##'   to `NA` to force no small unlabelled tickmarks.
 ##' @param x_small_ticks_labels, y_small_ticks_labels numeric vector of big tick
 ##'   marks to label on x-axis/y-axis. If NULL then gets done automatically, so

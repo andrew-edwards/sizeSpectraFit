@@ -30,4 +30,23 @@ test_that("plot.size_spectrum_numeric() works", {
   expect_error(plot(res_vec,
                     log = "xy"))
 
+  expect_invisible(plot(res_vec,
+                        y_small_ticks = c(126:135),
+                        y_big_ticks = c(125, 250, 777),
+                        x_big_ticks = NULL,  # not sure covers L98 of
+                                             # add_ticks_to_one_axis()
+                        x_small_ticks = 10:19))
+
+  expect_invisible(plot(res_vec,
+                        style = "linear_y_axis"))
+  expect_error(plot(res_vec,
+                    log = "xy"))
+
+  expect_invisible(plot(res_vec,
+                    y_small_ticks_by = NA,    # no tick marks
+                    style = "linear_y_axis"))
+
+  expect_error(plot(res_vec,
+                    y_small_ticks_by = 57))   # not allowed for log axis
+
 })

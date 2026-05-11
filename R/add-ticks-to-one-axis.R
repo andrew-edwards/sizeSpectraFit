@@ -22,6 +22,12 @@ add_ticks_to_one_axis <- function(log_scale,
                                   small_ticks_labels){
   ll = 1:9
 
+  if(log_scale & !is.null(small_ticks_by)){
+    stop("Cannot have `small_ticks_by` specified for x or y axis when plotting
+          on a log scale, as it's fiddly and the default generally looks good; specify `small_ticks` to precisely define
+  what you want. This option may be introduced if desired, please contact me.")
+  }
+
   if(x_or_y == "x"){
     axis_to_do <- 1
     lim <- par("usr")[1:2]   # But then 10^ this below if logscale

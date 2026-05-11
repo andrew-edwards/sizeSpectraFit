@@ -20,6 +20,30 @@ test_that("MLEbins fitting and plotting works and matches original results", {
                                   mediterranean_length_weight_coefficients,
                                   length_data_unit = "mm")
 
+  dat_needed <- mediterranean_for_mlebins(dat_joined) %>%
+    dplyr::filter(bin_min < 20)
+
+  expect_equal(nrow(mediterranean_for_mlebins(dat_joined, minimum_length =
+                                                            100)),
+               48)
+
+  # Some extra tests for options
+  dat_with_breaks_2 <- calc_bin_breaks(dat,
+                                       bin_width = 1,
+                                       represents = "min") %>%
+    dplyr::rename(bin_count = number)
+
+  expect_equal(dat_with_breaks_2$length,
+               dat_with_breaks_2$length_bin_min)
+
+  dat_with_breaks_3 <- calc_bin_breaks(dat,
+                                       bin_width = 1,
+                                       represents = "max") %>%
+    dplyr::rename(bin_count = number)
+
+  expect_equal(dat_with_breaks_3$length,
+               dat_with_breaks_3$length_bin_max)
+
   dat_joined_wrong <-
     length_bins_to_body_mass_bins(dat_with_breaks,
                                   mediterranean_length_weight_coefficients,
@@ -30,15 +54,14 @@ test_that("MLEbins fitting and plotting works and matches original results", {
                136.103754*1000)        # example just to use cm and kg, not
                # checked manually (though 136.1.. is the value when not using "kg"
 
+  dat_joined_wrong_2 <-
+    length_bins_to_body_mass_bins(dat_with_breaks,
+                                  mediterranean_length_weight_coefficients,
+                                  length_relationship_unit = "mm",
+                                  body_mass_relationship_unit = "kg")
+  expect_equal(as.numeric(dat_joined_wrong_2[1, "weight_bin_min"]),
+               5190.03281)        # example not checked manually
 
-
-
-  dat_needed <- mediterranean_for_mlebins(dat_joined) %>%
-    dplyr::filter(bin_min < 20)
-
-  expect_equal(nrow(mediterranean_for_mlebins(dat_joined, minimum_length =
-                                                            100)),
-               48)
 
   # sum(dat_needed$bin_count)
    #   [1] 1085.234   doesn't seem to match figure
