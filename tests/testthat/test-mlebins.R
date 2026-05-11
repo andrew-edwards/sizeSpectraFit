@@ -97,8 +97,10 @@ test_that("MLEbins fitting and plotting works and matches original results", {
 
 test_that("Plotting of Figure B.20 works",{
   # Fig B.20:
-  plot_multiple_exponents(quevedo_table_b1,
-                          shade_first = TRUE)
-
-
+  expect_invisible(plot_multiple_exponents(quevedo_table_b1,
+                                           shade_first = TRUE))
+  expect_error(plot_multiple_exponents(quevedo_table_b1,
+                                       col_strata = "red"))
+  expect_error(plot_multiple_exponents(quevedo_table_b1,
+                                       pch_strata = 15))
 })
