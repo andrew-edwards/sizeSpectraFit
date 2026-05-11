@@ -12,3 +12,20 @@
 ##' @author Andrew Edwards
 ##' @source Generated from `data-raw/sim_vec.R`.
 "sim_vec"
+
+##' Results of the fits as shown in Table B.1 (to use as the example code to
+##' plot Figure B.20 of Quevedo et al., 2026)
+##'
+##' @format tibble
+##' @examples
+##' \dontrun{
+##' quevedo_table_b1
+##' knitr::kable(quevedo_table_b1,
+##'              digits = 2)       # As shown in Table B.1 (2 decimal places)
+##' plot_multiple_exponents(quevedo_table_b1,         # Plot Figure B.20
+##'                         shade_first = TRUE)
+##' }
+##' @author Andrew Edwards
+##' @source Generated from `data-raw/mediterranean-results.R`.
+"quevedo_table_b1"
+

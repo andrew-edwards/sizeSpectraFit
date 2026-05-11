@@ -4,6 +4,7 @@
 # Based on med-analysis-4.Rmd, doing Cephalopda (small) Fishing Grounds, which
 # should not take too long to fit.
 
+# Also using quevedo-table-b1 object to test plotting for Figure B.20
 test_that("MLEbins fitting and plotting works and matches original results", {
 
   dat <- dplyr::filter(mediterranean_data,
@@ -91,4 +92,13 @@ test_that("MLEbins fitting and plotting works and matches original results", {
       dat_needed,
       bin_start = NULL)$mlebins_fit$b_mle,
     -2.99753213)
+})
+
+
+test_that("Plotting of Figure B.20 works",{
+  # Fig B.20:
+  plot_multiple_exponents(quevedo_table_b1,
+                          shade_first = TRUE)
+
+
 })

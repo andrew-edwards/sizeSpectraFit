@@ -1,5 +1,8 @@
 # Going to save the MLEbins results for cephalopoda (small) fishing grounds, to
 # show on main README without rerunning each time (takes a few minutes to run)
+# Also med-analysis-4.Rmd's `res_table_agg.rds` results which contains the
+# combined table results, to then use as example and test for
+# plot_multiple_exponents()
 
 load_all()
 
@@ -36,3 +39,12 @@ usethis::use_data(data_cephsmall_fg,
 
 usethis::use_data(res_cephsmall_fg,
                   overwrite = TRUE)
+
+
+# res_table_agg
+
+quevedo_table_b1 <- readRDS(paste0(here::here(),
+                                   "/report/mediterranean/mediterranean-analysis-4/res_table_agg.rds"))
+usethis::use_data(quevedo_table_b1,
+                  overwrite = TRUE)
+
