@@ -91,7 +91,7 @@ length_bins_to_body_mass_bins <- function(dat,
   }
 
   if(body_mass_relationship_unit == "kg"){   # need it in g, so just scale alpha
-    coefficients <- dplyr::mutate(coeffieicents,
+    coefficients <- dplyr::mutate(coefficients,
                                   alpha = 1000 * alpha)
   }
 
@@ -110,47 +110,6 @@ length_bins_to_body_mass_bins <- function(dat,
                   weight_bin_max = alpha * (length_bin_max)^beta) %>%
     # Remove species with no length-weight coefficients:
     dplyr::filter(!is.na(alpha))
-
-  # NOT DOING THIS NOW as need to return the original tibble (to not lose strata
-  # etc.), and this only summarises by species. TODO decide on this, may be best to just remove it and tell people to
-  # aggregate repeated measurements (by strata) at the start, like I'm doing for
-  # med analysis. Too fiddly to keep this more general and allow for all strata
-  # to be retained.
-
-  if(FALSE){
-    # Now aggregate duplicate bins (not keeping species in case duplicate bins are
-    #  for different species, which can happen if they share length-weight
-    #  coefficients), and then arrange by weight_bin_min, but first check if we
-    #  can keep species in there also.  bin_min etc. here need to be
-    #  weight_bin_min if keeping
-    check_unique_species <- dplyr::summarise(dplyr::group_by(dat_joined,
-                                                             bin_min,
-                                                             bin_max,),
-                                             number_species =
-                                               length(unique(species))) %>%
-      dplyr::ungroup()
-
-    if(max(check_unique_species$number_species) > 1){
-      # Cannot include species name
-      dat_joined_2 <- dplyr::summarise(dplyr::group_by(dat_joined,
-                                                       bin_min,
-                                                       bin_max),
-                                       bin_count = sum(bin_count)) %>%
-        dplyr::ungroup() %>%
-        dplyr::arrange(bin_min)
-    } else {
-      # Can include species name
-      dat_joined_2 <- dplyr::summarise(dplyr::group_by(dat_joined,
-                                                       bin_min,
-                                                       bin_max),
-                                       bin_count = sum(bin_count),
-                                       species = unique(species)) %>%
-        dplyr::ungroup() %>%
-        dplyr::arrange(bin_min) %>%
-        dplyr::relocate(species)
-    }
-
-  }
 
   dat_joined
 }

@@ -20,6 +20,19 @@ test_that("MLEbins fitting and plotting works and matches original results", {
                                   mediterranean_length_weight_coefficients,
                                   length_data_unit = "mm")
 
+  dat_joined_wrong <-
+    length_bins_to_body_mass_bins(dat_with_breaks,
+                                  mediterranean_length_weight_coefficients,
+                                  length_data_unit = "cm",
+                                  body_mass_relationship_unit = "kg")
+
+  expect_equal(as.numeric(dat_joined_wrong[1, "weight_bin_min"]),
+               136.103754*1000)        # example just to use cm and kg, not
+               # checked manually (though 136.1.. is the value when not using "kg"
+
+
+
+
   dat_needed <- mediterranean_for_mlebins(dat_joined) %>%
     dplyr::filter(bin_min < 20)
 
@@ -63,6 +76,8 @@ test_that("MLEbins fitting and plotting works and matches original results", {
   expect_equal(res_cephsmall_fg$mlebins_fit$b_conf,
                c(-3.16269213,
                  -2.83629213))
+
+
 
   # Testing detect_outliers and remove_outliers. You detect first then look at
   # results to judge what to remove (it's not automatic, you assing
