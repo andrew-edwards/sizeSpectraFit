@@ -1,5 +1,5 @@
 ##' Do an aggregated MLEbin or MLEbins plot of several PLB fits, each to a separate (but related)
-##' group of individuals.
+##' group of individuals; returns the fitted values.
 ##'
 ##' Users may need to play with the colour settings to get an instructive
 ##' plot; it is hard to automate all of them, see the arguments available.

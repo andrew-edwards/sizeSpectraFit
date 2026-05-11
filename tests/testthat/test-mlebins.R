@@ -99,6 +99,8 @@ test_that("Plotting of Figure B.20 works",{
   # Fig B.20:
   expect_invisible(plot_multiple_exponents(quevedo_table_b1,
                                            shade_first = TRUE))
+  expect_invisible(plot_multiple_exponents(quevedo_table_b1,
+                                           x_tick_end = NULL))
   expect_error(plot_multiple_exponents(quevedo_table_b1,
                                        col_strata = "red"))
   expect_error(plot_multiple_exponents(quevedo_table_b1,
