@@ -239,7 +239,7 @@ Specifically we fit the size spectrum for the small cephalopoda species
 group in the fishing grounds strata (reproducing Fig. B.14 of
 [\[3\]](https://www.sciencedirect.com/science/article/pii/S2351989426001769)).
 For brevity the wrangling for that (see the
-[fit-data-mlebins.html](http://htmlpreview.github.io/?https://github.com/andrew-edwards/sizeSpectraFit/blob/main/vignettes/fit-data-mlebins.html)
+[fit-data-mlebins.html](https://andrew-edwards.github.io/sizeSpectraFit/vignettes/fit-data-mlebins.html)
 vignette) has already been done and the required dataset saved in the
 package as a tibble of data where each row represents a species-bin
 combination, including the count for that bin:
@@ -319,13 +319,13 @@ Three vignettes for sizeSpectraFit go into more details than shown
 above. Also see the help files for the functions for more details. The
 vignettes are rendered and viewable on GitHub at:
 
-- [fit-data.html](http://htmlpreview.github.io/?https://github.com/andrew-edwards/sizeSpectraFit/blob/main/vignettes/fit-data.html)
+- [fit-data.html](https://andrew-edwards.github.io/sizeSpectraFit/vignettes/fit-data.html)
   – the MLE and MLEbin methods in more detail than shown above, plus
   with extra plotting ideas
-- [fit-data-mlebins.html](http://htmlpreview.github.io/?https://github.com/andrew-edwards/sizeSpectraFit/blob/main/vignettes/fit-data-mlebins.html)
+- [fit-data-mlebins.html](https://andrew-edwards.github.io/sizeSpectraFit/vignettes/fit-data-mlebins.html)
   – the MLEbins method including further results, calculations,
   explanations, and figure options.
-- [fit-aggregate.html](http://htmlpreview.github.io/?https://github.com/andrew-edwards/sizeSpectraFit/blob/main/vignettes/fit-aggregate.html)
+- [fit-aggregate.html](https://andrew-edwards.github.io/sizeSpectraFit/vignettes/fit-aggregate.html)
   – our new normalised aggregated size spectrum, as described in
   [\[3\]](https://www.sciencedirect.com/science/article/pii/S2351989426001769)
 

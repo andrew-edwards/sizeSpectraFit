@@ -1,0 +1,24 @@
+---
+title: "sizeSpectraFit vignettes"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{index}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r start, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.width = 6,
+  fig.height = 6
+)
+options(rmarkdown.html_vignette.check_title = FALSE)
+# rmarkdown::render("index.Rmd")
+```
+
+Dummy page to set up vignette .html rendering for
+[sizeSpectraFit](https://github.com/andrew-edwards/sizeSpectraFit#vignettes) vignettes.
+
+
