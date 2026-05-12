@@ -325,16 +325,16 @@ vignettes are rendered and viewable on GitHub at:
 - [fit-data-mlebins.html](https://andrew-edwards.github.io/sizeSpectraFit/vignettes/fit-data-mlebins.html)
   – the MLEbins method including further results, calculations,
   explanations, and figure options.
-- [fit-aggregate.html](https://andrew-edwards.github.io/sizeSpectraFit/vignettes/fit-aggregate.html)
+- [fit-aggregated.html](https://andrew-edwards.github.io/sizeSpectraFit/vignettes/fit-aggregated.html)
   – our new normalised aggregated size spectrum, as described in
   [\[3\]](https://www.sciencedirect.com/science/article/pii/S2351989426001769)
 
 To run and adapt the code yourself, simply download the raw R Markdown
 files from
 [fit-data.Rmd](https://github.com/andrew-edwards/sizeSpectraFit/blob/main/vignettes/fit-data.Rmd),
-[fit-data-mlebins.Rmd](https://github.com/andrew-edwards/sizeSpectraFit/blob/main/vignettes/fit-data-mlebins),
+[fit-data-mlebins.Rmd](https://github.com/andrew-edwards/sizeSpectraFit/blob/main/vignettes/fit-data-mlebins.Rmd),
 or
-[fit-aggregate.Rmd](https://github.com/andrew-edwards/sizeSpectraFit/blob/main/vignettes/fit-aggregate.Rmd).
+[fit-aggregated.Rmd](https://github.com/andrew-edwards/sizeSpectraFit/blob/main/vignettes/fit-aggregated.Rmd).
 
 Run the file locally, and then adapt it for your own data.
 

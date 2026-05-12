@@ -16,8 +16,8 @@ rmarkdown::render("fit-data-mlebins.Rmd")
 ```
 
 ```{r, load, include = FALSE}
-# load_all()
-library(sizeSpectraFit)
+load_all()
+# library(sizeSpectraFit)
 
 knitr::opts_chunk$set(
   collapse = TRUE,
@@ -39,7 +39,7 @@ The MLEbins method calculates the maximum likelihood estimate
 of the size-spectrum exponent, $b$, when the data are collected as lengths and
 we have species-specific length-weight coefficients. So individual body masses
 are not available; if they were we could use the MLE method in the
-[fit-data.html](http://htmlpreview.github.io/?https://github.com/andrew-edwards/sizeSpectraFit/blob/main/vignettes/fit-data.html)
+[fit-data.html](https://andrew-edwards.github.io/sizeSpectraFit/vignettes/fit-data.html)
 vignette. If you have binned body masses but the bins overlap, then you also
 need to use MLEbins.
 
