@@ -18,8 +18,9 @@ test_that("MLEbin fitting and plotting works and matches original results", {
                -1.98307875)
 
   expect_equal(fit_size_spectrum(sim_vec_binned,
-                                 x_max = 200)$b_mle,
-               -2.02285725)
+                                 x_max = 200,
+                                 b_start = -1)$b_mle,
+               -2.02285708)
 
   expect_error(fit_size_spectrum(sim_vec_binned,
                                  x_min = 20,
@@ -35,7 +36,8 @@ test_that("MLEbin fitting and plotting works and matches original results", {
                                  strata = "hello"))
   expect_invisible(plot(res_mlebin))
   expect_invisible(plot(res_mlebin,
-                        style = "both_y_axes"))
+                        style = "both_y_axes",
+                        rect_border_col = "red"))
   expect_invisible(plot(res_mlebin,
                         style = "biomass"))
   expect_invisible(plot(res_mlebin,

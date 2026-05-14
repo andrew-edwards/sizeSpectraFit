@@ -3,6 +3,8 @@
 test_that("fit_size_spectrum() works with different settings and matches previous results", {
   res_vec <- fit_size_spectrum(sim_vec)
 
+  expect_visible(res_vec)    # test print.size_spectrum_numeric
+
   # Taking values from sizeSpectra vignette, for which we then simulation tested
   #  the code.
   expect_equal(res_vec$b_mle,
@@ -50,4 +52,25 @@ test_that("fit_size_spectrum() works with different settings and matches previou
                         xlim_hist = c(7, 100)))
   expect_error(determine_xmin_and_fit("hello"))
 
+  # Likelihood functions
+  expect_equal(neg_ll_mle_method(b = -1,               # edge case
+                                 x = sim_vec,
+                                 n = 1000,
+                                 x_min = min(sim_vec),
+                                 x_max = max(sim_vec),
+                                 sum_log_x = sum(log(sim_vec))),
+               2748.5854)
+  expect_error(neg_ll_mle_method(b = -2,
+                                 x = sim_vec,
+                                 n = 1000,
+                                 x_min = -1,
+                                 x_max = max(sim_vec),
+                                 sum_log_x = sum(log(sim_vec))))
+
+  expect_error(neg_ll_mle_method(b = -2,
+                                 x = sim_vec,
+                                 n = 1000,
+                                 x_min = 1,
+                                 x_max = 0.5,
+                                 sum_log_x = sum(log(sim_vec))))
 })
