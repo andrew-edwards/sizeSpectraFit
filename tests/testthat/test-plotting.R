@@ -60,4 +60,9 @@ test_that("plot.size_spectrum_numeric() works", {
   expect_invisible(plot(res_vec,
                         x_small_ticks_labels = c(3, 7, 60, 80)))
 
+  expect_invisible({
+    plot(1:10, axes = FALSE)
+    add_ticks()
+  }
+
 })
