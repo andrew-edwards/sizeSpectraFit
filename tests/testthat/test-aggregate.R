@@ -118,14 +118,20 @@ test_that("dPLB_agg() and plotting functions work with different settings", {
                                        strata_names = strata,
                                        ylim = c(10^(-4), 1)))
 
-  expect_error(plot_aggregate_fits(1:10))
+  expect_error(plot_aggregate_fits(1:10,
+                                   strata_names = strata))
 
   expect_error(plot_aggregate_fits(agg_list_2,
                                        strata_names = "need_a_bigger_boat"))
   expect_error(plot_aggregate_fits(agg_list_2,
-                                       col_strata = "blue"))
+                                   col_strata = "blue",
+                                   strata_names = strata))
   expect_error(plot_aggregate_fits(agg_list_2,
-                                       lty_strata = 1))
+                                   lty_strata = 1,
+                                   strata_names = strata))
+
+  expect_error(plot_aggregate_fits(sim_vec,strata_names = strata))
+
 
   expect_invisible(plot_aggregate_fits(agg_list_2,
                                        strata_names = strata,

@@ -52,8 +52,6 @@ plot_aggregate_fits <- function(agg_list,
                                 legend_text_second_row_multiplier = 2,
                                 ...){    # passed onto plot(...)
 
-   # TODO check works for agg_list of just length 1
-
   num_strata <- length(strata_names)
 
   if(!("list" %in% class(agg_list))){
