@@ -110,6 +110,11 @@ test_that("dPLB_agg() and plotting functions work with different settings", {
 
   expect_invisible(fished_agg_fit_2 <- plot_aggregate(res_fished_list_2))
 
+  expect_error(plot_aggregate(res_fished_list_2,
+                              col_vec = "red"))
+  expect_error(plot_aggregate(1:3))
+  expect_error(plot_aggregate(res_mlebin_list))
+
   agg_list_2 <- list(orig_agg_fit,
                      fished_agg_fit_2)
   strata <- c("unfished",
@@ -122,16 +127,13 @@ test_that("dPLB_agg() and plotting functions work with different settings", {
                                    strata_names = strata))
 
   expect_error(plot_aggregate_fits(agg_list_2,
-                                       strata_names = "need_a_bigger_boat"))
+                                   strata_names = "need_a_bigger_boat"))
   expect_error(plot_aggregate_fits(agg_list_2,
                                    col_strata = "blue",
                                    strata_names = strata))
   expect_error(plot_aggregate_fits(agg_list_2,
                                    lty_strata = 1,
                                    strata_names = strata))
-
-  expect_error(plot_aggregate_fits(sim_vec,strata_names = strata))
-
 
   expect_invisible(plot_aggregate_fits(agg_list_2,
                                        strata_names = strata,
@@ -143,10 +145,12 @@ test_that("dPLB_agg() and plotting functions work with different settings", {
                                        rect_shading_equal_col_vec= TRUE,
                                        rect_border_equal_col_vec = FALSE))
 
+  expect_error(plot_aggregate_mlebin(1:10))
+
   expect_error(plot_aggregate_mlebin(res_mlebin_list,
                                      col_vec = "pink"))
-  expect_error(plot_aggregate_mlebin(1:10))
   expect_error(plot_aggregate_mlebin(list(a = 3)))
+
 })
 
 

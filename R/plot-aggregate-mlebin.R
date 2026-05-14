@@ -62,13 +62,13 @@ plot_aggregate_mlebin <- function(res_list,
   # in aggregate_mlebins(). Hard to make the plotting functions
   # general enough to do this, so just copying the relevant bits here.
 
-  if(length(res_list) > length(col_vec)){
-    stop("Need to add more colours to col_vec to have one for each results component in res_list.")
-  }
-
   # TODO could generalise this in the master wrapper function
   if(!("list" %in% class(res_list))){
     stop("res_list need to be a list of lists of MLE results.")
+  }
+
+  if(length(res_list) > length(col_vec)){
+    stop("Need to add more colours to col_vec to have one for each results component in res_list.")
   }
 
   # TODO could generalise this in the master wrapper function; may want mlebin

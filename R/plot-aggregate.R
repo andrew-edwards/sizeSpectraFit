@@ -35,12 +35,17 @@ plot_aggregate <- function(res_list,
                            ylim_global = NULL,
                            return_agg_x_y = TRUE){
 
-  if(length(res_list) > length(col_vec)){
-    stop("Need to add more colours to col_vec to have one for each results component in res_list.")
+  if(!("list" %in% class(res_list))){
+    stop("res_list need to be a list of lists of MLE results.")
   }
 
-  if(!("list" %in% class(res_list[[1]]))){
-    stop("res_list need to be a list of lists of MLE results.")
+  if(!("size_spectrum_numeric" %in% class(res_list[[1]]))){
+    stop("res_list need to be a list of size_spectrum_numeric results.")
+  }
+
+
+  if(length(res_list) > length(col_vec)){
+    stop("Need to add more colours to col_vec to have one for each results component in res_list.")
   }
 
   S <- length(res_list)
