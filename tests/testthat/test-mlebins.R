@@ -153,6 +153,8 @@ test_that("Plotting of Figure B.20 works, and remove_hist",{
   expect_equal(remove_hist(strata_list,
                            remove_strata = "strata2")$strata1$b_mle,
                -2.99753213)
+  expect_error(remove_hist(strata_list,
+                           remove_strata = "nonexistent"))
 
   # No hist to remove:
   expect_equal(remove_hist(res_cephsmall_fg$mlebins_fit)$b_mle,
