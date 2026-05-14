@@ -3,7 +3,8 @@
 ##'
 ##' @param agg_list List of objects of class `determine_xmin_and_fit_mlebins`,
 ##'   from running `determine_xmin_and_fit_mlebins()` and then putting results
-##'   into one list (TODO see vignette).
+##'   into one list (TODO add example to vignette). If length 2 then assumed to
+##' be the fit and the histogram object, with no strata.
 ##' @param remove_strata vector of names of any strata to remove, each must be one of `names(agg_list)`.
 ##'
 ##' @return the input list but with the histogram information removed as well as
@@ -12,21 +13,26 @@
 ##' @author Andrew Edwards
 ##' @examples
 ##' \dontrun{
-##'
+##' remove_hist(res_cephsmall_fg)
 ##' }
 remove_hist <- function(agg_list,
                         remove_strata = NULL){
   return_agg <- list()
 
-  for(i in 1:length(agg_list)){
-    if("determine_xmin_and_fit_mlebins" %in% class(agg_list[[i]])){
-      return_agg[[i]] <- agg_list[[i]]$mlebins
-      # might need mlebin also if we create determine_xmin_and_fit_mlebin, or below TODO
-    } else {
-      return_agg[[i]] <- agg_list[[i]]    # presumably already the mlebins or mlebin results
+  if(length(agg_list) == 2 & class(agg_list[[2]]) == "histogram"){
+    # from determine_xmin_and_fit_mlebins on one strata
+    return_agg <- agg_list[[1]]
+    class(return_agg) <- class(agg_list[[1]])
+  } else
+    for(i in 1:length(agg_list)){     # many strata
+      if("determine_xmin_and_fit_mlebins" %in% class(agg_list[[i]])){
+        return_agg[[i]] <- agg_list[[i]]$mlebins
+        # might need mlebin also if we create determine_xmin_and_fit_mlebin, or below TODO
+      } else {
+        return_agg[[i]] <- agg_list[[i]]    # presumably already the mlebins or mlebin results
+      }
+      names(return_agg)[i] <- names(agg_list)[i]
     }
-    names(return_agg)[i] <- names(agg_list)[i]
-  }
 
   if(!is.null(remove_strata)){
     for(j in 1:length(remove_strata)){

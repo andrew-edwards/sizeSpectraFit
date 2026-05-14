@@ -141,4 +141,9 @@ test_that("Plotting of Figure B.20 works",{
                                        col_strata = "red"))
   expect_error(plot_multiple_exponents(quevedo_table_b1,
                                        pch_strata = 15))
+
+  expect_equal(class(remove_hist(res_cephsmall_fg)),
+               c("size_spectrum_mlebins",
+                 "list"))
+
 })
