@@ -25,6 +25,8 @@ test_that("MLEbin fitting and plotting works and matches original results", {
                                  x_min = 20,
                                  x_max = 15))
 
+  expect_error(fit_size_spectrum(sim_vec_binned,
+                                 strata = "hello"))
   expect_invisible(plot(res_mlebin))
   expect_invisible(plot(res_mlebin,
                         style = "both_y_axes"))
