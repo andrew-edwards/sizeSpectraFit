@@ -1,4 +1,4 @@
-##' TODO Print a Markdown summary table of main results from...  adapting from
+##' TODO Not done yet.Print a Markdown summary table of main results from...  adapting from
 ##' HDIanalysis. First make a generic one from ....and-fit.R, and just keep
 ##' calling that, extracting the correct mle results from each type of object
 ##'
@@ -24,5 +24,5 @@
 ##' summary_table(res_df)
 ##' }
 summary_mle_table <- function(obj, ...){
-  UseMethod("summary_mle_table")
+  # UseMethod("summary_mle_table")
 }

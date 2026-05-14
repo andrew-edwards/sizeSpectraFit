@@ -3,7 +3,8 @@
 test_that("fit_size_spectrum() works with different settings and matches previous results", {
   res_vec <- fit_size_spectrum(sim_vec)
 
-  expect_visible(res_vec)    # test print.size_spectrum_numeric
+  expect_invisible(print(res_vec))    # test print.size_spectrum_numeric,
+                                      # returns invisibly
 
   # Taking values from sizeSpectra vignette, for which we then simulation tested
   #  the code.

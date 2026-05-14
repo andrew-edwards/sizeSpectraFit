@@ -37,11 +37,13 @@ test_that("MLEbin fitting and plotting works and matches original results", {
   expect_invisible(plot(res_mlebin))
   expect_invisible(plot(res_mlebin,
                         style = "both_y_axes",
-                        rect_border_col = "red"))
+                        rect_border_col = "red",
+                        show_fit_on_top = FALSE))
   expect_invisible(plot(res_mlebin,
                         style = "biomass"))
   expect_invisible(plot(res_mlebin,
                         style = "biomass_and_log"))
+
 
   # Zero count in first bin, this currently passes but should fail if I fix the
   # function (see TODO's in it).
