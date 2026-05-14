@@ -63,6 +63,6 @@ test_that("plot.size_spectrum_numeric() works", {
   expect_invisible({
     plot(1:10, axes = FALSE)
     add_ticks()
-  }
+  })
 
 })
