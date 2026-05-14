@@ -73,4 +73,21 @@ test_that("fit_size_spectrum() works with different settings and matches previou
                                  x_min = 1,
                                  x_max = 0.5,
                                  sum_log_x = sum(log(sim_vec))))
+
+  # Test p_biomass_bins(), need to contrive some examples
+  res_vec_3 <- res_vec
+  res_vec_3$b_mle <- -1        # not tweaking conf so results likely meaningless
+
+  expect_equal(p_biomass_bins(res_vec_3)[2, ]$mle_biomass,
+               333.991968)
+
+  res_vec_4 <- res_vec
+  res_vec_4$b_mle <- -2
+
+  expect_equal(p_biomass_bins(res_vec_4)[2, ]$mle_biomass,
+               695.056023)
+
+  res_vec_5 <- res_vec
+  res_vec_5$x_min <- -77
+  expect_error(p_biomass_bins(res_vec_5))
 })
