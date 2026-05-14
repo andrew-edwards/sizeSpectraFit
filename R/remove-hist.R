@@ -19,7 +19,7 @@ remove_hist <- function(agg_list,
                         remove_strata = NULL){
   return_agg <- list()
 
-  if(length(agg_list) == 2 & class(agg_list[[2]]) == "histogram"){
+  if(length(agg_list) == 2 & names(agg_list[2]) == "h"){   # histogram
     # from determine_xmin_and_fit_mlebins on one strata
     return_agg <- agg_list[[1]]
     class(return_agg) <- class(agg_list[[1]])

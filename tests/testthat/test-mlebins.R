@@ -133,7 +133,7 @@ test_that("MLEbins fitting and plotting works and matches original results", {
 })
 
 
-test_that("Plotting of Figure B.20 works",{
+test_that("Plotting of Figure B.20 works, and remove_hist",{
   # Fig B.20:
   expect_invisible(plot_multiple_exponents(quevedo_table_b1,
                                            shade_first = TRUE))
@@ -145,5 +145,17 @@ test_that("Plotting of Figure B.20 works",{
   expect_equal(class(remove_hist(res_cephsmall_fg)),
                c("size_spectrum_mlebins",
                  "list"))
+
+  # Make up contrived list to test strata_remove
+  strata_list <- list(strata1 = res_cephsmall_fg,
+                      strata2 = res_cephsmall_fg)
+
+  expect_equal(remove_hist(strata_list,
+                           remove_strata = "strata2")$strata1$b_mle,
+               -2.99753213)
+
+  # No hist to remove:
+  expect_equal(remove_hist(res_cephsmall_fg$mlebins_fit)$b_mle,
+               -2.99753213)
 
 })
