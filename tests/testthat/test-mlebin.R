@@ -25,6 +25,12 @@ test_that("MLEbin fitting and plotting works and matches original results", {
                                  x_min = 20,
                                  x_max = 15))
 
+  sim_vec_binned_2 <- sim_vec_binned    # test error for x_min = min(bin_min)
+  sim_vec_binned_2[1,"bin_min"] <- 0
+  expect_error(fit_size_spectrum(sim_vec_binned_2))
+  expect_error(fit_size_spectrum(sim_vec_binned_2,
+                                 x_min = 0))    # different error to previous
+
   expect_error(fit_size_spectrum(sim_vec_binned,
                                  strata = "hello"))
   expect_invisible(plot(res_mlebin))
@@ -57,4 +63,7 @@ test_that("MLEbin fitting and plotting works and matches original results", {
   expect_error(determine_xmin_and_fit_mlebin(sim_vec_binned[-4, ]))
 
   # TODO need some outlier detection here?
+
+  expect_equal(make_hist(1:10)$breaks[10],
+               10)
 })

@@ -23,8 +23,9 @@
 ##' @author Andrew Edwards
 ##' @examples
 ##' \dontrun{
-##' TODO counts_per_bin_example
-##' make_hist(counts_per_bin_example)
+##' x <- 1:10
+##' make_hist(x)
+##'
 ##' TODO for test do
 ##' x <- 1:49
 ##' and make up other ones
@@ -41,7 +42,8 @@ make_hist <- function(x,
                 by = bin_width)
   # Given seq generates values up to the sequence value below `to`, this should
   #  ensure final bin has max(x) in it. But if max(x) is exactly a bin break,
-  #  need to remove the top 0 count. Doing below.
+  #  need to remove the top 0 count, since bins are ( , ].
+  # Doing below.
   h <- hist(x,
             breaks = breaks,
             plot = FALSE)
