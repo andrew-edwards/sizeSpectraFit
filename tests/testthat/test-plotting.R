@@ -6,7 +6,7 @@ test_that("plot.size_spectrum_numeric() works", {
 
   expect_invisible(plot(res_vec))
   expect_invisible(plot(res_vec, style = "log_y_axis"))
-  expect_invisible(plot(res_vec, style = "linear_y_axis"))
+  expect_invisible(plot(res_vec, style = "linear_y_axis", y_big_ticks = c(10, 57, 99)))
   expect_invisible(plot(res_vec, style = "both_y_axes"))
   expect_invisible(plot(res_vec, style = "biomass"))
   expect_invisible(plot(res_vec, style = "biomass_and_isd"))
