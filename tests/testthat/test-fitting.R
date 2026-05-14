@@ -20,6 +20,23 @@ test_that("fit_size_spectrum() works with different settings and matches previou
                                  x_max = 100)$b_mle,
                -2.02652123)
 
+  # Trying to force it hitting a bound but setting p way out, and test suppress_warnings
+  expect_equal(calc_mle_conf(neg_ll_mle_method,
+                             p = -10,
+                             vec = seq(-2, -1.9, by = 0.00001),  # -2 should be inside and
+                             # force the repeating of the conf calc, L() of function.
+                             vec_inc = 0.00001,
+                             x = sim_vec,
+                             n = length(sim_vec),
+                             x_min = min(sim_vec),
+                             x_max = max(sim_vec),
+                             sum_log_x = sum(log(sim_vec)),
+                             suppress_warnings = TRUE),
+               list(mle = -2.02969679,
+                    conf = c(-2.09742,
+                             -1.96431)))  # Not exactly same as different increments
+
+
   # To estimate xmin from the data
   set.seed(42)
   sim_vec_2 <- c(runif(100, 0.1, 10),
