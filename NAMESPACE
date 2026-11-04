@@ -67,44 +67,52 @@ export(remove_hist)
 export(remove_outliers)
 export(summary_mle_table)
 export(summary_mle_table.determine_xmin_and_fit)
-importFrom(dplyr,"%>%")
-importFrom(dplyr,anti_join)
-importFrom(dplyr,arrange)
-importFrom(dplyr,as_tibble)
-importFrom(dplyr,bind_rows)
-importFrom(dplyr,case_when)
-importFrom(dplyr,contains)
-importFrom(dplyr,full_join)
-importFrom(dplyr,group_by)
-importFrom(dplyr,inner_join)
-importFrom(dplyr,left_join)
-importFrom(dplyr,mutate)
-importFrom(dplyr,n)
-importFrom(dplyr,pull)
-importFrom(dplyr,rename)
-importFrom(dplyr,right_join)
-importFrom(dplyr,row_number)
-importFrom(dplyr,select)
-importFrom(dplyr,semi_join)
-importFrom(dplyr,summarise)
-importFrom(dplyr,tibble)
-importFrom(dplyr,ungroup)
-importFrom(graphics,abline)
-importFrom(graphics,axis)
-importFrom(graphics,box)
-importFrom(graphics,hist)
-importFrom(graphics,legend)
-importFrom(graphics,lines)
-importFrom(graphics,par)
-importFrom(graphics,plot.default)
-importFrom(graphics,points)
-importFrom(graphics,rect)
-importFrom(graphics,segments)
+importFrom(dplyr,
+  "%>%",
+  anti_join,
+  arrange,
+  as_tibble,
+  bind_rows,
+  case_when,
+  contains,
+  full_join,
+  group_by,
+  inner_join,
+  left_join,
+  mutate,
+  n,
+  pull,
+  rename,
+  right_join,
+  row_number,
+  select,
+  semi_join,
+  summarise,
+  tibble,
+  ungroup
+)
+importFrom(graphics,
+  abline,
+  axis,
+  box,
+  hist,
+  legend,
+  lines,
+  par,
+  plot.default,
+  points,
+  rect,
+  segments
+)
 importFrom(methods,hasArg)
-importFrom(stats,nlm)
-importFrom(stats,qchisq)
-importFrom(stats,runif)
-importFrom(tibble,add_column)
-importFrom(tibble,as_tibble)
-importFrom(tibble,tibble)
+importFrom(stats,
+  nlm,
+  qchisq,
+  runif
+)
+importFrom(tibble,
+  add_column,
+  as_tibble,
+  tibble
+)
 importFrom(utils,head)

@@ -16,9 +16,11 @@ make_hist_for_binned_counts(
 \arguments{
 \item{dat}{tibble of data in the format required for fitting
 using MLEbins methods; i.e. at a minimum has to include the columns:
-* \code{bin_min}
-* \code{bin_max}
-* \code{bin_count}.}
+\itemize{
+\item \code{bin_min}
+\item \code{bin_max}
+\item \code{bin_count}.
+}}
 
 \item{bin_width}{numeric bin width to fit a histogram to help determine x_min}
 

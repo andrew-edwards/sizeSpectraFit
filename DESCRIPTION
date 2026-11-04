@@ -16,7 +16,6 @@ Encoding: UTF-8
 LazyData: true
 LazyDataCompression: xz
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.3.3
 Remotes: github::andrew-edwards/sizeSpectraFit
 Imports:
     dplyr (>= 1.0.2),
@@ -31,3 +30,4 @@ VignetteBuilder: knitr
 Config/testthat/edition: 3
 Depends:
     R (>= 3.5)
+Config/roxygen2/version: 8.1.0

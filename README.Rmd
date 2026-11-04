@@ -34,7 +34,7 @@ library(badger)
 <!-- badges: start -->
 <!-- `r badge_lifecycle("under development", "orange")` connection timed out, -->
 <!-- 17/9/25, but extracting what's needed here, just does not link to a website-->
-`r badge_custom("lifecycle", "under development", color = "orange")`
+<!-- `r badge_custom("lifecycle", "under development", color = "orange")` -->
 [![R-CMD-check](https://github.com/andrew-edwards/sizeSpectraFit/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/andrew-edwards/sizeSpectraFit/actions/workflows/R-CMD-check.yaml)
 [![Codecov test coverage](https://codecov.io/gh/andrew-edwards/sizeSpectraFit/branch/main/graph/badge.svg)](https://app.codecov.io/gh/andrew-edwards/sizeSpectraFit?branch=main)
 ![Visitors](https://api.visitorbadge.io/api/visitors?path=https%3A%2F%2Fgithub.com%2Fandrew-edwards%2FsizeSpectraFit&label=VISITORS&countColor=%23263759&style=flat&labelStyle=lower)
@@ -42,8 +42,6 @@ library(badger)
 <!-- see data-raw/ for logo hexSticker code-->
 
 A streamlined R package for fitting size spectra to ecological data
-
-**Under development, though functions are all working and should remain back compatible**
 
 Monday 8th June 2026
 

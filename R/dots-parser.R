@@ -2,7 +2,10 @@
 ##'  without giving a warning.
 ##'
 ##' Taken from
-##'   https://stackoverflow.com/questions/4124900/is-there-a-way-to-use-two-statements-in-a-function-in-r. So within a larger function that has `...`, use this to send the appropriate values to two (or more) further functions. The values can go to both further functions.
+##'   https://stackoverflow.com/questions/4124900/is-there-a-way-to-use-two-statements-in-a-function-in-r. So
+##' within a larger function that has `...`, use this to send the appropriate
+##' values to two (or more) further functions. The values can go to both further
+##' functions. Copied into pacea also.
 ##' @param FUN function to be run with arguments from `...`
 ##' @param ... arguments to be passed onto `FUN`
 ##' @return appropriately evaluates `FUN`

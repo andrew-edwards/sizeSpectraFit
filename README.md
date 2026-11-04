@@ -18,7 +18,8 @@ save figures.
 
 <!-- 17/9/25, but extracting what's needed here, just does not link to a website-->
 
-![](https://img.shields.io/badge/lifecycle-under%20development-orange.svg)
+<!-- ![](https://img.shields.io/badge/lifecycle-under%20development-orange.svg) -->
+
 [![R-CMD-check](https://github.com/andrew-edwards/sizeSpectraFit/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/andrew-edwards/sizeSpectraFit/actions/workflows/R-CMD-check.yaml)
 [![Codecov test
 coverage](https://codecov.io/gh/andrew-edwards/sizeSpectraFit/branch/main/graph/badge.svg)](https://app.codecov.io/gh/andrew-edwards/sizeSpectraFit?branch=main)
@@ -26,9 +27,6 @@ coverage](https://codecov.io/gh/andrew-edwards/sizeSpectraFit/branch/main/graph/
 <!-- badges: end --> <!-- see data-raw/ for logo hexSticker code-->
 
 A streamlined R package for fitting size spectra to ecological data
-
-**Under development, though functions are all working and should remain
-back compatible**
 
 Monday 8th June 2026
 

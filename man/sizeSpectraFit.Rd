@@ -19,5 +19,10 @@ Useful links:
 \author{
 \strong{Maintainer}: A. M. Edwards \email{andrew.edwards@dfo-mpo.gc.ca} (\href{https://orcid.org/0000-0003-2749-8198}{ORCID})
 
+Authors:
+\itemize{
+  \item A. M. Edwards \email{andrew.edwards@dfo-mpo.gc.ca} (\href{https://orcid.org/0000-0003-2749-8198}{ORCID})
+}
+
 }
 \keyword{internal}
